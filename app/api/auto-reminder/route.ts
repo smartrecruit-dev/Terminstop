@@ -58,11 +58,21 @@ export async function GET() {
       if (appointmentDate > now && appointmentDate <= in24h) {
 
         try {
-          await client.messages.create({
-            body: `Reminder: Dein Termin ist am ${a.date} um ${a.time}`,
-            from: process.env.TWILIO_PHONE!,
-            to: formatPhone(a.phone)
-          })
+         // 🔥 Firmenname holen
+const { data: company } = await supabase
+  .from("companies")
+  .select("name")
+  .eq("id", a.company_id)
+  .single()
+
+const companyName = company?.name || "dem Unternehmen"
+
+// 🔥 SMS senden
+await client.messages.create({
+  body: `Reminder: Dein Termin bei ${companyName} ist morgen um ${a.time}`,
+  from: process.env.TWILIO_PHONE!,
+  to: formatPhone(a.phone)
+})
 
           await supabase
             .from("appointments")
