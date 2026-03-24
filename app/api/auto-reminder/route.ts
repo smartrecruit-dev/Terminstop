@@ -2,7 +2,7 @@ import { NextResponse } from "next/server"
 import { createClient } from "@supabase/supabase-js"
 import twilio from "twilio"
 
-// ✅ Supabase (Service Role)
+// ✅ Supabase
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -32,10 +32,6 @@ function formatPhone(phone: string) {
 export async function GET() {
   try {
     const now = new Date()
-    const in24h = new Date(now.getTime() + 24 * 60 * 60 * 1000)
-
-    console.log("NOW:", now.toISOString())
-    console.log("IN 24H:", in24h.toISOString())
 
     const { data, error } = await supabase
       .from("appointments")
@@ -52,17 +48,13 @@ export async function GET() {
     for (const a of data || []) {
 
       const appointmentDate = new Date(`${a.date}T${a.time}`)
+      const diffMs = appointmentDate.getTime() - now.getTime()
+      const diffHours = diffMs / (1000 * 60 * 60)
 
-      console.log("CHECK:", a.id, appointmentDate.toISOString())
-
-      // 🔥 STABILE LOGIK (KEIN ENGER ZEITRAHMEN MEHR)
-      if (
-        appointmentDate > now &&
-        appointmentDate <= in24h &&
-        !a.reminded
-      ) {
+      if (diffHours <= 24 && diffHours > 0) {
 
         try {
+
           // 🔥 Firmenname holen
           const { data: company } = await supabase
             .from("companies")
@@ -70,16 +62,27 @@ export async function GET() {
             .eq("id", a.company_id)
             .single()
 
-          const companyName = company?.name || "dem Unternehmen"
+          const companyName = company?.name || "unserem Unternehmen"
+
+          // 🔥 Kundenname
+          const customerName = a.name || "Kunde"
+
+          // 🔥 FINAL SMS TEXT
+          const message = `Hallo ${customerName} 👋
+
+wir möchten Sie daran erinnern, dass Ihr Termin bei ${companyName} morgen um ${a.time} Uhr stattfindet.
+
+Wir freuen uns auf Sie!
+Ihr Team von ${companyName} 😊`
 
           // 🔥 SMS senden
           await client.messages.create({
-            body: `Reminder: Dein Termin bei ${companyName} ist morgen um ${a.time}`,
+            body: message,
             from: process.env.TWILIO_PHONE!,
             to: formatPhone(a.phone)
           })
 
-          // 🔥 Als gesendet markieren
+          // 🔥 markieren
           await supabase
             .from("appointments")
             .update({ reminded: true })
@@ -93,15 +96,12 @@ export async function GET() {
           console.log("❌ TWILIO ERROR:", smsError)
         }
 
-      } else {
-        console.log("⏭️ SKIPPED:", a.id)
       }
     }
 
     return NextResponse.json({
       success: true,
-      sent: sentCount,
-      message: `${sentCount} SMS gesendet`
+      sent: sentCount
     })
 
   } catch (err) {
