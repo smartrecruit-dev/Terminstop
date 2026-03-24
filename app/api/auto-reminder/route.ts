@@ -50,30 +50,36 @@ export async function GET() {
     let sentCount = 0
 
     for (const a of data || []) {
+
       const appointmentDate = new Date(`${a.date}T${a.time}`)
 
       console.log("CHECK:", a.id, appointmentDate.toISOString())
 
-      // ✅ STABILES 24h FENSTER
-      if (appointmentDate > now && appointmentDate <= in24h) {
+      // 🔥 STABILE LOGIK (KEIN ENGER ZEITRAHMEN MEHR)
+      if (
+        appointmentDate > now &&
+        appointmentDate <= in24h &&
+        !a.reminded
+      ) {
 
         try {
-         // 🔥 Firmenname holen
-const { data: company } = await supabase
-  .from("companies")
-  .select("name")
-  .eq("id", a.company_id)
-  .single()
+          // 🔥 Firmenname holen
+          const { data: company } = await supabase
+            .from("companies")
+            .select("name")
+            .eq("id", a.company_id)
+            .single()
 
-const companyName = company?.name || "dem Unternehmen"
+          const companyName = company?.name || "dem Unternehmen"
 
-// 🔥 SMS senden
-await client.messages.create({
-  body: `Reminder: Dein Termin bei ${companyName} ist morgen um ${a.time}`,
-  from: process.env.TWILIO_PHONE!,
-  to: formatPhone(a.phone)
-})
+          // 🔥 SMS senden
+          await client.messages.create({
+            body: `Reminder: Dein Termin bei ${companyName} ist morgen um ${a.time}`,
+            from: process.env.TWILIO_PHONE!,
+            to: formatPhone(a.phone)
+          })
 
+          // 🔥 Als gesendet markieren
           await supabase
             .from("appointments")
             .update({ reminded: true })
