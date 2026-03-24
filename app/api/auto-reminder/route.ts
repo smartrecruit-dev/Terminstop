@@ -29,9 +29,19 @@ function formatPhone(phone: string) {
   return cleaned
 }
 
+// 🔥 ZEIT FIX (LOKAL, NICHT UTC)
+function parseLocalDate(date: string, time: string) {
+  const [year, month, day] = date.split("-").map(Number)
+  const [hour, minute] = time.split(":").map(Number)
+
+  return new Date(year, month - 1, day, hour, minute, 0)
+}
+
 export async function GET() {
   try {
     const now = new Date()
+
+    console.log("NOW:", now.toString())
 
     const { data, error } = await supabase
       .from("appointments")
@@ -47,11 +57,19 @@ export async function GET() {
 
     for (const a of data || []) {
 
-      const appointmentDate = new Date(`${a.date}T${a.time}`)
+      const appointmentDate = parseLocalDate(a.date, a.time)
+
       const diffMs = appointmentDate.getTime() - now.getTime()
       const diffHours = diffMs / (1000 * 60 * 60)
 
-      if (diffHours <= 24 && diffHours > 0) {
+      console.log("DEBUG:", {
+        id: a.id,
+        appointment: appointmentDate.toString(),
+        diffHours
+      })
+
+      // 🔥 ULTRA STABILE LOGIK
+      if (diffHours <= 24 && diffHours > -1) {
 
         try {
 
@@ -63,11 +81,8 @@ export async function GET() {
             .single()
 
           const companyName = company?.name || "unserem Unternehmen"
-
-          // 🔥 Kundenname
           const customerName = a.name || "Kunde"
 
-          // 🔥 FINAL SMS TEXT
           const message = `Hallo ${customerName} 👋
 
 wir möchten Sie daran erinnern, dass Ihr Termin bei ${companyName} morgen um ${a.time} Uhr stattfindet.
@@ -75,14 +90,12 @@ wir möchten Sie daran erinnern, dass Ihr Termin bei ${companyName} morgen um ${
 Wir freuen uns auf Sie!
 Ihr Team von ${companyName} 😊`
 
-          // 🔥 SMS senden
           await client.messages.create({
             body: message,
             from: process.env.TWILIO_PHONE!,
             to: formatPhone(a.phone)
           })
 
-          // 🔥 markieren
           await supabase
             .from("appointments")
             .update({ reminded: true })
@@ -96,6 +109,8 @@ Ihr Team von ${companyName} 😊`
           console.log("❌ TWILIO ERROR:", smsError)
         }
 
+      } else {
+        console.log("⏭️ SKIPPED:", a.id)
       }
     }
 
