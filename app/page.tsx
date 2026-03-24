@@ -273,61 +273,85 @@ export default function LandingPage() {
       </div>
 
       {/* PRICING */}
-      <div className="bg-white py-28">
+<div className="bg-white py-28">
 
-        <div className="max-w-6xl mx-auto px-10 text-center">
+  <div className="max-w-6xl mx-auto px-10 text-center">
 
-          <h2 className="text-3xl font-semibold mb-14">
-            Wählen Sie Ihr Paket
-          </h2>
+    <h2 className="text-3xl font-semibold mb-6">
+      Individuelle Lösungen für Ihr Unternehmen
+    </h2>
 
-          <div className="grid grid-cols-2 gap-10">
+    <p className="text-black/50 max-w-2xl mx-auto mb-14">
+      TerminStop wird individuell an Ihr Unternehmen angepasst – je nach Terminanzahl,
+      Auslastung und Anforderungen. So stellen wir sicher, dass Sie das Maximum aus Ihrem System herausholen.
+    </p>
 
-            <div className="border border-black/10 rounded-2xl p-10">
-              <div className="text-xl mb-2">Basic</div>
-              <div className="text-4xl font-semibold mb-2">39€</div>
-              <div className="text-sm text-black/40 mb-6">pro Monat</div>
+    <div className="grid grid-cols-2 gap-10">
 
-              <ul className="text-black/60 space-y-3 mb-8">
-                <li>✔ Terminverwaltung</li>
-                <li>✔ Automatische SMS</li>
-              </ul>
+      {/* BASIC */}
+      <div className="border border-black/10 rounded-2xl p-10">
 
-              <a href="/login" className="border border-black px-6 py-3 rounded-lg">
-                Starten
-              </a>
-            </div>
-
-            <div className="border-2 border-black rounded-2xl p-10 bg-black text-white shadow-lg">
-              <div className="text-xs mb-2 text-white/60">BELIEBTESTE WAHL</div>
-              <div className="text-xl mb-2">Pro</div>
-              <div className="text-4xl font-semibold mb-2">59€</div>
-              <div className="text-sm text-white/60 mb-6">pro Monat</div>
-
-              <ul className="text-white/80 space-y-3 mb-8">
-                <li>✔ Persönliche Betreuung</li>
-                <li>✔ Auswertungen</li>
-                <li>✔ Optimierung</li>
-              </ul>
-
-              <a href="/login" className="bg-white text-black px-6 py-3 rounded-lg">
-                Jetzt starten
-              </a>
-            </div>
-
-          </div>
-
+        <div className="text-xl mb-4 font-medium">
+          Für kleinere Betriebe
         </div>
 
+        <ul className="text-black/60 space-y-3 mb-8">
+          <li>✔ Automatische SMS-Erinnerungen</li>
+          <li>✔ Weniger Terminausfälle</li>
+          <li>✔ Einfache Einrichtung</li>
+        </ul>
+
+        <div className="text-sm text-black/40 mb-6">
+          Individuelle Preisgestaltung je nach Terminaufkommen
+        </div>
+
+        <a href="/login" className="border border-black px-6 py-3 rounded-lg">
+          Erstgespräch vereinbaren
+        </a>
+
       </div>
+
+      {/* PRO */}
+      <div className="border-2 border-black rounded-2xl p-10 bg-black text-white shadow-lg">
+
+        <div className="text-xs mb-2 text-white/60">
+          EMPFOHLEN
+        </div>
+
+        <div className="text-xl mb-4 font-medium">
+          Für wachsende Betriebe
+        </div>
+
+        <ul className="text-white/80 space-y-3 mb-8">
+          <li>✔ Persönliche Betreuung</li>
+          <li>✔ Auswertungen & Optimierung</li>
+          <li>✔ Maximale Auslastung</li>
+        </ul>
+
+        <div className="text-sm text-white/60 mb-6">
+          Individuelles Angebot im Erstgespräch
+        </div>
+
+        <a href="/login" className="bg-white text-black px-6 py-3 rounded-lg">
+          Beratung starten
+        </a>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
 
       {/* FOOTER */}
       <div className="text-center text-xs text-black/40 py-12 space-y-3">
         <div>TerminStop – Weniger Ausfälle. Mehr Umsatz.</div>
 
         <div className="flex justify-center gap-6">
-          <a href="#">Impressum</a>
-          <a href="#">Datenschutz</a>
+        <a href="/impressum">Impressum</a>
+<a href="/datenschutz">Datenschutz</a>
+<a href="/agb">AGB</a>
         </div>
       </div>
 

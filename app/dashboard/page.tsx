@@ -20,6 +20,10 @@ export default function Dashboard() {
 
   const [justAddedId, setJustAddedId] = useState<string | null>(null)
 
+  // 🔥 NEU: SMS STATES
+  const [monthlySMS, setMonthlySMS] = useState(0)
+  const [totalSMS, setTotalSMS] = useState(0)
+
   useEffect(() => {
     const storedId = localStorage.getItem("company_id")
     const storedName = localStorage.getItem("company_name")
@@ -47,6 +51,35 @@ export default function Dashboard() {
 
   useEffect(() => {
     loadAppointments()
+  }, [companyId])
+
+  // 🔥 NEU: SMS STATS
+  useEffect(() => {
+    async function loadSMSStats() {
+
+      if (!companyId) return
+
+      const now = new Date()
+      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
+
+      const { count: monthly } = await supabase
+        .from("appointments")
+        .select("*", { count: "exact", head: true })
+        .eq("company_id", companyId)
+        .not("sms_sent_at", "is", null)
+        .gte("sms_sent_at", startOfMonth.toISOString())
+
+      const { count: total } = await supabase
+        .from("appointments")
+        .select("*", { count: "exact", head: true })
+        .eq("company_id", companyId)
+        .not("sms_sent_at", "is", null)
+
+      setMonthlySMS(monthly || 0)
+      setTotalSMS(total || 0)
+    }
+
+    loadSMSStats()
   }, [companyId])
 
   async function handleSubmit(e:any){
@@ -80,7 +113,6 @@ export default function Dashboard() {
     window.location.href = "/login"
   }
 
-  // 🔥 ZEITLOGIK (nur ZUKUNFT)
   const now = new Date()
 
   const futureAppointments = appointments.filter(a => {
@@ -113,9 +145,8 @@ export default function Dashboard() {
 
       <div className="p-10 max-w-6xl mx-auto">
 
-        {/* 🔥 PERSONAL HEADER */}
+        {/* HEADER */}
         <div className="mb-10">
-
           <div className="text-sm text-black/40 mb-2">
             Willkommen zurück
           </div>
@@ -123,10 +154,9 @@ export default function Dashboard() {
           <h1 className="text-3xl font-semibold tracking-tight">
             {companyName || "Ihr Unternehmen"}
           </h1>
-
         </div>
 
-        {/* 🔥 HEUTE STATUS */}
+        {/* STATUS */}
         <div className="mb-10">
           <h2 className="text-xl font-medium mb-1">
             {todayCount > 0
@@ -139,6 +169,21 @@ export default function Dashboard() {
               ? `Nächster Termin um ${nextAppointment.time}`
               : "Keine Termine geplant"}
           </p>
+        </div>
+
+        {/* 🔥 SMS KPI */}
+        <div className="grid grid-cols-2 gap-6 mb-10">
+
+          <div className="bg-white p-6 rounded-xl">
+            <div className="text-sm text-black/40">SMS diesen Monat</div>
+            <div className="text-2xl font-semibold">{monthlySMS}</div>
+          </div>
+
+          <div className="bg-white p-6 rounded-xl">
+            <div className="text-sm text-black/40">SMS gesamt</div>
+            <div className="text-2xl font-semibold">{totalSMS}</div>
+          </div>
+
         </div>
 
         {/* KPI */}
@@ -175,7 +220,6 @@ export default function Dashboard() {
             headerToolbar={false}
             slotMinTime="06:00:00"
             slotMaxTime="22:00:00"
-
             events={appointments.map(a => {
               const start = new Date(`${a.date}T${a.time}`)
               const end = new Date(start.getTime() + 30 * 60000)

@@ -2,7 +2,7 @@ import { NextResponse } from "next/server"
 import { createClient } from "@supabase/supabase-js"
 import twilio from "twilio"
 
-// ✅ Supabase
+// ✅ Supabase (Service Role)
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -29,7 +29,7 @@ function formatPhone(phone: string) {
   return cleaned
 }
 
-// 🔥 ZEIT FIX (LOKAL, NICHT UTC)
+// 🕒 Lokale Zeit korrekt parsen
 function parseLocalDate(date: string, time: string) {
   const [year, month, day] = date.split("-").map(Number)
   const [hour, minute] = time.split(":").map(Number)
@@ -68,8 +68,8 @@ export async function GET() {
         diffHours
       })
 
-      // 🔥 ULTRA STABILE LOGIK
-      if (diffHours <= 24 && diffHours > -1) {
+      // 🔥 STABILES 24H FENSTER
+      if (diffHours <= 24 && diffHours > 0) {
 
         try {
 
@@ -90,15 +90,22 @@ wir möchten Sie daran erinnern, dass Ihr Termin bei ${companyName} morgen um ${
 Wir freuen uns auf Sie!
 Ihr Team von ${companyName} 😊`
 
-          await client.messages.create({
+          // 🔥 SMS senden
+          const result = await client.messages.create({
             body: message,
             from: process.env.TWILIO_PHONE!,
             to: formatPhone(a.phone)
           })
 
+          console.log("TWILIO RESULT:", result.sid)
+
+          // 🔥 TRACKING + DOPPEL-SCHUTZ
           await supabase
             .from("appointments")
-            .update({ reminded: true })
+            .update({
+              reminded: true,
+              sms_sent_at: new Date().toISOString()
+            })
             .eq("id", a.id)
 
           sentCount++
