@@ -20,7 +20,6 @@ export default function Dashboard() {
 
   const [justAddedId, setJustAddedId] = useState<string | null>(null)
 
-  // 🔥 NEU: SMS STATES
   const [monthlySMS, setMonthlySMS] = useState(0)
   const [totalSMS, setTotalSMS] = useState(0)
 
@@ -53,7 +52,6 @@ export default function Dashboard() {
     loadAppointments()
   }, [companyId])
 
-  // 🔥 NEU: SMS STATS
   useEffect(() => {
     async function loadSMSStats() {
 
@@ -89,7 +87,10 @@ export default function Dashboard() {
     const { data } = await supabase
       .from("appointments")
       .insert([{
-        name, phone, date, time,
+        name,
+        phone,
+        date,
+        time,
         status: "pending",
         company_id: companyId
       }])
@@ -132,7 +133,6 @@ export default function Dashboard() {
 
     <div className="min-h-screen bg-[#F7F7F5] text-black">
 
-      {/* NAVBAR */}
       <div className="flex justify-between items-center px-10 py-6 border-b border-black/5">
         <div className="flex gap-8 text-sm">
           <a href="/dashboard" className="font-medium">Dashboard</a>
@@ -145,7 +145,6 @@ export default function Dashboard() {
 
       <div className="p-10 max-w-6xl mx-auto">
 
-        {/* HEADER */}
         <div className="mb-10">
           <div className="text-sm text-black/40 mb-2">
             Willkommen zurück
@@ -156,7 +155,6 @@ export default function Dashboard() {
           </h1>
         </div>
 
-        {/* STATUS */}
         <div className="mb-10">
           <h2 className="text-xl font-medium mb-1">
             {todayCount > 0
@@ -171,7 +169,6 @@ export default function Dashboard() {
           </p>
         </div>
 
-        {/* 🔥 SMS KPI */}
         <div className="grid grid-cols-2 gap-6 mb-10">
 
           <div className="bg-white p-6 rounded-xl">
@@ -186,7 +183,6 @@ export default function Dashboard() {
 
         </div>
 
-        {/* KPI */}
         <div className="grid grid-cols-3 gap-6 mb-10">
 
           <div className="bg-white p-6 rounded-xl hover:shadow-md transition">
@@ -207,7 +203,6 @@ export default function Dashboard() {
 
         </div>
 
-        {/* MINI KALENDER */}
         <div className="bg-white p-6 rounded-xl mb-12">
 
           <div className="text-sm text-black/40 mb-4">Heute</div>
@@ -231,7 +226,6 @@ export default function Dashboard() {
 
         <div className="grid grid-cols-2 gap-12">
 
-          {/* FORM */}
           <div>
             <h2 className="text-lg mb-4">Neuer Termin</h2>
 
@@ -247,7 +241,6 @@ export default function Dashboard() {
             </form>
           </div>
 
-          {/* TERMINE */}
           <div>
 
             <h2 className="text-lg mb-4">Heute</h2>

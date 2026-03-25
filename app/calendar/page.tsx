@@ -1,17 +1,14 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import FullCalendar from "@fullcalendar/react"
-import timeGridPlugin from "@fullcalendar/timegrid"
-import interactionPlugin from "@fullcalendar/interaction"
-import deLocale from "@fullcalendar/core/locales/de"
 import { supabase } from "../lib/supabaseClient"
 
 export default function CalendarPage() {
 
-  const [events, setEvents] = useState<any[]>([])
+  const [appointments, setAppointments] = useState<any[]>([])
   const [companyId, setCompanyId] = useState<string | null>(null)
-  const [view, setView] = useState("timeGridDay")
+  const [view, setView] = useState<"day" | "week">("day")
+  const [selected, setSelected] = useState<any>(null)
 
   useEffect(() => {
     const storedId = localStorage.getItem("company_id")
@@ -19,8 +16,7 @@ export default function CalendarPage() {
     else setCompanyId(storedId)
   }, [])
 
-  async function loadAppointments(){
-
+  async function loadAppointments() {
     if (!companyId) return
 
     const { data } = await supabase
@@ -30,66 +26,43 @@ export default function CalendarPage() {
       .order("date", { ascending: true })
       .order("time", { ascending: true })
 
-    if(data){
-
-      const calendarEvents = data.map((a:any)=>{
-
-        const start = new Date(`${a.date}T${a.time}`)
-        const end = new Date(start.getTime() + 30 * 60000)
-
-        return {
-          id: a.id,
-          title: a.name,
-          start,
-          end
-        }
-
-      })
-
-      setEvents(calendarEvents)
-
-    }
-
+    if (data) setAppointments(data)
   }
 
-  useEffect(()=>{
+  useEffect(() => {
     loadAppointments()
-  },[companyId])
+  }, [companyId])
 
-  async function handleEventDrop(info:any){
+  async function toggleDone(a:any) {
+    const newStatus = a.status === "done" ? "pending" : "done"
 
-    const event = info.event
-    const newStart = new Date(event.start)
-
-    const newDate =
-      newStart.getFullYear() + "-" +
-      String(newStart.getMonth()+1).padStart(2,"0") + "-" +
-      String(newStart.getDate()).padStart(2,"0")
-
-    const newTime =
-      String(newStart.getHours()).padStart(2,"0") + ":" +
-      String(newStart.getMinutes()).padStart(2,"0")
-
-    const { error } = await supabase
+    await supabase
       .from("appointments")
-      .update({
-        date: newDate,
-        time: newTime
-      })
-      .eq("id", event.id)
+      .update({ status: newStatus })
+      .eq("id", a.id)
 
-    if(error){
-      alert("Fehler beim Verschieben")
-    } else {
-      loadAppointments()
-    }
-
+    loadAppointments()
   }
 
-  function handleLogout(){
+  function handleLogout() {
     localStorage.removeItem("company_id")
     window.location.href = "/login"
   }
+
+  const today = new Date()
+  const todayStr = today.toISOString().split("T")[0]
+
+  const hours = Array.from({ length: 15 }, (_, i) => i + 6)
+
+  const dayAppointments = appointments.filter(a => a.date === todayStr)
+
+  const doneToday = dayAppointments.filter(a => a.status === "done").length
+
+  const weekDays = Array.from({ length: 7 }, (_, i) => {
+    const d = new Date()
+    d.setDate(today.getDate() + i)
+    return d
+  })
 
   return (
 
@@ -97,92 +70,199 @@ export default function CalendarPage() {
 
       {/* NAVBAR */}
       <div className="flex justify-between items-center px-10 py-6 border-b border-black/5">
-
         <div className="flex gap-8 text-sm">
-          <a href="/dashboard" className="text-black/40 hover:text-black">
-            Dashboard
-          </a>
-          <a href="/calendar" className="font-medium">
-            Kalender
-          </a>
+          <a href="/dashboard" className="text-black/40">Dashboard</a>
+          <a href="/calendar" className="font-medium">Kalender</a>
         </div>
 
-        <button
-          onClick={handleLogout}
-          className="text-sm text-black/40 hover:text-black"
-        >
+        <button onClick={handleLogout} className="text-sm text-black/40">
           Logout
         </button>
-
       </div>
 
       <div className="p-10 max-w-6xl mx-auto">
 
         {/* HEADER */}
-        <div className="flex justify-between items-center mb-8">
+        <div className="flex justify-between items-center mb-6">
 
-          <h1 className="text-3xl font-semibold">
-            Kalender
-          </h1>
+          <div>
+            <h1 className="text-2xl font-semibold">
+              {view === "day" ? "Heute" : "Woche"}
+            </h1>
+            {view === "day" && (
+              <div className="text-sm text-black/40 mt-1">
+                {today.toLocaleDateString("de-DE", {
+                  weekday: "long",
+                  day: "numeric",
+                  month: "long"
+                })}
+              </div>
+            )}
+          </div>
 
-          {/* VIEW SWITCH */}
           <div className="flex gap-4 text-sm">
-
-            <button
-              onClick={()=>setView("timeGridDay")}
-              className={view === "timeGridDay" ? "font-medium" : "text-black/40"}
-            >
+            <button onClick={()=>setView("day")} className={view === "day" ? "font-medium" : "text-black/40"}>
               Tag
             </button>
-
-            <button
-              onClick={()=>setView("timeGridWeek")}
-              className={view === "timeGridWeek" ? "font-medium" : "text-black/40"}
-            >
+            <button onClick={()=>setView("week")} className={view === "week" ? "font-medium" : "text-black/40"}>
               Woche
             </button>
-
           </div>
 
         </div>
 
-        {/* CALENDAR */}
-        <div className="bg-white border border-black/5 rounded-xl p-4">
+        {/* DONE KPI */}
+        {view === "day" && (
+          <div className="mb-6 text-sm text-black/50">
+            {doneToday} Termine erledigt heute
+          </div>
+        )}
 
-          <FullCalendar
-            plugins={[timeGridPlugin, interactionPlugin]}
-            locale={deLocale}
+        {/* DAY VIEW */}
+        {view === "day" && (
 
-            initialView={view}
-            key={view} // wichtig für Wechsel
+          <div className="flex flex-col gap-5">
 
-            editable={true}
-            eventDrop={handleEventDrop}
+            {hours.map((hour) => {
 
-            slotMinTime="06:00:00"
-            slotMaxTime="22:00:00"
-            slotDuration="00:30:00"
+              const slot = dayAppointments.filter((a:any) => {
+                const h = parseInt(a.time.split(":")[0])
+                return h === hour
+              })
 
-            slotLabelFormat={{
-              hour: "2-digit",
-              minute: "2-digit",
-              hour12: false
-            }}
+              return (
+                <div key={hour} className="bg-white rounded-2xl p-5 border border-black/5 shadow-sm">
 
-            eventOverlap={false}
-            slotEventOverlap={false}
+                  <div className="text-sm text-black/40 mb-3">
+                    {hour}:00 – {hour}:59
+                  </div>
 
-            height="auto"
+                  {slot.length === 0 ? (
+                    <div className="text-black/20 text-sm">frei</div>
+                  ) : (
+                    <div className="flex flex-col gap-3">
 
-            events={events}
+                      {slot.map((a:any) => {
 
-          />
+                        const isDone = a.status === "done"
 
-        </div>
+                        return (
+                          <div
+                            key={a.id}
+                            onClick={() => setSelected(a)}
+                            className={`flex justify-between items-center px-4 py-3 rounded-xl cursor-pointer transition
+                              ${isDone
+                                ? "bg-green-100 text-green-700"
+                                : "bg-[#111827] text-white hover:bg-black"
+                              }`}
+                          >
+
+                            <div>
+                              <div className="font-medium">{a.name}</div>
+                              <div className="text-xs opacity-70">{a.time}</div>
+                            </div>
+
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                toggleDone(a)
+                              }}
+                              className={`text-xs px-3 py-1 rounded-lg
+                                ${isDone
+                                  ? "bg-green-600 text-white"
+                                  : "bg-white text-black"
+                                }`}
+                            >
+                              ✓
+                            </button>
+
+                          </div>
+                        )
+
+                      })}
+
+                    </div>
+                  )}
+
+                </div>
+              )
+            })}
+
+          </div>
+
+        )}
+
+        {/* WEEK VIEW */}
+        {view === "week" && (
+
+          <div className="grid grid-cols-7 gap-4">
+
+            {weekDays.map((day, i) => {
+
+              const dStr = day.toISOString().split("T")[0]
+              const items = appointments.filter(a => a.date === dStr)
+
+              return (
+                <div key={i} className="bg-white p-4 rounded-xl border border-black/5">
+
+                  <div className="text-xs text-black/40 mb-2">
+                    {day.toLocaleDateString("de-DE", { weekday: "short" })}
+                  </div>
+
+                  <div className="text-sm font-medium mb-3">
+                    {day.getDate()}
+                  </div>
+
+                  <div className="flex flex-col gap-2">
+
+                    {items.slice(0,4).map((a:any) => (
+                      <div key={a.id} className="text-xs bg-black/5 px-2 py-1 rounded">
+                        {a.time} • {a.name}
+                      </div>
+                    ))}
+
+                    {items.length > 4 && (
+                      <div className="text-xs text-black/40">
+                        +{items.length - 4}
+                      </div>
+                    )}
+
+                  </div>
+
+                </div>
+              )
+
+            })}
+
+          </div>
+
+        )}
 
       </div>
 
-    </div>
+      {/* POPUP */}
+      {selected && (
+        <div
+          className="fixed inset-0 bg-black/40 flex items-center justify-center"
+          onClick={() => setSelected(null)}
+        >
+          <div
+            className="bg-white p-6 rounded-xl w-80"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 className="text-lg font-semibold mb-2">{selected.name}</h2>
+            <p className="text-sm text-black/40 mb-4">{selected.time}</p>
 
+            <button
+              onClick={() => toggleDone(selected)}
+              className="w-full bg-black text-white py-2 rounded-lg text-sm"
+            >
+              Status ändern
+            </button>
+          </div>
+        </div>
+      )}
+
+    </div>
   )
 }
