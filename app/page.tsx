@@ -1,270 +1,283 @@
 "use client"
 
+import { useState, useEffect } from "react"
+
 export default function LandingPage() {
+
+  // ⭐ REVIEW STATE
+  const [reviewIndex, setReviewIndex] = useState(0)
+
+  const reviews = [
+    {
+      text: "Seit wir TerminStop nutzen, sind unsere Ausfälle massiv gesunken. Einfach ein No-Brainer.",
+      name: "Autohaus Müller GmbH",
+      stars: 5
+    },
+    {
+      text: "Super einfach, keine Einarbeitung nötig. Läuft einfach im Hintergrund.",
+      name: "Friseurstudio Elegance",
+      stars: 4
+    },
+    {
+      text: "Wir sparen täglich Zeit und unsere Termine werden endlich eingehalten.",
+      name: "Physiotherapie Berger",
+      stars: 5
+    },
+    {
+      text: "Hat unseren kompletten Ablauf verbessert. Weniger Stress, mehr Umsatz.",
+      name: "KFZ-Service Schneider",
+      stars: 4.5
+    },
+    {
+      text: "Genau das, was wir gebraucht haben. Simpel, aber extrem effektiv.",
+      name: "Studio BeautyLine",
+      stars: 5
+    },
+  ]
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setReviewIndex((prev) => (prev + 1) % reviews.length)
+    }, 4000)
+    return () => clearInterval(interval)
+  }, [])
+
+  const renderStars = (stars:number) => {
+    if (stars === 5) return "★★★★★"
+    if (stars === 4.5) return "★★★★☆"
+    if (stars === 4) return "★★★★☆"
+    return "★★★★☆"
+  }
+
   return (
     <div className="min-h-screen bg-[#F7F7F5] text-black">
 
       {/* NAVBAR */}
       <div className="flex justify-between items-center px-16 py-6 border-b border-black/5">
-        <div className="text-sm tracking-wide text-black/60">
-          TerminStop
-        </div>
+        <div className="text-sm font-medium text-black/60">TerminStop</div>
         <a href="/login" className="text-sm text-black/50 hover:text-black">
           Login
         </a>
       </div>
 
       {/* HERO */}
-      <div className="max-w-7xl mx-auto px-10 py-32 grid grid-cols-2 gap-24 items-center">
+      <div className="max-w-5xl mx-auto px-10 py-36 text-center">
+        <h1 className="text-6xl font-semibold mb-8 leading-tight">
+          Termine, die eingehalten werden.
+        </h1>
+
+        <p className="text-xl text-black/60 mb-10">
+          Automatische Erinnerungen sorgen dafür, dass Ihre Kunden erscheinen –
+          und Ihr Alltag planbar bleibt.
+        </p>
+
+        <a href="/lead" className="bg-black text-white px-10 py-4 rounded-xl hover:scale-105 transition">
+          Kostenlose Beratung sichern
+        </a>
+      </div>
+
+      {/* IMAGE + TEXT */}
+      <div className="max-w-7xl mx-auto px-10 py-24 grid grid-cols-2 gap-20 items-center">
 
         <div>
-          <h1 className="text-6xl font-semibold leading-tight mb-8">
-            Keine Terminausfälle mehr.
-          </h1>
+          <h2 className="text-3xl font-semibold mb-6">
+            Weniger Chaos im Alltag
+          </h2>
 
-          <p className="text-xl text-black/50 mb-6">
-            TerminStop sorgt dafür, dass Ihre Kunden zuverlässig erscheinen –
-            durch automatische SMS-Erinnerungen.
+          <p className="text-black/60 text-lg mb-6">
+            Terminausfälle bringen Ihren gesamten Tag durcheinander.
           </p>
 
-          <p className="text-lg text-black/40 mb-10">
-            Für Friseure, Werkstätten und Dienstleister mit Terminen.
+          <p className="text-black/50">
+            TerminStop erinnert Ihre Kunden automatisch –
+            bevor der Termin stattfindet.
           </p>
-
-          <a href="/login" className="bg-black text-white px-8 py-4 rounded-xl text-sm inline-block">
-            Jetzt starten
-          </a>
         </div>
 
         <div>
           <img
             src="https://images.unsplash.com/photo-1521791136064-7986c2920216"
-            className="rounded-2xl shadow-lg"
+            className="rounded-2xl shadow-lg w-full object-cover"
           />
         </div>
 
       </div>
 
-      {/* TRUST NUMBERS */}
-      <div className="max-w-5xl mx-auto grid grid-cols-3 text-center py-16 text-sm text-black/50">
-        <div>
-          <div className="text-2xl font-semibold text-black">50+</div>
-          Unternehmen
-        </div>
-        <div>
-          <div className="text-2xl font-semibold text-black">1000+</div>
-          Erinnerungen / Monat
-        </div>
-        <div>
-          <div className="text-2xl font-semibold text-black">-70%</div>
-          Ausfälle
-        </div>
-      </div>
+      {/* PHONE + TEXT */}
+      <div className="max-w-7xl mx-auto px-10 py-28 grid grid-cols-2 gap-20 items-center">
 
-      {/* 🖥️ WAS IST TERMINSTOP */}
-      <div className="max-w-7xl mx-auto px-10 py-28 grid grid-cols-2 gap-24 items-center">
+        <div className="flex justify-center">
+          <div className="bg-black p-3 rounded-[40px] shadow-2xl">
+            <div className="bg-[#f2f2f7] w-[300px] h-[600px] rounded-[32px] relative overflow-hidden">
+
+              <div className="absolute top-[120px] left-1/2 -translate-x-1/2 w-[90%] bg-white rounded-xl shadow p-3">
+
+                <div className="text-[10px] text-black/40 mb-1">
+                  TerminStop
+                </div>
+
+                <div className="text-xs leading-snug">
+                  Sehr geehrter Herr Mustermann,<br />
+                  wir erinnern Sie an Ihren Termin morgen um 10:00 Uhr.<br /><br />
+                  Wir freuen uns auf Sie.<br />
+                  Ihr Team der Mustermann GmbH
+                </div>
+
+              </div>
+
+            </div>
+          </div>
+        </div>
 
         <div>
           <h2 className="text-3xl font-semibold mb-6">
-            Was ist TerminStop?
+            Individuell angepasst
           </h2>
 
-          <p className="text-black/60 text-lg leading-relaxed mb-6">
-            TerminStop ist ein einfaches System für Unternehmen,
-            die mit Terminen arbeiten.
+          <p className="text-black/60 text-lg mb-6">
+            Jede Nachricht wird an Ihr Unternehmen angepasst –
+            professionell und persönlich.
           </p>
 
-          <p className="text-black/60 text-lg leading-relaxed mb-6">
-            Sie tragen einen Termin ein – und Ihr Kunde erhält automatisch
-            eine Erinnerung per SMS.
+          <p className="text-black/50">
+            So fühlen sich Ihre Kunden angesprochen und erscheinen zuverlässiger.
           </p>
-
-          <p className="text-black/60 text-lg leading-relaxed">
-            So vermeiden Sie Ausfälle, sparen Zeit
-            und steigern Ihren Umsatz.
-          </p>
-
         </div>
+
+      </div>
+
+      {/* BENEFITS */}
+      <div className="max-w-6xl mx-auto px-10 py-24 grid grid-cols-3 gap-12 text-center">
+
+        <div>
+          <div className="text-lg font-medium mb-2">📅 Planbarkeit</div>
+          <div className="text-black/50 text-sm">
+            Strukturierte Tage ohne Lücken
+          </div>
+        </div>
+
+        <div>
+          <div className="text-lg font-medium mb-2">⏱ Zeit sparen</div>
+          <div className="text-black/50 text-sm">
+            Kein Nachtelefonieren mehr
+          </div>
+        </div>
+
+        <div>
+          <div className="text-lg font-medium mb-2">💰 Mehr Umsatz</div>
+          <div className="text-black/50 text-sm">
+            Weniger Ausfälle
+          </div>
+        </div>
+
+      </div>
+
+      {/* 🤝 TEAM / TRUST */}
+      <div className="max-w-7xl mx-auto px-10 py-28 grid grid-cols-2 gap-20 items-center">
 
         <div>
           <img
-            src="https://images.unsplash.com/photo-1460925895917-afdab827c52f"
-            className="rounded-2xl shadow-lg"
+            src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d"
+            className="rounded-2xl shadow-lg w-full object-cover"
           />
         </div>
 
-      </div>
-
-      {/* ⚙️ HOW IT WORKS */}
-      <div className="bg-white py-24">
-
-        <div className="max-w-6xl mx-auto px-10 text-center">
-
-          <h2 className="text-3xl font-semibold mb-12">
-            So einfach funktioniert es
-          </h2>
-
-          <div className="grid grid-cols-3 gap-10 text-sm">
-
-            <div>
-              <div className="text-4xl mb-3">📅</div>
-              Termin eintragen
-            </div>
-
-            <div>
-              <div className="text-4xl mb-3">📲</div>
-              SMS wird automatisch gesendet
-            </div>
-
-            <div>
-              <div className="text-4xl mb-3">✅</div>
-              Kunde erscheint
-            </div>
-
-          </div>
-
-        </div>
-
-      </div>
-
-      {/* 🔥 CASE STUDY */}
-      <div className="bg-white py-24 border-y border-black/5">
-
-        <div className="max-w-5xl mx-auto px-10 text-center">
-
-          <h2 className="text-3xl font-semibold mb-10">
-            Ergebnis aus der Praxis
-          </h2>
-
-          <div className="bg-[#F7F7F5] p-10 rounded-2xl border border-black/5">
-
-            <div className="text-lg font-medium mb-4">
-              Friseursalon Elegance
-            </div>
-
-            <div className="grid grid-cols-3 gap-6 text-sm text-black/60">
-
-              <div>
-                <div className="font-medium text-black">Vorher</div>
-                6–8 Ausfälle / Woche
-              </div>
-
-              <div>
-                <div className="font-medium text-black">Nachher</div>
-                1–2 Ausfälle / Woche
-              </div>
-
-              <div>
-                <div className="font-medium text-black">Ergebnis</div>
-                +1.000€ – 1.500€ zusätzlicher Umsatz / Monat
-              </div>
-
-            </div>
-
-          </div>
-
-        </div>
-
-      </div>
-
-      {/* 💥 ERFOLGSGARANTIE */}
-      <div className="bg-white py-28 border-y border-black/5">
-
-        <div className="max-w-6xl mx-auto px-10 text-center">
-
+        <div>
           <h2 className="text-3xl font-semibold mb-6">
-            100% risikofrei – unsere Geld-zurück-Garantie
+            Persönlicher Support
           </h2>
 
-          <p className="text-black/60 text-lg max-w-2xl mx-auto mb-12">
-            Wir sind überzeugt, dass TerminStop Ihre Terminausfälle deutlich reduziert.
-            Sollten Sie keinen spürbaren Unterschied feststellen,
-            erhalten Sie Ihr Geld vollständig zurück.
+          <p className="text-black/60 text-lg mb-6">
+            Wir begleiten Sie bei der Einrichtung und stehen Ihnen jederzeit zur Seite.
           </p>
 
-          {/* Diagramm */}
-          <div className="flex justify-center gap-16 items-end mb-8">
+          <p className="text-black/50">
+            Kein anonymer Support – sondern echte Unterstützung,
+            wenn Sie sie brauchen.
+          </p>
+        </div>
 
-            <div className="text-center">
-              <div className="h-40 w-20 bg-black/10 rounded-lg"></div>
-              <div className="text-xs mt-2 text-black/40">Ohne TerminStop</div>
-            </div>
+      </div>
 
-            <div className="text-center">
-              <div className="h-16 w-20 bg-black rounded-lg"></div>
-              <div className="text-xs mt-2 text-black/40">Mit TerminStop</div>
-            </div>
+      {/* 📊 COMPARISON TABLE */}
+      <div className="max-w-5xl mx-auto px-10 py-28">
 
-          </div>
+        <h2 className="text-3xl font-semibold text-center mb-16">
+          Der Unterschied im Alltag
+        </h2>
 
-          <div className="text-sm text-black/40">
-            Weniger Ausfälle – mehr planbare Termine
+        <div className="overflow-hidden rounded-2xl border border-black/10">
+
+          <div className="grid grid-cols-3 text-sm">
+
+            <div className="p-6 font-medium text-black/50">Funktion</div>
+            <div className="p-6 text-black/50">Ohne TerminStop</div>
+            <div className="p-6 bg-black text-white">TerminStop</div>
+
+            {[
+              ["Erinnerungen", "❌", "✔"],
+              ["Weniger Ausfälle", "❌", "✔"],
+              ["Zeitersparnis", "❌", "✔"],
+              ["Automatisierung", "❌", "✔"],
+              ["Planbarkeit", "⚠️", "✔"]
+            ].map((row, i) => (
+              <div key={i} className="contents">
+                <div className="p-6 border-t border-black/5">{row[0]}</div>
+                <div className="p-6 border-t border-black/5 text-black/40">{row[1]}</div>
+                <div className="p-6 border-t border-black/5 bg-black/5 font-medium">{row[2]}</div>
+              </div>
+            ))}
+
           </div>
 
         </div>
 
       </div>
 
-      {/* 🔥 VERGLEICH */}
-      <div className="bg-white border-y border-black/5 py-28">
+      {/* ⭐ REVIEWS */}
+      <div className="max-w-6xl mx-auto px-10 py-28">
 
-        <div className="max-w-5xl mx-auto px-10">
+        <h2 className="text-3xl font-semibold text-center mb-16">
+          Vertrauen von Unternehmen
+        </h2>
 
-          <h2 className="text-3xl font-semibold text-center mb-16">
-            Der Unterschied im Alltag
-          </h2>
+        <div className="overflow-hidden">
 
-          <div className="overflow-hidden rounded-2xl border border-black/10">
+          <div
+            className="flex gap-6 transition-transform duration-700"
+            style={{
+              transform: `translateX(-${reviewIndex * 33.333}%)`
+            }}
+          >
 
-            <div className="grid grid-cols-3 text-sm">
+            {reviews.map((r, i) => (
+              <div
+                key={i}
+                className="min-w-[33.333%] bg-white border border-black/10 rounded-2xl p-6 shadow-sm"
+              >
 
-              <div className="p-6 font-medium text-black/50">Funktion</div>
-              <div className="p-6 text-black/50">Andere</div>
-              <div className="p-6 bg-black text-white">TerminStop</div>
-
-              {[
-                ["Automatische Erinnerung", "❌", "✔"],
-                ["Weniger Ausfälle", "❌", "✔"],
-                ["Zeit sparen", "❌", "✔"],
-                ["Einfache Bedienung", "⚠️", "✔"],
-                ["Support", "❌", "✔"]
-              ].map((row, i) => (
-                <div key={i} className="contents">
-                  <div className="p-6 border-t border-black/5">{row[0]}</div>
-                  <div className="p-6 border-t border-black/5 text-black/40">{row[1]}</div>
-                  <div className="p-6 border-t border-black/5 bg-black/5 font-medium">{row[2]}</div>
+                <div className="text-yellow-500 text-sm mb-3">
+                  {renderStars(r.stars)}
                 </div>
-              ))}
 
-            </div>
+                <p className="text-black/70 text-sm mb-6">
+                  "{r.text}"
+                </p>
 
-          </div>
+                <div className="flex items-center gap-3">
 
-        </div>
+                  <div className="w-10 h-10 bg-black text-white flex items-center justify-center rounded-full text-xs">
+                    {r.name.charAt(0)}
+                  </div>
 
-      </div>
+                  <div className="text-xs text-black/60">
+                    {r.name}
+                  </div>
 
-      {/* 🤝 TEAM */}
-      <div className="bg-white py-28">
+                </div>
 
-        <div className="max-w-6xl mx-auto px-10 grid grid-cols-2 gap-20 items-center">
-
-          <div>
-            <img
-              src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d"
-              className="rounded-2xl shadow-md"
-            />
-          </div>
-
-          <div>
-            <h2 className="text-3xl font-semibold mb-6">
-              Persönliche Unterstützung
-            </h2>
-
-            <p className="text-black/60 text-lg leading-relaxed">
-              Wir unterstützen Sie dabei, Ihr System optimal zu nutzen
-              und Ihre Termine effizient zu organisieren.
-            </p>
+              </div>
+            ))}
 
           </div>
 
@@ -272,86 +285,45 @@ export default function LandingPage() {
 
       </div>
 
-      {/* PRICING */}
-<div className="bg-white py-28">
+      {/* TEXT BLOCK */}
+      <div className="max-w-3xl mx-auto text-center px-6 pb-24">
 
-  <div className="max-w-6xl mx-auto px-10 text-center">
+        <p className="text-black/60 text-lg leading-relaxed">
+          TerminStop ist kein kompliziertes System –
+          sondern eine einfache Lösung für ein echtes Problem.
+        </p>
 
-    <h2 className="text-3xl font-semibold mb-6">
-      Individuelle Lösungen für Ihr Unternehmen
-    </h2>
+      </div>
 
-    <p className="text-black/50 max-w-2xl mx-auto mb-14">
-      TerminStop wird individuell an Ihr Unternehmen angepasst – je nach Terminanzahl,
-      Auslastung und Anforderungen. So stellen wir sicher, dass Sie das Maximum aus Ihrem System herausholen.
-    </p>
+      {/* 🔥 FINAL CTA UPGRADE */}
+      <div className="text-center py-32 px-6">
 
-    <div className="grid grid-cols-2 gap-10">
+        <h2 className="text-4xl font-semibold mb-6">
+          Machen Sie Ihre Termine endlich planbar.
+        </h2>
 
-      {/* BASIC */}
-      <div className="border border-black/10 rounded-2xl p-10">
+        <p className="text-black/60 text-lg mb-6 max-w-xl mx-auto">
+          Weniger Ausfälle, weniger Stress – und volle Kontrolle über Ihren Tag.
+        </p>
 
-        <div className="text-xl mb-4 font-medium">
-          Für kleinere Betriebe
-        </div>
+        <p className="text-black/40 text-sm mb-10">
+          Unverbindlich. Schnell eingerichtet. Sofort einsatzbereit.
+        </p>
 
-        <ul className="text-black/60 space-y-3 mb-8">
-          <li>✔ Automatische SMS-Erinnerungen</li>
-          <li>✔ Weniger Terminausfälle</li>
-          <li>✔ Einfache Einrichtung</li>
-        </ul>
-
-        <div className="text-sm text-black/40 mb-6">
-          Individuelle Preisgestaltung je nach Terminaufkommen
-        </div>
-
-        <a href="/login" className="border border-black px-6 py-3 rounded-lg">
-          Erstgespräch vereinbaren
+        <a href="/lead" className="bg-black text-white px-12 py-4 rounded-xl hover:scale-105 transition shadow-lg">
+          Jetzt kostenlose Beratung sichern
         </a>
 
       </div>
-
-      {/* PRO */}
-      <div className="border-2 border-black rounded-2xl p-10 bg-black text-white shadow-lg">
-
-        <div className="text-xs mb-2 text-white/60">
-          EMPFOHLEN
-        </div>
-
-        <div className="text-xl mb-4 font-medium">
-          Für wachsende Betriebe
-        </div>
-
-        <ul className="text-white/80 space-y-3 mb-8">
-          <li>✔ Persönliche Betreuung</li>
-          <li>✔ Auswertungen & Optimierung</li>
-          <li>✔ Maximale Auslastung</li>
-        </ul>
-
-        <div className="text-sm text-white/60 mb-6">
-          Individuelles Angebot im Erstgespräch
-        </div>
-
-        <a href="/login" className="bg-white text-black px-6 py-3 rounded-lg">
-          Beratung starten
-        </a>
-
-      </div>
-
-    </div>
-
-  </div>
-
-</div>
 
       {/* FOOTER */}
       <div className="text-center text-xs text-black/40 py-12 space-y-3">
         <div>TerminStop – Weniger Ausfälle. Mehr Umsatz.</div>
 
         <div className="flex justify-center gap-6">
-        <a href="/impressum">Impressum</a>
-<a href="/datenschutz">Datenschutz</a>
-<a href="/agb">AGB</a>
+          <a href="/impressum">Impressum</a>
+          <a href="/datenschutz">Datenschutz</a>
+          <a href="/agb">AGB</a>
         </div>
       </div>
 
