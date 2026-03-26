@@ -31,44 +31,72 @@ export default function Dashboard() {
   async function loadAppointments() {
     if (!companyId) return
 
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from("appointments")
       .select("*")
       .eq("company_id", companyId)
       .order("date", { ascending: true })
       .order("time", { ascending: true })
 
+    if (error) {
+      console.log("LOAD ERROR:", error)
+      return
+    }
+
     if (data) setAppointments(data)
   }
 
   useEffect(() => {
-    loadAppointments()
+    if (companyId) loadAppointments()
   }, [companyId])
 
   async function toggleDone(a:any) {
     const newStatus = a.status === "done" ? "pending" : "done"
 
-    await supabase
+    const { error } = await supabase
       .from("appointments")
       .update({ status: newStatus })
       .eq("id", a.id)
+
+    if (error) {
+      console.log("UPDATE ERROR:", error)
+    }
 
     loadAppointments()
   }
 
   async function handleSubmit(e:any){
     e.preventDefault()
-    if (!companyId) return
 
-    const { data } = await supabase.from("appointments").insert([{
-      name,
-      phone,
-      date,
-      time,
-      note,
-      status: "pending",
-      company_id: companyId
-    }]).select()
+    if (!companyId) {
+      console.log("NO COMPANY ID")
+      return
+    }
+
+    if (!name || !phone || !date || !time) {
+      console.log("FEHLENDE FELDER")
+      return
+    }
+
+    const { data, error } = await supabase
+      .from("appointments")
+      .insert([{
+        name,
+        phone,
+        date,
+        time,
+        status: "pending",
+        company_id: companyId
+      }])
+      .select()
+
+    console.log("INSERT DATA:", data)
+    console.log("INSERT ERROR:", error)
+
+    if (error) {
+      alert("Fehler beim Speichern")
+      return
+    }
 
     if (data) {
       setJustAddedId(data[0].id)
@@ -109,21 +137,17 @@ export default function Dashboard() {
     <div className="min-h-screen bg-[#F7F7F5] text-black">
 
       {/* NAV */}
-     <div className="flex justify-between items-center px-12 py-6 border-b border-black/5">
-  <div className="flex gap-6 text-sm">
-    <a href="/dashboard" className="font-medium">Dashboard</a>
-    <a href="/calendar" className="text-black/40 hover:text-black transition">
-      Kalender
-    </a>
-    <a href="/insights" className="text-black/40 hover:text-black transition">
-      Einblicke
-    </a>
-  </div>
+      <div className="flex justify-between items-center px-12 py-6 border-b border-black/5">
+        <div className="flex gap-6 text-sm">
+          <a href="/dashboard" className="font-medium">Dashboard</a>
+          <a href="/calendar" className="text-black/40 hover:text-black transition">Kalender</a>
+          <a href="/insights" className="text-black/40 hover:text-black transition">Einblicke</a>
+        </div>
 
-  <button onClick={handleLogout} className="text-sm text-black/40 hover:text-black transition">
-    Logout
-  </button>
-</div>
+        <button onClick={handleLogout} className="text-sm text-black/40 hover:text-black transition">
+          Logout
+        </button>
+      </div>
 
       <div className="max-w-5xl mx-auto px-8 py-16">
 
@@ -142,11 +166,9 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* 🔥 FOKUS BLOCK */}
+        {/* FOKUS */}
         <div className="mb-10 bg-white p-6 rounded-xl border border-black/5">
-          <div className="text-xs text-black/40 mb-2">
-            Heute im Fokus
-          </div>
+          <div className="text-xs text-black/40 mb-2">Heute im Fokus</div>
 
           <div className="text-lg font-medium mb-1">
             {filteredAppointments.length} Termine
@@ -158,56 +180,36 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* 🔥 NEXT APPOINTMENT */}
+        {/* NEXT */}
         {nextOpen && (
           <div className="mb-10 bg-white p-5 rounded-xl border border-black/5">
-            <div className="text-xs text-black/40 mb-1">
-              Nächster Termin
-            </div>
-
-            <div className="text-lg font-medium">
-              {nextOpen.name}
-            </div>
-
-            <div className="text-sm text-black/40">
-              {nextOpen.time}
-            </div>
+            <div className="text-xs text-black/40 mb-1">Nächster Termin</div>
+            <div className="text-lg font-medium">{nextOpen.name}</div>
+            <div className="text-sm text-black/40">{nextOpen.time}</div>
           </div>
         )}
 
         <div className="grid grid-cols-2 gap-20">
 
-          {/* TERMINE */}
+          {/* LISTE */}
           <div className="flex flex-col gap-4">
-
-            {filteredAppointments.length === 0 && (
-              <div className="text-black/30 text-sm">
-                Aktuell keine relevanten Termine 👍
-              </div>
-            )}
-
             {filteredAppointments.map((a:any) => {
 
               const isDone = a.status === "done"
               const isNew = a.id === justAddedId
 
               return (
-                <div
-                  key={a.id}
+                <div key={a.id}
                   className={`
                     flex items-center justify-between
                     px-4 py-3 rounded-xl
                     transition-all duration-500
                     ${isDone ? "opacity-40" : "hover:bg-black/5"}
                     ${isNew ? "animate-[fadeInUp_0.4s_ease]" : ""}
-                  `}
-                >
+                  `}>
 
                   <div className="flex gap-4 items-center">
-
-                    <div className="text-sm text-black/40 w-14">
-                      {a.time}
-                    </div>
+                    <div className="text-sm text-black/40 w-14">{a.time}</div>
 
                     <div>
                       <div className={`text-lg ${isDone ? "line-through" : ""}`}>
@@ -215,80 +217,49 @@ export default function Dashboard() {
                       </div>
 
                       {a.note && (
-                        <div className="text-xs text-black/40">
-                          {a.note}
-                        </div>
+                        <div className="text-xs text-black/40">{a.note}</div>
                       )}
                     </div>
-
                   </div>
 
                   <button
                     onClick={() => toggleDone(a)}
-                    className={`
-                      w-5 h-5 rounded-full border transition
-                      ${isDone
-                        ? "bg-green-500 border-green-500"
-                        : "border-black/20 hover:border-black"
-                      }
-                    `}
+                    className={`w-5 h-5 rounded-full border transition ${
+                      isDone ? "bg-green-500 border-green-500" : "border-black/20 hover:border-black"
+                    }`}
                   />
-
                 </div>
               )
-
             })}
-
           </div>
 
           {/* FORM */}
           <div>
-
-            <h2 className="text-lg mb-4">
-              Neuer Termin
-            </h2>
+            <h2 className="text-lg mb-4">Neuer Termin</h2>
 
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
 
-              <input className="border-b p-2 bg-transparent focus:outline-none focus:border-black" placeholder="Name" value={name} onChange={(e)=>setName(e.target.value)} />
+              <input className="border-b p-2 bg-transparent" placeholder="Name" value={name} onChange={(e)=>setName(e.target.value)} />
+              <input className="border-b p-2 bg-transparent" placeholder="Telefon" value={phone} onChange={(e)=>setPhone(e.target.value)} />
+              <input className="border-b p-2 bg-transparent" type="date" value={date} onChange={(e)=>setDate(e.target.value)} />
+              <input className="border-b p-2 bg-transparent" type="time" value={time} onChange={(e)=>setTime(e.target.value)} />
 
-              <input className="border-b p-2 bg-transparent focus:outline-none focus:border-black" placeholder="Telefon" value={phone} onChange={(e)=>setPhone(e.target.value)} />
-
-              <input className="border-b p-2 bg-transparent focus:outline-none focus:border-black" type="date" value={date} onChange={(e)=>setDate(e.target.value)} />
-
-              <input className="border-b p-2 bg-transparent focus:outline-none focus:border-black" type="time" value={time} onChange={(e)=>setTime(e.target.value)} />
-
-              <input
-                className="border-b p-2 bg-transparent focus:outline-none focus:border-black"
+              <input className="border-b p-2 bg-transparent"
                 placeholder="Notiz (optional)"
                 value={note}
                 onChange={(e)=>setNote(e.target.value)}
               />
 
-              <button className="mt-6 bg-black text-white py-3 rounded-lg hover:opacity-90 transition">
+              <button className="mt-6 bg-black text-white py-3 rounded-lg">
                 Speichern
               </button>
 
             </form>
-
           </div>
 
         </div>
 
       </div>
-
-      <style jsx>{`
-        @keyframes fadeInUp {
-          from {
-            opacity: 0;
-            transform: translateY(10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-      `}</style>
 
     </div>
   )
