@@ -68,20 +68,26 @@ export default function CalendarPage() {
 
     <div className="min-h-screen bg-[#F7F7F5] text-black">
 
-      {/* NAVBAR */}
-      <div className="flex justify-between items-center px-10 py-6 border-b border-black/5">
-        <div className="flex gap-8 text-sm">
-          <a href="/dashboard" className="text-black/40">Dashboard</a>
-          <a href="/calendar" className="font-medium">Kalender</a>
-        </div>
+     {/* NAVBAR */}
+<div className="flex justify-between items-center px-10 py-6 border-b border-black/5">
+  <div className="flex gap-8 text-sm">
+    <a href="/dashboard" className="text-black/40 hover:text-black transition">
+      Dashboard
+    </a>
+    <a href="/calendar" className="font-medium">
+      Kalender
+    </a>
+    <a href="/insights" className="text-black/40 hover:text-black transition">
+      Einblicke
+    </a>
+  </div>
 
-        <button onClick={handleLogout} className="text-sm text-black/40">
-          Logout
-        </button>
-      </div>
+  <button onClick={handleLogout} className="text-sm text-black/40 hover:text-black transition">
+    Logout
+  </button>
+</div>
 
-      <div className="p-10 max-w-6xl mx-auto">
-
+<div className="p-10 max-w-6xl mx-auto">
         {/* HEADER */}
         <div className="flex justify-between items-center mb-6">
 
