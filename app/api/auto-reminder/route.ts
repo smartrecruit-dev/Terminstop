@@ -83,12 +83,7 @@ export async function GET() {
           const companyName = company?.name || "unserem Unternehmen"
           const customerName = a.name || "Kunde"
 
-          const message = `Hallo ${customerName} 👋
-
-wir möchten Sie daran erinnern, dass Ihr Termin bei ${companyName} morgen um ${a.time} Uhr stattfindet.
-
-Wir freuen uns auf Sie!
-Ihr Team von ${companyName} 😊`
+          const message = `Hallo ${customerName}, Erinnerung: Termin morgen um ${a.time} bei ${companyName}. Bis morgen. ${companyName}`
 
           // 🔥 SMS senden
           const result = await client.messages.create({
