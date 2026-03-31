@@ -590,6 +590,7 @@ export default function LandingPage() {
             <a href="/impressum" className="hover:text-[#1F2A37] transition">Impressum</a>
             <a href="/datenschutz" className="hover:text-[#1F2A37] transition">Datenschutz</a>
             <a href="/agb" className="hover:text-[#1F2A37] transition">AGB</a>
+            <a href="/avv" className="hover:text-[#1F2A37] transition">Avv</a>
           </div>
         </div>
       </footer>
