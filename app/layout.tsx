@@ -15,9 +15,6 @@ const geistMono = Geist_Mono({
 export const metadata = {
   title: 'TerminStop',
   description: 'Automatische Termin-Erinnerungen per SMS',
-  icons: {
-    icon: '/icon.png',
-  },
 }
 
 export default function RootLayout({
