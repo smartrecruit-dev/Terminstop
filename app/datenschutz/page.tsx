@@ -293,7 +293,7 @@ export default function Datenschutz() {
                 { right: "Widerruf (Art. 7 Abs. 3 DSGVO)", desc: "Sofern die Verarbeitung auf einer Einwilligung basiert, können Sie diese jederzeit widerrufen." },
               ].map((item, i) => (
                 <div key={i} className="flex items-start gap-3 bg-[#F7FAFC] border border-[#E5E7EB] rounded-xl px-4 py-3">
-                  <div className="w-2 h-2 bg-[#18A66D] rounded-full flex-shrink-0 mt-1.5" />
+                  <div className="w-2 h-2 bg-[#18A66D] rounded-full shrink-0 mt-1.5" />
                   <div>
                     <div className="text-xs font-semibold text-[#1F2A37] mb-0.5">{item.right}</div>
                     <div className="text-xs text-[#6B7280] leading-relaxed">{item.desc}</div>
