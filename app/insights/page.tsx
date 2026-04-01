@@ -202,7 +202,7 @@ export default function Insights() {
 
         {/* ─── EINSCHÄTZUNG ─── */}
         <div className={`${insightBg} border border-[#E5E7EB] rounded-2xl p-6 mb-8 flex items-start gap-5`}>
-          <div className="w-12 h-12 bg-white rounded-xl border border-[#E5E7EB] flex items-center justify-center text-2xl flex-shrink-0 shadow-sm">
+          <div className="w-12 h-12 bg-white rounded-xl border border-[#E5E7EB] flex items-center justify-center text-2xl shrink-0 shadow-sm">
             {todayAppointments.length === 0 ? "📭" : completionPct >= 80 ? "🏆" : done >= open ? "✅" : "💡"}
           </div>
           <div>
@@ -419,7 +419,7 @@ export default function Insights() {
                 href="mailto:terminstopp.business@gmail.com"
                 className="flex items-center gap-3 bg-[#F7FAFC] border border-[#E5E7EB] rounded-xl px-4 py-3 hover:border-[#18A66D] transition group"
               >
-                <div className="w-9 h-9 bg-[#E8FBF3] rounded-lg flex items-center justify-center text-base flex-shrink-0">✉️</div>
+                <div className="w-9 h-9 bg-[#E8FBF3] rounded-lg flex items-center justify-center text-base shrink-0">✉️</div>
                 <div>
                   <div className="text-xs text-[#6B7280] font-medium">E-Mail</div>
                   <div className="text-sm font-semibold text-[#1F2A37] group-hover:text-[#18A66D] transition">
@@ -431,7 +431,7 @@ export default function Insights() {
                 href="tel:015154212634"
                 className="flex items-center gap-3 bg-[#F7FAFC] border border-[#E5E7EB] rounded-xl px-4 py-3 hover:border-[#18A66D] transition group"
               >
-                <div className="w-9 h-9 bg-[#E8FBF3] rounded-lg flex items-center justify-center text-base flex-shrink-0">📞</div>
+                <div className="w-9 h-9 bg-[#E8FBF3] rounded-lg flex items-center justify-center text-base shrink-0">📞</div>
                 <div>
                   <div className="text-xs text-[#6B7280] font-medium">Telefon</div>
                   <div className="text-sm font-semibold text-[#1F2A37] group-hover:text-[#18A66D] transition">

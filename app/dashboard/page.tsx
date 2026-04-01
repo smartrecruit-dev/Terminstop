@@ -228,7 +228,7 @@ export default function Dashboard() {
         {nextOpen && (
           <div className="bg-[#1F2A37] text-white rounded-2xl p-5 mb-8 flex items-center justify-between gap-4 shadow-lg">
             <div className="flex items-center gap-4">
-              <div className="w-10 h-10 bg-[#18A66D] rounded-xl flex items-center justify-center flex-shrink-0">
+              <div className="w-10 h-10 bg-[#18A66D] rounded-xl flex items-center justify-center shrink-0">
                 <span className="text-white text-lg">📍</span>
               </div>
               <div>
@@ -292,7 +292,7 @@ export default function Dashboard() {
                       <div className="flex items-center gap-4">
                         {/* Time badge */}
                         <div className={`
-                          text-xs font-bold w-14 text-center py-1.5 rounded-lg flex-shrink-0
+                          text-xs font-bold w-14 text-center py-1.5 rounded-lg shrink-0
                           ${isNext ? "bg-[#18A66D] text-white" : "bg-[#F7FAFC] text-[#6B7280]"}
                         `}>
                           {a.time}
@@ -319,7 +319,7 @@ export default function Dashboard() {
                         </div>
                         <button
                           onClick={() => toggleDone(a)}
-                          className={`w-6 h-6 rounded-full border-2 transition-all flex items-center justify-center flex-shrink-0 ${
+                          className={`w-6 h-6 rounded-full border-2 transition-all flex items-center justify-center shrink-0 ${
                             isDone
                               ? "bg-[#18A66D] border-[#18A66D]"
                               : "border-[#D1D5DB] hover:border-[#18A66D]"

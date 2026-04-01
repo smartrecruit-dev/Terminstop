@@ -32,7 +32,7 @@ export default function AVV() {
         {/* Intro Box */}
         <div className="bg-[#E8FBF3] border border-[#6EE7B7]/50 rounded-2xl px-6 py-5 mb-8">
           <div className="flex items-start gap-3">
-            <span className="text-[#18A66D] text-lg flex-shrink-0">ℹ️</span>
+            <span className="text-[#18A66D] text-lg shrink-0">ℹ️</span>
             <div className="text-sm text-[#1F2A37] leading-relaxed">
               Dieser Auftragsverarbeitungsvertrag (AVV) wird zwischen dem Kunden (nachfolgend
               „Verantwortlicher") und TerminStop / Marvin Passe (nachfolgend „Auftragsverarbeiter")
@@ -191,7 +191,7 @@ export default function AVV() {
                 { title: "Trennungsgebot", desc: "Daten verschiedener Kunden werden durch eindeutige Unternehmens-IDs (company_id) konsequent getrennt verarbeitet." },
               ].map((item, i) => (
                 <div key={i} className="flex items-start gap-3 bg-[#F7FAFC] border border-[#E5E7EB] rounded-xl px-4 py-3">
-                  <div className="w-2 h-2 bg-[#18A66D] rounded-full flex-shrink-0 mt-1.5" />
+                  <div className="w-2 h-2 bg-[#18A66D] rounded-full shrink-0 mt-1.5" />
                   <div>
                     <div className="text-xs font-semibold text-[#1F2A37] mb-0.5">{item.title}</div>
                     <div className="text-xs text-[#6B7280] leading-relaxed">{item.desc}</div>
