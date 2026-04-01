@@ -423,7 +423,7 @@ export default function Insights() {
                 <div>
                   <div className="text-xs text-[#6B7280] font-medium">E-Mail</div>
                   <div className="text-sm font-semibold text-[#1F2A37] group-hover:text-[#18A66D] transition">
-                    terminstopp.business@gmail.com
+                    terminstop.business@gmail.com
                   </div>
                 </div>
               </a>

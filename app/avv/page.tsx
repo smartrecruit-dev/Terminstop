@@ -59,7 +59,7 @@ export default function AVV() {
                 <div className="text-xs font-semibold text-[#6B7280] uppercase tracking-wide mb-2">Auftragsverarbeiter</div>
                 <div className="text-sm text-[#1F2A37]">
                   <strong>Marvin Passe</strong><br />
-                  [Hinterm Stieberge 16], [31535 Neustadt am Rübenberge]<br />
+                  Hinterm Stieberge 16, 31535 Neustadt am Rübenberge<br />
                   E-Mail: terminstop.business@gmail.com<br />
                   Tel.: 0151 54212634
                 </div>

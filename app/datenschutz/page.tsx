@@ -34,8 +34,8 @@ export default function Datenschutz() {
             <h2 className="text-base font-bold text-[#1F2A37] mb-3">1. Verantwortlicher</h2>
             <div className="bg-[#F7FAFC] border border-[#E5E7EB] rounded-xl px-5 py-4 text-[#1F2A37]">
               <strong>Marvin Passe</strong><br />
-              [Hinterm Stieberge 16]<br />
-              [31535] [Neustadt am Rübenberge]<br />
+              Hinterm Stieberge 16<br />
+              31535 Neustadt am Rübenberge<br />
               Deutschland<br /><br />
               E-Mail: terminstop.business@gmail.com<br />
               Telefon: 0151 54212634

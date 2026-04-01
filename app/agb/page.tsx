@@ -36,7 +36,7 @@ export default function AGB() {
               Diese Allgemeinen Geschäftsbedingungen (nachfolgend „AGB") gelten für alle Verträge zwischen
             </p>
             <div className="bg-[#F7FAFC] border border-[#E5E7EB] rounded-xl px-5 py-4 mb-3 text-[#1F2A37]">
-              <strong>Marvin Passe</strong>, [Hinterm Stieberge 16], [31535 Neustadt am Rübenberge], Deutschland<br />
+              <strong>Marvin Passe</strong>, Hinterm Stieberge 16, 31535 Neustadt am Rübenberge, Deutschland<br />
               E-Mail: terminstop.business@gmail.com · Tel.: 0151 54212634<br />
               (nachfolgend „Anbieter")
             </div>
