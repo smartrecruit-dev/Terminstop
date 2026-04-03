@@ -87,7 +87,7 @@ export default function LoginPage() {
         {/* Trust strip */}
         <div className="flex items-center gap-5 mt-10 pt-8 border-t border-[#E5E7EB]">
           <div>
-            <div className="text-lg font-black text-[#18A66D]">500+</div>
+            <div className="text-lg font-black text-[#18A66D]">50+</div>
             <div className="text-xs text-[#6B7280]">Betriebe</div>
           </div>
           <div className="h-6 w-px bg-[#E5E7EB]" />

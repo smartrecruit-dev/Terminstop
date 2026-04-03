@@ -101,7 +101,7 @@ export default function LeadPage() {
           {/* Trust strip */}
           <div className="flex flex-wrap gap-5 pt-8 border-t border-[#E5E7EB]">
             {[
-              { value: "500+", label: "Betriebe aktiv" },
+              { value: "50+", label: "Betriebe aktiv" },
               { value: "95%", label: "Weniger Ausfälle" },
               { value: "Ø 8 Min.", label: "Einrichtung" },
             ].map((kpi, i) => (
