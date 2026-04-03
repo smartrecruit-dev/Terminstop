@@ -124,7 +124,7 @@ export default function LandingPage() {
         {/* Social proof strip */}
         <div className="flex flex-wrap justify-center gap-6 text-sm text-[#6B7280]">
           <div className="flex items-center gap-2">
-            <span className="text-[#18A66D] font-bold text-base">500+</span>
+            <span className="text-[#18A66D] font-bold text-base">50+</span>
             <span>Betriebe aktiv</span>
           </div>
           <div className="text-[#E5E7EB]">|</div>
@@ -429,7 +429,7 @@ export default function LandingPage() {
                   "Sie telefonieren hinterher oder verlieren den Slot",
                   "Unberechenbare Tage, lückenhafte Kalender",
                   "Keine Möglichkeit vorher zu reagieren",
-                  "Bis zu €800 Verlust pro Monat",
+                  "Bis zu Tausenden € Verlust pro Monat",
                 ].map((item, i) => (
                   <div key={i} className="flex items-start gap-3">
                     <span className="text-[#EF4444] text-sm mt-0.5 flex-shrink-0">✗</span>
@@ -451,7 +451,7 @@ export default function LandingPage() {
                   "Kein manueller Aufwand, kein Nachtelefonieren",
                   "Planbare Tage, volle Auslastung",
                   "Rechtzeitig reagieren, bevor Ausfälle entstehen",
-                  "Monatliche Einsparung €500–7500",
+                  "Monatliche Einsparung durch Automatisierung",
                 ].map((item, i) => (
                   <div key={i} className="flex items-start gap-3">
                     <span className="text-[#18A66D] text-sm mt-0.5 flex-shrink-0">✓</span>

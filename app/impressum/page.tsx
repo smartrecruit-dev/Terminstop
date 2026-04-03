@@ -45,7 +45,7 @@ export default function Impressum() {
             <h2 className="text-base font-bold text-[#1F2A37] mb-4">Kontakt</h2>
             <div className="space-y-3">
               <div className="flex items-center gap-3 bg-[#F7FAFC] border border-[#E5E7EB] rounded-xl px-4 py-3">
-                <div className="w-8 h-8 bg-[#E8FBF3] rounded-lg flex items-center justify-center text-sm flex-shrink-0">📞</div>
+                <div className="w-8 h-8 bg-[#E8FBF3] rounded-lg flex items-center justify-center text-sm shrink-0">📞</div>
                 <div>
                   <div className="text-xs text-[#6B7280] font-medium">Telefon</div>
                   <a href="tel:015154212634" className="text-sm font-semibold text-[#1F2A37] hover:text-[#18A66D] transition">
@@ -54,7 +54,7 @@ export default function Impressum() {
                 </div>
               </div>
               <div className="flex items-center gap-3 bg-[#F7FAFC] border border-[#E5E7EB] rounded-xl px-4 py-3">
-                <div className="w-8 h-8 bg-[#E8FBF3] rounded-lg flex items-center justify-center text-sm flex-shrink-0">✉️</div>
+                <div className="w-8 h-8 bg-[#E8FBF3] rounded-lg flex items-center justify-center text-sm shrink-0">✉️</div>
                 <div>
                   <div className="text-xs text-[#6B7280] font-medium">E-Mail</div>
                   <a href="mailto:terminstopp.business@gmail.com" className="text-sm font-semibold text-[#1F2A37] hover:text-[#18A66D] transition">
