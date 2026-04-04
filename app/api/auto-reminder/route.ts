@@ -1,46 +1,51 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@supabase/supabase-js"
-import twilio from "twilio"
 
-// ✅ Supabase (Service Role)
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
 
-// ✅ Twilio
-const client = twilio(
-  process.env.TWILIO_SID!,
-  process.env.TWILIO_AUTH!
-)
+// ✅ Seven.io SMS Funktion
+async function sendSMS(to: string, message: string) {
+  const response = await fetch("https://gateway.seven.io/api/sms", {
+    method: "POST",
+    headers: {
+      "X-Api-Key": process.env.SEVEN_API_KEY!,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      to,
+      text: message,
+      from: "Terminstopp" // max. 11 Zeichen, keine Sonderzeichen
+    })
+  })
 
-// 📞 Telefonnummer normalisieren
+  const result = await response.json()
+
+  if (!response.ok || result.success === "false") {
+    throw new Error(`Seven.io Fehler: ${JSON.stringify(result)}`)
+  }
+
+  return result
+}
+
 function formatPhone(phone: string) {
   let cleaned = phone.replace(/\s+/g, "")
-
-  if (cleaned.startsWith("0")) {
-    cleaned = "+49" + cleaned.substring(1)
-  }
-
-  if (!cleaned.startsWith("+")) {
-    cleaned = "+" + cleaned
-  }
-
+  if (cleaned.startsWith("0")) cleaned = "+49" + cleaned.substring(1)
+  if (!cleaned.startsWith("+")) cleaned = "+" + cleaned
   return cleaned
 }
 
-// 🕒 Lokale Zeit korrekt parsen
 function parseLocalDate(date: string, time: string) {
   const [year, month, day] = date.split("-").map(Number)
   const [hour, minute] = time.split(":").map(Number)
-
   return new Date(year, month - 1, day, hour, minute, 0)
 }
 
 export async function GET() {
   try {
     const now = new Date()
-
     console.log("NOW:", now.toString())
 
     const { data, error } = await supabase
@@ -56,24 +61,14 @@ export async function GET() {
     let sentCount = 0
 
     for (const a of data || []) {
-
       const appointmentDate = parseLocalDate(a.date, a.time)
-
       const diffMs = appointmentDate.getTime() - now.getTime()
       const diffHours = diffMs / (1000 * 60 * 60)
 
-      console.log("DEBUG:", {
-        id: a.id,
-        appointment: appointmentDate.toString(),
-        diffHours
-      })
+      console.log("DEBUG:", { id: a.id, appointment: appointmentDate.toString(), diffHours })
 
-      // 🔥 STABILES 24H FENSTER
       if (diffHours <= 24 && diffHours > 0) {
-
         try {
-
-          // 🔥 Firmenname holen
           const { data: company } = await supabase
             .from("companies")
             .select("name")
@@ -82,19 +77,11 @@ export async function GET() {
 
           const companyName = company?.name || "unserem Unternehmen"
           const customerName = a.name || "Kunde"
-
           const message = `Hallo ${customerName}, Erinnerung: Termin morgen um ${a.time} bei ${companyName}. Bis morgen. ${companyName}`
 
-          // 🔥 SMS senden
-          const result = await client.messages.create({
-            body: message,
-            from: process.env.TWILIO_PHONE!,
-            to: formatPhone(a.phone)
-          })
+          const result = await sendSMS(formatPhone(a.phone), message)
+          console.log("SEVEN.IO RESULT:", result)
 
-          console.log("TWILIO RESULT:", result.sid)
-
-          // 🔥 TRACKING + DOPPEL-SCHUTZ
           await supabase
             .from("appointments")
             .update({
@@ -104,22 +91,17 @@ export async function GET() {
             .eq("id", a.id)
 
           sentCount++
-
           console.log("✅ SMS SENT:", a.phone)
 
         } catch (smsError) {
-          console.log("❌ TWILIO ERROR:", smsError)
+          console.log("❌ SEVEN.IO ERROR:", smsError)
         }
-
       } else {
         console.log("⏭️ SKIPPED:", a.id)
       }
     }
 
-    return NextResponse.json({
-      success: true,
-      sent: sentCount
-    })
+    return NextResponse.json({ success: true, sent: sentCount })
 
   } catch (err) {
     console.log("GLOBAL ERROR:", err)
