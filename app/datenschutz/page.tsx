@@ -175,36 +175,34 @@ export default function Datenschutz() {
             </p>
           </section>
 
-          {/* § 7 SMS-Versand */}
-          <section>
-            <h2 className="text-base font-bold text-[#1F2A37] mb-3">7. Automatisierter SMS-Versand</h2>
-            <p className="mb-3">
-              Der Versand von SMS-Erinnerungen erfolgt über den Dienst
-              <strong> Twilio Inc.</strong>, 375 Beale Street, Suite 300,
-              San Francisco, CA 94105, USA.
-            </p>
-            <p className="mb-3">
-              Zur Durchführung des SMS-Versands werden folgende Daten an Twilio übermittelt:
-            </p>
-            <ul className="list-disc pl-6 space-y-1 mb-3 text-[#4B5563]">
-              <li>Mobilfunknummer des Empfängers</li>
-              <li>Inhalt der SMS-Nachricht (Name, Datum, Uhrzeit des Termins)</li>
-            </ul>
-            <p className="mb-3">
-              Da Twilio in den USA ansässig ist, erfolgt eine Datenübermittlung in ein Drittland.
-              Die Übermittlung erfolgt auf Basis von EU-Standardvertragsklauseln (SCCs)
-              gemäß Art. 46 Abs. 2 lit. c DSGVO. Twilio hat ein Data Processing Agreement (DPA)
-              abgeschlossen. Weitere Informationen:
-              {" "}<a href="https://www.twilio.com/en-us/legal/privacy" target="_blank" rel="noopener noreferrer" className="text-[#18A66D] hover:underline">twilio.com/legal/privacy</a>
-            </p>
-            <p>
-              Rechtsgrundlage für die Verarbeitung ist Art. 6 Abs. 1 lit. b DSGVO
-              (Vertragserfüllung gegenüber dem B2B-Kunden) sowie Art. 6 Abs. 1 lit. f DSGVO
-              (berechtigtes Interesse des B2B-Kunden an der Terminerinnerung).
-              Die Verantwortung für das Vorliegen einer geeigneten Rechtsgrundlage
-              gegenüber den Terminempfängern liegt beim jeweiligen B2B-Kunden.
-            </p>
-          </section>
+        {/* § 7 SMS-Versand */}
+<section>
+  <h2 className="text-base font-bold text-[#1F2A37] mb-3">7. Automatisierter SMS-Versand</h2>
+  <p className="mb-3">
+    Der Versand von SMS-Erinnerungen erfolgt über den Dienst
+    <strong> seven communications GmbH & Co. KG</strong>, Willestr. 4-6,
+    24103 Kiel, Deutschland (seven.io).
+  </p>
+  <p className="mb-3">
+    Zur Durchführung des SMS-Versands werden folgende Daten an seven.io übermittelt:
+  </p>
+  <ul className="list-disc pl-6 space-y-1 mb-3 text-[#4B5563]">
+    <li>Mobilfunknummer des Empfängers</li>
+    <li>Inhalt der SMS-Nachricht (Name, Datum, Uhrzeit des Termins)</li>
+  </ul>
+  <p className="mb-3">
+    Seven.io ist ein deutsches Unternehmen mit Serverstandort in Deutschland.
+    Die Datenverarbeitung erfolgt vollständig innerhalb der Europäischen Union –
+    eine Drittlandübermittlung findet nicht statt. Weitere Informationen:
+    {" "}<a href="https://www.seven.io/en/company/privacy/" target="_blank" rel="noopener noreferrer" className="text-[#18A66D] hover:underline">seven.io/privacy</a>
+  </p>
+  <p>
+    Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO (Vertragserfüllung gegenüber
+    dem B2B-Kunden). Die Verantwortung für das Vorliegen einer geeigneten
+    Rechtsgrundlage gegenüber den Terminempfängern liegt beim jeweiligen B2B-Kunden.
+  </p>
+</section>
+
 
           {/* § 8 Datenbank */}
           <section>
