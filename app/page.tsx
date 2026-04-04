@@ -192,7 +192,7 @@ export default function LandingPage() {
               <div className="font-semibold mb-1">Die gute Nachricht:</div>
               <div className="text-white/70 text-sm">Das lässt sich mit einem automatischen System komplett vermeiden.</div>
             </div>
-            <a href="/lead" className="bg-[#18A66D] text-white text-sm px-6 py-3 rounded-xl hover:bg-[#0F8F63] transition font-semibold whitespace-nowrap flex-shrink-0">
+            <a href="/lead" className="bg-[#18A66D] text-white text-sm px-6 py-3 rounded-xl hover:bg-[#0F8F63] transition font-semibold whitespace-nowrap shrink-0">
               Problem lösen →
             </a>
           </div>
@@ -262,7 +262,7 @@ export default function LandingPage() {
             <div className="relative">
               <div className="absolute inset-0 bg-[#18A66D]/10 rounded-[50px] blur-3xl scale-110" />
               <div className="relative bg-[#1F2A37] p-3 rounded-[44px] shadow-2xl">
-                <div className="bg-[#f2f2f7] w-[280px] h-[560px] rounded-[36px] overflow-hidden relative">
+                <div className="bg-[#f2f2f7] w-70 h-140 rounded-[36px] overflow-hidden relative">
 
                   <div className="bg-[#f2f2f7] px-6 pt-4 pb-2 flex justify-between items-center">
                     <span className="text-[10px] text-black/50 font-medium">9:41</span>
@@ -301,7 +301,7 @@ export default function LandingPage() {
 
                   <div className="absolute bottom-5 left-4 right-4">
                     <div className="bg-[#E8FBF3] border border-[#18A66D]/20 rounded-xl p-3 flex items-center gap-2.5">
-                      <div className="w-7 h-7 bg-[#18A66D] rounded-full flex items-center justify-center flex-shrink-0">
+                      <div className="w-7 h-7 bg-[#18A66D] rounded-full flex items-center justify-center shrink-0">
                         <span className="text-white text-xs">✓</span>
                       </div>
                       <div>
@@ -334,7 +334,7 @@ export default function LandingPage() {
                 { icon: "📊", title: "Volle Übersicht", desc: "Sie sehen jederzeit, wer bestätigt hat und wer nicht." },
               ].map((item, i) => (
                 <div key={i} className="flex items-start gap-4 bg-[#F7FAFC] border border-[#E5E7EB] rounded-xl p-4">
-                  <div className="w-9 h-9 bg-[#E8FBF3] rounded-lg flex items-center justify-center text-base flex-shrink-0">
+                  <div className="w-9 h-9 bg-[#E8FBF3] rounded-lg flex items-center justify-center text-base shrink-0">
                     {item.icon}
                   </div>
                   <div>
@@ -368,7 +368,7 @@ export default function LandingPage() {
             {reviews.map((r, i) => (
               <div
                 key={i}
-                className="min-w-[50%] bg-white border border-[#E5E7EB] rounded-2xl p-8 shadow-sm flex-shrink-0"
+                className="min-w-[50%] bg-white border border-[#E5E7EB] rounded-2xl p-8 shadow-sm shrink-0"
               >
                 {/* Result badge */}
                 <div className="inline-flex items-center gap-1.5 bg-[#E8FBF3] text-[#18A66D] text-xs font-bold px-3 py-1.5 rounded-full mb-5">
@@ -382,7 +382,7 @@ export default function LandingPage() {
                 </p>
 
                 <div className="flex items-center gap-3 pt-5 border-t border-[#E5E7EB]">
-                  <div className="w-10 h-10 bg-[#18A66D] text-white flex items-center justify-center rounded-full text-sm font-bold flex-shrink-0">
+                  <div className="w-10 h-10 bg-[#18A66D] text-white flex items-center justify-center rounded-full text-sm font-bold shrink-0">
                     {r.name.charAt(0)}
                   </div>
                   <div>
@@ -432,7 +432,7 @@ export default function LandingPage() {
                   "Bis zu Tausenden € Verlust pro Monat",
                 ].map((item, i) => (
                   <div key={i} className="flex items-start gap-3">
-                    <span className="text-[#EF4444] text-sm mt-0.5 flex-shrink-0">✗</span>
+                    <span className="text-[#EF4444] text-sm mt-0.5 shrink-0">✗</span>
                     <span className="text-sm text-[#6B7280]">{item}</span>
                   </div>
                 ))}
@@ -454,7 +454,7 @@ export default function LandingPage() {
                   "Monatliche Einsparung durch Automatisierung",
                 ].map((item, i) => (
                   <div key={i} className="flex items-start gap-3">
-                    <span className="text-[#18A66D] text-sm mt-0.5 flex-shrink-0">✓</span>
+                    <span className="text-[#18A66D] text-sm mt-0.5 shrink-0">✓</span>
                     <span className="text-sm text-[#1F2A37]">{item}</span>
                   </div>
                 ))}
@@ -497,7 +497,7 @@ export default function LandingPage() {
               "Keine Vertragsbindung",
             ].map((item, i) => (
               <div key={i} className="flex items-center gap-3">
-                <div className="w-5 h-5 bg-[#E8FBF3] rounded-full flex items-center justify-center flex-shrink-0">
+                <div className="w-5 h-5 bg-[#E8FBF3] rounded-full flex items-center justify-center shrink-0">
                   <span className="text-[#18A66D] text-xs">✓</span>
                 </div>
                 <span className="text-sm text-[#1F2A37]">{item}</span>
@@ -536,7 +536,7 @@ export default function LandingPage() {
                   className="w-full text-left px-6 py-5 flex items-center justify-between gap-4 hover:bg-[#F7FAFC] transition"
                 >
                   <span className="font-semibold text-[#1F2A37] text-sm leading-snug">{faq.q}</span>
-                  <span className={`text-[#18A66D] text-xl flex-shrink-0 transition-transform ${openFaq === i ? "rotate-45" : ""}`}>+</span>
+                  <span className={`text-[#18A66D] text-xl shrink-0 transition-transform ${openFaq === i ? "rotate-45" : ""}`}>+</span>
                 </button>
                 {openFaq === i && (
                   <div className="px-6 pb-5 text-sm text-[#6B7280] leading-relaxed border-t border-[#E5E7EB] pt-4 bg-[#F7FAFC]">
@@ -550,7 +550,7 @@ export default function LandingPage() {
       </section>
 
       {/* ─── FINAL CTA ─── */}
-      <section className="mx-4 md:mx-8 my-16 bg-gradient-to-br from-[#0F8F63] via-[#18A66D] to-[#1FB07A] rounded-3xl px-8 py-20 text-center text-white shadow-2xl shadow-[#18A66D]/20">
+      <section className="mx-4 md:mx-8 my-16 bg-linear-to-br from-[#0F8F63] via-[#18A66D] to-[#1FB07A] rounded-3xl px-8 py-20 text-center text-white shadow-2xl shadow-[#18A66D]/20">
         <div className="max-w-2xl mx-auto">
           <div className="inline-flex items-center gap-2 bg-white/20 text-white text-xs font-semibold px-4 py-2 rounded-full mb-7">
             ✓ Kein Risiko · Persönliche Beratung
