@@ -65,17 +65,18 @@ export default function AGB() {
             </p>
             <ul className="list-disc pl-6 space-y-1 mb-3 text-[#4B5563]">
               <li>Erfassung und Verwaltung von Termindaten</li>
-              <li>Automatischer Versand von SMS-Erinnerungen über den Dienstleister Twilio Inc.</li>
+              <li>Automatischer Versand von SMS-Erinnerungen über den Dienstleister seven.io</li>
               <li>Dashboard zur Übersicht und Verwaltung von Terminen</li>
               <li>Auswertungen und Einblicke zur Terminentwicklung</li>
               <li>Kalenderansicht (Tages- und Wochenansicht)</li>
             </ul>
             <p className="mb-3">
-              Der Anbieter erbringt die Leistungen über die technische Infrastruktur von
-              Supabase Inc. (Datenbankdienst), Vercel Inc. (Hosting) sowie Twilio Inc. (SMS-Versand).
-              Der Kunde nimmt zur Kenntnis, dass die Verfügbarkeit der Plattform auch von diesen
-              Drittanbietern abhängt.
-            </p>
+  Der Anbieter erbringt die Leistungen über die technische Infrastruktur von
+  Supabase Inc. (Datenbankdienst), Vercel Inc. (Hosting) sowie seven communications
+  GmbH & Co. KG (SMS-Versand). Der Kunde nimmt zur Kenntnis, dass die Verfügbarkeit
+  der Plattform auch von diesen Drittanbietern abhängt.
+</p>
+
             <p className="mb-3">
               Ein Anspruch auf bestimmte Funktionen, Erweiterungen oder eine spezifische
               Systemarchitektur besteht nicht. Der Anbieter ist berechtigt, den Funktionsumfang
@@ -144,6 +145,13 @@ export default function AGB() {
               Volumen und Zielland variieren und sind, sofern nicht ausdrücklich im Preis
               enthalten, gesondert zu entrichten.
             </p>
+            <p className="mb-3">
+  Die Zahlung erfolgt per Dauerauftrag des Kunden. Der Kunde verpflichtet sich,
+  einen Dauerauftrag über den vereinbarten Monatsbetrag einzurichten, der jeweils
+  zum 1. eines Kalendermonats auf das Konto des Anbieters überwiesen wird.
+  Die Bankverbindung des Anbieters wird dem Kunden gesondert mitgeteilt.
+</p>
+
           </section>
 
           {/* § 5 */}
@@ -188,28 +196,30 @@ export default function AGB() {
 
           {/* § 6 */}
           <section>
-            <h2 className="text-base font-bold text-[#1F2A37] mb-3">§ 6 SMS-Versand und Drittanbieter</h2>
-            <p className="mb-3">
-              Der SMS-Versand erfolgt über Twilio Inc., 375 Beale Street, Suite 300,
-              San Francisco, CA 94105, USA. Der Anbieter hat mit Twilio einen
-              Datenverarbeitungsvertrag abgeschlossen.
-            </p>
-            <p className="mb-3">
-              Der Anbieter übernimmt keine Gewährleistung für die Zustellung einzelner
-              SMS-Nachrichten. Faktoren wie Netzprobleme, blockierte Nummern oder
-              Entscheidungen des Empfängers können die Zustellung beeinflussen.
-            </p>
-            <p className="mb-3">
-              Automatisierte Erinnerungsprozesse werden über zeitgesteuerte Aufgaben
-              (Cron-Jobs) ausgeführt. Der Anbieter ist bemüht, diese zuverlässig zu betreiben,
-              übernimmt jedoch keine Garantie für die minutengenaue Ausführung.
-            </p>
-            <p>
-              Der Kunde ist verpflichtet, beim Eintragen von Telefonnummern das korrekte
-              Format (internationales Format, z. B. +49...) zu verwenden, um eine
-              ordnungsgemäße Zustellung zu ermöglichen.
-            </p>
-          </section>
+  <h2 className="text-base font-bold text-[#1F2A37] mb-3">§ 6 SMS-Versand und Drittanbieter</h2>
+  <p className="mb-3">
+    Der SMS-Versand erfolgt über seven communications GmbH & Co. KG, Willestr. 4-6,
+    24103 Kiel, Deutschland (seven.io). Seven.io ist ein deutsches Unternehmen mit
+    Serverstandort in Deutschland – eine Datenübermittlung in Drittländer findet
+    nicht statt.
+  </p>
+  <p className="mb-3">
+    Der Anbieter übernimmt keine Gewährleistung für die Zustellung einzelner
+    SMS-Nachrichten. Faktoren wie Netzprobleme, blockierte Nummern oder
+    Entscheidungen des Empfängers können die Zustellung beeinflussen.
+  </p>
+  <p className="mb-3">
+    Automatisierte Erinnerungsprozesse werden über zeitgesteuerte Aufgaben
+    (Cron-Jobs) ausgeführt. Der Anbieter ist bemüht, diese zuverlässig zu betreiben,
+    übernimmt jedoch keine Garantie für die minutengenaue Ausführung.
+  </p>
+  <p>
+    Der Kunde ist verpflichtet, beim Eintragen von Telefonnummern das korrekte
+    Format (internationales Format, z. B. +49...) zu verwenden, um eine
+    ordnungsgemäße Zustellung zu ermöglichen.
+  </p>
+</section>
+
 
           {/* § 7 */}
           <section>
@@ -288,7 +298,7 @@ export default function AGB() {
             <ul className="list-disc pl-6 space-y-1 mt-2 text-[#4B5563]">
               <li>Supabase Inc., USA – Datenbankdienst und Authentifizierung</li>
               <li>Vercel Inc., USA – Hosting und Bereitstellung der Webanwendung</li>
-              <li>Twilio Inc., USA – SMS-Versand</li>
+              <li>seven communications GmbH & Co. KG, Deutschland – SMS-Versand</li>
               <li>GitHub Inc., USA – Versionsverwaltung und Code-Hosting</li>
             </ul>
           </section>
@@ -311,7 +321,7 @@ export default function AGB() {
             </ul>
             <p className="mb-3">
               Kündigungen bedürfen der Textform (E-Mail genügt) an:
-              terminstopp.business@gmail.com
+              terminstop.business@gmail.com
             </p>
             <p>
               Nach Vertragsende werden die Daten des Kunden innerhalb von 30 Tagen
