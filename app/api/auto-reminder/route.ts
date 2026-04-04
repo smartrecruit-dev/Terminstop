@@ -6,7 +6,6 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
 
-// ✅ Seven.io SMS Funktion
 async function sendSMS(to: string, message: string) {
   const response = await fetch("https://gateway.seven.io/api/sms", {
     method: "POST",
@@ -17,7 +16,7 @@ async function sendSMS(to: string, message: string) {
     body: JSON.stringify({
       to,
       text: message,
-      from: "Terminstopp" // max. 11 Zeichen, keine Sonderzeichen
+      from: "Terminstop"
     })
   })
 
@@ -38,14 +37,14 @@ function formatPhone(phone: string) {
 }
 
 function parseLocalDate(date: string, time: string) {
-  const [year, month, day] = date.split("-").map(Number)
-  const [hour, minute] = time.split(":").map(Number)
-  return new Date(year, month - 1, day, hour, minute, 0)
+  const dateTimeString = `${date}T${time}:00`
+  return new Date(new Date(dateTimeString).toLocaleString("en-US", { timeZone: "Europe/Berlin" }))
 }
 
 export async function GET() {
   try {
-    const now = new Date()
+    const now = new Date(new Date().toLocaleString("en-US", { timeZone: "Europe/Berlin" }))
+
     console.log("NOW:", now.toString())
 
     const { data, error } = await supabase
@@ -78,8 +77,6 @@ export async function GET() {
           const companyName = company?.name || "unserem Unternehmen"
           const customerName = a.name || "Kunde"
           const message = `Hallo ${customerName}, Ihr Termin bei ${companyName} ist morgen um ${a.time} Uhr. Wir freuen uns auf Sie!`
-
-
 
           const result = await sendSMS(formatPhone(a.phone), message)
           console.log("SEVEN.IO RESULT:", result)
