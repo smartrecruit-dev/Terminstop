@@ -58,12 +58,21 @@ export default function Impressum() {
                 <div>
                   <div className="text-xs text-[#6B7280] font-medium">E-Mail</div>
                   <a href="mailto:terminstopp.business@gmail.com" className="text-sm font-semibold text-[#1F2A37] hover:text-[#18A66D] transition">
-                    terminstopp.business@gmail.com
+                    terminstop.business@gmail.com
                   </a>
                 </div>
               </div>
             </div>
           </section>
+
+          <section>
+  <h2 className="text-base font-bold text-[#1F2A37] mb-3">Gewerbeanmeldung</h2>
+  <p>
+    Gewerbeanmeldung gemäß § 14 GewO beim zuständigen Gewerbeamt
+    Neustadt am Rübenberge.
+  </p>
+</section>
+
 
           {/* Umsatzsteuer */}
           <section>
