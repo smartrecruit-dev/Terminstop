@@ -107,6 +107,11 @@ export async function GET() {
             })
             .eq("id", a.id)
 
+          // ✅ SMS Zähler hochzählen
+          await supabase.rpc("increment_sms_count", {
+            company_id_input: a.company_id
+          })
+
           sentCount++
           console.log("✅ SMS SENT:", a.phone)
 
