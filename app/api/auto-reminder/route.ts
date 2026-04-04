@@ -77,7 +77,9 @@ export async function GET() {
 
           const companyName = company?.name || "unserem Unternehmen"
           const customerName = a.name || "Kunde"
-          const message = `Hallo ${customerName}, Erinnerung: Termin morgen um ${a.time} bei ${companyName}. Bis morgen. ${companyName}`
+          const message = `Hallo ${customerName}, Ihr Termin bei ${companyName} ist morgen um ${a.time} Uhr. Wir freuen uns auf Sie!`
+
+
 
           const result = await sendSMS(formatPhone(a.phone), message)
           console.log("SEVEN.IO RESULT:", result)
