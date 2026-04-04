@@ -184,9 +184,9 @@ export default function AVV() {
                 { title: "Zutrittskontrolle", desc: "Serverinfrastruktur wird durch Supabase und Vercel in gesicherten Rechenzentren betrieben. Physischer Zugang ist ausgeschlossen." },
                 { title: "Zugangskontrolle", desc: "Zugang zur Plattform nur mit Benutzername und Passwort. Passwörter werden nicht im Klartext gespeichert." },
                 { title: "Zugriffskontrolle", desc: "Jeder Betrieb hat ausschließlich Zugriff auf seine eigenen Daten (Mandantentrennung durch company_id)." },
-                { title: "Weitergabekontrolle", desc: "Alle Datenübertragungen erfolgen verschlüsselt über HTTPS/TLS. SMS-Versand über Twilio mit verschlüsselter API-Kommunikation." },
+                { title: "Weitergabekontrolle", desc: "Alle Datenübertragungen erfolgen verschlüsselt über HTTPS/TLS. SMS-Versand über seven.io mit verschlüsselter API-Kommunikation." },
                 { title: "Eingabekontrolle", desc: "Zugang zur Datenbank (Supabase) ist auf autorisierte Dienste beschränkt. Direkte Datenbankzugriffe von außen sind nicht möglich." },
-                { title: "Auftragskontrolle", desc: "Verarbeitung durch Unterauftragsverarbeiter nur im Rahmen der dokumentierten Vereinbarungen (Twilio, Supabase, Vercel)." },
+               { title: "Auftragskontrolle", desc: "Verarbeitung durch Unterauftragsverarbeiter nur im Rahmen der dokumentierten Vereinbarungen (seven.io, Supabase, Vercel)." },
                 { title: "Verfügbarkeitskontrolle", desc: "Regelmäßige automatische Datensicherungen durch Supabase. Monitoring der Systemverfügbarkeit." },
                 { title: "Trennungsgebot", desc: "Daten verschiedener Kunden werden durch eindeutige Unternehmens-IDs (company_id) konsequent getrennt verarbeitet." },
               ].map((item, i) => (
@@ -222,7 +222,7 @@ export default function AVV() {
                   {[
                     { name: "Supabase Inc.", purpose: "Datenbankdienst, Authentifizierung", location: "USA · SCCs" },
                     { name: "Vercel Inc.", purpose: "Hosting, Webanwendung", location: "USA · SCCs" },
-                    { name: "Twilio Inc.", purpose: "SMS-Versand", location: "USA · SCCs" },
+                   { name: "seven communications GmbH & Co. KG", purpose: "SMS-Versand", location: "Deutschland · DSGVO (EU)" },
                     { name: "GitHub Inc.", purpose: "Code-Hosting, Versionsverwaltung", location: "USA · SCCs" },
                   ].map((row, i) => (
                     <tr key={i} className="bg-white hover:bg-[#FAFAFA] transition">
