@@ -64,7 +64,7 @@ export default function Dashboard() {
 
     const { data, error } = await supabase
       .from("appointments")
-      .insert([{ name, phone, date, time, status: "pending", company_id: companyId }])
+      .insert([{ name, phone, date, time, note, status: "pending", company_id: companyId }])
       .select()
 
     console.log("INSERT DATA:", data)
