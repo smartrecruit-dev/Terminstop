@@ -36,16 +36,30 @@ function formatPhone(phone: string) {
   return cleaned
 }
 
-function parseLocalDate(date: string, time: string) {
-  const dateTimeString = `${date}T${time}:00`
-  return new Date(new Date(dateTimeString).toLocaleString("en-US", { timeZone: "Europe/Berlin" }))
+function getNowInBerlin(): Date {
+  const now = new Date()
+  const berlinTime = new Date(
+    now.toLocaleString("en-US", { timeZone: "Europe/Berlin" })
+  )
+  return berlinTime
+}
+
+function parseLocalDate(date: string, time: string): Date {
+  const berlinNow = new Date(
+    new Date().toLocaleString("en-US", { timeZone: "Europe/Berlin" })
+  )
+  const [year, month, day] = date.split("-").map(Number)
+  const [hour, minute] = time.split(":").map(Number)
+  const result = new Date(berlinNow)
+  result.setFullYear(year, month - 1, day)
+  result.setHours(hour, minute, 0, 0)
+  return result
 }
 
 export async function GET() {
   try {
-    const now = new Date(new Date().toLocaleString("en-US", { timeZone: "Europe/Berlin" }))
-
-    console.log("NOW:", now.toString())
+    const now = getNowInBerlin()
+    console.log("NOW (Berlin):", now.toString())
 
     const { data, error } = await supabase
       .from("appointments")
@@ -64,7 +78,11 @@ export async function GET() {
       const diffMs = appointmentDate.getTime() - now.getTime()
       const diffHours = diffMs / (1000 * 60 * 60)
 
-      console.log("DEBUG:", { id: a.id, appointment: appointmentDate.toString(), diffHours })
+      console.log("DEBUG:", {
+        id: a.id,
+        appointment: appointmentDate.toString(),
+        diffHours
+      })
 
       if (diffHours <= 24 && diffHours > 0) {
         try {
