@@ -18,6 +18,9 @@ export default function Dashboard() {
 
   const [companyId, setCompanyId] = useState<string | null>(null)
   const [companyName, setCompanyName] = useState("")
+  const [customers, setCustomers] = useState<any[]>([])
+  const [customerSearch, setCustomerSearch] = useState("")
+  const [showSuggestions, setShowSuggestions] = useState(false)
 
   useEffect(() => {
     const storedId = localStorage.getItem("company_id")
@@ -42,8 +45,20 @@ export default function Dashboard() {
   }
 
   useEffect(() => {
-    if (companyId) loadAppointments()
+    if (companyId) {
+      loadAppointments()
+      loadCustomers()
+    }
   }, [companyId])
+
+  async function loadCustomers() {
+    const { data } = await supabase
+      .from("customers")
+      .select("*")
+      .eq("company_id", companyId)
+      .order("name", { ascending: true })
+    if (data) setCustomers(data)
+  }
 
   async function toggleDone(a: any) {
     const newStatus = a.status === "done" ? "pending" : "done"
@@ -142,6 +157,12 @@ export default function Dashboard() {
               className="text-sm text-[#6B7280] hover:text-[#1F2A37] hover:bg-[#F7FAFC] px-4 py-2 rounded-lg transition"
             >
               Kalender
+            </a>
+            <a
+              href="/customers"
+              className="text-sm text-[#6B7280] hover:text-[#1F2A37] hover:bg-[#F7FAFC] px-4 py-2 rounded-lg transition"
+            >
+              Kunden
             </a>
             <a
               href="/insights"
@@ -344,8 +365,8 @@ export default function Dashboard() {
 
             <form onSubmit={handleSubmit} className="px-6 py-6 flex flex-col gap-4">
 
-              {/* Name */}
-              <div>
+              {/* Name mit Kunden-Auswahl */}
+              <div className="relative">
                 <label className="text-xs font-semibold text-[#6B7280] uppercase tracking-wide mb-1.5 block">
                   Name
                 </label>
@@ -353,8 +374,42 @@ export default function Dashboard() {
                   className="w-full bg-[#F7FAFC] border border-[#E5E7EB] rounded-xl px-4 py-3 text-sm text-[#1F2A37] placeholder-[#9CA3AF] focus:outline-none focus:border-[#18A66D] focus:ring-2 focus:ring-[#18A66D]/10 transition"
                   placeholder="Max Mustermann"
                   value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  onChange={(e) => {
+                    setName(e.target.value)
+                    setCustomerSearch(e.target.value)
+                    setShowSuggestions(true)
+                  }}
+                  onFocus={() => setShowSuggestions(true)}
+                  onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
+                  autoComplete="off"
                 />
+                {showSuggestions && customerSearch.length > 0 && (
+                  <div className="absolute z-10 left-0 right-0 top-full mt-1 bg-white border border-[#E5E7EB] rounded-xl shadow-lg overflow-hidden">
+                    {customers
+                      .filter(c => c.name.toLowerCase().includes(customerSearch.toLowerCase()))
+                      .slice(0, 5)
+                      .map(c => (
+                        <button
+                          key={c.id}
+                          type="button"
+                          onMouseDown={() => {
+                            setName(c.name)
+                            setPhone(c.phone)
+                            setCustomerSearch("")
+                            setShowSuggestions(false)
+                          }}
+                          className="w-full text-left px-4 py-2.5 text-sm hover:bg-[#F0FDF6] transition flex items-center justify-between"
+                        >
+                          <span className="font-medium text-[#1F2A37]">{c.name}</span>
+                          <span className="text-xs text-[#9CA3AF]">{c.phone}</span>
+                        </button>
+                      ))
+                    }
+                    {customers.filter(c => c.name.toLowerCase().includes(customerSearch.toLowerCase())).length === 0 && (
+                      <div className="px-4 py-3 text-xs text-[#9CA3AF]">Kein Treffer in der Kartei</div>
+                    )}
+                  </div>
+                )}
               </div>
 
               {/* Telefon */}
