@@ -1,10 +1,9 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 
 export default function LandingPage() {
 
-  const [reviewIndex, setReviewIndex] = useState(0)
   const [openFaq, setOpenFaq] = useState<number | null>(null)
 
   const reviews = [
@@ -34,7 +33,7 @@ export default function LandingPage() {
       name: "Markus S.",
       role: "KFZ-Werkstatt, Stuttgart",
       result: "+18% Auslastung in Monat 1",
-      stars: 4.5
+      stars: 5
     },
   ]
 
@@ -61,24 +60,11 @@ export default function LandingPage() {
     },
   ]
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setReviewIndex((prev) => (prev + 1) % reviews.length)
-    }, 5000)
-    return () => clearInterval(interval)
-  }, [])
-
-  const renderStars = (stars: number) => {
-    if (stars === 5) return "★★★★★"
-    if (stars === 4.5) return "★★★★½"
-    return "★★★★☆"
-  }
-
   return (
     <div className="min-h-screen bg-[#F7FAFC] text-[#1F2A37]" style={{ fontFamily: "'Inter', 'Manrope', sans-serif" }}>
 
       {/* ─── NAVBAR ─── */}
-      <nav className="flex justify-between items-center px-8 md:px-16 py-5 border-b border-[#E5E7EB] bg-white/90 backdrop-blur-sm sticky top-0 z-50">
+      <nav className="flex justify-between items-center px-8 md:px-16 py-5 border-b border-[#E5E7EB] bg-white/95 backdrop-blur-sm sticky top-0 z-50">
         <span className="text-lg font-bold tracking-tight">
           <span className="text-[#18A66D]">Termin</span>
           <span className="text-[#1F2A37]">Stop</span>
@@ -96,9 +82,9 @@ export default function LandingPage() {
       {/* ─── HERO ─── */}
       <section className="max-w-5xl mx-auto px-8 md:px-10 pt-24 pb-20 text-center">
 
-        <div className="inline-flex items-center gap-2 bg-[#FEF3C7] text-[#D97706] text-xs font-semibold px-4 py-2 rounded-full mb-8 border border-[#FDE68A]">
-          <span>💡</span>
-          <span>Jeder ausgefallene Termin kostet Sie durchschnittlich €50</span>
+        <div className="inline-flex items-center gap-2 bg-[#E8FBF3] text-[#18A66D] text-xs font-semibold px-4 py-2 rounded-full mb-8 border border-[#6EE7B7]/40">
+          <span className="w-1.5 h-1.5 bg-[#18A66D] rounded-full" />
+          <span>Automatische SMS-Erinnerungen für Ihren Betrieb</span>
         </div>
 
         <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-[1.1] tracking-tight text-[#1F2A37]">
@@ -122,26 +108,18 @@ export default function LandingPage() {
         </div>
 
         {/* Social proof strip */}
-        <div className="flex flex-wrap justify-center gap-6 text-sm text-[#6B7280]">
-          <div className="flex items-center gap-2">
-            <span className="text-[#18A66D] font-bold text-base">50+</span>
-            <span>Betriebe aktiv</span>
-          </div>
-          <div className="text-[#E5E7EB]">|</div>
-          <div className="flex items-center gap-2">
-            <span className="text-[#18A66D] font-bold text-base">95%</span>
-            <span>weniger Ausfälle</span>
-          </div>
-          <div className="text-[#E5E7EB]">|</div>
-          <div className="flex items-center gap-2">
-            <span className="text-[#18A66D] font-bold text-base">4.9★</span>
-            <span>Kundenbewertung</span>
-          </div>
-          <div className="text-[#E5E7EB]">|</div>
-          <div className="flex items-center gap-2">
-            <span className="text-[#18A66D] font-bold text-base">Ø 8 Min.</span>
-            <span>Einrichtung</span>
-          </div>
+        <div className="flex flex-wrap justify-center gap-8 text-sm text-[#6B7280]">
+          {[
+            { value: "50+", label: "Betriebe aktiv" },
+            { value: "95%", label: "weniger Ausfälle" },
+            { value: "4.9★", label: "Kundenbewertung" },
+            { value: "Ø 8 Min.", label: "Einrichtung" },
+          ].map((stat, i) => (
+            <div key={i} className="flex flex-col items-center gap-0.5">
+              <span className="text-[#18A66D] font-bold text-lg">{stat.value}</span>
+              <span className="text-xs text-[#9CA3AF]">{stat.label}</span>
+            </div>
+          ))}
         </div>
       </section>
 
@@ -157,32 +135,17 @@ export default function LandingPage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-10">
             {[
-              {
-                icon: "💸",
-                value: "€50",
-                label: "Verlust pro Ausfall",
-                desc: "Nicht erschienene Kunden kosten nicht nur den Umsatz – sondern auch Ihre Zeit."
-              },
-              {
-                icon: "📉",
-                value: "4–9×",
-                label: "Ausfälle pro Woche",
-                desc: "Im Schnitt hat jeder Betrieb mehrmals wöchentlich Kunden, die nicht erscheinen."
-              },
-              {
-                icon: "🗓",
-                value: "€300–7500",
-                label: "Verlust pro Monat",
-                desc: "Das sind echte Einnahmen, die schlicht nicht stattfinden – obwohl der Slot gebucht war."
-              },
+              { icon: "💸", value: "€50", label: "Verlust pro Ausfall", desc: "Nicht erschienene Kunden kosten nicht nur den Umsatz – sondern auch Ihre Zeit." },
+              { icon: "📉", value: "4–9×", label: "Ausfälle pro Woche", desc: "Im Schnitt hat jeder Betrieb mehrmals wöchentlich Kunden, die nicht erscheinen." },
+              { icon: "🗓", value: "€300–7.500", label: "Verlust pro Monat", desc: "Das sind echte Einnahmen, die schlicht nicht stattfinden – obwohl der Slot gebucht war." },
             ].map((item, i) => (
-              <div key={i} className="bg-[#FEF9F0] border border-[#FDE68A] rounded-2xl p-6 text-center">
+              <div key={i} className="bg-[#F7FAFC] border border-[#E5E7EB] rounded-2xl p-6 text-center">
                 <div className="text-3xl mb-3">{item.icon}</div>
-                <div className="text-3xl font-bold text-[#D97706] mb-1">{item.value}</div>
-                <div className="text-sm font-semibold text-[#1F2A37] mb-2">{item.label}</div>
-                <div className="text-xs text-[#6B7280] leading-relaxed">{item.desc}</div>
+                <div className="text-3xl font-bold text-[#1F2A37] mb-1">{item.value}</div>
+                <div className="text-sm font-semibold text-[#6B7280] mb-2">{item.label}</div>
+                <div className="text-xs text-[#9CA3AF] leading-relaxed">{item.desc}</div>
               </div>
             ))}
           </div>
@@ -190,7 +153,7 @@ export default function LandingPage() {
           <div className="bg-[#1F2A37] rounded-2xl px-8 py-6 flex flex-col md:flex-row items-center justify-between gap-4 text-white">
             <div>
               <div className="font-semibold mb-1">Die gute Nachricht:</div>
-              <div className="text-white/70 text-sm">Das lässt sich mit einem automatischen System komplett vermeiden.</div>
+              <div className="text-white/60 text-sm">Das lässt sich mit einem automatischen System komplett vermeiden.</div>
             </div>
             <a href="/lead" className="bg-[#18A66D] text-white text-sm px-6 py-3 rounded-xl hover:bg-[#0F8F63] transition font-semibold whitespace-nowrap shrink-0">
               Problem lösen →
@@ -200,8 +163,8 @@ export default function LandingPage() {
       </section>
 
       {/* ─── HOW IT WORKS ─── */}
-      <section id="wie-es-funktioniert" className="max-w-5xl mx-auto px-8 md:px-10 py-28">
-        <div className="text-center mb-16">
+      <section id="wie-es-funktioniert" className="max-w-5xl mx-auto px-8 md:px-10 py-24">
+        <div className="text-center mb-14">
           <div className="inline-flex items-center gap-2 bg-[#E8FBF3] text-[#18A66D] text-xs font-semibold px-3 py-1.5 rounded-full mb-5">
             So einfach
           </div>
@@ -213,7 +176,7 @@ export default function LandingPage() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {[
             {
               step: "01",
@@ -237,13 +200,13 @@ export default function LandingPage() {
               note: "95% Erfolgsquote in der Praxis"
             },
           ].map((s, i) => (
-            <div key={i} className="relative bg-white border border-[#E5E7EB] rounded-2xl p-8 shadow-sm hover:shadow-md transition">
-              <div className="text-[#E5E7EB] text-5xl font-black absolute top-6 right-7 select-none leading-none">{s.step}</div>
-              <div className="w-12 h-12 bg-[#E8FBF3] rounded-xl flex items-center justify-center text-2xl mb-5">
+            <div key={i} className="relative bg-white border border-[#E5E7EB] rounded-2xl p-7 shadow-sm hover:shadow-md transition">
+              <div className="text-[#F3F4F6] text-5xl font-black absolute top-6 right-7 select-none leading-none">{s.step}</div>
+              <div className="w-11 h-11 bg-[#E8FBF3] rounded-xl flex items-center justify-center text-xl mb-5">
                 {s.icon}
               </div>
-              <h3 className="text-lg font-bold text-[#1F2A37] mb-3">{s.title}</h3>
-              <p className="text-[#6B7280] text-sm leading-relaxed mb-5">{s.desc}</p>
+              <h3 className="text-base font-bold text-[#1F2A37] mb-2">{s.title}</h3>
+              <p className="text-[#6B7280] text-sm leading-relaxed mb-4">{s.desc}</p>
               <div className="flex items-center gap-2 text-xs text-[#18A66D] font-semibold">
                 <span>✓</span>
                 <span>{s.note}</span>
@@ -254,15 +217,15 @@ export default function LandingPage() {
       </section>
 
       {/* ─── PRODUCT PREVIEW (Phone + Features) ─── */}
-      <section className="bg-white border-y border-[#E5E7EB] py-28">
-        <div className="max-w-7xl mx-auto px-8 md:px-10 grid grid-cols-1 md:grid-cols-2 gap-20 items-center">
+      <section className="bg-white border-y border-[#E5E7EB] py-24">
+        <div className="max-w-6xl mx-auto px-8 md:px-10 grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
 
           {/* Phone Mock */}
           <div className="flex justify-center">
             <div className="relative">
               <div className="absolute inset-0 bg-[#18A66D]/10 rounded-[50px] blur-3xl scale-110" />
               <div className="relative bg-[#1F2A37] p-3 rounded-[44px] shadow-2xl">
-                <div className="bg-[#f2f2f7] w-70 h-140 rounded-[36px] overflow-hidden relative">
+                <div className="bg-[#f2f2f7] w-[280px] h-[560px] rounded-[36px] overflow-hidden relative">
 
                   <div className="bg-[#f2f2f7] px-6 pt-4 pb-2 flex justify-between items-center">
                     <span className="text-[10px] text-black/50 font-medium">9:41</span>
@@ -327,7 +290,7 @@ export default function LandingPage() {
               Einmal eingerichtet – läuft für immer.
             </p>
 
-            <div className="space-y-4">
+            <div className="space-y-3">
               {[
                 { icon: "🏷", title: "Ihr Name, Ihr Stil", desc: "Jede Nachricht wirkt wie von Ihnen persönlich geschrieben." },
                 { icon: "⏰", title: "Immer zum richtigen Zeitpunkt", desc: "24 Stunden vor dem Termin – automatisch, ohne Ihr Zutun." },
@@ -349,8 +312,8 @@ export default function LandingPage() {
       </section>
 
       {/* ─── SOCIAL PROOF / REVIEWS ─── */}
-      <section className="max-w-6xl mx-auto px-8 md:px-10 py-28">
-        <div className="text-center mb-16">
+      <section className="max-w-6xl mx-auto px-8 md:px-10 py-24">
+        <div className="text-center mb-14">
           <div className="inline-flex items-center gap-2 bg-[#E8FBF3] text-[#18A66D] text-xs font-semibold px-3 py-1.5 rounded-full mb-4">
             Echte Ergebnisse
           </div>
@@ -360,70 +323,48 @@ export default function LandingPage() {
           <p className="text-[#6B7280]">Keine Hochglanzversprechen – nur echte Erfahrungen.</p>
         </div>
 
-        <div className="overflow-hidden">
-          <div
-            className="flex gap-6 transition-transform duration-700 ease-in-out"
-            style={{ transform: `translateX(-${reviewIndex * 50}%)` }}
-          >
-            {reviews.map((r, i) => (
-              <div
-                key={i}
-                className="min-w-[50%] bg-white border border-[#E5E7EB] rounded-2xl p-8 shadow-sm shrink-0"
-              >
-                {/* Result badge */}
-                <div className="inline-flex items-center gap-1.5 bg-[#E8FBF3] text-[#18A66D] text-xs font-bold px-3 py-1.5 rounded-full mb-5">
-                  ✓ {r.result}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          {reviews.map((r, i) => (
+            <div key={i} className="bg-white border border-[#E5E7EB] rounded-2xl p-7 shadow-sm flex flex-col">
+              <div className="inline-flex items-center gap-1.5 bg-[#E8FBF3] text-[#18A66D] text-xs font-bold px-3 py-1.5 rounded-full mb-4 self-start">
+                ✓ {r.result}
+              </div>
+              <div className="text-[#F59E0B] text-sm mb-3">{"★".repeat(Math.floor(r.stars))}</div>
+              <p className="text-[#1F2A37] text-sm leading-relaxed flex-1 mb-5">
+                „{r.text}"
+              </p>
+              <div className="flex items-center gap-3 pt-4 border-t border-[#F3F4F6]">
+                <div className="w-9 h-9 bg-[#18A66D] text-white flex items-center justify-center rounded-full text-sm font-bold shrink-0">
+                  {r.name.charAt(0)}
                 </div>
-
-                <div className="text-[#F59E0B] text-sm mb-4">{renderStars(r.stars)}</div>
-
-                <p className="text-[#1F2A37] text-base mb-7 leading-relaxed">
-                  „{r.text}"
-                </p>
-
-                <div className="flex items-center gap-3 pt-5 border-t border-[#E5E7EB]">
-                  <div className="w-10 h-10 bg-[#18A66D] text-white flex items-center justify-center rounded-full text-sm font-bold shrink-0">
-                    {r.name.charAt(0)}
-                  </div>
-                  <div>
-                    <div className="text-sm font-semibold text-[#1F2A37]">{r.name}</div>
-                    <div className="text-xs text-[#6B7280]">{r.role}</div>
-                  </div>
+                <div>
+                  <div className="text-sm font-semibold text-[#1F2A37]">{r.name}</div>
+                  <div className="text-xs text-[#9CA3AF]">{r.role}</div>
                 </div>
               </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="flex justify-center gap-2 mt-8">
-          {reviews.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => setReviewIndex(i)}
-              className={`h-2 rounded-full transition-all duration-300 ${i === reviewIndex ? "bg-[#18A66D] w-6" : "bg-[#E5E7EB] w-2"}`}
-            />
+            </div>
           ))}
         </div>
       </section>
 
       {/* ─── COMPARISON ─── */}
-      <section className="bg-white border-y border-[#E5E7EB] py-28">
+      <section className="bg-white border-y border-[#E5E7EB] py-24">
         <div className="max-w-5xl mx-auto px-8 md:px-10">
-          <div className="text-center mb-16">
+          <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-[#1F2A37] mb-3">
               Mit oder ohne TerminStop
             </h2>
             <p className="text-[#6B7280]">Der Unterschied ist schwarz auf weiß.</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             {/* Without */}
-            <div className="border border-[#FECACA] bg-[#FFF5F5] rounded-2xl p-8">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-8 h-8 bg-[#FEE2E2] rounded-full flex items-center justify-center text-sm">✗</div>
+            <div className="border border-[#FECACA] bg-[#FFF5F5] rounded-2xl p-7">
+              <div className="flex items-center gap-3 mb-5">
+                <div className="w-8 h-8 bg-[#FEE2E2] rounded-full flex items-center justify-center text-sm text-[#EF4444]">✗</div>
                 <h3 className="font-bold text-[#1F2A37]">Ohne TerminStop</h3>
               </div>
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {[
                   "Kunden vergessen Termine – und erscheinen nicht",
                   "Sie telefonieren hinterher oder verlieren den Slot",
@@ -440,12 +381,12 @@ export default function LandingPage() {
             </div>
 
             {/* With */}
-            <div className="border border-[#6EE7B7] bg-[#F0FDF6] rounded-2xl p-8">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-8 h-8 bg-[#D1FAE5] rounded-full flex items-center justify-center text-sm">✓</div>
+            <div className="border border-[#6EE7B7] bg-[#F0FDF6] rounded-2xl p-7">
+              <div className="flex items-center gap-3 mb-5">
+                <div className="w-8 h-8 bg-[#D1FAE5] rounded-full flex items-center justify-center text-sm text-[#18A66D]">✓</div>
                 <h3 className="font-bold text-[#1F2A37]">Mit TerminStop</h3>
               </div>
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {[
                   "Kunden werden automatisch erinnert – und erscheinen",
                   "Kein manueller Aufwand, kein Nachtelefonieren",
@@ -465,14 +406,14 @@ export default function LandingPage() {
       </section>
 
       {/* ─── PRICING ─── */}
-      <section id="preise" className="max-w-4xl mx-auto px-8 md:px-10 py-28 text-center">
+      <section id="preise" className="max-w-4xl mx-auto px-8 md:px-10 py-24 text-center">
         <div className="inline-flex items-center gap-2 bg-[#E8FBF3] text-[#18A66D] text-xs font-semibold px-3 py-1.5 rounded-full mb-5">
           Transparent & fair
         </div>
         <h2 className="text-3xl md:text-4xl font-bold text-[#1F2A37] mb-4">
           Einfache Preisgestaltung
         </h2>
-        <p className="text-[#6B7280] mb-14 max-w-lg mx-auto">
+        <p className="text-[#6B7280] mb-12 max-w-lg mx-auto">
           Kein Abo-Chaos, keine versteckten Gebühren. Sie zahlen einen festen Betrag –
           und wissen immer, wofür.
         </p>
@@ -485,7 +426,7 @@ export default function LandingPage() {
           <div className="text-5xl font-black text-[#1F2A37] mb-1">
             Ab <span className="text-[#18A66D]">€39</span>
           </div>
-          <div className="text-[#6B7280] text-sm mb-8">pro Monat · Je nach Volumen</div>
+          <div className="text-[#9CA3AF] text-sm mb-8">pro Monat · Je nach Volumen</div>
 
           <div className="space-y-3 text-left mb-10">
             {[
@@ -519,16 +460,16 @@ export default function LandingPage() {
       </section>
 
       {/* ─── FAQ ─── */}
-      <section className="bg-white border-y border-[#E5E7EB] py-28">
+      <section className="bg-white border-y border-[#E5E7EB] py-24">
         <div className="max-w-3xl mx-auto px-8 md:px-10">
-          <div className="text-center mb-14">
+          <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-[#1F2A37] mb-3">
               Häufige Fragen
             </h2>
             <p className="text-[#6B7280]">Alles, was Sie wissen möchten – bevor Sie anfragen.</p>
           </div>
 
-          <div className="space-y-3">
+          <div className="space-y-2">
             {faqs.map((faq, i) => (
               <div key={i} className="border border-[#E5E7EB] rounded-2xl overflow-hidden">
                 <button
@@ -536,7 +477,7 @@ export default function LandingPage() {
                   className="w-full text-left px-6 py-5 flex items-center justify-between gap-4 hover:bg-[#F7FAFC] transition"
                 >
                   <span className="font-semibold text-[#1F2A37] text-sm leading-snug">{faq.q}</span>
-                  <span className={`text-[#18A66D] text-xl shrink-0 transition-transform ${openFaq === i ? "rotate-45" : ""}`}>+</span>
+                  <span className={`text-[#18A66D] text-xl shrink-0 transition-transform duration-200 ${openFaq === i ? "rotate-45" : ""}`}>+</span>
                 </button>
                 {openFaq === i && (
                   <div className="px-6 pb-5 text-sm text-[#6B7280] leading-relaxed border-t border-[#E5E7EB] pt-4 bg-[#F7FAFC]">
@@ -550,15 +491,15 @@ export default function LandingPage() {
       </section>
 
       {/* ─── FINAL CTA ─── */}
-      <section className="mx-4 md:mx-8 my-16 bg-linear-to-br from-[#0F8F63] via-[#18A66D] to-[#1FB07A] rounded-3xl px-8 py-20 text-center text-white shadow-2xl shadow-[#18A66D]/20">
+      <section className="mx-4 md:mx-8 my-16 bg-gradient-to-br from-[#0F8F63] via-[#18A66D] to-[#1FB07A] rounded-3xl px-8 py-20 text-center text-white shadow-2xl shadow-[#18A66D]/20">
         <div className="max-w-2xl mx-auto">
-          <div className="inline-flex items-center gap-2 bg-white/20 text-white text-xs font-semibold px-4 py-2 rounded-full mb-7">
+          <div className="inline-flex items-center gap-2 bg-white/15 text-white text-xs font-semibold px-4 py-2 rounded-full mb-7 border border-white/20">
             ✓ Kein Risiko · Persönliche Beratung
           </div>
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
             Hören Sie auf, Geld zu verlieren.
           </h2>
-          <p className="text-white/80 text-lg mb-10 leading-relaxed max-w-lg mx-auto">
+          <p className="text-white/75 text-lg mb-10 leading-relaxed max-w-lg mx-auto">
             Buchen Sie jetzt ein kostenloses Beratungsgespräch.
             Wir zeigen Ihnen in 15 Minuten, was TerminStop für Ihren Betrieb bedeutet.
           </p>
@@ -568,7 +509,7 @@ export default function LandingPage() {
           >
             Jetzt kostenloses Gespräch buchen →
           </a>
-          <div className="mt-6 flex flex-wrap justify-center gap-6 text-white/60 text-sm">
+          <div className="mt-6 flex flex-wrap justify-center gap-6 text-white/50 text-sm">
             <span>✓ Kein Vertrag</span>
             <span>✓ Persönliches Gespräch</span>
             <span>✓ Klare Antworten</span>
@@ -577,20 +518,20 @@ export default function LandingPage() {
       </section>
 
       {/* ─── FOOTER ─── */}
-      <footer className="border-t border-[#E5E7EB] bg-white py-12 px-8">
+      <footer className="border-t border-[#E5E7EB] bg-white py-10 px-8">
         <div className="max-w-5xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
           <div>
             <span className="text-base font-bold">
               <span className="text-[#18A66D]">Termin</span>
               <span className="text-[#1F2A37]">Stop</span>
             </span>
-            <p className="text-xs text-[#6B7280] mt-1">Weniger Ausfälle. Mehr Umsatz.</p>
+            <p className="text-xs text-[#9CA3AF] mt-1">Weniger Ausfälle. Mehr Umsatz.</p>
           </div>
-          <div className="flex gap-6 text-xs text-[#6B7280]">
+          <div className="flex gap-6 text-xs text-[#9CA3AF]">
             <a href="/impressum" className="hover:text-[#1F2A37] transition">Impressum</a>
             <a href="/datenschutz" className="hover:text-[#1F2A37] transition">Datenschutz</a>
             <a href="/agb" className="hover:text-[#1F2A37] transition">AGB</a>
-            <a href="/avv" className="hover:text-[#1F2A37] transition">Avv</a>
+            <a href="/avv" className="hover:text-[#1F2A37] transition">AVV</a>
           </div>
         </div>
       </footer>

@@ -93,14 +93,13 @@ export default function Dashboard() {
   const now = new Date()
   const todayStr = now.toISOString().split("T")[0]
 
-  const filteredAppointments = appointments.filter(a => {
-    if (a.date !== todayStr) return false
-    const dateTime = new Date(`${a.date}T${a.time}`)
-    const diffHours = (dateTime.getTime() - now.getTime()) / (1000 * 60 * 60)
-    return diffHours >= -3
-  })
+  const filteredAppointments = appointments.filter(a => a.date === todayStr)
 
-  const nextOpen = filteredAppointments.find(a => a.status !== "done")
+  const nextOpen = filteredAppointments.find(a => {
+    if (a.status === "done") return false
+    const dateTime = new Date(`${a.date}T${a.time}`)
+    return dateTime.getTime() >= now.getTime() - 30 * 60 * 1000 // ab 30 min vor dem Termin anzeigen
+  })
   const doneCount = filteredAppointments.filter(a => a.status === "done").length
   const openCount = filteredAppointments.filter(a => a.status !== "done").length
   const completionPct = filteredAppointments.length > 0
@@ -279,13 +278,14 @@ export default function Dashboard() {
                   const isDone = a.status === "done"
                   const isNew = a.id === justAddedId
                   const isNext = a.id === nextOpen?.id
+                  const isPast = new Date(`${a.date}T${a.time}`).getTime() < now.getTime() - 30 * 60 * 1000
 
                   return (
                     <div
                       key={a.id}
                       className={`
                         flex items-center justify-between px-6 py-4 transition-all duration-300
-                        ${isDone ? "opacity-40" : isNext ? "bg-[#F0FDF6]" : "hover:bg-[#FAFAFA]"}
+                        ${isDone ? "opacity-35" : isPast ? "opacity-50 hover:opacity-70" : isNext ? "bg-[#F0FDF6]" : "hover:bg-[#FAFAFA]"}
                         ${isNew ? "animate-[fadeIn_0.4s_ease]" : ""}
                       `}
                     >
