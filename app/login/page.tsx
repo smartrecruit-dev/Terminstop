@@ -20,6 +20,10 @@ export default function LoginPage() {
     setLoading(true)
     setError("")
 
+    // Erst alten Cache löschen, damit nie falsche Daten hängenbleiben
+    localStorage.removeItem("company_id")
+    localStorage.removeItem("company_name")
+
     const { error: authError } = await supabase.auth.signInWithPassword({
       email: email.trim(),
       password: password.trim(),
@@ -31,16 +35,20 @@ export default function LoginPage() {
       return
     }
 
-    const { data: company } = await supabase
+    const { data: company, error: companyError } = await supabase
       .from("companies")
       .select("id, name")
       .single()
 
-    if (company) {
-      localStorage.setItem("company_id", company.id)
-      localStorage.setItem("company_name", company.name)
+    if (companyError || !company) {
+      setError("Konto nicht gefunden. Bitte Administrator kontaktieren.")
+      await supabase.auth.signOut()
+      setLoading(false)
+      return
     }
 
+    localStorage.setItem("company_id", company.id)
+    localStorage.setItem("company_name", company.name)
     router.push("/dashboard")
   }
 
