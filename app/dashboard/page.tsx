@@ -267,7 +267,7 @@ export default function Dashboard() {
               </div>
             </div>
 
-            <div className="divide-y divide-[#F3F4F6]">
+          <div className="divide-y divide-[#F3F4F6] overflow-y-auto max-h-[500px]">
               {filteredAppointments.length === 0 ? (
                 <div className="px-6 py-16 text-center">
                   <div className="text-4xl mb-3">📅</div>
