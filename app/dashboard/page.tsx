@@ -20,13 +20,22 @@ export default function Dashboard() {
   const [companyName, setCompanyName] = useState("")
 
   useEffect(() => {
-    const storedId = localStorage.getItem("company_id")
-    const storedName = localStorage.getItem("company_name")
-    if (!storedId) window.location.href = "/login"
-    else {
-      setCompanyId(storedId)
-      setCompanyName(storedName || "")
+    async function checkAuth() {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) { window.location.href = "/login"; return }
+
+      const { data: company } = await supabase
+        .from("companies")
+        .select("id, name")
+        .single()
+
+      if (!company) { window.location.href = "/login"; return }
+      setCompanyId(company.id)
+      setCompanyName(company.name || "")
+      // Firmenname für andere Seiten cachen
+      localStorage.setItem("company_name", company.name || "")
     }
+    checkAuth()
   }, [])
 
   async function loadAppointments() {
@@ -84,8 +93,8 @@ export default function Dashboard() {
     loadAppointments()
   }
 
-  function handleLogout() {
-    localStorage.removeItem("company_id")
+  async function handleLogout() {
+    await supabase.auth.signOut()
     localStorage.removeItem("company_name")
     window.location.href = "/login"
   }

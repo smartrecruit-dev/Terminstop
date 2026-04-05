@@ -20,27 +20,28 @@ export default function LoginPage() {
     setLoading(true)
     setError("")
 
-    const { data, error } = await supabase
-      .from("companies")
-      .select("*")
-      .eq("email", email.trim())
-      .eq("password", password.trim())
+    // Supabase Auth – sicher, kein Klartext-Vergleich
+    const { error: authError } = await supabase.auth.signInWithPassword({
+      email: email.trim(),
+      password: password.trim(),
+    })
 
-    if (error) {
-      setError("Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.")
-      setLoading(false)
-      return
-    }
-
-    if (!data || data.length === 0) {
+    if (authError) {
       setError("E-Mail oder Passwort ist nicht korrekt.")
       setLoading(false)
       return
     }
 
-    const company = data[0]
-    localStorage.setItem("company_id", company.id)
-    localStorage.setItem("company_name", company.name)
+    // Firmenname für die Anzeige im Dashboard laden
+    const { data: company } = await supabase
+      .from("companies")
+      .select("name")
+      .single()
+
+    if (company?.name) {
+      localStorage.setItem("company_name", company.name)
+    }
+
     router.push("/dashboard")
   }
 
@@ -199,8 +200,8 @@ export default function LoginPage() {
         {/* Footer */}
         <div className="mt-6 pt-6 border-t border-[#F3F4F6]">
           <div className="flex items-center justify-center gap-2 text-xs text-[#9CA3AF]">
-            <span className="w-3 h-3 text-[#18A66D]">🔒</span>
-            <span>Sicherer Zugriff für Ihr Unternehmen</span>
+            <span className="text-[#18A66D]">🔒</span>
+            <span>Verschlüsselt & sicher über Supabase Auth</span>
           </div>
           <div className="flex items-center justify-center gap-4 mt-3 text-xs text-[#9CA3AF]">
             <div className="flex items-center gap-1">

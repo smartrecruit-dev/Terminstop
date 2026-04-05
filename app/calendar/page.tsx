@@ -13,13 +13,20 @@ export default function CalendarPage() {
   const [confirmDelete, setConfirmDelete] = useState(false)
 
   useEffect(() => {
-    const storedId = localStorage.getItem("company_id")
-    const storedName = localStorage.getItem("company_name")
-    if (!storedId) window.location.href = "/login"
-    else {
-      setCompanyId(storedId)
-      setCompanyName(storedName || "")
+    async function checkAuth() {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) { window.location.href = "/login"; return }
+
+      const { data: company } = await supabase
+        .from("companies")
+        .select("id, name")
+        .single()
+
+      if (!company) { window.location.href = "/login"; return }
+      setCompanyId(company.id)
+      setCompanyName(company.name || "")
     }
+    checkAuth()
   }, [])
 
   async function loadAppointments() {
@@ -51,8 +58,8 @@ export default function CalendarPage() {
     loadAppointments()
   }
 
-  function handleLogout() {
-    localStorage.removeItem("company_id")
+  async function handleLogout() {
+    await supabase.auth.signOut()
     localStorage.removeItem("company_name")
     window.location.href = "/login"
   }
