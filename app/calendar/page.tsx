@@ -10,6 +10,7 @@ export default function CalendarPage() {
   const [companyName, setCompanyName] = useState("")
   const [view, setView] = useState<"day" | "week">("day")
   const [selected, setSelected] = useState<any>(null)
+  const [confirmDelete, setConfirmDelete] = useState(false)
 
   useEffect(() => {
     const storedId = localStorage.getItem("company_id")
@@ -40,6 +41,13 @@ export default function CalendarPage() {
     const newStatus = a.status === "done" ? "pending" : "done"
     await supabase.from("appointments").update({ status: newStatus }).eq("id", a.id)
     if (selected) setSelected({ ...selected, status: newStatus })
+    loadAppointments()
+  }
+
+  async function deleteAppointment(id: string) {
+    await supabase.from("appointments").delete().eq("id", id)
+    setSelected(null)
+    setConfirmDelete(false)
     loadAppointments()
   }
 
@@ -113,14 +121,11 @@ export default function CalendarPage() {
             </p>
           </div>
 
-          {/* View Toggle */}
           <div className="flex items-center gap-1 bg-white border border-[#E5E7EB] rounded-xl p-1 shadow-sm self-start">
             <button
               onClick={() => setView("day")}
               className={`px-5 py-2 rounded-lg text-sm font-semibold transition ${
-                view === "day"
-                  ? "bg-[#18A66D] text-white shadow-sm"
-                  : "text-[#6B7280] hover:text-[#1F2A37]"
+                view === "day" ? "bg-[#18A66D] text-white shadow-sm" : "text-[#6B7280] hover:text-[#1F2A37]"
               }`}
             >
               Tag
@@ -128,9 +133,7 @@ export default function CalendarPage() {
             <button
               onClick={() => setView("week")}
               className={`px-5 py-2 rounded-lg text-sm font-semibold transition ${
-                view === "week"
-                  ? "bg-[#18A66D] text-white shadow-sm"
-                  : "text-[#6B7280] hover:text-[#1F2A37]"
+                view === "week" ? "bg-[#18A66D] text-white shadow-sm" : "text-[#6B7280] hover:text-[#1F2A37]"
               }`}
             >
               Woche
@@ -171,29 +174,19 @@ export default function CalendarPage() {
               <h2 className="text-sm font-bold text-[#1F2A37]">Stundenplan</h2>
               <span className="text-xs text-[#6B7280]">06:00 – 20:59 Uhr</span>
             </div>
-
             <div className="divide-y divide-[#F3F4F6]">
               {hours.map((hour) => {
                 const slot = dayAppointments.filter((a: any) => parseInt(a.time.split(":")[0]) === hour)
                 const isCurrent = hour === currentHour
                 const isPast = hour < currentHour
-
                 return (
-                  <div
-                    key={hour}
-                    className={`flex gap-4 px-6 py-4 transition ${isCurrent ? "bg-[#F0FDF6]" : isPast ? "opacity-50" : ""}`}
-                  >
-                    {/* Hour label */}
+                  <div key={hour} className={`flex gap-4 px-6 py-4 transition ${isCurrent ? "bg-[#F0FDF6]" : isPast ? "opacity-50" : ""}`}>
                     <div className="flex-shrink-0 w-16 pt-0.5">
                       <div className={`text-xs font-bold ${isCurrent ? "text-[#18A66D]" : "text-[#9CA3AF]"}`}>
                         {String(hour).padStart(2, "0")}:00
                       </div>
-                      {isCurrent && (
-                        <div className="text-[9px] text-[#18A66D] font-semibold mt-0.5">Jetzt</div>
-                      )}
+                      {isCurrent && <div className="text-[9px] text-[#18A66D] font-semibold mt-0.5">Jetzt</div>}
                     </div>
-
-                    {/* Slots */}
                     <div className="flex-1">
                       {slot.length === 0 ? (
                         <div className="text-xs text-[#D1D5DB] py-1">—</div>
@@ -204,31 +197,22 @@ export default function CalendarPage() {
                             return (
                               <div
                                 key={a.id}
-                                onClick={() => setSelected(a)}
-                                className={`
-                                  flex items-center justify-between px-4 py-3 rounded-xl cursor-pointer transition
-                                  ${isDone
-                                    ? "bg-[#F0FDF6] border border-[#6EE7B7]/40"
-                                    : "bg-[#1F2A37] text-white hover:bg-[#2D3A4A]"
-                                  }
-                                `}
+                                onClick={() => { setSelected(a); setConfirmDelete(false) }}
+                                className={`flex items-center justify-between px-4 py-3 rounded-xl cursor-pointer transition ${
+                                  isDone ? "bg-[#F0FDF6] border border-[#6EE7B7]/40" : "bg-[#1F2A37] text-white hover:bg-[#2D3A4A]"
+                                }`}
                               >
                                 <div className="flex items-center gap-3">
-                                  <div className={`text-xs font-bold px-2 py-1 rounded-lg flex-shrink-0 ${isDone ? "bg-[#D1FAE5] text-[#18A66D]" : "bg-white/10 text-white/80"}`}>
+                                  <div className={`text-xs font-bold px-2 py-1 rounded-lg shrink-0 ${isDone ? "bg-[#D1FAE5] text-[#18A66D]" : "bg-white/10 text-white/80"}`}>
                                     {a.time}
                                   </div>
                                   <div>
                                     <div className={`text-sm font-semibold ${isDone ? "text-[#1F2A37] line-through opacity-60" : "text-white"}`}>
                                       {a.name}
                                     </div>
-                                    {a.note && (
-                                      <div className={`text-xs mt-0.5 ${isDone ? "text-[#6B7280]" : "text-white/50"}`}>
-                                        {a.note}
-                                      </div>
-                                    )}
+                                    {a.note && <div className={`text-xs mt-0.5 ${isDone ? "text-[#6B7280]" : "text-white/50"}`}>{a.note}</div>}
                                   </div>
                                 </div>
-
                                 <div className="flex items-center gap-2">
                                   <div className={`hidden sm:flex items-center gap-1 text-xs px-2 py-1 rounded-full font-medium ${isDone ? "bg-[#D1FAE5] text-[#18A66D]" : "bg-[#18A66D]/20 text-[#18A66D]"}`}>
                                     <span className="w-1 h-1 bg-[#18A66D] rounded-full" />
@@ -236,10 +220,8 @@ export default function CalendarPage() {
                                   </div>
                                   <button
                                     onClick={(e) => { e.stopPropagation(); toggleDone(a) }}
-                                    className={`w-7 h-7 rounded-full border-2 transition-all flex items-center justify-center flex-shrink-0 ${
-                                      isDone
-                                        ? "bg-[#18A66D] border-[#18A66D]"
-                                        : "border-white/30 hover:border-white"
+                                    className={`w-7 h-7 rounded-full border-2 transition-all flex items-center justify-center shrink-0 ${
+                                      isDone ? "bg-[#18A66D] border-[#18A66D]" : "border-white/30 hover:border-white"
                                     }`}
                                   >
                                     {isDone && <span className="text-white text-xs">✓</span>}
@@ -266,17 +248,8 @@ export default function CalendarPage() {
               const items = appointments.filter(a => a.date === dStr)
               const isToday = dStr === todayStr
               const doneCount = items.filter(a => a.status === "done").length
-
               return (
-                <div
-                  key={i}
-                  className={`rounded-2xl border overflow-hidden transition ${
-                    isToday
-                      ? "border-[#18A66D] shadow-md shadow-[#18A66D]/10"
-                      : "border-[#E5E7EB] bg-white"
-                  }`}
-                >
-                  {/* Day header */}
+                <div key={i} className={`rounded-2xl border overflow-hidden transition ${isToday ? "border-[#18A66D] shadow-md shadow-[#18A66D]/10" : "border-[#E5E7EB] bg-white"}`}>
                   <div className={`px-3 py-3 text-center border-b ${isToday ? "bg-[#18A66D]" : "bg-[#F7FAFC] border-[#E5E7EB]"}`}>
                     <div className={`text-xs font-semibold uppercase tracking-wide ${isToday ? "text-white/80" : "text-[#9CA3AF]"}`}>
                       {day.toLocaleDateString("de-DE", { weekday: "short" })}
@@ -290,8 +263,6 @@ export default function CalendarPage() {
                       </div>
                     )}
                   </div>
-
-                  {/* Appointments */}
                   <div className={`p-2 flex flex-col gap-1.5 min-h-[120px] ${isToday ? "bg-[#F0FDF6]" : "bg-white"}`}>
                     {items.length === 0 ? (
                       <div className="flex items-center justify-center h-full pt-4">
@@ -302,7 +273,7 @@ export default function CalendarPage() {
                         {items.slice(0, 4).map((a: any) => (
                           <div
                             key={a.id}
-                            onClick={() => setSelected(a)}
+                            onClick={() => { setSelected(a); setConfirmDelete(false) }}
                             className={`text-[10px] px-2 py-1.5 rounded-lg cursor-pointer transition flex items-center gap-1 ${
                               a.status === "done"
                                 ? "bg-[#D1FAE5] text-[#18A66D] line-through opacity-60"
@@ -316,22 +287,15 @@ export default function CalendarPage() {
                           </div>
                         ))}
                         {items.length > 4 && (
-                          <div className="text-[10px] text-[#9CA3AF] text-center pt-1">
-                            +{items.length - 4} weitere
-                          </div>
+                          <div className="text-[10px] text-[#9CA3AF] text-center pt-1">+{items.length - 4} weitere</div>
                         )}
                       </>
                     )}
                   </div>
-
-                  {/* Progress bar */}
                   {items.length > 0 && (
                     <div className="px-2 pb-2">
                       <div className="w-full bg-[#E5E7EB] rounded-full h-1">
-                        <div
-                          className="bg-[#18A66D] h-1 rounded-full transition-all"
-                          style={{ width: `${Math.round((doneCount / items.length) * 100)}%` }}
-                        />
+                        <div className="bg-[#18A66D] h-1 rounded-full transition-all" style={{ width: `${Math.round((doneCount / items.length) * 100)}%` }} />
                       </div>
                     </div>
                   )}
@@ -340,14 +304,13 @@ export default function CalendarPage() {
             })}
           </div>
         )}
-
       </div>
 
       {/* ─── DETAIL POPUP ─── */}
       {selected && (
         <div
           className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 px-4"
-          onClick={() => setSelected(null)}
+          onClick={() => { setSelected(null); setConfirmDelete(false) }}
         >
           <div
             className="bg-white rounded-2xl w-full max-w-sm shadow-2xl overflow-hidden"
@@ -360,7 +323,7 @@ export default function CalendarPage() {
                   Termindetails
                 </div>
                 <button
-                  onClick={() => setSelected(null)}
+                  onClick={() => { setSelected(null); setConfirmDelete(false) }}
                   className={`w-7 h-7 rounded-full flex items-center justify-center text-sm transition ${selected.status === "done" ? "bg-[#E5E7EB] text-[#6B7280] hover:bg-[#D1D5DB]" : "bg-white/10 text-white hover:bg-white/20"}`}
                 >
                   ✕
@@ -378,7 +341,7 @@ export default function CalendarPage() {
             <div className="px-6 py-5 space-y-4">
               {selected.phone && (
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 bg-[#F7FAFC] border border-[#E5E7EB] rounded-lg flex items-center justify-center text-sm flex-shrink-0">📞</div>
+                  <div className="w-8 h-8 bg-[#F7FAFC] border border-[#E5E7EB] rounded-lg flex items-center justify-center text-sm shrink-0">📞</div>
                   <div>
                     <div className="text-xs text-[#6B7280] font-medium">Telefon</div>
                     <div className="text-sm font-semibold text-[#1F2A37]">{selected.phone}</div>
@@ -387,7 +350,7 @@ export default function CalendarPage() {
               )}
               {selected.note && (
                 <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 bg-[#F7FAFC] border border-[#E5E7EB] rounded-lg flex items-center justify-center text-sm flex-shrink-0">📝</div>
+                  <div className="w-8 h-8 bg-[#F7FAFC] border border-[#E5E7EB] rounded-lg flex items-center justify-center text-sm shrink-0">📝</div>
                   <div>
                     <div className="text-xs text-[#6B7280] font-medium">Notiz</div>
                     <div className="text-sm text-[#1F2A37]">{selected.note}</div>
@@ -395,25 +358,21 @@ export default function CalendarPage() {
                 </div>
               )}
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-[#E8FBF3] border border-[#6EE7B7]/40 rounded-lg flex items-center justify-center text-sm flex-shrink-0">📱</div>
+                <div className="w-8 h-8 bg-[#E8FBF3] border border-[#6EE7B7]/40 rounded-lg flex items-center justify-center text-sm shrink-0">📱</div>
                 <div>
                   <div className="text-xs text-[#6B7280] font-medium">SMS-Erinnerung</div>
                   <div className="text-sm font-semibold text-[#18A66D]">Gesendet ✓</div>
                 </div>
               </div>
-
-              {/* Status Badge */}
               <div className={`flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-semibold ${
-                selected.status === "done"
-                  ? "bg-[#E8FBF3] text-[#18A66D]"
-                  : "bg-[#FEF3C7] text-[#D97706]"
+                selected.status === "done" ? "bg-[#E8FBF3] text-[#18A66D]" : "bg-[#FEF3C7] text-[#D97706]"
               }`}>
                 <span>{selected.status === "done" ? "✓ Termin wahrgenommen" : "⏳ Ausstehend"}</span>
               </div>
             </div>
 
             {/* Popup Footer */}
-            <div className="px-6 pb-6">
+            <div className="px-6 pb-6 flex flex-col gap-2">
               <button
                 onClick={() => toggleDone(selected)}
                 className={`w-full py-3.5 rounded-xl font-bold text-sm transition shadow-md ${
@@ -424,11 +383,40 @@ export default function CalendarPage() {
               >
                 {selected.status === "done" ? "Als offen markieren" : "Als erledigt markieren ✓"}
               </button>
+
+              {/* ─── LÖSCHEN ─── */}
+              {!confirmDelete ? (
+                <button
+                  onClick={() => setConfirmDelete(true)}
+                  className="w-full py-3 rounded-xl font-semibold text-sm text-[#EF4444] border border-[#FECACA] hover:bg-[#FEF2F2] transition"
+                >
+                  Termin löschen
+                </button>
+              ) : (
+                <div className="bg-[#FEF2F2] border border-[#FECACA] rounded-xl px-4 py-3">
+                  <p className="text-xs text-[#EF4444] font-semibold text-center mb-3">
+                    Wirklich löschen? Das kann nicht rückgängig gemacht werden.
+                  </p>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => setConfirmDelete(false)}
+                      className="flex-1 py-2.5 rounded-lg text-sm font-semibold bg-white border border-[#E5E7EB] text-[#6B7280] hover:bg-[#F7FAFC] transition"
+                    >
+                      Abbrechen
+                    </button>
+                    <button
+                      onClick={() => deleteAppointment(selected.id)}
+                      className="flex-1 py-2.5 rounded-lg text-sm font-bold bg-[#EF4444] text-white hover:bg-[#DC2626] transition"
+                    >
+                      Ja, löschen
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
       )}
-
     </div>
   )
 }
