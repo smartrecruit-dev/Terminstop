@@ -20,28 +20,27 @@ export default function LoginPage() {
     setLoading(true)
     setError("")
 
-    // Supabase Auth – sicher, kein Klartext-Vergleich
-    const { error: authError } = await supabase.auth.signInWithPassword({
-      email: email.trim(),
-      password: password.trim(),
-    })
+    const { data, error } = await supabase
+      .from("companies")
+      .select("*")
+      .eq("email", email.trim())
+      .eq("password", password.trim())
 
-    if (authError) {
+    if (error) {
+      setError("Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.")
+      setLoading(false)
+      return
+    }
+
+    if (!data || data.length === 0) {
       setError("E-Mail oder Passwort ist nicht korrekt.")
       setLoading(false)
       return
     }
 
-    // Firmenname für die Anzeige im Dashboard laden
-    const { data: company } = await supabase
-      .from("companies")
-      .select("name")
-      .single()
-
-    if (company?.name) {
-      localStorage.setItem("company_name", company.name)
-    }
-
+    const company = data[0]
+    localStorage.setItem("company_id", company.id)
+    localStorage.setItem("company_name", company.name)
     router.push("/dashboard")
   }
 
@@ -54,8 +53,6 @@ export default function LoginPage() {
         backgroundImage: "radial-gradient(ellipse at 60% 0%, #D1FAE5 0%, transparent 60%), radial-gradient(ellipse at 10% 100%, #E0F2FE 0%, transparent 50%)"
       }}
     >
-
-      {/* Left decoration — hidden on mobile */}
       <div className="hidden lg:flex flex-col justify-center pr-20 max-w-md">
         <div className="mb-6">
           <span className="text-3xl font-black tracking-tight">
@@ -71,11 +68,7 @@ export default function LoginPage() {
           und lassen Sie SMS-Erinnerungen automatisch für Sie arbeiten.
         </p>
         <div className="space-y-3">
-          {[
-            "Automatische SMS-Erinnerungen",
-            "Übersicht über alle Termine",
-            "Einblicke & Auswertungen",
-          ].map((item, i) => (
+          {["Automatische SMS-Erinnerungen", "Übersicht über alle Termine", "Einblicke & Auswertungen"].map((item, i) => (
             <div key={i} className="flex items-center gap-3">
               <div className="w-5 h-5 bg-[#E8FBF3] rounded-full flex items-center justify-center flex-shrink-0">
                 <span className="text-[#18A66D] text-xs">✓</span>
@@ -84,30 +77,16 @@ export default function LoginPage() {
             </div>
           ))}
         </div>
-
-        {/* Trust strip */}
         <div className="flex items-center gap-5 mt-10 pt-8 border-t border-[#E5E7EB]">
-          <div>
-            <div className="text-lg font-black text-[#18A66D]">50+</div>
-            <div className="text-xs text-[#6B7280]">Betriebe</div>
-          </div>
+          <div><div className="text-lg font-black text-[#18A66D]">50+</div><div className="text-xs text-[#6B7280]">Betriebe</div></div>
           <div className="h-6 w-px bg-[#E5E7EB]" />
-          <div>
-            <div className="text-lg font-black text-[#18A66D]">95%</div>
-            <div className="text-xs text-[#6B7280]">Weniger Ausfälle</div>
-          </div>
+          <div><div className="text-lg font-black text-[#18A66D]">95%</div><div className="text-xs text-[#6B7280]">Weniger Ausfälle</div></div>
           <div className="h-6 w-px bg-[#E5E7EB]" />
-          <div>
-            <div className="text-lg font-black text-[#18A66D]">4.9★</div>
-            <div className="text-xs text-[#6B7280]">Bewertung</div>
-          </div>
+          <div><div className="text-lg font-black text-[#18A66D]">4.9★</div><div className="text-xs text-[#6B7280]">Bewertung</div></div>
         </div>
       </div>
 
-      {/* LOGIN CARD */}
       <div className="bg-white border border-[#E5E7EB] rounded-3xl p-8 w-full max-w-[400px] shadow-xl shadow-[#1F2A37]/5">
-
-        {/* Brand (mobile only) */}
         <div className="lg:hidden text-center mb-8">
           <span className="text-2xl font-black tracking-tight">
             <span className="text-[#18A66D]">Termin</span>
@@ -115,17 +94,11 @@ export default function LoginPage() {
           </span>
         </div>
 
-        {/* Header */}
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-[#1F2A37] mb-1">
-            Willkommen zurück
-          </h1>
-          <p className="text-sm text-[#6B7280]">
-            Melden Sie sich an, um Ihr Dashboard zu öffnen.
-          </p>
+          <h1 className="text-2xl font-bold text-[#1F2A37] mb-1">Willkommen zurück</h1>
+          <p className="text-sm text-[#6B7280]">Melden Sie sich an, um Ihr Dashboard zu öffnen.</p>
         </div>
 
-        {/* Error */}
         {error && (
           <div className="flex items-center gap-3 bg-[#FEF2F2] border border-[#FECACA] rounded-xl px-4 py-3 mb-5">
             <span className="text-[#EF4444] text-sm flex-shrink-0">⚠</span>
@@ -133,14 +106,9 @@ export default function LoginPage() {
           </div>
         )}
 
-        {/* Form */}
         <form onSubmit={handleLogin} className="flex flex-col gap-4">
-
-          {/* E-Mail */}
           <div>
-            <label className="text-xs font-semibold text-[#6B7280] uppercase tracking-wide mb-1.5 block">
-              E-Mail
-            </label>
+            <label className="text-xs font-semibold text-[#6B7280] uppercase tracking-wide mb-1.5 block">E-Mail</label>
             <input
               type="email"
               className="w-full bg-[#F7FAFC] border border-[#E5E7EB] rounded-xl px-4 py-3 text-sm text-[#1F2A37] placeholder-[#9CA3AF] focus:outline-none focus:border-[#18A66D] focus:ring-2 focus:ring-[#18A66D]/10 transition"
@@ -150,12 +118,8 @@ export default function LoginPage() {
               autoComplete="email"
             />
           </div>
-
-          {/* Passwort */}
           <div>
-            <label className="text-xs font-semibold text-[#6B7280] uppercase tracking-wide mb-1.5 block">
-              Passwort
-            </label>
+            <label className="text-xs font-semibold text-[#6B7280] uppercase tracking-wide mb-1.5 block">Passwort</label>
             <div className="relative">
               <input
                 type={showPassword ? "text" : "password"}
@@ -174,15 +138,11 @@ export default function LoginPage() {
               </button>
             </div>
           </div>
-
-          {/* Submit */}
           <button
             type="submit"
             disabled={loading}
             className={`mt-2 w-full py-3.5 rounded-xl font-bold text-sm transition-all shadow-md ${
-              loading
-                ? "bg-[#6B7280] text-white cursor-not-allowed"
-                : "bg-[#18A66D] text-white hover:bg-[#0F8F63] shadow-[#18A66D]/20"
+              loading ? "bg-[#6B7280] text-white cursor-not-allowed" : "bg-[#18A66D] text-white hover:bg-[#0F8F63] shadow-[#18A66D]/20"
             }`}
           >
             {loading ? (
@@ -190,18 +150,14 @@ export default function LoginPage() {
                 <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                 Anmeldung läuft...
               </span>
-            ) : (
-              "Einloggen →"
-            )}
+            ) : "Einloggen →"}
           </button>
-
         </form>
 
-        {/* Footer */}
         <div className="mt-6 pt-6 border-t border-[#F3F4F6]">
           <div className="flex items-center justify-center gap-2 text-xs text-[#9CA3AF]">
             <span className="text-[#18A66D]">🔒</span>
-            <span>Verschlüsselt & sicher über Supabase Auth</span>
+            <span>Sicherer Zugriff für Ihr Unternehmen</span>
           </div>
           <div className="flex items-center justify-center gap-4 mt-3 text-xs text-[#9CA3AF]">
             <div className="flex items-center gap-1">
@@ -212,7 +168,6 @@ export default function LoginPage() {
             <span>SMS-Erinnerungen laufen</span>
           </div>
         </div>
-
       </div>
     </div>
   )
