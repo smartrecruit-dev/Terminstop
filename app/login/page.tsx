@@ -20,27 +20,27 @@ export default function LoginPage() {
     setLoading(true)
     setError("")
 
-    const { data, error } = await supabase
-      .from("companies")
-      .select("*")
-      .eq("email", email.trim())
-      .eq("password", password.trim())
+    const { error: authError } = await supabase.auth.signInWithPassword({
+      email: email.trim(),
+      password: password.trim(),
+    })
 
-    if (error) {
-      setError("Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.")
-      setLoading(false)
-      return
-    }
-
-    if (!data || data.length === 0) {
+    if (authError) {
       setError("E-Mail oder Passwort ist nicht korrekt.")
       setLoading(false)
       return
     }
 
-    const company = data[0]
-    localStorage.setItem("company_id", company.id)
-    localStorage.setItem("company_name", company.name)
+    const { data: company } = await supabase
+      .from("companies")
+      .select("id, name")
+      .single()
+
+    if (company) {
+      localStorage.setItem("company_id", company.id)
+      localStorage.setItem("company_name", company.name)
+    }
+
     router.push("/dashboard")
   }
 

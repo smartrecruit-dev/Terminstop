@@ -80,7 +80,8 @@ export default function CustomersPage() {
     loadCustomers()
   }
 
-  function handleLogout() {
+  async function handleLogout() {
+    await supabase.auth.signOut()
     localStorage.removeItem("company_id")
     localStorage.removeItem("company_name")
     window.location.href = "/login"

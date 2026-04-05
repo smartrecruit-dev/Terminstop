@@ -32,7 +32,8 @@ export default function Insights() {
     load()
   }, [companyId])
 
-  function handleLogout() {
+  async function handleLogout() {
+    await supabase.auth.signOut()
     localStorage.removeItem("company_id")
     localStorage.removeItem("company_name")
     window.location.href = "/login"
