@@ -263,6 +263,9 @@ export default function LandingPage() {
             <a href="#wie-es-funktioniert" className="text-sm text-white/35 hover:text-white transition-colors hidden md:block">So funktioniert's</a>
             <a href="#preise" className="text-sm text-white/35 hover:text-white transition-colors hidden md:block">Preise</a>
             <a href="/login" className="text-sm text-white/35 hover:text-white transition-colors hidden md:block">Login</a>
+            <a href="/demo" className="text-sm text-white/50 hover:text-[#4AE89B] transition-colors hidden md:block border border-white/10 hover:border-[#18A66D]/40 px-4 py-2 rounded-full">
+              Live-Demo
+            </a>
             <a href="/lead" className="grad-btn text-white text-sm px-5 py-2.5 rounded-full font-bold shadow-lg shadow-[#18A66D]/25 hover:opacity-90 transition-opacity">
               Kostenlos anfragen
             </a>
@@ -318,9 +321,9 @@ export default function LandingPage() {
                   className="grad-btn glow-btn inline-flex items-center justify-center gap-2 text-white px-10 py-4 rounded-full font-black text-base cursor-pointer shadow-2xl shadow-[#18A66D]/30">
                   Kostenlose Beratung sichern →
                 </MagneticBtn>
-                <a href="#wie-es-funktioniert"
-                  className="inline-flex items-center justify-center gap-2 text-white/40 px-6 py-4 rounded-full text-sm hover:text-white transition-colors border border-white/8 hover:border-white/18 backdrop-blur">
-                  So funktioniert's ↓
+                <a href="/demo"
+                  className="inline-flex items-center justify-center gap-2 text-white/50 px-6 py-4 rounded-full text-sm hover:text-[#4AE89B] transition-colors border border-white/10 hover:border-[#18A66D]/40 backdrop-blur">
+                  🎭 Live-Demo ansehen
                 </a>
               </div>
 
