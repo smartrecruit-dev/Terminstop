@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 
 function formatPhone(phone: string) {
   let cleaned = phone.replace(/\s+/g, "")
@@ -7,10 +7,20 @@ function formatPhone(phone: string) {
   return cleaned
 }
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
+  // ── Auth-Check: nur Aufrufe mit gültigem CRON_SECRET erlaubt ──
+  const authHeader = req.headers.get("authorization")
+  if (!authHeader || authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  }
+
   try {
     const body = await req.json()
     const { phone, message } = body
+
+    if (!phone || !message) {
+      return NextResponse.json({ error: "phone und message sind Pflichtfelder" }, { status: 400 })
+    }
 
     const response = await fetch("https://gateway.seven.io/api/sms", {
       method: "POST",

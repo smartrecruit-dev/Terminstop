@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@supabase/supabase-js"
 
 const supabase = createClient(
@@ -56,7 +56,13 @@ function parseLocalDate(date: string, time: string): Date {
   return result
 }
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  // ── Auth-Check: nur Aufrufe mit gültigem CRON_SECRET erlaubt ──
+  const authHeader = req.headers.get("authorization")
+  if (!authHeader || authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  }
+
   try {
     const now = getNowInBerlin()
     console.log("NOW (Berlin):", now.toString())
@@ -107,7 +113,6 @@ export async function GET() {
             })
             .eq("id", a.id)
 
-          // ✅ SMS Zähler hochzählen
           await supabase.rpc("increment_sms_count", {
             company_id_input: a.company_id
           })
