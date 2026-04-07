@@ -1,12 +1,10 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState } from "react"
 import { supabase } from "../lib/supabaseClient"
-import { useRouter } from "next/navigation"
 
 /* ─── Main Page ─────────────────────────────────────────────── */
 export default function LeadPage() {
-  const router = useRouter()
   const [name, setName] = useState("")
   const [phone, setPhone] = useState("")
   const [email, setEmail] = useState("")
@@ -15,9 +13,6 @@ export default function LeadPage() {
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
   const [formError, setFormError] = useState("")
-  const [mounted, setMounted] = useState(false)
-
-  useEffect(() => { setMounted(true) }, [])
 
   async function handleSubmit(e: any) {
     e.preventDefault()
@@ -39,292 +34,301 @@ export default function LeadPage() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
-        * { box-sizing: border-box; }
-        body { background: #F5F7FC; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+          background: #FFFFFF;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+        }
 
         .lead-root {
           min-height: 100vh;
-          background: #F5F7FC;
+          background: #FFFFFF;
           color: #0B0D14;
-          font-family: 'Inter', sans-serif;
-          position: relative;
-          overflow-x: hidden;
+          font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', 'Helvetica Neue', sans-serif;
         }
 
-        /* subtle grid texture */
-        .lead-root::before {
-          content: '';
-          position: fixed; inset: 0;
-          background-image:
-            linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px);
-          background-size: 72px 72px;
-          pointer-events: none; z-index: 0;
-        }
-
-        /* nav */
+        /* ── Nav ── */
         .lead-nav {
-          position: relative; z-index: 10;
+          position: sticky; top: 0; z-index: 50;
           display: flex; justify-content: space-between; align-items: center;
-          padding: 0 40px; height: 64px;
-          border-bottom: 1px solid rgba(0,0,0,0.07);
-          background: rgba(255,255,255,0.95);
-          backdrop-filter: blur(16px);
+          padding: 0 40px; height: 52px;
+          border-bottom: 1px solid rgba(0,0,0,0.06);
+          background: rgba(255,255,255,0.88);
+          backdrop-filter: blur(20px) saturate(180%);
+          -webkit-backdrop-filter: blur(20px) saturate(180%);
         }
         @media (max-width: 640px) { .lead-nav { padding: 0 20px; } }
 
-        .lead-logo { font-size: 18px; font-weight: 800; letter-spacing: -0.5px; text-decoration: none; }
-        .lead-logo .green { color: #18A66D; }
-        .lead-logo .dark { color: #0B0D14; }
+        .lead-logo {
+          font-size: 17px; font-weight: 800;
+          letter-spacing: -0.5px; text-decoration: none;
+        }
+        .lead-logo .g { color: #18A66D; }
+        .lead-logo .d { color: #0B0D14; }
 
         .lead-back {
           font-size: 13px; color: #6B7280;
-          text-decoration: none; transition: color 0.2s;
+          text-decoration: none; transition: color 0.15s;
           display: flex; align-items: center; gap: 4px;
         }
         .lead-back:hover { color: #0B0D14; }
 
-        /* layout */
+        /* ── Layout ── */
         .lead-body {
-          position: relative; z-index: 5;
-          max-width: 1100px; margin: 0 auto;
-          padding: 60px 24px 80px;
+          max-width: 1060px; margin: 0 auto;
+          padding: 72px 24px 100px;
           display: grid;
-          grid-template-columns: 1fr 460px;
-          gap: 64px;
+          grid-template-columns: 1fr 440px;
+          gap: 72px;
           align-items: start;
         }
         @media (max-width: 900px) {
-          .lead-body { grid-template-columns: 1fr; gap: 48px; }
+          .lead-body { grid-template-columns: 1fr; gap: 52px; }
         }
         @media (max-width: 640px) {
-          .lead-body { padding: 40px 16px 60px; }
+          .lead-body { padding: 48px 20px 72px; }
         }
 
-        /* ── LEFT ── */
+        /* ── Left column ── */
         .lead-badge {
           display: inline-flex; align-items: center; gap: 8px;
           background: #F0FBF5;
-          border: 1px solid rgba(24,166,109,0.25);
-          color: #149A60; font-size: 12px; font-weight: 600;
-          padding: 6px 14px; border-radius: 100px; margin-bottom: 28px;
-          letter-spacing: 0.3px;
+          border: 1px solid rgba(24,166,109,0.22);
+          color: #149A60; font-size: 11.5px; font-weight: 600;
+          padding: 5px 13px; border-radius: 100px; margin-bottom: 32px;
+          letter-spacing: 0.2px;
         }
         .badge-dot {
           width: 6px; height: 6px; border-radius: 50%;
           background: #18A66D;
-          animation: pulse-dot 2.5s ease-in-out infinite;
+          animation: pulseDot 2.5s ease-in-out infinite;
         }
-        @keyframes pulse-dot {
+        @keyframes pulseDot {
           0%,100% { opacity: 1; transform: scale(1); }
-          50% { opacity: 0.4; transform: scale(0.7); }
+          50% { opacity: 0.35; transform: scale(0.65); }
         }
 
         .lead-h1 {
-          font-size: clamp(28px, 4vw, 46px);
-          font-weight: 900; line-height: 1.1;
-          letter-spacing: -1.5px; margin-bottom: 18px;
+          font-size: clamp(30px, 4vw, 48px);
+          font-weight: 900; line-height: 1.08;
+          letter-spacing: -1.5px; margin-bottom: 20px;
           color: #0B0D14;
         }
         .lead-h1 .accent { color: #18A66D; }
 
         .lead-sub {
           font-size: 16px; color: #6B7280;
-          line-height: 1.7; margin-bottom: 44px;
-          max-width: 420px;
+          line-height: 1.72; margin-bottom: 48px;
+          max-width: 400px; font-weight: 400;
         }
 
-        /* feature items */
-        .features { display: flex; flex-direction: column; gap: 22px; margin-bottom: 48px; }
+        /* Feature list */
+        .features { display: flex; flex-direction: column; gap: 24px; margin-bottom: 52px; }
         .feat-item { display: flex; align-items: flex-start; gap: 16px; }
-        .feat-icon {
-          width: 44px; height: 44px; flex-shrink: 0;
-          background: white;
-          border: 1px solid rgba(0,0,0,0.08);
+
+        .feat-icon-wrap {
+          width: 42px; height: 42px; flex-shrink: 0;
+          background: #FFFFFF;
+          border: 1px solid #E5E7EB;
           border-radius: 12px;
           display: flex; align-items: center; justify-content: center;
-          font-size: 18px;
-          box-shadow: 0 1px 3px rgba(0,0,0,0.06);
-          transition: all 0.2s;
+          box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+          transition: border-color 0.2s, box-shadow 0.2s;
         }
-        .feat-item:hover .feat-icon {
-          border-color: rgba(24,166,109,0.3);
-          box-shadow: 0 0 0 3px rgba(24,166,109,0.08);
+        .feat-item:hover .feat-icon-wrap {
+          border-color: rgba(24,166,109,0.4);
+          box-shadow: 0 0 0 3px rgba(24,166,109,0.07);
         }
-        .feat-title { font-size: 14px; font-weight: 700; color: #0B0D14; margin-bottom: 3px; }
-        .feat-desc { font-size: 13px; color: #6B7280; line-height: 1.55; }
+        .feat-icon-svg {
+          width: 18px; height: 18px;
+          color: #18A66D;
+        }
 
-        /* kpis */
+        .feat-title { font-size: 14px; font-weight: 700; color: #0B0D14; margin-bottom: 3px; }
+        .feat-desc { font-size: 13px; color: #6B7280; line-height: 1.6; }
+
+        /* KPIs */
         .kpis {
-          display: flex; gap: 36px; flex-wrap: wrap;
-          padding-top: 28px;
-          border-top: 1px solid rgba(0,0,0,0.08);
+          display: flex; gap: 40px; flex-wrap: wrap;
+          padding-top: 32px;
+          border-top: 1px solid #F0F0F0;
         }
         .kpi-val {
-          font-size: 24px; font-weight: 900; color: #18A66D;
-          letter-spacing: -0.5px;
+          font-size: 26px; font-weight: 900; color: #18A66D;
+          letter-spacing: -0.5px; line-height: 1;
         }
-        .kpi-lbl { font-size: 12px; color: #9CA3AF; margin-top: 2px; }
+        .kpi-lbl { font-size: 11.5px; color: #9CA3AF; margin-top: 5px; font-weight: 500; }
 
-        /* ── RIGHT: Card ── */
+        /* ── Right column: Form card ── */
         .form-card {
-          background: white;
-          border: 1px solid rgba(0,0,0,0.08);
-          border-radius: 20px;
+          background: #FFFFFF;
+          border: 1px solid #E5E7EB;
+          border-radius: 18px;
+          box-shadow: 0 2px 16px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.02);
           overflow: hidden;
-          box-shadow: 0 4px 24px rgba(0,0,0,0.07), 0 1px 3px rgba(0,0,0,0.05);
         }
 
-        /* green top accent line */
-        .form-card-top {
+        .form-card-accent {
           height: 3px;
-          background: #18A66D;
+          background: linear-gradient(90deg, #18A66D, #4AE89B);
         }
 
         .card-header {
-          padding: 24px 28px 20px;
-          border-bottom: 1px solid rgba(0,0,0,0.06);
+          padding: 22px 26px 18px;
+          border-bottom: 1px solid #F3F4F6;
         }
-        .card-title { font-size: 17px; font-weight: 700; color: #0B0D14; }
-        .card-sub { font-size: 12px; color: #9CA3AF; margin-top: 4px; }
+        .card-title { font-size: 16px; font-weight: 700; color: #0B0D14; letter-spacing: -0.2px; }
+        .card-sub { font-size: 12px; color: #9CA3AF; margin-top: 4px; font-weight: 400; }
 
-        .form-inner { padding: 24px 28px 28px; }
+        .form-inner { padding: 22px 26px 26px; }
 
-        .field { margin-bottom: 16px; }
+        .field { margin-bottom: 15px; }
         .field label {
           display: block; font-size: 11px; font-weight: 600;
-          color: #6B7280; letter-spacing: 0.6px;
-          text-transform: uppercase; margin-bottom: 8px;
+          color: #6B7280; letter-spacing: 0.5px;
+          text-transform: uppercase; margin-bottom: 7px;
         }
         .field input,
         .field textarea {
           width: 100%;
           background: #F9FAFB;
-          border: 1px solid rgba(0,0,0,0.1);
-          border-radius: 10px;
-          padding: 12px 16px;
+          border: 1px solid #E5E7EB;
+          border-radius: 9px;
+          padding: 11px 14px;
           font-size: 14px; color: #0B0D14;
-          font-family: 'Inter', sans-serif;
-          outline: none; transition: all 0.18s;
+          font-family: inherit;
+          outline: none; transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+          -webkit-appearance: none;
         }
         .field input::placeholder,
-        .field textarea::placeholder { color: #C4C9D4; }
+        .field textarea::placeholder { color: #C4CAD4; }
         .field input:focus,
         .field textarea:focus {
           border-color: #18A66D;
-          background: white;
+          background: #FFFFFF;
           box-shadow: 0 0 0 3px rgba(24,166,109,0.1);
         }
         .field textarea { resize: none; }
 
         .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        @media (max-width: 400px) { .two-col { grid-template-columns: 1fr; } }
 
         .submit-btn {
-          width: 100%; margin-top: 8px;
-          padding: 15px; border-radius: 10px;
+          width: 100%; margin-top: 6px;
+          padding: 14px 20px; border-radius: 9px;
           font-size: 14px; font-weight: 700;
           cursor: pointer; border: none; outline: none;
           background: #18A66D;
           color: white;
-          transition: background 0.2s, box-shadow 0.2s, transform 0.12s;
-          box-shadow: 0 4px 16px rgba(24,166,109,0.25);
-          letter-spacing: 0.2px;
+          transition: background 0.18s, box-shadow 0.18s;
+          box-shadow: 0 1px 3px rgba(24,166,109,0.3), 0 4px 12px rgba(24,166,109,0.2);
+          letter-spacing: 0.1px;
+          font-family: inherit;
         }
         .submit-btn:hover:not(:disabled) {
           background: #149A60;
-          transform: translateY(-1px);
-          box-shadow: 0 6px 24px rgba(24,166,109,0.32);
+          box-shadow: 0 1px 3px rgba(24,166,109,0.4), 0 6px 18px rgba(24,166,109,0.28);
         }
-        .submit-btn:active:not(:disabled) { transform: translateY(0); }
-        .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; background: #6B7280; box-shadow: none; }
+        .submit-btn:active:not(:disabled) { background: #128A55; box-shadow: none; }
+        .submit-btn:disabled { opacity: 0.45; cursor: not-allowed; background: #9CA3AF; box-shadow: none; }
 
         .spin {
-          display: inline-block; width: 14px; height: 14px;
-          border: 2px solid rgba(255,255,255,0.3);
+          display: inline-block; width: 13px; height: 13px;
+          border: 2px solid rgba(255,255,255,0.35);
           border-top-color: white;
           border-radius: 50%;
-          animation: spin 0.7s linear infinite;
-          vertical-align: middle; margin-right: 6px;
+          animation: spin 0.65s linear infinite;
+          vertical-align: middle; margin-right: 7px;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
 
         .micro-trust {
-          display: flex; justify-content: center; gap: 20px;
-          margin-top: 14px;
-          font-size: 11px; color: #9CA3AF;
+          display: flex; justify-content: center; gap: 18px;
+          margin-top: 13px;
+          font-size: 11px; color: #9CA3AF; font-weight: 500;
         }
 
-        /* error */
         .form-error {
           display: flex; gap: 10px; align-items: center;
           background: #FFF5F5;
-          border: 1px solid #FCA5A5;
-          border-radius: 10px; padding: 10px 14px;
-          font-size: 13px; color: #EF4444; margin-bottom: 16px;
+          border: 1px solid #FECACA;
+          border-radius: 9px; padding: 10px 14px;
+          font-size: 13px; color: #EF4444; margin-bottom: 15px;
         }
 
-        /* ── SUCCESS ── */
+        /* ── Success ── */
         .success-card {
-          background: white;
-          border: 1px solid rgba(0,0,0,0.08);
-          border-radius: 20px; overflow: hidden;
-          box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+          background: #FFFFFF;
+          border: 1px solid #E5E7EB;
+          border-radius: 18px;
+          box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+          overflow: hidden;
           text-align: center;
         }
         .success-top {
-          background: linear-gradient(135deg, #F0FBF5, #E8F8F0);
-          padding: 44px 32px;
-          border-bottom: 1px solid rgba(24,166,109,0.12);
+          background: #F9FAFB;
+          padding: 48px 32px 40px;
+          border-bottom: 1px solid #F0F0F0;
         }
         .success-check {
-          width: 68px; height: 68px; border-radius: 50%; margin: 0 auto 18px;
+          width: 64px; height: 64px; border-radius: 50%; margin: 0 auto 20px;
           background: #18A66D;
           display: flex; align-items: center; justify-content: center;
-          font-size: 26px; color: white;
-          box-shadow: 0 8px 24px rgba(24,166,109,0.3);
-          animation: checkPop 0.45s cubic-bezier(0.175,0.885,0.32,1.275);
+          box-shadow: 0 8px 24px rgba(24,166,109,0.28);
+          animation: checkPop 0.4s cubic-bezier(0.175,0.885,0.32,1.275);
         }
         @keyframes checkPop {
           0% { transform: scale(0); opacity: 0; }
           100% { transform: scale(1); opacity: 1; }
         }
-        .success-title { font-size: 22px; font-weight: 800; color: #0B0D14; margin-bottom: 8px; }
+        .success-title {
+          font-size: 22px; font-weight: 800; color: #0B0D14;
+          letter-spacing: -0.5px; margin-bottom: 8px;
+        }
         .success-sub { font-size: 14px; color: #6B7280; }
-        .success-body { padding: 28px 32px; }
-        .success-text { font-size: 14px; color: #6B7280; line-height: 1.7; margin-bottom: 24px; }
-        .success-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 28px; text-align: left; }
-        .success-item { display: flex; align-items: center; gap: 12px; font-size: 14px; color: #374151; }
+        .success-body { padding: 28px 32px 32px; }
+        .success-text {
+          font-size: 14px; color: #6B7280; line-height: 1.72;
+          margin-bottom: 24px;
+        }
+        .success-list {
+          display: flex; flex-direction: column; gap: 12px;
+          margin-bottom: 28px; text-align: left;
+        }
+        .success-item {
+          display: flex; align-items: center; gap: 12px;
+          font-size: 14px; color: #374151;
+        }
         .s-check {
-          width: 22px; height: 22px; border-radius: 50%; flex-shrink: 0;
+          width: 20px; height: 20px; border-radius: 50%; flex-shrink: 0;
           background: #F0FBF5;
           border: 1px solid rgba(24,166,109,0.3);
           display: flex; align-items: center; justify-content: center;
-          font-size: 11px; color: #18A66D;
         }
         .back-btn {
           display: block; width: 100%;
-          padding: 13px; border-radius: 10px;
+          padding: 13px; border-radius: 9px;
           background: #F9FAFB;
-          border: 1px solid rgba(0,0,0,0.1);
+          border: 1px solid #E5E7EB;
           color: #374151; font-size: 14px; font-weight: 600;
           cursor: pointer; text-align: center;
-          text-decoration: none; transition: all 0.18s;
+          text-decoration: none; transition: all 0.15s;
+          font-family: inherit;
         }
         .back-btn:hover { background: #F0FBF5; border-color: rgba(24,166,109,0.3); color: #18A66D; }
 
-        /* fade-in on mount */
-        .fade-in {
-          opacity: 0; transform: translateY(20px);
-          animation: fadeUp 0.6s ease forwards;
+        /* Footer */
+        .lead-footer {
+          border-top: 1px solid #F3F4F6;
+          padding: 20px 40px;
+          display: flex; justify-content: space-between; align-items: center;
+          flex-wrap: wrap; gap: 12px;
         }
-        .fade-in-delay {
-          opacity: 0; transform: translateY(20px);
-          animation: fadeUp 0.6s ease 0.15s forwards;
-        }
-        @keyframes fadeUp {
-          to { opacity: 1; transform: translateY(0); }
-        }
+        .lead-footer span { font-size: 12px; color: #D1D5DB; }
+        .lead-footer a { font-size: 12px; color: #D1D5DB; text-decoration: none; transition: color 0.15s; }
+        .lead-footer a:hover { color: #9CA3AF; }
       `}</style>
 
       <div className="lead-root">
@@ -332,8 +336,8 @@ export default function LeadPage() {
         {/* Nav */}
         <nav className="lead-nav">
           <a href="/" className="lead-logo">
-            <span className="green">Termin</span>
-            <span className="dark">Stop</span>
+            <span className="g">Termin</span>
+            <span className="d">Stop</span>
           </a>
           <a href="/" className="lead-back">← Zurück</a>
         </nav>
@@ -342,7 +346,7 @@ export default function LeadPage() {
         <div className="lead-body">
 
           {/* ── LEFT ── */}
-          <div className="fade-in">
+          <div>
             <div className="lead-badge">
               <span className="badge-dot" />
               Kostenlos &amp; unverbindlich
@@ -354,18 +358,42 @@ export default function LeadPage() {
             </h1>
 
             <p className="lead-sub">
-              Wir zeigen Ihnen, wie TerminStop in Ihrem Betrieb funktioniert –
+              Wir zeigen Ihnen, wie TerminStop in Ihrem Betrieb funktioniert —
               und was es konkret für Sie bedeutet.
             </p>
 
             <div className="features">
               {[
-                { icon: "📞", title: "Persönliches Gespräch", desc: "Kein anonymer Support – Sie sprechen direkt mit uns." },
-                { icon: "⚡", title: "Schnelle Einrichtung", desc: "Wir zeigen Ihnen, wie das System in unter 10 Minuten läuft." },
-                { icon: "💡", title: "Konkrete Einschätzung", desc: "Sie erfahren, wie viel Sie monatlich durch TerminStop sparen können." },
+                {
+                  icon: (
+                    <svg className="feat-icon-svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" />
+                    </svg>
+                  ),
+                  title: "Persönliches Gespräch",
+                  desc: "Kein anonymer Support – Sie sprechen direkt mit uns.",
+                },
+                {
+                  icon: (
+                    <svg className="feat-icon-svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
+                    </svg>
+                  ),
+                  title: "Schnelle Einrichtung",
+                  desc: "Wir zeigen Ihnen, wie das System in unter 10 Minuten läuft.",
+                },
+                {
+                  icon: (
+                    <svg className="feat-icon-svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 18v-5.25m0 0a6.01 6.01 0 001.5-.189m-1.5.189a6.01 6.01 0 01-1.5-.189m3.75 7.478a12.06 12.06 0 01-4.5 0m3.75 2.383a14.406 14.406 0 01-3 0M14.25 18v-.192c0-.983.658-1.823 1.508-2.316a7.5 7.5 0 10-7.517 0c.85.493 1.509 1.333 1.509 2.316V18" />
+                    </svg>
+                  ),
+                  title: "Konkrete Einschätzung",
+                  desc: "Sie erfahren, wie viel Sie monatlich durch TerminStop sparen können.",
+                },
               ].map((item, i) => (
                 <div key={i} className="feat-item">
-                  <div className="feat-icon">{item.icon}</div>
+                  <div className="feat-icon-wrap">{item.icon}</div>
                   <div>
                     <div className="feat-title">{item.title}</div>
                     <div className="feat-desc">{item.desc}</div>
@@ -389,10 +417,10 @@ export default function LeadPage() {
           </div>
 
           {/* ── RIGHT ── */}
-          <div className="fade-in-delay">
+          <div>
             {!success ? (
               <div className="form-card">
-                <div className="form-card-top" />
+                <div className="form-card-accent" />
                 <div className="card-header">
                   <div className="card-title">Anfrage senden</div>
                   <div className="card-sub">Wir melden uns innerhalb von 24 Stunden bei Ihnen.</div>
@@ -439,7 +467,10 @@ export default function LeadPage() {
                     </div>
 
                     <div className="field">
-                      <label>Unternehmen <span style={{ textTransform: "none", fontWeight: 400, color: "#C4C9D4" }}>(optional)</span></label>
+                      <label>
+                        Unternehmen{" "}
+                        <span style={{ textTransform: "none", fontWeight: 400, color: "#C4CAD4" }}>(optional)</span>
+                      </label>
                       <input
                         placeholder="z. B. Autohaus Müller GmbH"
                         value={company}
@@ -448,7 +479,10 @@ export default function LeadPage() {
                     </div>
 
                     <div className="field">
-                      <label>Nachricht <span style={{ textTransform: "none", fontWeight: 400, color: "#C4C9D4" }}>(optional)</span></label>
+                      <label>
+                        Nachricht{" "}
+                        <span style={{ textTransform: "none", fontWeight: 400, color: "#C4CAD4" }}>(optional)</span>
+                      </label>
                       <textarea
                         rows={3}
                         placeholder="Kurze Info zu Ihrem Betrieb oder Anliegen..."
@@ -477,13 +511,17 @@ export default function LeadPage() {
             ) : (
               <div className="success-card">
                 <div className="success-top">
-                  <div className="success-check">✓</div>
+                  <div className="success-check">
+                    <svg width="26" height="26" fill="none" viewBox="0 0 24 24" stroke="white" strokeWidth={2.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                    </svg>
+                  </div>
                   <div className="success-title">Anfrage gesendet!</div>
                   <div className="success-sub">Wir haben Ihre Anfrage erhalten.</div>
                 </div>
                 <div className="success-body">
                   <p className="success-text">
-                    Wir melden uns <strong style={{ color: "#0B0D14" }}>innerhalb von 24 Stunden</strong> persönlich
+                    Wir melden uns <strong style={{ color: "#0B0D14", fontWeight: 700 }}>innerhalb von 24 Stunden</strong> persönlich
                     bei Ihnen – per Telefon oder E-Mail, ganz wie es Ihnen passt.
                   </p>
                   <div className="success-list">
@@ -493,7 +531,11 @@ export default function LeadPage() {
                       "Einrichtung in unter 10 Minuten",
                     ].map((item, i) => (
                       <div key={i} className="success-item">
-                        <div className="s-check">✓</div>
+                        <div className="s-check">
+                          <svg width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="#18A66D" strokeWidth={2.5}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                          </svg>
+                        </div>
                         {item}
                       </div>
                     ))}
@@ -504,6 +546,17 @@ export default function LeadPage() {
             )}
           </div>
         </div>
+
+        {/* Footer */}
+        <footer className="lead-footer">
+          <span>© {new Date().getFullYear()} TerminStop</span>
+          <div style={{ display: "flex", gap: 20 }}>
+            {[["Datenschutz", "/datenschutz"], ["AGB", "/agb"], ["Impressum", "/impressum"]].map(([label, href]) => (
+              <a key={href} href={href}>{label}</a>
+            ))}
+          </div>
+        </footer>
+
       </div>
     </>
   )
