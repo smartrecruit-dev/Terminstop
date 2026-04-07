@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import { supabase } from "../lib/supabaseClient"
 
 /* ─── Main Page ─────────────────────────────────────────────── */
 export default function LeadPage() {
@@ -18,16 +17,25 @@ export default function LeadPage() {
     e.preventDefault()
     setLoading(true)
     setFormError("")
-    const { error } = await supabase
-      .from("leads")
-      .insert([{ name, phone, email, company, message }])
-    setLoading(false)
-    if (!error) {
-      setSuccess(true)
-      setName(""); setPhone(""); setEmail(""); setCompany(""); setMessage("")
-    } else {
-      console.log(error)
-      setFormError("Beim Senden ist ein Fehler aufgetreten. Bitte erneut versuchen.")
+
+    try {
+      const res = await fetch("/api/lead", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, phone, email, company, message }),
+      })
+      const data = await res.json()
+
+      if (!res.ok) {
+        setFormError(data.error || "Beim Senden ist ein Fehler aufgetreten. Bitte erneut versuchen.")
+      } else {
+        setSuccess(true)
+        setName(""); setPhone(""); setEmail(""); setCompany(""); setMessage("")
+      }
+    } catch {
+      setFormError("Netzwerkfehler. Bitte Internetverbindung prüfen und erneut versuchen.")
+    } finally {
+      setLoading(false)
     }
   }
 
