@@ -301,7 +301,7 @@ export default function Datenschutz() {
             </div>
             <p className="mt-4">
               Zur Ausübung Ihrer Rechte wenden Sie sich bitte an:
-              {" "}<a href="mailto:terminstopp.business@gmail.com" className="text-[#18A66D] hover:underline">terminstopp.business@gmail.com</a>
+              {" "}<a href="mailto:terminstop.business@gmail.com" className="text-[#18A66D] hover:underline">terminstop.business@gmail.com</a>
             </p>
           </section>
 
@@ -337,7 +337,7 @@ export default function Datenschutz() {
                   {[
                     { name: "Vercel Inc.", purpose: "Hosting", location: "USA", basis: "SCCs" },
                     { name: "Supabase Inc.", purpose: "Datenbank", location: "USA/EU", basis: "DPA + SCCs" },
-                    { name: "Twilio Inc.", purpose: "SMS-Versand", location: "USA", basis: "SCCs" },
+                    { name: "seven communications GmbH & Co. KG", purpose: "SMS-Versand", location: "Deutschland (EU)", basis: "Auftragsverarbeitungsvertrag" },
                     { name: "GitHub Inc.", purpose: "Code-Hosting", location: "USA", basis: "SCCs" },
                   ].map((row, i) => (
                     <tr key={i} className="bg-white">

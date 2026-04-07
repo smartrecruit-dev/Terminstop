@@ -141,7 +141,7 @@ export default function AGB() {
               Abrechnungszeitraums zu kündigen.
             </p>
             <p>
-              Kosten, die durch den SMS-Versand über Twilio entstehen, können je nach
+              Kosten, die durch den SMS-Versand über seven.io entstehen, können je nach
               Volumen und Zielland variieren und sind, sofern nicht ausdrücklich im Preis
               enthalten, gesondert zu entrichten.
             </p>
@@ -227,7 +227,7 @@ export default function AGB() {
             <p className="mb-3">
               Der Anbieter strebt eine Verfügbarkeit der Plattform von mindestens 95 %
               im monatlichen Durchschnitt an. Hiervon ausgenommen sind geplante Wartungsarbeiten
-              sowie Ausfälle, die durch Drittanbieter (Supabase, Vercel, Twilio) verursacht werden.
+              sowie Ausfälle, die durch Drittanbieter (Supabase, Vercel, seven.io) verursacht werden.
             </p>
             <p className="mb-3">
               Geplante Wartungsarbeiten werden dem Kunden, soweit möglich, mindestens
@@ -260,7 +260,7 @@ export default function AGB() {
             <ul className="list-disc pl-6 space-y-1 mb-3 text-[#4B5563]">
               <li>entgangenen Gewinn oder mittelbare Schäden des Kunden;</li>
               <li>Schäden durch nicht zugestellte SMS-Nachrichten;</li>
-              <li>Schäden infolge von Ausfällen oder Fehlern der Drittanbieter (Supabase, Vercel, Twilio);</li>
+              <li>Schäden infolge von Ausfällen oder Fehlern der Drittanbieter (Supabase, Vercel, seven.io);</li>
               <li>
                 Schäden, die dadurch entstehen, dass der Kunde keine rechtmäßige Grundlage
                 für den SMS-Versand vorweisen kann;
