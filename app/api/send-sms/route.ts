@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
       body: JSON.stringify({
         to: formatPhone(phone),
         text: message,
-        from: "Terminstopp"
+        from: "TerminStop"
       })
     })
 
