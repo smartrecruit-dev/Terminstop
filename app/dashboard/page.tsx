@@ -131,7 +131,7 @@ export default function Dashboard() {
 
   return (
     <div
-      className="min-h-screen text-[#1F2A37]"
+      className="min-h-screen text-[#1F2A37] overflow-x-hidden"
       style={{
         fontFamily: "'Inter', 'Manrope', sans-serif",
         backgroundColor: "#F7FAFC"
@@ -139,57 +139,51 @@ export default function Dashboard() {
     >
 
       {/* ─── NAV ─── */}
-      <nav className="flex justify-between items-center px-8 md:px-12 py-4 border-b border-[#E5E7EB] bg-white sticky top-0 z-50">
-        <div className="flex items-center gap-8">
-          {/* Logo */}
-          <span className="text-base font-bold mr-2">
+      <nav className="flex justify-between items-center px-4 md:px-12 py-4 border-b border-[#E5E7EB] bg-white sticky top-0 z-50">
+        <div className="flex items-center gap-4 md:gap-8">
+          <span className="text-base font-bold">
             <span className="text-[#18A66D]">Termin</span>
             <span className="text-[#1F2A37]">Stop</span>
           </span>
-          <div className="flex gap-1">
-            <a
-              href="/dashboard"
-              className="text-sm font-semibold text-[#1F2A37] bg-[#F7FAFC] px-4 py-2 rounded-lg"
-            >
-              Dashboard
-            </a>
-            <a
-              href="/calendar"
-              className="text-sm text-[#6B7280] hover:text-[#1F2A37] hover:bg-[#F7FAFC] px-4 py-2 rounded-lg transition"
-            >
-              Kalender
-            </a>
-            <a
-              href="/customers"
-              className="text-sm text-[#6B7280] hover:text-[#1F2A37] hover:bg-[#F7FAFC] px-4 py-2 rounded-lg transition"
-            >
-              Kunden
-            </a>
-            <a
-              href="/insights"
-              className="text-sm text-[#6B7280] hover:text-[#1F2A37] hover:bg-[#F7FAFC] px-4 py-2 rounded-lg transition"
-            >
-              Einblicke
-            </a>
+          <div className="hidden md:flex gap-1">
+            <a href="/dashboard" className="text-sm font-semibold text-[#1F2A37] bg-[#F7FAFC] px-4 py-2 rounded-lg">Dashboard</a>
+            <a href="/calendar" className="text-sm text-[#6B7280] hover:text-[#1F2A37] hover:bg-[#F7FAFC] px-4 py-2 rounded-lg transition">Kalender</a>
+            <a href="/customers" className="text-sm text-[#6B7280] hover:text-[#1F2A37] hover:bg-[#F7FAFC] px-4 py-2 rounded-lg transition">Kunden</a>
+            <a href="/insights" className="text-sm text-[#6B7280] hover:text-[#1F2A37] hover:bg-[#F7FAFC] px-4 py-2 rounded-lg transition">Einblicke</a>
           </div>
         </div>
 
-        <div className="flex items-center gap-4">
-          {/* Live indicator */}
+        <div className="flex items-center gap-3">
           <div className="hidden md:flex items-center gap-2 text-xs text-[#18A66D] font-medium">
             <span className="w-1.5 h-1.5 bg-[#18A66D] rounded-full animate-pulse" />
             System aktiv
           </div>
-          <button
-            onClick={handleLogout}
-            className="text-sm text-[#6B7280] hover:text-[#1F2A37] transition px-3 py-1.5 rounded-lg hover:bg-[#F7FAFC]"
-          >
+          <button onClick={handleLogout} className="text-sm text-[#6B7280] hover:text-[#1F2A37] transition px-3 py-1.5 rounded-lg hover:bg-[#F7FAFC]">
             Logout
           </button>
         </div>
       </nav>
 
-      <div className="max-w-6xl mx-auto px-6 md:px-10 py-10">
+      {/* ─── MOBILE BOTTOM NAV ─── */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-[#E5E7EB] z-50 flex justify-around items-center px-2 py-2">
+        {[
+          { href: "/dashboard", label: "Dashboard", icon: "🏠", active: true },
+          { href: "/calendar", label: "Kalender", icon: "📅" },
+          { href: "/customers", label: "Kunden", icon: "👥" },
+          { href: "/insights", label: "Einblicke", icon: "📊" },
+        ].map((item) => (
+          <a key={item.href} href={item.href} className={`flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl transition ${item.active ? "text-[#18A66D]" : "text-[#9CA3AF]"}`}>
+            <span className="text-lg">{item.icon}</span>
+            <span className="text-[10px] font-medium">{item.label}</span>
+          </a>
+        ))}
+        <button onClick={handleLogout} className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl text-[#9CA3AF]">
+          <span className="text-lg">🚪</span>
+          <span className="text-[10px] font-medium">Logout</span>
+        </button>
+      </div>
+
+      <div className="max-w-6xl mx-auto px-4 md:px-10 py-8 pb-24 md:pb-10">
 
         {/* ─── HEADER ─── */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10">
