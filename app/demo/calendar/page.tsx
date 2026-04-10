@@ -49,18 +49,18 @@ export default function DemoCalendarPage() {
   })
 
   return (
-    <div className="min-h-screen text-[#1F2A37]" style={{ fontFamily: "'Inter','Manrope',sans-serif", backgroundColor: "#F7FAFC" }}>
+    <div className="min-h-screen text-[#1F2A37] overflow-x-hidden" style={{ fontFamily: "'Inter','Manrope',sans-serif", backgroundColor: "#F7FAFC" }}>
 
       <DemoBanner />
 
       {/* NAV */}
-      <nav className="flex justify-between items-center px-8 md:px-12 py-4 border-b border-[#E5E7EB] bg-white sticky top-0 z-50">
-        <div className="flex items-center gap-8">
-          <span className="text-base font-bold mr-2">
+      <nav className="flex justify-between items-center px-4 md:px-12 py-4 border-b border-[#E5E7EB] bg-white sticky top-0 z-50">
+        <div className="flex items-center gap-4 md:gap-8">
+          <span className="text-base font-bold">
             <span className="text-[#18A66D]">Termin</span>
             <span className="text-[#1F2A37]">Stop</span>
           </span>
-          <div className="flex gap-1">
+          <div className="hidden md:flex gap-1">
             <a href="/demo" className="text-sm text-[#6B7280] hover:text-[#1F2A37] hover:bg-[#F7FAFC] px-4 py-2 rounded-lg transition">Dashboard</a>
             <a href="/demo/calendar" className="text-sm font-semibold text-[#1F2A37] bg-[#F7FAFC] px-4 py-2 rounded-lg">Kalender</a>
             <a href="/demo/customers" className="text-sm text-[#6B7280] hover:text-[#1F2A37] hover:bg-[#F7FAFC] px-4 py-2 rounded-lg transition">Kunden</a>
@@ -71,11 +71,29 @@ export default function DemoCalendarPage() {
             <span className="w-1.5 h-1.5 bg-[#18A66D] rounded-full animate-pulse" />
             Demo aktiv
           </div>
-          <a href="/" className="text-sm text-[#6B7280] hover:text-[#1F2A37] transition px-3 py-1.5 rounded-lg hover:bg-[#F7FAFC]">← Startseite</a>
+          <a href="/" className="text-sm text-[#6B7280] hover:text-[#1F2A37] transition px-3 py-1.5 rounded-lg hover:bg-[#F7FAFC]">← Start</a>
         </div>
       </nav>
 
-      <div className="max-w-6xl mx-auto px-6 md:px-10 py-10">
+      {/* MOBILE BOTTOM NAV */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-[#E5E7EB] z-50 flex justify-around items-center px-2 py-2">
+        {[
+          { href: "/demo", label: "Dashboard", icon: "🏠" },
+          { href: "/demo/calendar", label: "Kalender", icon: "📅", active: true },
+          { href: "/demo/customers", label: "Kunden", icon: "👥" },
+        ].map((item) => (
+          <a key={item.href} href={item.href} className={`flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl transition ${item.active ? "text-[#18A66D]" : "text-[#9CA3AF]"}`}>
+            <span className="text-lg">{item.icon}</span>
+            <span className="text-[10px] font-medium">{item.label}</span>
+          </a>
+        ))}
+        <a href="/lead" className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl bg-[#18A66D] text-white">
+          <span className="text-lg">✨</span>
+          <span className="text-[10px] font-medium">Testen</span>
+        </a>
+      </div>
+
+      <div className="max-w-6xl mx-auto px-4 md:px-10 py-8 pb-24 md:pb-10">
 
         {/* HEADER */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">

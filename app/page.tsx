@@ -109,6 +109,8 @@ export default function LandingPage() {
         .pulse-ring  { position:absolute; inset:0; border-radius:50%; background:rgba(24,166,109,.2); animation:pulse-ring 2.2s cubic-bezier(0,.2,.2,1) infinite; }
         .marquee-wrap { animation: marquee 32s linear infinite; }
         .word-slot { animation: wordIn 2.6s ease-in-out; }
+        .badge-pill { display:inline-flex; align-items:center; gap:8px; border:1px solid rgba(255,255,255,.1); border-radius:980px; padding:5px 14px; margin-bottom:32px; background:rgba(255,255,255,.04); max-width:100%; flex-wrap:wrap; }
+        @media(max-width:600px){ .badge-pill { font-size:11px; padding:5px 10px; } }
 
         /* Buttons */
         .btn-primary {
@@ -184,12 +186,12 @@ export default function LandingPage() {
             {/* LEFT */}
             <div>
               {/* badge */}
-              <div style={{ display:"inline-flex", alignItems:"center", gap:8, border:"1px solid rgba(255,255,255,.1)", borderRadius:980, padding:"5px 14px", marginBottom:32, background:"rgba(255,255,255,.04)" }}>
-                <span style={{ position:"relative", display:"flex", width:7, height:7 }}>
+              <div className="badge-pill">
+                <span style={{ position:"relative", display:"flex", width:7, height:7, flexShrink:0 }}>
                   <span className="pulse-ring" />
                   <span style={{ position:"relative", display:"inline-flex", borderRadius:"50%", width:7, height:7, background:"#18A66D" }} />
                 </span>
-                <span style={{ fontSize:12, color:"rgba(255,255,255,.45)", fontWeight:600, letterSpacing:.2 }}>
+                <span style={{ fontSize:12, color:"rgba(255,255,255,.45)", fontWeight:600, letterSpacing:.2, whiteSpace:"nowrap" }}>
                   SMS-Erinnerungen für Ihren&nbsp;
                   <span style={{ color:"#18A66D", fontWeight:800 }} key={heroWord} className="word-slot">{words[heroWord]}</span>
                 </span>
