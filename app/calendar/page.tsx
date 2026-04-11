@@ -76,18 +76,18 @@ export default function CalendarPage() {
 
   return (
     <div
-      className="min-h-screen text-[#1F2A37]"
+      className="min-h-screen text-[#1F2A37] overflow-x-hidden"
       style={{ fontFamily: "'Inter', 'Manrope', sans-serif", backgroundColor: "#F7FAFC" }}
     >
 
       {/* ─── NAVBAR ─── */}
-      <nav className="flex justify-between items-center px-8 md:px-12 py-4 border-b border-[#E5E7EB] bg-white sticky top-0 z-50">
+      <nav className="flex justify-between items-center px-4 md:px-12 py-4 border-b border-[#E5E7EB] bg-white sticky top-0 z-50">
         <div className="flex items-center gap-8">
           <span className="text-base font-bold mr-2">
             <span className="text-[#18A66D]">Termin</span>
             <span className="text-[#1F2A37]">Stop</span>
           </span>
-          <div className="flex gap-1">
+          <div className="hidden md:flex gap-1">
             <a href="/dashboard" className="text-sm text-[#6B7280] hover:text-[#1F2A37] hover:bg-[#F7FAFC] px-4 py-2 rounded-lg transition">Dashboard</a>
             <a href="/calendar" className="text-sm font-semibold text-[#1F2A37] bg-[#F7FAFC] px-4 py-2 rounded-lg">Kalender</a>
             <a href="/customers" className="text-sm text-[#6B7280] hover:text-[#1F2A37] hover:bg-[#F7FAFC] px-4 py-2 rounded-lg transition">Kunden</a>
@@ -105,7 +105,7 @@ export default function CalendarPage() {
         </div>
       </nav>
 
-      <div className="max-w-6xl mx-auto px-6 md:px-10 py-10">
+      <div className="max-w-6xl mx-auto px-4 md:px-10 py-8 pb-24 md:pb-10">
 
         {/* ─── HEADER ─── */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
@@ -244,69 +244,161 @@ export default function CalendarPage() {
 
         {/* ─── WEEK VIEW ─── */}
         {view === "week" && (
-          <div className="grid grid-cols-7 gap-3">
-            {weekDays.map((day, i) => {
-              const dStr = day.toISOString().split("T")[0]
-              const items = appointments.filter(a => a.date === dStr)
-              const isToday = dStr === todayStr
-              const doneCount = items.filter(a => a.status === "done").length
-              return (
-                <div key={i} className={`rounded-2xl border overflow-hidden transition ${isToday ? "border-[#18A66D] shadow-md shadow-[#18A66D]/10" : "border-[#E5E7EB] bg-white"}`}>
-                  <div className={`px-3 py-3 text-center border-b ${isToday ? "bg-[#18A66D]" : "bg-[#F7FAFC] border-[#E5E7EB]"}`}>
-                    <div className={`text-xs font-semibold uppercase tracking-wide ${isToday ? "text-white/80" : "text-[#9CA3AF]"}`}>
-                      {day.toLocaleDateString("de-DE", { weekday: "short" })}
+          <>
+            {/* Mobile: nächste 2 Tage, scrollbar */}
+            <div className="md:hidden overflow-x-auto pb-2">
+              <div className="flex gap-3 min-w-0" style={{ minWidth: "max-content" }}>
+                {weekDays.slice(0, 2).map((day, i) => {
+                  const dStr = day.toISOString().split("T")[0]
+                  const items = appointments.filter(a => a.date === dStr)
+                  const isToday = dStr === todayStr
+                  const doneCount = items.filter(a => a.status === "done").length
+                  return (
+                    <div key={i} style={{ width: "calc(50vw - 24px)", minWidth: 160 }} className={`rounded-2xl border overflow-hidden transition flex-shrink-0 ${isToday ? "border-[#18A66D] shadow-md shadow-[#18A66D]/10" : "border-[#E5E7EB] bg-white"}`}>
+                      <div className={`px-4 py-3 text-center border-b ${isToday ? "bg-[#18A66D]" : "bg-[#F7FAFC] border-[#E5E7EB]"}`}>
+                        <div className={`text-xs font-semibold uppercase tracking-wide ${isToday ? "text-white/80" : "text-[#9CA3AF]"}`}>
+                          {day.toLocaleDateString("de-DE", { weekday: "long" })}
+                        </div>
+                        <div className={`text-2xl font-black mt-0.5 ${isToday ? "text-white" : "text-[#1F2A37]"}`}>
+                          {day.getDate()}. {day.toLocaleDateString("de-DE", { month: "short" })}
+                        </div>
+                        {items.length > 0 && (
+                          <div className={`text-[10px] font-medium mt-1 ${isToday ? "text-white/70" : "text-[#6B7280]"}`}>
+                            {items.length} Termin{items.length !== 1 ? "e" : ""}
+                          </div>
+                        )}
+                      </div>
+                      <div className={`p-3 flex flex-col gap-2 min-h-[160px] ${isToday ? "bg-[#F0FDF6]" : "bg-white"}`}>
+                        {items.length === 0 ? (
+                          <div className="flex items-center justify-center h-full pt-6">
+                            <span className="text-xs text-[#D1D5DB]">Keine Termine</span>
+                          </div>
+                        ) : (
+                          <>
+                            {items.slice(0, 6).map((a: any) => (
+                              <div
+                                key={a.id}
+                                onClick={() => { setSelected(a); setConfirmDelete(false) }}
+                                className={`text-xs px-3 py-2 rounded-xl cursor-pointer transition flex items-center gap-2 ${
+                                  a.status === "done"
+                                    ? "bg-[#D1FAE5] text-[#18A66D] line-through opacity-60"
+                                    : isToday
+                                    ? "bg-[#18A66D] text-white"
+                                    : "bg-[#F7FAFC] text-[#1F2A37] border border-[#E5E7EB]"
+                                }`}
+                              >
+                                <span className="font-bold shrink-0">{a.time}</span>
+                                <span className="truncate">{a.name}</span>
+                              </div>
+                            ))}
+                            {items.length > 6 && (
+                              <div className="text-xs text-[#9CA3AF] text-center pt-1">+{items.length - 6} weitere</div>
+                            )}
+                          </>
+                        )}
+                      </div>
+                      {items.length > 0 && (
+                        <div className="px-3 pb-3">
+                          <div className="w-full bg-[#E5E7EB] rounded-full h-1.5">
+                            <div className="bg-[#18A66D] h-1.5 rounded-full transition-all" style={{ width: `${Math.round((doneCount / items.length) * 100)}%` }} />
+                          </div>
+                        </div>
+                      )}
                     </div>
-                    <div className={`text-xl font-black mt-0.5 ${isToday ? "text-white" : "text-[#1F2A37]"}`}>
-                      {day.getDate()}
+                  )
+                })}
+              </div>
+            </div>
+
+            {/* Desktop: 7 Tage Grid */}
+            <div className="hidden md:grid grid-cols-7 gap-3">
+              {weekDays.map((day, i) => {
+                const dStr = day.toISOString().split("T")[0]
+                const items = appointments.filter(a => a.date === dStr)
+                const isToday = dStr === todayStr
+                const doneCount = items.filter(a => a.status === "done").length
+                return (
+                  <div key={i} className={`rounded-2xl border overflow-hidden transition ${isToday ? "border-[#18A66D] shadow-md shadow-[#18A66D]/10" : "border-[#E5E7EB] bg-white"}`}>
+                    <div className={`px-3 py-3 text-center border-b ${isToday ? "bg-[#18A66D]" : "bg-[#F7FAFC] border-[#E5E7EB]"}`}>
+                      <div className={`text-xs font-semibold uppercase tracking-wide ${isToday ? "text-white/80" : "text-[#9CA3AF]"}`}>
+                        {day.toLocaleDateString("de-DE", { weekday: "short" })}
+                      </div>
+                      <div className={`text-xl font-black mt-0.5 ${isToday ? "text-white" : "text-[#1F2A37]"}`}>
+                        {day.getDate()}
+                      </div>
+                      {items.length > 0 && (
+                        <div className={`text-[10px] font-medium mt-1 ${isToday ? "text-white/70" : "text-[#6B7280]"}`}>
+                          {items.length} Termin{items.length !== 1 ? "e" : ""}
+                        </div>
+                      )}
+                    </div>
+                    <div className={`p-2 flex flex-col gap-1.5 min-h-[120px] ${isToday ? "bg-[#F0FDF6]" : "bg-white"}`}>
+                      {items.length === 0 ? (
+                        <div className="flex items-center justify-center h-full pt-4">
+                          <span className="text-[10px] text-[#D1D5DB]">Frei</span>
+                        </div>
+                      ) : (
+                        <>
+                          {items.slice(0, 4).map((a: any) => (
+                            <div
+                              key={a.id}
+                              onClick={() => { setSelected(a); setConfirmDelete(false) }}
+                              className={`text-[10px] px-2 py-1.5 rounded-lg cursor-pointer transition flex items-center gap-1 ${
+                                a.status === "done"
+                                  ? "bg-[#D1FAE5] text-[#18A66D] line-through opacity-60"
+                                  : isToday
+                                  ? "bg-[#18A66D] text-white"
+                                  : "bg-[#F7FAFC] text-[#1F2A37] border border-[#E5E7EB] hover:border-[#18A66D]"
+                              }`}
+                            >
+                              <span className="font-bold">{a.time}</span>
+                              <span className="truncate">{a.name}</span>
+                            </div>
+                          ))}
+                          {items.length > 4 && (
+                            <div className="text-[10px] text-[#9CA3AF] text-center pt-1">+{items.length - 4} weitere</div>
+                          )}
+                        </>
+                      )}
                     </div>
                     {items.length > 0 && (
-                      <div className={`text-[10px] font-medium mt-1 ${isToday ? "text-white/70" : "text-[#6B7280]"}`}>
-                        {items.length} Termin{items.length !== 1 ? "e" : ""}
+                      <div className="px-2 pb-2">
+                        <div className="w-full bg-[#E5E7EB] rounded-full h-1">
+                          <div className="bg-[#18A66D] h-1 rounded-full transition-all" style={{ width: `${Math.round((doneCount / items.length) * 100)}%` }} />
+                        </div>
                       </div>
                     )}
                   </div>
-                  <div className={`p-2 flex flex-col gap-1.5 min-h-[120px] ${isToday ? "bg-[#F0FDF6]" : "bg-white"}`}>
-                    {items.length === 0 ? (
-                      <div className="flex items-center justify-center h-full pt-4">
-                        <span className="text-[10px] text-[#D1D5DB]">Frei</span>
-                      </div>
-                    ) : (
-                      <>
-                        {items.slice(0, 4).map((a: any) => (
-                          <div
-                            key={a.id}
-                            onClick={() => { setSelected(a); setConfirmDelete(false) }}
-                            className={`text-[10px] px-2 py-1.5 rounded-lg cursor-pointer transition flex items-center gap-1 ${
-                              a.status === "done"
-                                ? "bg-[#D1FAE5] text-[#18A66D] line-through opacity-60"
-                                : isToday
-                                ? "bg-[#18A66D] text-white"
-                                : "bg-[#F7FAFC] text-[#1F2A37] border border-[#E5E7EB] hover:border-[#18A66D]"
-                            }`}
-                          >
-                            <span className="font-bold">{a.time}</span>
-                            <span className="truncate">{a.name}</span>
-                          </div>
-                        ))}
-                        {items.length > 4 && (
-                          <div className="text-[10px] text-[#9CA3AF] text-center pt-1">+{items.length - 4} weitere</div>
-                        )}
-                      </>
-                    )}
-                  </div>
-                  {items.length > 0 && (
-                    <div className="px-2 pb-2">
-                      <div className="w-full bg-[#E5E7EB] rounded-full h-1">
-                        <div className="bg-[#18A66D] h-1 rounded-full transition-all" style={{ width: `${Math.round((doneCount / items.length) * 100)}%` }} />
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )
-            })}
-          </div>
+                )
+              })}
+            </div>
+          </>
         )}
       </div>
+
+      {/* ─── MOBILE BOTTOM NAV ─── */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-[#E5E7EB] z-50 flex justify-around items-center py-2 px-2">
+        <a href="/dashboard" className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl text-[#9CA3AF]">
+          <span className="text-xl">🏠</span>
+          <span className="text-[10px] font-medium">Start</span>
+        </a>
+        <a href="/calendar" className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl text-[#18A66D]">
+          <span className="text-xl">📅</span>
+          <span className="text-[10px] font-bold">Kalender</span>
+        </a>
+        <a href="/customers" className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl text-[#9CA3AF]">
+          <span className="text-xl">👥</span>
+          <span className="text-[10px] font-medium">Kunden</span>
+        </a>
+        <a href="/insights" className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl text-[#9CA3AF]">
+          <span className="text-xl">📊</span>
+          <span className="text-[10px] font-medium">Einblicke</span>
+        </a>
+        <button onClick={handleLogout} className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl text-[#9CA3AF]">
+          <span className="text-xl">🚪</span>
+          <span className="text-[10px] font-medium">Logout</span>
+        </button>
+      </nav>
 
       {/* ─── DETAIL POPUP ─── */}
       {selected && (

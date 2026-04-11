@@ -19,6 +19,8 @@ export default function CustomersPage() {
   const [saving, setSaving] = useState(false)
   const [success, setSuccess] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
+  const [editingNote, setEditingNote] = useState(false)
+  const [noteValue, setNoteValue] = useState("")
 
   useEffect(() => {
     const storedId = localStorage.getItem("company_id")
@@ -80,6 +82,23 @@ export default function CustomersPage() {
     loadCustomers()
   }
 
+  async function handleUpdateNote() {
+    if (!selected) return
+    await supabase.from("customers").update({ note: noteValue }).eq("id", selected.id)
+    const updated = { ...selected, note: noteValue }
+    setSelected(updated)
+    setEditingNote(false)
+    loadCustomers()
+  }
+
+  async function handleDeleteNote() {
+    if (!selected) return
+    await supabase.from("customers").update({ note: "" }).eq("id", selected.id)
+    const updated = { ...selected, note: "" }
+    setSelected(updated)
+    loadCustomers()
+  }
+
   async function handleLogout() {
     await supabase.auth.signOut()
     localStorage.removeItem("company_id")
@@ -97,16 +116,16 @@ export default function CustomersPage() {
     : []
 
   return (
-    <div className="min-h-screen text-[#1F2A37]" style={{ fontFamily: "'Inter', 'Manrope', sans-serif", backgroundColor: "#F7FAFC" }}>
+    <div className="min-h-screen text-[#1F2A37] overflow-x-hidden" style={{ fontFamily: "'Inter', 'Manrope', sans-serif", backgroundColor: "#F7FAFC" }}>
 
       {/* ─── NAV ─── */}
-      <nav className="flex justify-between items-center px-8 md:px-12 py-4 border-b border-[#E5E7EB] bg-white sticky top-0 z-50">
+      <nav className="flex justify-between items-center px-4 md:px-12 py-4 border-b border-[#E5E7EB] bg-white sticky top-0 z-50">
         <div className="flex items-center gap-8">
           <span className="text-base font-bold mr-2">
             <span className="text-[#18A66D]">Termin</span>
             <span className="text-[#1F2A37]">Stop</span>
           </span>
-          <div className="flex gap-1">
+          <div className="hidden md:flex gap-1">
             <a href="/dashboard" className="text-sm text-[#6B7280] hover:text-[#1F2A37] hover:bg-[#F7FAFC] px-4 py-2 rounded-lg transition">Dashboard</a>
             <a href="/calendar" className="text-sm text-[#6B7280] hover:text-[#1F2A37] hover:bg-[#F7FAFC] px-4 py-2 rounded-lg transition">Kalender</a>
             <a href="/customers" className="text-sm font-semibold text-[#1F2A37] bg-[#F7FAFC] px-4 py-2 rounded-lg">Kunden</a>
@@ -124,7 +143,7 @@ export default function CustomersPage() {
         </div>
       </nav>
 
-      <div className="max-w-6xl mx-auto px-6 md:px-10 py-10">
+      <div className="max-w-6xl mx-auto px-4 md:px-10 py-8 pb-24 md:pb-10">
 
         {/* ─── HEADER ─── */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10">
@@ -226,15 +245,63 @@ export default function CustomersPage() {
                       <div className="text-sm font-semibold text-[#1F2A37]">{selected.phone}</div>
                     </div>
                   </div>
-                  {selected.note && (
-                    <div className="flex items-start gap-3">
-                      <div className="w-8 h-8 bg-[#F7FAFC] border border-[#E5E7EB] rounded-lg flex items-center justify-center text-sm shrink-0">📝</div>
-                      <div>
+                  {/* ─── NOTIZ (editierbar) ─── */}
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 bg-[#F7FAFC] border border-[#E5E7EB] rounded-lg flex items-center justify-center text-sm shrink-0">📝</div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between mb-1">
                         <div className="text-xs text-[#9CA3AF]">Notiz</div>
-                        <div className="text-sm text-[#1F2A37]">{selected.note}</div>
+                        <div className="flex items-center gap-1">
+                          {!editingNote && (
+                            <button
+                              onClick={() => { setNoteValue(selected.note || ""); setEditingNote(true) }}
+                              className="text-[10px] text-[#18A66D] font-semibold hover:underline"
+                            >
+                              {selected.note ? "Bearbeiten" : "+ Notiz"}
+                            </button>
+                          )}
+                          {!editingNote && selected.note && (
+                            <button
+                              onClick={handleDeleteNote}
+                              className="text-[10px] text-[#EF4444] font-semibold hover:underline ml-2"
+                            >
+                              Löschen
+                            </button>
+                          )}
+                        </div>
                       </div>
+                      {editingNote ? (
+                        <div className="flex flex-col gap-2">
+                          <textarea
+                            value={noteValue}
+                            onChange={e => setNoteValue(e.target.value)}
+                            rows={3}
+                            className="w-full bg-[#F7FAFC] border border-[#18A66D] rounded-xl px-3 py-2 text-sm text-[#1F2A37] placeholder-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#18A66D]/20 resize-none transition"
+                            placeholder="Notiz eingeben..."
+                            autoFocus
+                          />
+                          <div className="flex gap-2">
+                            <button
+                              onClick={handleUpdateNote}
+                              className="flex-1 py-2 rounded-lg text-xs font-bold bg-[#18A66D] text-white hover:bg-[#0F8F63] transition"
+                            >
+                              Speichern
+                            </button>
+                            <button
+                              onClick={() => setEditingNote(false)}
+                              className="flex-1 py-2 rounded-lg text-xs font-semibold bg-white border border-[#E5E7EB] text-[#6B7280] hover:bg-[#F7FAFC] transition"
+                            >
+                              Abbrechen
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="text-sm text-[#1F2A37]">
+                          {selected.note || <span className="text-[#D1D5DB] italic">Keine Notiz</span>}
+                        </div>
+                      )}
                     </div>
-                  )}
+                  </div>
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 bg-[#F7FAFC] border border-[#E5E7EB] rounded-lg flex items-center justify-center text-sm shrink-0">📅</div>
                     <div>
@@ -333,6 +400,30 @@ export default function CustomersPage() {
           </div>
         </div>
       </div>
+
+      {/* ─── MOBILE BOTTOM NAV ─── */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-[#E5E7EB] z-50 flex justify-around items-center py-2 px-2">
+        <a href="/dashboard" className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl text-[#9CA3AF]">
+          <span className="text-xl">🏠</span>
+          <span className="text-[10px] font-medium">Start</span>
+        </a>
+        <a href="/calendar" className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl text-[#9CA3AF]">
+          <span className="text-xl">📅</span>
+          <span className="text-[10px] font-medium">Kalender</span>
+        </a>
+        <a href="/customers" className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl text-[#18A66D]">
+          <span className="text-xl">👥</span>
+          <span className="text-[10px] font-bold">Kunden</span>
+        </a>
+        <a href="/insights" className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl text-[#9CA3AF]">
+          <span className="text-xl">📊</span>
+          <span className="text-[10px] font-medium">Einblicke</span>
+        </a>
+        <button onClick={handleLogout} className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl text-[#9CA3AF]">
+          <span className="text-xl">🚪</span>
+          <span className="text-[10px] font-medium">Logout</span>
+        </button>
+      </nav>
     </div>
   )
 }
