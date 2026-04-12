@@ -84,6 +84,16 @@ export default function LandingPage() {
 
   const industries = ["Friseur", "KFZ-Werkstatt", "Arztpraxis", "Handwerk", "Kosmetik", "Physiotherapie", "Tattoo-Studio", "Nagelstudio", "Zahnarzt", "Optiker", "Hundesalon", "Massage"]
 
+  const compRows = [
+    { label:"Kosten",               them:"15–30 % Provision pro Buchung",   us:"Ab €39 / Monat — fertig" },
+    { label:"Vertragslaufzeit",      them:"Oft 12+ Monate gebunden",         us:"Monatlich kündbar" },
+    { label:"Ihre Kundendaten",      them:"Gehören der Plattform",           us:"Gehören ausschließlich Ihnen" },
+    { label:"SMS-Erinnerungen",      them:"✗ Nicht enthalten",               us:"✓ Vollautomatisch" },
+    { label:"Eigene Kundenkartei",   them:"✗ Nicht enthalten",               us:"✓ Mit Verlauf & Notizen" },
+    { label:"Auswertungen",          them:"Kaum / eingeschränkt",            us:"✓ Vollständig inklusive" },
+    { label:"Kundenbindung",         them:"Kunden vergleichen Preise",       us:"Direktkontakt — kein Vergleich" },
+  ]
+
   const F = "-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', sans-serif"
 
   return (
@@ -142,6 +152,19 @@ export default function LandingPage() {
         /* Accordion */
         .faq-item { border-bottom:1px solid #F3F4F6; }
         .faq-item:first-child { border-top:1px solid #F3F4F6; }
+
+        /* Mobile layout */
+        @media(max-width:768px){
+          .sec-pad{padding-top:64px!important;padding-bottom:64px!important;padding-left:20px!important;padding-right:20px!important}
+          .hero-phone-hide{display:none!important}
+          .showcase-phone-hide{display:none!important}
+          .sticky-mob-cta{display:flex!important}
+        }
+        .sticky-mob-cta{
+          display:none;position:fixed;bottom:0;left:0;right:0;z-index:45;
+          padding:12px 16px 28px;
+          background:linear-gradient(0deg,rgba(6,9,26,1) 55%,rgba(6,9,26,0) 100%);
+        }
       `}</style>
 
       <div style={{ fontFamily: F, color: "#0B0D14" }}>
@@ -231,7 +254,7 @@ export default function LandingPage() {
             </div>
 
             {/* RIGHT – phone */}
-            <div style={{ display:"flex", justifyContent:"flex-end" }}>
+            <div style={{ display:"flex", justifyContent:"flex-end" }} className="hero-phone-hide">
               <div className="float-phone" style={{ position:"relative" }}>
                 <div style={{
                   position:"absolute", inset:-40, borderRadius:"50%",
@@ -312,7 +335,7 @@ export default function LandingPage() {
         </section>
 
         {/* ══ PROBLEM ══ */}
-        <section style={{ background:"#fff", padding:"100px 32px" }}>
+        <section className="sec-pad" style={{ background:"#fff", padding:"100px 32px" }}>
           <div style={{ maxWidth:960, margin:"0 auto" }}>
             <Reveal>
               <div style={{ maxWidth:560, marginBottom:64 }}>
@@ -358,7 +381,7 @@ export default function LandingPage() {
         </section>
 
         {/* ══ HOW IT WORKS ══ */}
-        <section id="wie-es-funktioniert" style={{ background:"#F9FAFB", padding:"100px 32px" }}>
+        <section id="wie-es-funktioniert" className="sec-pad" style={{ background:"#F9FAFB", padding:"100px 32px" }}>
           <div style={{ maxWidth:960, margin:"0 auto" }}>
             <Reveal>
               <div style={{ maxWidth:520, marginBottom:64 }}>
@@ -391,7 +414,7 @@ export default function LandingPage() {
         </section>
 
         {/* ══ 4 FEATURE PILLARS ══ */}
-        <section style={{ background:"#F9FAFB", padding:"100px 32px" }}>
+        <section className="sec-pad" style={{ background:"#F9FAFB", padding:"100px 32px" }}>
           <div style={{ maxWidth:1080, margin:"0 auto" }}>
             <Reveal>
               <div style={{ textAlign:"center", maxWidth:580, margin:"0 auto 64px" }}>
@@ -444,12 +467,12 @@ export default function LandingPage() {
         </section>
 
         {/* ══ PRODUCT SHOWCASE ══ */}
-        <section style={{ background:"#fff", padding:"100px 32px" }}>
+        <section className="sec-pad" style={{ background:"#fff", padding:"100px 32px" }}>
           <div style={{ maxWidth:1080, margin:"0 auto", display:"grid", gridTemplateColumns:"1fr 1fr", gap:80, alignItems:"center" }} className="showcase-grid">
             <style>{`.showcase-grid{grid-template-columns:1fr 1fr} @media(max-width:900px){.showcase-grid{grid-template-columns:1fr!important}}`}</style>
 
             {/* phone */}
-            <div style={{ display:"flex", justifyContent:"center" }}>
+            <div style={{ display:"flex", justifyContent:"center" }} className="showcase-phone-hide">
               <div style={{ position:"relative" }}>
                 <div style={{ position:"absolute", inset:-32, borderRadius:"50%", background:"radial-gradient(ellipse,rgba(24,166,109,.06) 0%,transparent 70%)", pointerEvents:"none" }} />
                 <div style={{ background:"#02060A", padding:12, borderRadius:44, border:"1px solid rgba(24,166,109,.1)", boxShadow:"0 32px 64px rgba(0,0,0,.12)" }}>
@@ -518,7 +541,7 @@ export default function LandingPage() {
         </section>
 
         {/* ══ COMPETITOR COMPARISON ══ */}
-        <section style={{ background:"#06091A", padding:"100px 32px" }}>
+        <section style={{ background:"#06091A", padding:"100px 32px" }} className="sec-pad">
           <div style={{ maxWidth:960, margin:"0 auto" }}>
             <Reveal>
               <div style={{ textAlign:"center", maxWidth:580, margin:"0 auto 56px" }}>
@@ -527,52 +550,76 @@ export default function LandingPage() {
                   Was andere kosten.<br /><span style={{ color:"#18A66D" }}>Was Sie bekommen.</span>
                 </h2>
                 <p style={{ fontSize:16, color:"rgba(255,255,255,.32)", margin:0 }}>
-                  Treatwell, Pointify & Co. klingen verlockend — bis man genau hinschaut.
+                  Buchungsportale & Marktplätze klingen verlockend — bis man genau hinschaut.
                 </p>
               </div>
             </Reveal>
 
             <Reveal delay={60}>
-              <div style={{ background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.08)", borderRadius:20, overflow:"hidden" }}>
-                {/* Table header */}
-                <div style={{ display:"grid", gridTemplateColumns:"1.6fr 1fr 1fr", borderBottom:"1px solid rgba(255,255,255,.08)" }} className="ctable">
-                  <style>{`.ctable,.ctrow{display:grid;grid-template-columns:1.6fr 1fr 1fr} @media(max-width:600px){.ctable,.ctrow{grid-template-columns:1fr 0.8fr 0.9fr}}`}</style>
-                  <div style={{ padding:"18px 24px" }} />
-                  <div style={{ padding:"18px 16px", textAlign:"center", borderLeft:"1px solid rgba(255,255,255,.06)", display:"flex", alignItems:"center", justifyContent:"center" }}>
-                    <span style={{ fontSize:13, color:"rgba(255,255,255,.3)", fontWeight:600 }}>Treatwell / Pointify</span>
+              {/* ── Desktop Table (hidden on mobile) ── */}
+              <div className="comp-desktop">
+                <style>{`.comp-desktop{display:block} @media(max-width:600px){.comp-desktop{display:none!important}}`}</style>
+                <div style={{ background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.08)", borderRadius:20, overflow:"hidden" }}>
+                  <div style={{ display:"grid", gridTemplateColumns:"1.6fr 1fr 1fr", borderBottom:"1px solid rgba(255,255,255,.08)" }}>
+                    <div style={{ padding:"18px 24px" }} />
+                    <div style={{ padding:"18px 16px", textAlign:"center", borderLeft:"1px solid rgba(255,255,255,.06)", display:"flex", alignItems:"center", justifyContent:"center" }}>
+                      <span style={{ fontSize:13, color:"rgba(255,255,255,.3)", fontWeight:600 }}>Klassische Portale</span>
+                    </div>
+                    <div style={{ padding:"18px 16px", textAlign:"center", background:"rgba(24,166,109,.07)", borderLeft:"1px solid rgba(24,166,109,.18)", display:"flex", alignItems:"center", justifyContent:"center" }}>
+                      <span style={{ fontSize:14, fontWeight:800, color:"#4AE89B" }}>TerminStop ✓</span>
+                    </div>
                   </div>
-                  <div style={{ padding:"18px 16px", textAlign:"center", background:"rgba(24,166,109,.07)", borderLeft:"1px solid rgba(24,166,109,.18)", display:"flex", alignItems:"center", justifyContent:"center" }}>
-                    <span style={{ fontSize:14, fontWeight:800, color:"#4AE89B" }}>TerminStop ✓</span>
+                  {compRows.map((row, i) => (
+                    <div key={i} style={{ display:"grid", gridTemplateColumns:"1.6fr 1fr 1fr", borderBottom: i < compRows.length-1 ? "1px solid rgba(255,255,255,.05)" : "none" }}>
+                      <div style={{ padding:"15px 24px", display:"flex", alignItems:"center" }}>
+                        <span style={{ fontSize:13, color:"rgba(255,255,255,.4)", fontWeight:500 }}>{row.label}</span>
+                      </div>
+                      <div style={{ padding:"15px 16px", borderLeft:"1px solid rgba(255,255,255,.04)", display:"flex", alignItems:"center", justifyContent:"center" }}>
+                        <span style={{ fontSize:12, color:"rgba(255,255,255,.22)", lineHeight:1.5, textAlign:"center" as any }}>{row.them}</span>
+                      </div>
+                      <div style={{ padding:"15px 16px", background:"rgba(24,166,109,.04)", borderLeft:"1px solid rgba(24,166,109,.1)", display:"flex", alignItems:"center", justifyContent:"center" }}>
+                        <span style={{ fontSize:12, color:"rgba(74,232,155,.9)", fontWeight:600, lineHeight:1.5, textAlign:"center" as any }}>{row.us}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* ── Mobile Cards (hidden on desktop) ── */}
+              <div className="comp-mobile">
+                <style>{`.comp-mobile{display:none} @media(max-width:600px){.comp-mobile{display:block}}`}</style>
+                {/* Column labels */}
+                <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10, marginBottom:14 }}>
+                  <div style={{ background:"rgba(255,255,255,.04)", border:"1px solid rgba(255,255,255,.08)", borderRadius:12, padding:"11px", textAlign:"center" as any }}>
+                    <span style={{ fontSize:12, color:"rgba(255,255,255,.3)", fontWeight:600 }}>Klassische Portale</span>
+                  </div>
+                  <div style={{ background:"rgba(24,166,109,.1)", border:"1px solid rgba(24,166,109,.25)", borderRadius:12, padding:"11px", textAlign:"center" as any }}>
+                    <span style={{ fontSize:13, fontWeight:800, color:"#4AE89B" }}>TerminStop ✓</span>
                   </div>
                 </div>
-                {[
-                  { label:"Kosten",               them:"15–30 % Provision pro Buchung",   us:"Ab €39 / Monat — fertig" },
-                  { label:"Vertragslaufzeit",      them:"Oft 12+ Monate gebunden",         us:"Monatlich kündbar" },
-                  { label:"Ihre Kundendaten",      them:"Gehören der Plattform",           us:"Gehören ausschließlich Ihnen" },
-                  { label:"SMS-Erinnerungen",      them:"✗ Nicht enthalten",               us:"✓ Vollautomatisch" },
-                  { label:"Eigene Kundenkartei",   them:"✗ Nicht enthalten",               us:"✓ Mit Verlauf & Notizen" },
-                  { label:"Auswertungen",          them:"Kaum / eingeschränkt",            us:"✓ Vollständig inklusive" },
-                  { label:"Kundenbindung",         them:"Kunden vergleichen Preise",       us:"Direktkontakt — kein Vergleich" },
-                ].map((row, i) => (
-                  <div key={i} className="ctrow" style={{ borderBottom: i < 6 ? "1px solid rgba(255,255,255,.05)" : "none" }}>
-                    <div style={{ padding:"15px 24px", display:"flex", alignItems:"center" }}>
-                      <span style={{ fontSize:13, color:"rgba(255,255,255,.4)", fontWeight:500 }}>{row.label}</span>
+                {/* Each category as a card */}
+                <div style={{ display:"flex", flexDirection:"column" as any, gap:10 }}>
+                  {compRows.map((row, i) => (
+                    <div key={i} style={{ background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.07)", borderRadius:14, padding:"14px 16px" }}>
+                      <div style={{ fontSize:10, fontWeight:700, color:"rgba(255,255,255,.3)", textTransform:"uppercase" as any, letterSpacing:1.5, marginBottom:10 }}>{row.label}</div>
+                      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}>
+                        <div style={{ background:"rgba(255,255,255,.04)", borderRadius:10, padding:"10px 12px" }}>
+                          <span style={{ fontSize:12, color:"rgba(255,255,255,.25)", lineHeight:1.5 }}>{row.them}</span>
+                        </div>
+                        <div style={{ background:"rgba(24,166,109,.07)", border:"1px solid rgba(24,166,109,.15)", borderRadius:10, padding:"10px 12px" }}>
+                          <span style={{ fontSize:12, color:"rgba(74,232,155,.9)", fontWeight:600, lineHeight:1.5 }}>{row.us}</span>
+                        </div>
+                      </div>
                     </div>
-                    <div style={{ padding:"15px 16px", borderLeft:"1px solid rgba(255,255,255,.04)", display:"flex", alignItems:"center", justifyContent:"center" }}>
-                      <span style={{ fontSize:12, color:"rgba(255,255,255,.22)", lineHeight:1.5, textAlign:"center" as any }}>{row.them}</span>
-                    </div>
-                    <div style={{ padding:"15px 16px", background:"rgba(24,166,109,.04)", borderLeft:"1px solid rgba(24,166,109,.1)", display:"flex", alignItems:"center", justifyContent:"center" }}>
-                      <span style={{ fontSize:12, color:"rgba(74,232,155,.9)", fontWeight:600, lineHeight:1.5, textAlign:"center" as any }}>{row.us}</span>
-                    </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             </Reveal>
 
             <Reveal delay={100}>
               <div style={{ marginTop:24, display:"flex", flexDirection:"column" as any, alignItems:"center", gap:16, textAlign:"center" as any }}>
                 <p style={{ fontSize:13, color:"rgba(255,255,255,.22)", margin:0 }}>
-                  Bei 100 Buchungen/Monat à €50 zahlen Sie bei Treatwell bis zu <strong style={{ color:"rgba(255,255,255,.45)" }}>€1.500 Provision</strong>. TerminStop kostet <strong style={{ color:"#4AE89B" }}>€39</strong>.
+                  Bei 100 Buchungen/Monat à €50 zahlen Sie über ein Buchungsportal bis zu <strong style={{ color:"rgba(255,255,255,.45)" }}>€1.500 Provision</strong>. TerminStop kostet <strong style={{ color:"#4AE89B" }}>€39</strong>.
                 </p>
                 <a href="/lead" className="btn-primary" style={{ fontSize:15, padding:"14px 32px" }}>Jetzt wechseln →</a>
               </div>
@@ -581,7 +628,7 @@ export default function LandingPage() {
         </section>
 
         {/* ══ REVIEWS ══ */}
-        <section style={{ background:"#fff", padding:"100px 32px" }}>
+        <section className="sec-pad" style={{ background:"#fff", padding:"100px 32px" }}>
           <div style={{ maxWidth:1080, margin:"0 auto" }}>
             <Reveal>
               <div style={{ textAlign:"center", marginBottom:60 }}>
@@ -615,7 +662,7 @@ export default function LandingPage() {
         </section>
 
         {/* ══ PRICING ══ */}
-        <section id="preise" style={{ background:"#F9FAFB", padding:"100px 32px" }}>
+        <section id="preise" className="sec-pad" style={{ background:"#F9FAFB", padding:"100px 32px" }}>
           <div style={{ maxWidth:960, margin:"0 auto" }}>
             <Reveal>
               <div style={{ textAlign:"center", maxWidth:560, margin:"0 auto 16px" }}>
@@ -688,7 +735,7 @@ export default function LandingPage() {
         </section>
 
         {/* ══ FAQ ══ */}
-        <section style={{ background:"#fff", padding:"100px 32px" }}>
+        <section className="sec-pad" style={{ background:"#fff", padding:"100px 32px" }}>
           <div style={{ maxWidth:680, margin:"0 auto" }}>
             <Reveal>
               <div style={{ textAlign:"center", marginBottom:56 }}>
@@ -717,7 +764,7 @@ export default function LandingPage() {
         </section>
 
         {/* ══ FINAL CTA ══ */}
-        <section style={{ background:"linear-gradient(170deg,#06091A 0%,#080C1E 100%)", padding:"120px 32px", position:"relative", overflow:"hidden" }}>
+        <section className="sec-pad" style={{ background:"linear-gradient(170deg,#06091A 0%,#080C1E 100%)", padding:"120px 32px", position:"relative", overflow:"hidden" }}>
           <div style={{ position:"absolute", top:"50%", left:"50%", transform:"translate(-50%,-50%)", width:600, height:400, borderRadius:"50%", background:"radial-gradient(ellipse,rgba(24,166,109,.08) 0%,transparent 65%)", pointerEvents:"none" }} />
           <div style={{ maxWidth:600, margin:"0 auto", textAlign:"center", position:"relative" }}>
             <Reveal>
@@ -741,6 +788,13 @@ export default function LandingPage() {
             </Reveal>
           </div>
         </section>
+
+        {/* ══ STICKY MOBILE CTA ══ */}
+        <div className="sticky-mob-cta">
+          <a href="/lead" className="btn-primary" style={{ flex:1, textAlign:"center" as any, fontSize:16, padding:"15px 0", borderRadius:16 }}>
+            Kostenlos anfragen →
+          </a>
+        </div>
 
         {/* ══ FOOTER ══ */}
         <footer style={{ background:"#fff", borderTop:"1px solid #F3F4F6", padding:"28px 32px" }}>
