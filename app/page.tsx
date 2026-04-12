@@ -67,6 +67,7 @@ export default function LandingPage() {
   ]
 
   const faqs = [
+    { q: "Ist TerminStop nur für SMS-Erinnerungen?", a: "Nein – SMS-Erinnerungen sind nur eine von vier Funktionen. TerminStop ist Ihr komplettes digitales Terminbüro: mit digitalem Kalender, Kundenkartei mit vollständiger Terminhistorie, automatischen SMS-Erinnerungen und Auswertungen über Ihre Entwicklung. Alles in einem System, monatlich ab €39." },
     { q: "Muss ich eine App installieren oder etwas technisch einrichten?", a: "Nein. TerminStop läuft komplett im Browser – keine App, keine Software, keine technischen Vorkenntnisse. Die Einrichtung dauert unter 10 Minuten und wir begleiten Sie dabei persönlich." },
     { q: "Was kostet TerminStop monatlich?", a: "Unsere Pakete starten ab €39 pro Monat – je nach Anzahl Ihrer Termine. Im Beratungsgespräch finden wir gemeinsam das passende Paket. Kein Vertrag, monatlich kündbar." },
     { q: "Funktioniert das auch für meinen Betrieb – ich bin kein IT-Unternehmen?", a: "Genau dafür ist TerminStop gebaut. Die meisten unserer Kunden sind Handwerker, Friseure, Praxen oder KFZ-Betriebe – keine Vorkenntnisse nötig." },
@@ -194,19 +195,19 @@ export default function LandingPage() {
                   <span style={{ position:"relative", display:"inline-flex", borderRadius:"50%", width:7, height:7, background:"#18A66D" }} />
                 </span>
                 <span style={{ fontSize:12, color:"rgba(255,255,255,.45)", fontWeight:600, letterSpacing:.2 }}>
-                  SMS-Erinnerungen für Ihren&nbsp;<span style={{ color:"#18A66D", fontWeight:800, display:"inline-block" }} key={heroWord} className="word-slot">{words[heroWord]}</span>
+                  Digitales Terminbüro für Ihren&nbsp;<span style={{ color:"#18A66D", fontWeight:800, display:"inline-block" }} key={heroWord} className="word-slot">{words[heroWord]}</span>
                 </span>
               </div>
 
               {/* headline */}
               <h1 style={{ fontSize:"clamp(40px,5vw,72px)", fontWeight:900, lineHeight:1.04, letterSpacing:"-2px", color:"#fff", margin:"0 0 24px" }}>
-                Kein Termin<br />
-                geht mehr<br />
-                <span style={{ color:"#18A66D" }}>verloren.</span>
+                Ihr Betrieb.<br />
+                Digital.<br />
+                <span style={{ color:"#18A66D" }}>Automatisch.</span>
               </h1>
 
               <p style={{ fontSize:18, color:"rgba(255,255,255,.42)", lineHeight:1.65, maxWidth:420, margin:"0 0 40px" }}>
-                TerminStop erinnert Ihre Kunden automatisch per SMS — damit Termine eingehalten werden und Sie sich auf Ihr Handwerk konzentrieren können.
+                TerminStop ist Ihr komplettes digitales Terminbüro — mit Kalender, Kundenkartei, automatischen SMS-Erinnerungen und Auswertungen. Alles in einem. In 10 Minuten eingerichtet.
               </p>
 
               <div className="hero-btns" style={{ display:"flex", gap:12, flexWrap:"wrap", marginBottom:52 }}>
@@ -317,10 +318,10 @@ export default function LandingPage() {
               <div style={{ maxWidth:560, marginBottom:64 }}>
                 <div style={{ fontSize:11, fontWeight:700, letterSpacing:3, textTransform:"uppercase", color:"#18A66D", marginBottom:16 }}>Das Problem</div>
                 <h2 style={{ fontSize:"clamp(32px,4vw,52px)", fontWeight:900, letterSpacing:"-1.5px", lineHeight:1.08, margin:"0 0 18px" }}>
-                  Terminausfälle kosten Sie<br />täglich echtes Geld.
+                  Zettelwirtschaft, Telefonate,<br />No-Shows. Täglich.
                 </h2>
                 <p style={{ fontSize:17, color:"#6B7280", lineHeight:1.65, margin:0 }}>
-                  Jeder Betrieb verliert täglich durch No-Shows Umsatz — nicht einmal, sondern jeden Tag.
+                  Kein Überblick über Kunden, kein digitaler Kalender, kein System — und dazu noch Kunden, die einfach nicht erscheinen. Das kostet Sie jeden Tag Zeit und Geld.
                 </p>
               </div>
             </Reveal>
@@ -370,9 +371,9 @@ export default function LandingPage() {
             </Reveal>
             <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
               {[
-                { num:"01", title:"Einmalig einrichten – in unter 10 Minuten", desc:"Wir richten TerminStop gemeinsam mit Ihnen ein. Persönlicher Onboarding-Support inklusive.", tag:"Persönliche Begleitung" },
-                { num:"02", title:"Kunden erhalten automatisch eine SMS", desc:"24 Stunden vor jedem Termin verschickt TerminStop eine personalisierte Erinnerung – mit Ihrem Namen und dem genauen Termin.", tag:"Vollständig automatisch" },
-                { num:"03", title:"Ihre Termine werden tatsächlich eingehalten", desc:"Weniger Ausfälle, planbarere Tage, mehr Umsatz. Sie sehen, wer bestätigt hat – und können rechtzeitig reagieren.", tag:"95 % Erfolgsquote" },
+                { num:"01", title:"Einmalig einrichten – in unter 10 Minuten", desc:"Wir richten TerminStop gemeinsam mit Ihnen ein: Kalender, Kundenkartei und SMS-Erinnerungen. Persönlicher Onboarding-Support inklusive – kein technisches Vorwissen nötig.", tag:"Persönliche Begleitung" },
+                { num:"02", title:"Ihr digitales Büro läuft – sofort und vollautomatisch", desc:"Termine im Kalender, Kunden in der Kartei, SMS-Erinnerungen gehen automatisch raus – 24h vor jedem Termin, mit Ihrem Namen. Sie sehen auf einen Blick, wer bestätigt hat und wer nicht.", tag:"Alles in einem" },
+                { num:"03", title:"Ihr Betrieb läuft planbarer. Jeden Tag.", desc:"Weniger Ausfälle, mehr Überblick, mehr Umsatz. Kein Hinterhertelefonieren, keine Zettelwirtschaft – TerminStop arbeitet dauerhaft für Sie im Hintergrund.", tag:"95 % Erfolgsquote" },
               ].map((s, i) => (
                 <Reveal key={i} delay={i * 80}>
                   <div style={{ background:"#fff", border:"1px solid #F3F4F6", borderRadius:18, padding:"32px 36px", display:"flex", gap:32, alignItems:"flex-start", boxShadow:"0 1px 4px rgba(0,0,0,.04)" }}>
@@ -386,6 +387,59 @@ export default function LandingPage() {
                 </Reveal>
               ))}
             </div>
+          </div>
+        </section>
+
+        {/* ══ 4 FEATURE PILLARS ══ */}
+        <section style={{ background:"#F9FAFB", padding:"100px 32px" }}>
+          <div style={{ maxWidth:1080, margin:"0 auto" }}>
+            <Reveal>
+              <div style={{ textAlign:"center", maxWidth:580, margin:"0 auto 64px" }}>
+                <div style={{ fontSize:11, fontWeight:700, letterSpacing:3, textTransform:"uppercase", color:"#18A66D", marginBottom:16 }}>Alles inklusive</div>
+                <h2 style={{ fontSize:"clamp(32px,4vw,52px)", fontWeight:900, letterSpacing:"-1.5px", lineHeight:1.08, margin:"0 0 16px" }}>
+                  Kein Einzeltool.<br />Ein komplettes System.
+                </h2>
+                <p style={{ fontSize:17, color:"#6B7280", lineHeight:1.65, margin:0 }}>
+                  TerminStop ersetzt Notizbuch, Papierkalender und Erinnerungsanrufe — und gibt Ihnen dabei mehr Einblick als je zuvor.
+                </p>
+              </div>
+            </Reveal>
+            <div style={{ display:"grid", gap:20 }} className="features4-grid">
+              <style>{`.features4-grid{grid-template-columns:repeat(2,1fr)} @media(max-width:700px){.features4-grid{grid-template-columns:1fr!important}}`}</style>
+              {[
+                { icon:"📅", title:"Digitaler Kalender", tag:"Notizbuch adé", desc:"Tag- und Wochenübersicht für alle Termine. Auf dem Handy, Tablet oder PC — immer aktuell, immer dabei. Nie wieder Zettelwirtschaft." },
+                { icon:"👥", title:"Kundenkartei", tag:"Voller Überblick", desc:"Stammkunden anlegen, Verlauf einsehen, Notizen hinterlegen. Sie wissen immer, wer zuverlässig ist — und wer nicht." },
+                { icon:"📱", title:"Automatische SMS-Erinnerungen", tag:"Vollautomatisch", desc:"24h vor jedem Termin geht automatisch eine personalisierte SMS raus — ohne Ihr Zutun. Nie wieder hinterhertelefonieren." },
+                { icon:"📊", title:"Auswertungen & Einblicke", tag:"Datengestützt", desc:"Wie hoch ist Ihre Erfolgsquote? Welche Kunden kommen regelmäßig? Sehen Sie Ihren Betrieb endlich schwarz auf weiß." },
+              ].map((f, i) => (
+                <Reveal key={i} delay={i * 70}>
+                  <div style={{ background:"#fff", border:"1px solid #F3F4F6", borderRadius:20, padding:"32px", boxShadow:"0 1px 4px rgba(0,0,0,.04)", height:"100%", boxSizing:"border-box" as any }}>
+                    <div style={{ display:"flex", alignItems:"center", gap:14, marginBottom:18 }}>
+                      <div style={{ width:48, height:48, background:"#F0FBF5", borderRadius:14, display:"flex", alignItems:"center", justifyContent:"center", fontSize:22, flexShrink:0 }}>{f.icon}</div>
+                      <div>
+                        <span style={{ display:"inline-block", background:"#F0FBF5", border:"1px solid rgba(24,166,109,.2)", color:"#18A66D", fontSize:10, fontWeight:700, padding:"3px 10px", borderRadius:980, marginBottom:6 }}>{f.tag}</span>
+                        <h3 style={{ fontSize:16, fontWeight:800, color:"#0B0D14", margin:0, letterSpacing:"-0.2px" }}>{f.title}</h3>
+                      </div>
+                    </div>
+                    <p style={{ fontSize:14, color:"#6B7280", lineHeight:1.7, margin:0 }}>{f.desc}</p>
+                  </div>
+                </Reveal>
+              ))}
+            </div>
+            <Reveal delay={100}>
+              <div style={{ marginTop:24, background:"#06091A", borderRadius:20, padding:"24px 32px", display:"flex", alignItems:"center", justifyContent:"space-between", gap:20, flexWrap:"wrap" as any }}>
+                <div style={{ display:"flex", alignItems:"center", gap:16 }}>
+                  <div style={{ width:40, height:40, background:"rgba(24,166,109,.15)", borderRadius:12, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+                    <span style={{ color:"#18A66D", fontWeight:900, fontSize:18 }}>✓</span>
+                  </div>
+                  <div>
+                    <div style={{ color:"#fff", fontWeight:700, fontSize:15, marginBottom:2 }}>Alles in einem Paket — keine versteckten Extras.</div>
+                    <div style={{ color:"rgba(255,255,255,.35)", fontSize:13 }}>Kalender + Kundenkartei + SMS + Auswertungen · ab €39/Monat</div>
+                  </div>
+                </div>
+                <a href="/lead" className="btn-primary" style={{ fontSize:14, padding:"12px 24px", flexShrink:0 }}>Kostenlos anfragen →</a>
+              </div>
+            </Reveal>
           </div>
         </section>
 
@@ -463,47 +517,66 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* ══ COMPARISON ══ */}
+        {/* ══ COMPETITOR COMPARISON ══ */}
         <section style={{ background:"#06091A", padding:"100px 32px" }}>
           <div style={{ maxWidth:960, margin:"0 auto" }}>
             <Reveal>
-              <div style={{ textAlign:"center", maxWidth:500, margin:"0 auto 56px" }}>
-                <h2 style={{ fontSize:"clamp(32px,4vw,52px)", fontWeight:900, color:"#fff", letterSpacing:"-1.5px", lineHeight:1.08, margin:"0 0 14px" }}>Mit oder ohne<br />TerminStop.</h2>
-                <p style={{ fontSize:16, color:"rgba(255,255,255,.32)", margin:0 }}>Der Unterschied – schwarz auf weiß.</p>
+              <div style={{ textAlign:"center", maxWidth:580, margin:"0 auto 56px" }}>
+                <div style={{ fontSize:11, fontWeight:700, letterSpacing:3, textTransform:"uppercase", color:"#18A66D", marginBottom:16 }}>Der Vergleich</div>
+                <h2 style={{ fontSize:"clamp(32px,4vw,52px)", fontWeight:900, color:"#fff", letterSpacing:"-1.5px", lineHeight:1.08, margin:"0 0 14px" }}>
+                  Was andere kosten.<br /><span style={{ color:"#18A66D" }}>Was Sie bekommen.</span>
+                </h2>
+                <p style={{ fontSize:16, color:"rgba(255,255,255,.32)", margin:0 }}>
+                  Treatwell, Pointify & Co. klingen verlockend — bis man genau hinschaut.
+                </p>
               </div>
             </Reveal>
-            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:16 }} className="comp-grid">
-              <style>{`.comp-grid{grid-template-columns:1fr 1fr} @media(max-width:700px){.comp-grid{grid-template-columns:1fr!important}}`}</style>
-              <Reveal>
-                <div style={{ background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.07)", borderRadius:20, padding:"36px 32px", height:"100%" }}>
-                  <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:28 }}>
-                    <div style={{ width:32, height:32, borderRadius:"50%", background:"rgba(239,68,68,.1)", border:"1px solid rgba(239,68,68,.2)", display:"flex", alignItems:"center", justifyContent:"center", color:"#F87171", fontWeight:700, fontSize:14 }}>✗</div>
-                    <span style={{ fontWeight:700, color:"#fff", fontSize:16 }}>Ohne TerminStop</span>
+
+            <Reveal delay={60}>
+              <div style={{ background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.08)", borderRadius:20, overflow:"hidden" }}>
+                {/* Table header */}
+                <div style={{ display:"grid", gridTemplateColumns:"1.6fr 1fr 1fr", borderBottom:"1px solid rgba(255,255,255,.08)" }} className="ctable">
+                  <style>{`.ctable,.ctrow{display:grid;grid-template-columns:1.6fr 1fr 1fr} @media(max-width:600px){.ctable,.ctrow{grid-template-columns:1fr 0.8fr 0.9fr}}`}</style>
+                  <div style={{ padding:"18px 24px" }} />
+                  <div style={{ padding:"18px 16px", textAlign:"center", borderLeft:"1px solid rgba(255,255,255,.06)", display:"flex", alignItems:"center", justifyContent:"center" }}>
+                    <span style={{ fontSize:13, color:"rgba(255,255,255,.3)", fontWeight:600 }}>Treatwell / Pointify</span>
                   </div>
-                  {["Kunden vergessen Termine – Sie erfahren es zu spät","Sie rufen selbst an – kostet Zeit und Nerven","Unberechenbare Tage, lückenhafte Auslastung","Keine Vorwarnung – kein Reaktionsspielraum","Bis zu €2.000+ Umsatzverlust pro Monat"].map((item, i) => (
-                    <div key={i} style={{ display:"flex", gap:12, marginBottom:14 }}>
-                      <span style={{ color:"rgba(239,68,68,.5)", flexShrink:0, marginTop:1 }}>✗</span>
-                      <span style={{ fontSize:14, color:"rgba(255,255,255,.32)", lineHeight:1.6 }}>{item}</span>
-                    </div>
-                  ))}
-                </div>
-              </Reveal>
-              <Reveal delay={80}>
-                <div style={{ background:"linear-gradient(140deg,#0D2E1C,#0F2419)", border:"1px solid rgba(24,166,109,.2)", borderRadius:20, padding:"36px 32px", height:"100%", position:"relative", overflow:"hidden" }}>
-                  <div style={{ position:"absolute", top:0, right:0, width:120, height:120, borderRadius:"50%", background:"radial-gradient(circle,rgba(24,166,109,.12),transparent 70%)", pointerEvents:"none" }} />
-                  <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:28 }}>
-                    <div style={{ width:32, height:32, borderRadius:"50%", background:"#18A66D", display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontWeight:700, fontSize:14 }}>✓</div>
-                    <span style={{ fontWeight:700, color:"#fff", fontSize:16 }}>Mit TerminStop</span>
+                  <div style={{ padding:"18px 16px", textAlign:"center", background:"rgba(24,166,109,.07)", borderLeft:"1px solid rgba(24,166,109,.18)", display:"flex", alignItems:"center", justifyContent:"center" }}>
+                    <span style={{ fontSize:14, fontWeight:800, color:"#4AE89B" }}>TerminStop ✓</span>
                   </div>
-                  {["Kunden werden automatisch erinnert – und erscheinen","Kein manueller Aufwand, kein Nachtelefonieren","Planbare Tage, maximale Auslastung","Rechtzeitig informiert – Zeit zum Reagieren","Monatliche Einsparung durch Automatisierung"].map((item, i) => (
-                    <div key={i} style={{ display:"flex", gap:12, marginBottom:14 }}>
-                      <span style={{ color:"#18A66D", flexShrink:0, marginTop:1 }}>✓</span>
-                      <span style={{ fontSize:14, color:"rgba(255,255,255,.65)", lineHeight:1.6 }}>{item}</span>
-                    </div>
-                  ))}
                 </div>
-              </Reveal>
-            </div>
+                {[
+                  { label:"Kosten",               them:"15–30 % Provision pro Buchung",   us:"Ab €39 / Monat — fertig" },
+                  { label:"Vertragslaufzeit",      them:"Oft 12+ Monate gebunden",         us:"Monatlich kündbar" },
+                  { label:"Ihre Kundendaten",      them:"Gehören der Plattform",           us:"Gehören ausschließlich Ihnen" },
+                  { label:"SMS-Erinnerungen",      them:"✗ Nicht enthalten",               us:"✓ Vollautomatisch" },
+                  { label:"Eigene Kundenkartei",   them:"✗ Nicht enthalten",               us:"✓ Mit Verlauf & Notizen" },
+                  { label:"Auswertungen",          them:"Kaum / eingeschränkt",            us:"✓ Vollständig inklusive" },
+                  { label:"Kundenbindung",         them:"Kunden vergleichen Preise",       us:"Direktkontakt — kein Vergleich" },
+                ].map((row, i) => (
+                  <div key={i} className="ctrow" style={{ borderBottom: i < 6 ? "1px solid rgba(255,255,255,.05)" : "none" }}>
+                    <div style={{ padding:"15px 24px", display:"flex", alignItems:"center" }}>
+                      <span style={{ fontSize:13, color:"rgba(255,255,255,.4)", fontWeight:500 }}>{row.label}</span>
+                    </div>
+                    <div style={{ padding:"15px 16px", borderLeft:"1px solid rgba(255,255,255,.04)", display:"flex", alignItems:"center", justifyContent:"center" }}>
+                      <span style={{ fontSize:12, color:"rgba(255,255,255,.22)", lineHeight:1.5, textAlign:"center" as any }}>{row.them}</span>
+                    </div>
+                    <div style={{ padding:"15px 16px", background:"rgba(24,166,109,.04)", borderLeft:"1px solid rgba(24,166,109,.1)", display:"flex", alignItems:"center", justifyContent:"center" }}>
+                      <span style={{ fontSize:12, color:"rgba(74,232,155,.9)", fontWeight:600, lineHeight:1.5, textAlign:"center" as any }}>{row.us}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </Reveal>
+
+            <Reveal delay={100}>
+              <div style={{ marginTop:24, display:"flex", flexDirection:"column" as any, alignItems:"center", gap:16, textAlign:"center" as any }}>
+                <p style={{ fontSize:13, color:"rgba(255,255,255,.22)", margin:0 }}>
+                  Bei 100 Buchungen/Monat à €50 zahlen Sie bei Treatwell bis zu <strong style={{ color:"rgba(255,255,255,.45)" }}>€1.500 Provision</strong>. TerminStop kostet <strong style={{ color:"#4AE89B" }}>€39</strong>.
+                </p>
+                <a href="/lead" className="btn-primary" style={{ fontSize:15, padding:"14px 32px" }}>Jetzt wechseln →</a>
+              </div>
+            </Reveal>
           </div>
         </section>
 
@@ -652,16 +725,16 @@ export default function LandingPage() {
                 ✓ Kostenlos · Unverbindlich · 15 Minuten
               </div>
               <h2 style={{ fontSize:"clamp(36px,5vw,64px)", fontWeight:900, color:"#fff", letterSpacing:"-2px", lineHeight:1.04, margin:"0 0 20px" }}>
-                Hören Sie auf,<br /><span style={{ color:"#18A66D" }}>Geld zu verlieren.</span>
+                Ihr Betrieb.<br /><span style={{ color:"#18A66D" }}>Endlich digital.</span>
               </h2>
-              <p style={{ fontSize:18, color:"rgba(255,255,255,.38)", lineHeight:1.65, maxWidth:460, margin:"0 auto 44px" }}>
-                Ein 15-minütiges Gespräch – und Sie wissen, was TerminStop konkret für Ihren Betrieb bedeutet.
+              <p style={{ fontSize:18, color:"rgba(255,255,255,.38)", lineHeight:1.65, maxWidth:480, margin:"0 auto 44px" }}>
+                Kalender, Kundenkartei, SMS-Erinnerungen und Auswertungen — in einem System, in 10 Minuten eingerichtet. Sprechen Sie kurz mit uns und starten Sie noch heute.
               </p>
               <a href="/lead" className="btn-primary" style={{ fontSize:16, padding:"16px 40px" }}>
                 Kostenloses Gespräch sichern →
               </a>
               <div style={{ marginTop:32, display:"flex", justifyContent:"center", gap:28, flexWrap:"wrap" }}>
-                {["Kein Vertrag","Persönliches Gespräch","Klare Antworten","Sofort startklar"].map((t, i) => (
+                {["Kein Vertrag","Monatlich kündbar","Persönliches Onboarding","In 10 Min. startklar"].map((t, i) => (
                   <span key={i} style={{ fontSize:13, color:"rgba(255,255,255,.22)" }}>✓ {t}</span>
                 ))}
               </div>
