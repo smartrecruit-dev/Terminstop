@@ -158,12 +158,6 @@ export default function LandingPage() {
           .sec-pad{padding-top:64px!important;padding-bottom:64px!important;padding-left:20px!important;padding-right:20px!important}
           .hero-phone-hide{display:none!important}
           .showcase-phone-hide{display:none!important}
-          .sticky-mob-cta{display:flex!important}
-        }
-        .sticky-mob-cta{
-          display:none;position:fixed;bottom:0;left:0;right:0;z-index:45;
-          padding:12px 16px 28px;
-          background:linear-gradient(0deg,rgba(6,9,26,1) 55%,rgba(6,9,26,0) 100%);
         }
       `}</style>
 
@@ -788,13 +782,6 @@ export default function LandingPage() {
             </Reveal>
           </div>
         </section>
-
-        {/* ══ STICKY MOBILE CTA ══ */}
-        <div className="sticky-mob-cta">
-          <a href="/lead" className="btn-primary" style={{ flex:1, textAlign:"center" as any, fontSize:16, padding:"15px 0", borderRadius:16 }}>
-            Kostenlos anfragen →
-          </a>
-        </div>
 
         {/* ══ FOOTER ══ */}
         <footer style={{ background:"#fff", borderTop:"1px solid #F3F4F6", padding:"28px 32px" }}>
