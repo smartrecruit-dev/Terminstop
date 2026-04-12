@@ -213,33 +213,92 @@ export default function DemoCalendarPage() {
 
         {/* WEEK VIEW */}
         {view === "week" && (
-          <div className="grid grid-cols-7 gap-3">
-            {weekDays.map((day, i) => {
-              const dStr = day.toISOString().split("T")[0]
-              const items = appointments.filter(a => a.date === dStr).sort((a, b) => a.time.localeCompare(b.time))
-              const isToday = dStr === todayStr
-              const doneCount = items.filter(a => a.status === "done").length
-              return (
-                <div key={i} className={`rounded-2xl border overflow-hidden transition ${isToday ? "border-[#18A66D] shadow-md shadow-[#18A66D]/10" : "border-[#E5E7EB] bg-white"}`}>
-                  <div className={`px-3 py-3 text-center border-b ${isToday ? "bg-[#18A66D]" : "bg-[#F7FAFC] border-[#E5E7EB]"}`}>
-                    <div className={`text-xs font-semibold uppercase tracking-wide ${isToday ? "text-white/80" : "text-[#9CA3AF]"}`}>
-                      {day.toLocaleDateString("de-DE", { weekday: "short" })}
+          <>
+            {/* Mobile: alle 7 Tage, horizontal scrollbar (2 sichtbar) */}
+            <div className="md:hidden overflow-x-auto pb-2">
+              <div className="flex gap-3" style={{ minWidth: "max-content" }}>
+                {weekDays.map((day, i) => {
+                  const dStr = day.toISOString().split("T")[0]
+                  const items = appointments.filter(a => a.date === dStr).sort((a, b) => a.time.localeCompare(b.time))
+                  const isToday = dStr === todayStr
+                  const doneCount = items.filter(a => a.status === "done").length
+                  return (
+                    <div key={i} style={{ width: "calc(50vw - 24px)", minWidth: 160 }} className={`rounded-2xl border overflow-hidden transition flex-shrink-0 ${isToday ? "border-[#18A66D] shadow-md shadow-[#18A66D]/10" : "border-[#E5E7EB] bg-white"}`}>
+                      <div className={`px-4 py-3 text-center border-b ${isToday ? "bg-[#18A66D]" : "bg-[#F7FAFC] border-[#E5E7EB]"}`}>
+                        <div className={`text-xs font-semibold uppercase tracking-wide ${isToday ? "text-white/80" : "text-[#9CA3AF]"}`}>
+                          {day.toLocaleDateString("de-DE", { weekday: "long" })}
+                        </div>
+                        <div className={`text-2xl font-black mt-0.5 ${isToday ? "text-white" : "text-[#1F2A37]"}`}>
+                          {day.getDate()}. {day.toLocaleDateString("de-DE", { month: "short" })}
+                        </div>
+                        {items.length > 0 && (
+                          <div className={`text-[10px] font-medium mt-1 ${isToday ? "text-white/70" : "text-[#6B7280]"}`}>
+                            {items.length} Termin{items.length !== 1 ? "e" : ""}
+                          </div>
+                        )}
+                      </div>
+                      <div className={`p-3 flex flex-col gap-2 overflow-y-auto ${isToday ? "bg-[#F0FDF6]" : "bg-white"}`} style={{ minHeight: 160, maxHeight: 280 }}>
+                        {items.length === 0 ? (
+                          <div className="flex items-center justify-center h-full pt-6">
+                            <span className="text-xs text-[#D1D5DB]">Keine Termine</span>
+                          </div>
+                        ) : (
+                          items.map((a: any) => (
+                            <div
+                              key={a.id}
+                              onClick={() => setSelected(a)}
+                              className={`text-xs px-3 py-2 rounded-xl cursor-pointer transition flex items-center gap-2 ${
+                                a.status === "done" ? "bg-[#D1FAE5] text-[#18A66D] line-through opacity-60"
+                                : isToday ? "bg-[#18A66D] text-white"
+                                : "bg-[#F7FAFC] text-[#1F2A37] border border-[#E5E7EB]"
+                              }`}
+                            >
+                              <span className="font-bold shrink-0">{a.time}</span>
+                              <span className="truncate">{a.name}</span>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                      {items.length > 0 && (
+                        <div className="px-3 pb-3">
+                          <div className="w-full bg-[#E5E7EB] rounded-full h-1.5">
+                            <div className="bg-[#18A66D] h-1.5 rounded-full transition-all" style={{ width: `${Math.round((doneCount / items.length) * 100)}%` }} />
+                          </div>
+                        </div>
+                      )}
                     </div>
-                    <div className={`text-xl font-black mt-0.5 ${isToday ? "text-white" : "text-[#1F2A37]"}`}>{day.getDate()}</div>
-                    {items.length > 0 && (
-                      <div className={`text-[10px] font-medium mt-1 ${isToday ? "text-white/70" : "text-[#6B7280]"}`}>
-                        {items.length} Termin{items.length !== 1 ? "e" : ""}
+                  )
+                })}
+              </div>
+            </div>
+
+            {/* Desktop: 7 Tage Grid, scrollbar */}
+            <div className="hidden md:grid grid-cols-7 gap-3">
+              {weekDays.map((day, i) => {
+                const dStr = day.toISOString().split("T")[0]
+                const items = appointments.filter(a => a.date === dStr).sort((a, b) => a.time.localeCompare(b.time))
+                const isToday = dStr === todayStr
+                const doneCount = items.filter(a => a.status === "done").length
+                return (
+                  <div key={i} className={`rounded-2xl border overflow-hidden transition ${isToday ? "border-[#18A66D] shadow-md shadow-[#18A66D]/10" : "border-[#E5E7EB] bg-white"}`}>
+                    <div className={`px-3 py-3 text-center border-b ${isToday ? "bg-[#18A66D]" : "bg-[#F7FAFC] border-[#E5E7EB]"}`}>
+                      <div className={`text-xs font-semibold uppercase tracking-wide ${isToday ? "text-white/80" : "text-[#9CA3AF]"}`}>
+                        {day.toLocaleDateString("de-DE", { weekday: "short" })}
                       </div>
-                    )}
-                  </div>
-                  <div className={`p-2 flex flex-col gap-1.5 min-h-[120px] ${isToday ? "bg-[#F0FDF6]" : "bg-white"}`}>
-                    {items.length === 0 ? (
-                      <div className="flex items-center justify-center h-full pt-4">
-                        <span className="text-[10px] text-[#D1D5DB]">Frei</span>
-                      </div>
-                    ) : (
-                      <>
-                        {items.slice(0, 4).map((a: any) => (
+                      <div className={`text-xl font-black mt-0.5 ${isToday ? "text-white" : "text-[#1F2A37]"}`}>{day.getDate()}</div>
+                      {items.length > 0 && (
+                        <div className={`text-[10px] font-medium mt-1 ${isToday ? "text-white/70" : "text-[#6B7280]"}`}>
+                          {items.length} Termin{items.length !== 1 ? "e" : ""}
+                        </div>
+                      )}
+                    </div>
+                    <div className={`p-2 flex flex-col gap-1.5 overflow-y-auto ${isToday ? "bg-[#F0FDF6]" : "bg-white"}`} style={{ minHeight: 120, maxHeight: 320 }}>
+                      {items.length === 0 ? (
+                        <div className="flex items-center justify-center h-full pt-4">
+                          <span className="text-[10px] text-[#D1D5DB]">Frei</span>
+                        </div>
+                      ) : (
+                        items.map((a: any) => (
                           <div
                             key={a.id}
                             onClick={() => setSelected(a)}
@@ -249,27 +308,24 @@ export default function DemoCalendarPage() {
                               : "bg-[#F7FAFC] text-[#1F2A37] border border-[#E5E7EB] hover:border-[#18A66D]"
                             }`}
                           >
-                            <span className="font-bold">{a.time}</span>
+                            <span className="font-bold shrink-0">{a.time}</span>
                             <span className="truncate">{a.name}</span>
                           </div>
-                        ))}
-                        {items.length > 4 && (
-                          <div className="text-[10px] text-[#9CA3AF] text-center pt-1">+{items.length - 4} weitere</div>
-                        )}
-                      </>
+                        ))
+                      )}
+                    </div>
+                    {items.length > 0 && (
+                      <div className="px-2 pb-2">
+                        <div className="w-full bg-[#E5E7EB] rounded-full h-1">
+                          <div className="bg-[#18A66D] h-1 rounded-full transition-all" style={{ width: `${Math.round((doneCount / items.length) * 100)}%` }} />
+                        </div>
+                      </div>
                     )}
                   </div>
-                  {items.length > 0 && (
-                    <div className="px-2 pb-2">
-                      <div className="w-full bg-[#E5E7EB] rounded-full h-1">
-                        <div className="bg-[#18A66D] h-1 rounded-full transition-all" style={{ width: `${Math.round((doneCount / items.length) * 100)}%` }} />
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )
-            })}
-          </div>
+                )
+              })}
+            </div>
+          </>
         )}
       </div>
 

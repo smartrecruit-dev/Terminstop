@@ -91,6 +91,11 @@ export default function CustomersPage() {
     loadCustomers()
   }
 
+  async function handleDeleteAppointment(id: string) {
+    await supabase.from("appointments").delete().eq("id", id)
+    loadAppointments()
+  }
+
   async function handleDeleteNote() {
     if (!selected) return
     await supabase.from("customers").update({ note: "" }).eq("id", selected.id)
@@ -305,7 +310,7 @@ export default function CustomersPage() {
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 bg-[#F7FAFC] border border-[#E5E7EB] rounded-lg flex items-center justify-center text-sm shrink-0">📅</div>
                     <div>
-                      <div className="text-xs text-[#9CA3AF]">Termine insgesamt</div>
+                      <div className="text-xs text-[#9CA3AF]">Termine (letzte 31 Tage)</div>
                       <div className="text-sm font-semibold text-[#1F2A37]">{customerAppointments.length} Termin{customerAppointments.length !== 1 ? "e" : ""}</div>
                     </div>
                   </div>
@@ -314,11 +319,18 @@ export default function CustomersPage() {
                   {customerAppointments.length > 0 && (
                     <div>
                       <div className="text-xs text-[#9CA3AF] font-semibold uppercase tracking-wide mb-2">Verlauf</div>
-                      <div className="space-y-2 max-h-40 overflow-y-auto">
-                        {customerAppointments.slice(0, 8).map(a => (
+                      <div className="space-y-2 max-h-48 overflow-y-auto">
+                        {customerAppointments.map(a => (
                           <div key={a.id} className={`flex items-center justify-between px-3 py-2 rounded-xl text-xs ${a.status === "done" ? "bg-[#F0FDF6] text-[#18A66D]" : "bg-[#F7FAFC] text-[#6B7280]"}`}>
                             <span>{a.date} · {a.time} Uhr</span>
-                            <span className="font-semibold">{a.status === "done" ? "✓ Erschienen" : "Ausstehend"}</span>
+                            <div className="flex items-center gap-2">
+                              <span className="font-semibold">{a.status === "done" ? "✓ Erschienen" : "Ausstehend"}</span>
+                              <button
+                                onClick={() => handleDeleteAppointment(a.id)}
+                                className="text-[#EF4444] hover:text-[#DC2626] text-[10px] font-bold px-1.5 py-0.5 rounded hover:bg-[#FEF2F2] transition"
+                                title="Termin löschen"
+                              >✕</button>
+                            </div>
                           </div>
                         ))}
                       </div>

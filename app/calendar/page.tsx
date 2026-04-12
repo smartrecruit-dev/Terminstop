@@ -248,7 +248,7 @@ export default function CalendarPage() {
             {/* Mobile: nächste 2 Tage, scrollbar */}
             <div className="md:hidden overflow-x-auto pb-2">
               <div className="flex gap-3 min-w-0" style={{ minWidth: "max-content" }}>
-                {weekDays.slice(0, 2).map((day, i) => {
+                {weekDays.map((day, i) => {
                   const dStr = day.toISOString().split("T")[0]
                   const items = appointments.filter(a => a.date === dStr)
                   const isToday = dStr === todayStr
@@ -310,7 +310,7 @@ export default function CalendarPage() {
               </div>
             </div>
 
-            {/* Desktop: 7 Tage Grid */}
+            {/* Desktop: 7 Tage Grid, scrollbar */}
             <div className="hidden md:grid grid-cols-7 gap-3">
               {weekDays.map((day, i) => {
                 const dStr = day.toISOString().split("T")[0]
@@ -332,33 +332,28 @@ export default function CalendarPage() {
                         </div>
                       )}
                     </div>
-                    <div className={`p-2 flex flex-col gap-1.5 min-h-[120px] ${isToday ? "bg-[#F0FDF6]" : "bg-white"}`}>
+                    <div className={`p-2 flex flex-col gap-1.5 overflow-y-auto ${isToday ? "bg-[#F0FDF6]" : "bg-white"}`} style={{ minHeight: 120, maxHeight: 320 }}>
                       {items.length === 0 ? (
                         <div className="flex items-center justify-center h-full pt-4">
                           <span className="text-[10px] text-[#D1D5DB]">Frei</span>
                         </div>
                       ) : (
-                        <>
-                          {items.slice(0, 4).map((a: any) => (
-                            <div
-                              key={a.id}
-                              onClick={() => { setSelected(a); setConfirmDelete(false) }}
-                              className={`text-[10px] px-2 py-1.5 rounded-lg cursor-pointer transition flex items-center gap-1 ${
-                                a.status === "done"
-                                  ? "bg-[#D1FAE5] text-[#18A66D] line-through opacity-60"
-                                  : isToday
-                                  ? "bg-[#18A66D] text-white"
-                                  : "bg-[#F7FAFC] text-[#1F2A37] border border-[#E5E7EB] hover:border-[#18A66D]"
-                              }`}
-                            >
-                              <span className="font-bold">{a.time}</span>
-                              <span className="truncate">{a.name}</span>
-                            </div>
-                          ))}
-                          {items.length > 4 && (
-                            <div className="text-[10px] text-[#9CA3AF] text-center pt-1">+{items.length - 4} weitere</div>
-                          )}
-                        </>
+                        items.map((a: any) => (
+                          <div
+                            key={a.id}
+                            onClick={() => { setSelected(a); setConfirmDelete(false) }}
+                            className={`text-[10px] px-2 py-1.5 rounded-lg cursor-pointer transition flex items-center gap-1 ${
+                              a.status === "done"
+                                ? "bg-[#D1FAE5] text-[#18A66D] line-through opacity-60"
+                                : isToday
+                                ? "bg-[#18A66D] text-white"
+                                : "bg-[#F7FAFC] text-[#1F2A37] border border-[#E5E7EB] hover:border-[#18A66D]"
+                            }`}
+                          >
+                            <span className="font-bold shrink-0">{a.time}</span>
+                            <span className="truncate">{a.name}</span>
+                          </div>
+                        ))
                       )}
                     </div>
                     {items.length > 0 && (
