@@ -37,11 +37,18 @@ export default function LoginPage() {
 
     const { data: company, error: companyError } = await supabase
       .from("companies")
-      .select("id, name")
+      .select("id, name, paused")
       .single()
 
     if (companyError || !company) {
       setError("Konto nicht gefunden. Bitte Administrator kontaktieren.")
+      await supabase.auth.signOut()
+      setLoading(false)
+      return
+    }
+
+    if (company.paused) {
+      setError("Ihr Zugang wurde vorübergehend pausiert. Bitte kontaktieren Sie uns unter terminstop.business@gmail.com.")
       await supabase.auth.signOut()
       setLoading(false)
       return

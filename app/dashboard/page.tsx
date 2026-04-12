@@ -25,11 +25,24 @@ export default function Dashboard() {
   useEffect(() => {
     const storedId = localStorage.getItem("company_id")
     const storedName = localStorage.getItem("company_name")
-    if (!storedId) window.location.href = "/login"
-    else {
-      setCompanyId(storedId)
-      setCompanyName(storedName || "")
-    }
+    if (!storedId) { window.location.href = "/login"; return }
+
+    // Pausiert-Check bei jedem Dashboard-Aufruf
+    supabase
+      .from("companies")
+      .select("paused")
+      .eq("id", storedId)
+      .single()
+      .then(({ data }) => {
+        if (data?.paused) {
+          localStorage.removeItem("company_id")
+          localStorage.removeItem("company_name")
+          window.location.href = "/login"
+        } else {
+          setCompanyId(storedId)
+          setCompanyName(storedName || "")
+        }
+      })
   }, [])
 
   async function loadAppointments() {
