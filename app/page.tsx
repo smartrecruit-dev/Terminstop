@@ -162,6 +162,8 @@ export default function LandingPage() {
             <a href="#preise" style={{ fontSize:13, color:"#6B7280", textDecoration:"none", fontWeight:500 }} className="hidden md:block">Preise</a>
             <a href="/login" style={{ fontSize:13, color:"#6B7280", textDecoration:"none", fontWeight:500 }} className="hidden md:block">Login</a>
             <a href="/demo" style={{ fontSize:13, color:"#6B7280", textDecoration:"none", fontWeight:500, padding:"6px 16px", border:"1px solid #E5E7EB", borderRadius:980 }} className="hidden md:block">Demo</a>
+            {/* Login-Button nur auf Mobile */}
+            <a href="/login" className="block md:hidden" style={{ fontSize:13, color:"#6B7280", textDecoration:"none", fontWeight:600, padding:"6px 14px", border:"1px solid #E5E7EB", borderRadius:980, background:"rgba(255,255,255,.9)" }}>Login</a>
             <a href="/lead" className="btn-primary" style={{ fontSize:13, padding:"8px 20px" }}>Kostenlos anfragen</a>
           </div>
         </nav>
@@ -191,9 +193,8 @@ export default function LandingPage() {
                   <span className="pulse-ring" />
                   <span style={{ position:"relative", display:"inline-flex", borderRadius:"50%", width:7, height:7, background:"#18A66D" }} />
                 </span>
-                <span style={{ fontSize:12, color:"rgba(255,255,255,.45)", fontWeight:600, letterSpacing:.2, whiteSpace:"nowrap" }}>
-                  SMS-Erinnerungen für Ihren&nbsp;
-                  <span style={{ color:"#18A66D", fontWeight:800 }} key={heroWord} className="word-slot">{words[heroWord]}</span>
+                <span style={{ fontSize:12, color:"rgba(255,255,255,.45)", fontWeight:600, letterSpacing:.2 }}>
+                  SMS-Erinnerungen für Ihren&nbsp;<span style={{ color:"#18A66D", fontWeight:800, display:"inline-block" }} key={heroWord} className="word-slot">{words[heroWord]}</span>
                 </span>
               </div>
 
