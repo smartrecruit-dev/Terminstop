@@ -8,6 +8,8 @@ export default function Insights() {
   const [appointments, setAppointments] = useState<any[]>([])
   const [companyId, setCompanyId] = useState<string | null>(null)
   const [companyName, setCompanyName] = useState("")
+  const [smsCount, setSmsCount] = useState<number>(0)
+  const [smsLimit, setSmsLimit] = useState<number>(200)
 
   useEffect(() => {
     const storedId = localStorage.getItem("company_id")
@@ -23,11 +25,22 @@ export default function Insights() {
   useEffect(() => {
     async function load() {
       if (!companyId) return
-      const { data } = await supabase
+
+      const { data: appts } = await supabase
         .from("appointments")
         .select("*")
         .eq("company_id", companyId)
-      if (data) setAppointments(data)
+      if (appts) setAppointments(appts)
+
+      const { data: company } = await supabase
+        .from("companies")
+        .select("sms_count, sms_limit")
+        .eq("id", companyId)
+        .single()
+      if (company) {
+        setSmsCount(company.sms_count ?? 0)
+        setSmsLimit(company.sms_limit ?? 200)
+      }
     }
     load()
   }, [companyId])
@@ -220,6 +233,63 @@ export default function Insights() {
             </div>
           </div>
         </div>
+
+        {/* ─── SMS KONTINGENT ─── */}
+        {(() => {
+          const smsRemaining = Math.max(smsLimit - smsCount, 0)
+          const smsPct = smsLimit > 0 ? Math.round((smsCount / smsLimit) * 100) : 0
+          const smsWarning = smsPct >= 90
+          const smsOk = smsPct < 75
+          const currentMonthLabel = today.toLocaleDateString("de-DE", { month: "long", year: "numeric" })
+          return (
+            <div className="bg-white border border-[#E5E7EB] rounded-2xl shadow-sm overflow-hidden mb-8">
+              <div className="px-6 py-4 border-b border-[#E5E7EB] flex items-center justify-between">
+                <div>
+                  <h2 className="text-sm font-bold text-[#1F2A37]">SMS-Kontingent</h2>
+                  <p className="text-xs text-[#6B7280] mt-0.5">{currentMonthLabel} · Reset am 1. des Monats</p>
+                </div>
+                <div className={`flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full ${
+                  smsWarning ? "bg-[#FEF3C7] text-[#D97706]" : "bg-[#E8FBF3] text-[#18A66D]"
+                }`}>
+                  <span className={`w-1.5 h-1.5 rounded-full animate-pulse ${smsWarning ? "bg-[#D97706]" : "bg-[#18A66D]"}`} />
+                  {smsWarning ? "Fast aufgebraucht" : "Aktiv"}
+                </div>
+              </div>
+              <div className="px-6 py-5">
+                <div className="flex items-end justify-between mb-3">
+                  <div>
+                    <span className="text-4xl font-black text-[#1F2A37]">{smsCount}</span>
+                    <span className="text-sm text-[#6B7280] ml-2">von {smsLimit} SMS gesendet</span>
+                  </div>
+                  <div className="text-right">
+                    <div className={`text-2xl font-black ${smsOk ? "text-[#18A66D]" : smsWarning ? "text-[#D97706]" : "text-[#1F2A37]"}`}>
+                      {smsRemaining}
+                    </div>
+                    <div className="text-xs text-[#6B7280]">noch verfügbar</div>
+                  </div>
+                </div>
+                <div className="w-full bg-[#E5E7EB] rounded-full h-2.5 overflow-hidden">
+                  <div
+                    className={`h-2.5 rounded-full transition-all duration-700 ${
+                      smsWarning ? "bg-[#D97706]" : "bg-[#18A66D]"
+                    }`}
+                    style={{ width: `${Math.min(smsPct, 100)}%` }}
+                  />
+                </div>
+                <div className="flex justify-between text-xs text-[#9CA3AF] mt-1.5">
+                  <span>0</span>
+                  <span>{smsPct}% genutzt</span>
+                  <span>{smsLimit}</span>
+                </div>
+                {smsWarning && (
+                  <div className="mt-4 bg-[#FEF3C7] border border-[#FDE68A] rounded-xl px-4 py-3 text-xs text-[#92400E]">
+                    ⚠️ Ihr SMS-Kontingent ist fast aufgebraucht. Bitte melden Sie sich bei uns, um Ihr Paket anzupassen.
+                  </div>
+                )}
+              </div>
+            </div>
+          )
+        })()}
 
         {/* ─── EINSCHÄTZUNG ─── */}
         <div className={`${insightBg} border border-[#E5E7EB] rounded-2xl p-6 mb-8 flex items-start gap-5`}>
@@ -449,14 +519,14 @@ export default function Insights() {
                 </div>
               </a>
               <a
-                href="tel:015154212634"
+                href="tel:015154219634"
                 className="flex items-center gap-3 bg-[#F7FAFC] border border-[#E5E7EB] rounded-xl px-4 py-3 hover:border-[#18A66D] transition group"
               >
                 <div className="w-9 h-9 bg-[#E8FBF3] rounded-lg flex items-center justify-center text-base shrink-0">📞</div>
                 <div>
                   <div className="text-xs text-[#6B7280] font-medium">Telefon</div>
                   <div className="text-sm font-semibold text-[#1F2A37] group-hover:text-[#18A66D] transition">
-                    0151 54212634
+                    0151 54219634
                   </div>
                 </div>
               </a>
