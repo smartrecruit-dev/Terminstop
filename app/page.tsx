@@ -1,33 +1,9 @@
 "use client"
 
-import { useState, useEffect, useRef, useCallback } from "react"
+import { useState, useEffect, useRef } from "react"
 
-/* ═══════════════════════════════════════════════════════════════
-   HOOKS
-═══════════════════════════════════════════════════════════════ */
-function useScrollY() {
-  const [y, setY] = useState(0)
-  useEffect(() => {
-    const h = () => setY(window.scrollY)
-    window.addEventListener("scroll", h, { passive: true })
-    return () => window.removeEventListener("scroll", h)
-  }, [])
-  return y
-}
-
-function useInView(threshold = 0.15) {
-  const ref = useRef<HTMLDivElement>(null)
-  const [vis, setVis] = useState(false)
-  useEffect(() => {
-    const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setVis(true); obs.disconnect() } }, { threshold })
-    if (ref.current) obs.observe(ref.current)
-    return () => obs.disconnect()
-  }, [threshold])
-  return { ref, vis }
-}
-
-/* ─── Animated Counter ── */
-function Counter({ to, suffix = "", duration = 2200 }: { to: number; suffix?: string; duration?: number }) {
+/* ─── Animated Counter ──────────────────────────────────────── */
+function Counter({ to, suffix = "", duration = 1800 }: { to: number; suffix?: string; duration?: number }) {
   const [val, setVal] = useState(0)
   const ref = useRef<HTMLSpanElement>(null)
   const started = useRef(false)
@@ -38,8 +14,7 @@ function Counter({ to, suffix = "", duration = 2200 }: { to: number; suffix?: st
         const start = performance.now()
         const tick = (now: number) => {
           const p = Math.min((now - start) / duration, 1)
-          const ease = 1 - Math.pow(1 - p, 4)
-          setVal(Math.round(to * ease))
+          setVal(Math.round(to * (1 - Math.pow(1 - p, 3))))
           if (p < 1) requestAnimationFrame(tick)
         }
         requestAnimationFrame(tick)
@@ -51,39 +26,23 @@ function Counter({ to, suffix = "", duration = 2200 }: { to: number; suffix?: st
   return <span ref={ref}>{val}{suffix}</span>
 }
 
-/* ─── Reveal ── */
-function Reveal({ children, delay = 0, y = 28, className = "" }: { children: React.ReactNode; delay?: number; y?: number; className?: string }) {
-  const { ref, vis } = useInView()
+/* ─── Scroll Reveal ─────────────────────────────────────────── */
+function Reveal({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) {
+  const ref = useRef<HTMLDivElement>(null)
+  const [vis, setVis] = useState(false)
+  useEffect(() => {
+    const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setVis(true); obs.disconnect() } }, { threshold: 0.1 })
+    if (ref.current) obs.observe(ref.current)
+    return () => obs.disconnect()
+  }, [])
   return (
     <div ref={ref} className={className} style={{
       opacity: vis ? 1 : 0,
-      transform: vis ? "translateY(0)" : `translateY(${y}px)`,
-      transition: `opacity 0.9s cubic-bezier(0.16,1,0.3,1) ${delay}ms, transform 0.9s cubic-bezier(0.16,1,0.3,1) ${delay}ms`
+      transform: vis ? "translateY(0)" : "translateY(24px)",
+      transition: `opacity 0.7s ease ${delay}ms, transform 0.7s ease ${delay}ms`
     }}>
       {children}
     </div>
-  )
-}
-
-/* ─── Magnetic Button ── */
-function MagneticBtn({ children, href, className, style }: { children: React.ReactNode; href: string; className?: string; style?: React.CSSProperties }) {
-  const ref = useRef<HTMLAnchorElement>(null)
-  const handleMove = useCallback((e: React.MouseEvent) => {
-    if (!ref.current) return
-    const r = ref.current.getBoundingClientRect()
-    const x = (e.clientX - r.left - r.width / 2) * 0.35
-    const y = (e.clientY - r.top - r.height / 2) * 0.35
-    ref.current.style.transform = `translate(${x}px, ${y}px)`
-  }, [])
-  const handleLeave = useCallback(() => {
-    if (!ref.current) return
-    ref.current.style.transform = "translate(0,0)"
-  }, [])
-  return (
-    <a ref={ref} href={href} className={className} style={{ ...style, transition:"transform 0.4s cubic-bezier(0.16,1,0.3,1), background 0.2s, box-shadow 0.2s" }}
-      onMouseMove={handleMove} onMouseLeave={handleLeave}>
-      {children}
-    </a>
   )
 }
 
@@ -93,27 +52,11 @@ function MagneticBtn({ children, href, className, style }: { children: React.Rea
 export default function LandingPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(null)
   const [heroWord, setHeroWord] = useState(0)
-  const [cursorPos, setCursorPos] = useState({ x: -100, y: -100 })
-  const [cursorHover, setCursorHover] = useState(false)
-  const scrollY = useScrollY()
   const words = ["Friseur.", "Werkstatt.", "Praxis.", "Betrieb."]
 
   useEffect(() => {
-    const t = setInterval(() => setHeroWord(w => (w + 1) % words.length), 2800)
+    const t = setInterval(() => setHeroWord(w => (w + 1) % words.length), 2600)
     return () => clearInterval(t)
-  }, [])
-
-  useEffect(() => {
-    const move = (e: MouseEvent) => setCursorPos({ x: e.clientX, y: e.clientY })
-    window.addEventListener("mousemove", move)
-    const links = document.querySelectorAll("a, button")
-    const on = () => setCursorHover(true)
-    const off = () => setCursorHover(false)
-    links.forEach(l => { l.addEventListener("mouseenter", on); l.addEventListener("mouseleave", off) })
-    return () => {
-      window.removeEventListener("mousemove", move)
-      links.forEach(l => { l.removeEventListener("mouseenter", on); l.removeEventListener("mouseleave", off) })
-    }
   }, [])
 
   const reviews = [
@@ -142,339 +85,225 @@ export default function LandingPage() {
   const industries = ["Friseur", "KFZ-Werkstatt", "Arztpraxis", "Handwerk", "Kosmetik", "Physiotherapie", "Tattoo-Studio", "Nagelstudio", "Zahnarzt", "Optiker", "Hundesalon", "Massage"]
 
   const compRows = [
-    { label: "Kosten",             them: "15–30 % Provision pro Buchung",  us: "Ab €39 / Monat — fertig" },
-    { label: "Vertragslaufzeit",   them: "Oft 12+ Monate gebunden",        us: "Monatlich kündbar" },
-    { label: "Ihre Kundendaten",   them: "Gehören der Plattform",          us: "Gehören ausschließlich Ihnen" },
-    { label: "SMS-Erinnerungen",   them: "Nicht enthalten",                us: "Vollautomatisch" },
-    { label: "Kundenkartei",       them: "Nicht enthalten",                us: "Mit Verlauf & Notizen" },
-    { label: "Auswertungen",       them: "Kaum / eingeschränkt",           us: "Vollständig inklusive" },
-    { label: "Kundenbindung",      them: "Kunden vergleichen Preise",      us: "Direktkontakt — kein Vergleich" },
+    { label:"Kosten",               them:"15–30 % Provision pro Buchung",   us:"Ab €39 / Monat — fertig" },
+    { label:"Vertragslaufzeit",      them:"Oft 12+ Monate gebunden",         us:"Monatlich kündbar" },
+    { label:"Ihre Kundendaten",      them:"Gehören der Plattform",           us:"Gehören ausschließlich Ihnen" },
+    { label:"SMS-Erinnerungen",      them:"✗ Nicht enthalten",               us:"✓ Vollautomatisch" },
+    { label:"Eigene Kundenkartei",   them:"✗ Nicht enthalten",               us:"✓ Mit Verlauf & Notizen" },
+    { label:"Auswertungen",          them:"Kaum / eingeschränkt",            us:"✓ Vollständig inklusive" },
+    { label:"Kundenbindung",         them:"Kunden vergleichen Preise",       us:"Direktkontakt — kein Vergleich" },
   ]
 
-  const serif = "'Cormorant Garamond', 'Playfair Display', Georgia, serif"
-  const sans  = "'Inter', -apple-system, BlinkMacSystemFont, sans-serif"
-  const navScrolled = scrollY > 40
+  const F = "-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', sans-serif"
 
   return (
     <>
-      {/* ── Google Fonts ── */}
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500&family=Inter:wght@300;400;500;600;700&display=swap');
-
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-        html { scroll-behavior: smooth; }
-
-        body { cursor: none !important; }
-        a, button { cursor: none !important; }
-
-        /* ── Custom Cursor ── */
-        .cur-dot {
-          position: fixed; width: 6px; height: 6px; background: #18A66D;
-          border-radius: 50%; pointer-events: none; z-index: 9999;
-          transform: translate(-50%, -50%);
-          transition: transform 0.1s, width 0.3s, height 0.3s, background 0.3s;
+        @keyframes wordIn {
+          0%   { opacity:0; transform:translateY(8px); }
+          12%, 88% { opacity:1; transform:translateY(0); }
+          100% { opacity:0; transform:translateY(-8px); }
         }
-        .cur-ring {
-          position: fixed; width: 36px; height: 36px;
-          border: 1px solid rgba(24,166,109,0.5); border-radius: 50%;
-          pointer-events: none; z-index: 9998;
-          transform: translate(-50%, -50%);
-          transition: transform 0.18s cubic-bezier(0.16,1,0.3,1), width 0.3s, height 0.3s, border-color 0.3s, background 0.3s;
+        @keyframes float {
+          0%,100% { transform:translateY(0px); }
+          50%      { transform:translateY(-14px); }
         }
-        .cur-ring.hover {
-          width: 56px; height: 56px;
-          background: rgba(24,166,109,0.07);
-          border-color: rgba(24,166,109,0.8);
+        @keyframes pulse-ring {
+          0%   { transform:scale(1); opacity:.5; }
+          100% { transform:scale(2.2); opacity:0; }
         }
-
-        /* ── Grain overlay ── */
-        .grain::after {
-          content: '';
-          position: absolute; inset: 0;
-          background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-          pointer-events: none; z-index: 1; opacity: 0.35; mix-blend-mode: overlay;
+        @keyframes marquee {
+          0%   { transform:translateX(0); }
+          100% { transform:translateX(-50%); }
         }
+        .float-phone { animation: float 8s ease-in-out infinite; }
+        .pulse-ring  { position:absolute; inset:0; border-radius:50%; background:rgba(24,166,109,.2); animation:pulse-ring 2.2s cubic-bezier(0,.2,.2,1) infinite; }
+        .marquee-wrap { animation: marquee 32s linear infinite; }
+        .word-slot { animation: wordIn 2.6s ease-in-out; }
+        .badge-pill { display:inline-flex; align-items:center; gap:8px; border:1px solid rgba(255,255,255,.1); border-radius:980px; padding:5px 14px; margin-bottom:32px; background:rgba(255,255,255,.04); max-width:100%; flex-wrap:wrap; }
+        @media(max-width:600px){ .badge-pill { font-size:11px; padding:5px 10px; } }
 
-        /* ── Marquee ── */
-        @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
-        .marquee-track { animation: marquee 40s linear infinite; }
-
-        /* ── Word cycle ── */
-        @keyframes wordReveal {
-          0%   { opacity: 0; transform: translateY(10px); }
-          10%, 90% { opacity: 1; transform: translateY(0); }
-          100% { opacity: 0; transform: translateY(-10px); }
+        /* Buttons */
+        .btn-primary {
+          display:inline-flex; align-items:center; justify-content:center;
+          background:#18A66D; color:#fff; border:none; border-radius:980px;
+          font-weight:700; cursor:pointer; text-decoration:none;
+          transition:background .18s, box-shadow .18s;
+          box-shadow:0 2px 12px rgba(24,166,109,.28);
         }
-        .word-anim { animation: wordReveal 2.8s cubic-bezier(0.16,1,0.3,1); }
+        .btn-primary:hover { background:#149A60; box-shadow:0 4px 20px rgba(24,166,109,.38); }
 
-        /* ── Float ── */
-        @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-16px); } }
-        .floating { animation: float 10s ease-in-out infinite; }
-
-        /* ── Pulse ── */
-        @keyframes pulse { 0% { transform: scale(1); opacity: 0.5; } 100% { transform: scale(2.6); opacity: 0; } }
-        .pulse-ring { animation: pulse 2.4s ease-out infinite; }
-
-        /* ── Line draw ── */
-        @keyframes drawLine { from { scaleX: 0; } to { scaleX: 1; } }
-
-        /* ── Shimmer on CTA button ── */
-        @keyframes shimmer {
-          0%   { background-position: -200% center; }
-          100% { background-position: 200% center; }
+        .btn-ghost {
+          display:inline-flex; align-items:center; justify-content:center;
+          background:transparent; color:rgba(255,255,255,.55); border:1px solid rgba(255,255,255,.14);
+          border-radius:980px; font-weight:600; cursor:pointer; text-decoration:none;
+          transition:color .18s, border-color .18s, background .18s;
         }
+        .btn-ghost:hover { color:#fff; border-color:rgba(255,255,255,.35); background:rgba(255,255,255,.05); }
 
-        /* ── Buttons ── */
-        .btn-emerald {
-          display: inline-flex; align-items: center; justify-content: center;
-          background: #18A66D; color: #fff; border: none; text-decoration: none;
-          font-family: 'Inter', sans-serif; font-weight: 600; letter-spacing: 0.01em;
-          position: relative; overflow: hidden;
+        .btn-outline {
+          display:inline-flex; align-items:center; justify-content:center;
+          background:transparent; color:#374151; border:1px solid #E5E7EB;
+          border-radius:980px; font-weight:600; cursor:pointer; text-decoration:none;
+          transition:border-color .18s, color .18s, background .18s;
         }
-        .btn-emerald::after {
-          content: ''; position: absolute; inset: 0;
-          background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.18) 50%, transparent 60%);
-          background-size: 200% 100%; background-position: -200% center;
-        }
-        .btn-emerald:hover::after { animation: shimmer 0.7s ease forwards; }
-        .btn-emerald:hover { background: #149A60; box-shadow: 0 0 0 4px rgba(24,166,109,0.15); }
+        .btn-outline:hover { border-color:#18A66D; color:#18A66D; background:#F0FBF5; }
 
-        .btn-ghost-lux {
-          display: inline-flex; align-items: center; justify-content: center;
-          background: transparent; color: rgba(255,255,255,0.5);
-          border: 1px solid rgba(255,255,255,0.15); text-decoration: none;
-          font-family: 'Inter', sans-serif; font-weight: 500;
-          transition: color 0.2s, border-color 0.2s, background 0.2s;
-        }
-        .btn-ghost-lux:hover { color: #fff; border-color: rgba(255,255,255,0.4); background: rgba(255,255,255,0.05); }
+        /* Accordion */
+        .faq-item { border-bottom:1px solid #F3F4F6; }
+        .faq-item:first-child { border-top:1px solid #F3F4F6; }
 
-        .btn-outline-lux {
-          display: inline-flex; align-items: center; justify-content: center;
-          background: transparent; color: #111318;
-          border: 1px solid #D4D8DE; text-decoration: none;
-          font-family: 'Inter', sans-serif; font-weight: 500;
-          transition: color 0.2s, border-color 0.2s;
-        }
-        .btn-outline-lux:hover { border-color: #18A66D; color: #18A66D; }
-
-        /* ── Divider line ── */
-        .h-line { height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent); }
-        .h-line-light { height: 1px; background: linear-gradient(90deg, transparent, rgba(0,0,0,0.08), transparent); }
-
-        /* ── Section label ── */
-        .sect-label {
-          font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 600;
-          letter-spacing: 0.18em; text-transform: uppercase; color: #18A66D;
-          display: flex; align-items: center; gap: 10px;
-        }
-        .sect-label::before {
-          content: ''; display: block; width: 24px; height: 1px; background: #18A66D;
-        }
-
-        /* ── FAQ ── */
-        .faq-row { border-bottom: 1px solid rgba(0,0,0,0.07); }
-        .faq-row:first-child { border-top: 1px solid rgba(0,0,0,0.07); }
-
-        /* ── Card hover ── */
-        .lux-card { transition: transform 0.4s cubic-bezier(0.16,1,0.3,1), box-shadow 0.4s cubic-bezier(0.16,1,0.3,1); }
-        .lux-card:hover { transform: translateY(-4px); box-shadow: 0 24px 64px rgba(0,0,0,0.1) !important; }
-
-        /* ── Responsive ── */
-        @media (max-width: 900px) {
-          .hero-two-col { grid-template-columns: 1fr !important; }
-          .hero-right { display: none !important; }
-          .hero-text { text-align: center; }
-          .hero-ctas { justify-content: center !important; }
-          .hero-stats { justify-content: center !important; }
-        }
-        @media (max-width: 768px) {
-          .sec { padding: 80px 24px !important; }
-          .grid-3 { grid-template-columns: 1fr !important; }
-          .grid-2 { grid-template-columns: 1fr !important; }
-          .showcase-phone { display: none !important; }
-          .comp-desk { display: none !important; }
-          .comp-mob { display: block !important; }
-          .nav-links { display: none !important; }
-        }
-        @media (min-width: 769px) {
-          .comp-mob { display: none !important; }
+        /* Mobile layout */
+        @media(max-width:768px){
+          .sec-pad{padding-top:64px!important;padding-bottom:64px!important;padding-left:20px!important;padding-right:20px!important}
+          .hero-phone-hide{display:none!important}
+          .showcase-phone-hide{display:none!important}
         }
       `}</style>
 
-      {/* ── Custom Cursor ── */}
-      <div className="cur-dot" style={{ left: cursorPos.x, top: cursorPos.y }} />
-      <div className={`cur-ring ${cursorHover ? "hover" : ""}`} style={{ left: cursorPos.x, top: cursorPos.y }} />
+      <div style={{ fontFamily: F, color: "#0B0D14" }}>
 
-      <div style={{ fontFamily: sans, color: "#111318", background: "#fff", overflowX: "hidden" }}>
-
-        {/* ══════════════════════════════════════════
-            NAVBAR
-        ══════════════════════════════════════════ */}
+        {/* ══ NAVBAR ══ */}
         <nav style={{
-          position: "fixed", top: 0, left: 0, right: 0, zIndex: 100,
-          height: 60,
-          display: "flex", alignItems: "center", justifyContent: "space-between",
-          padding: "0 48px",
-          background: navScrolled ? "rgba(4,6,20,0.94)" : "transparent",
-          backdropFilter: navScrolled ? "blur(24px)" : "none",
-          borderBottom: navScrolled ? "1px solid rgba(255,255,255,0.06)" : "none",
-          transition: "background 0.4s, border 0.4s, backdrop-filter 0.4s",
+          position:"fixed", top:0, left:0, right:0, zIndex:50,
+          height:52, display:"flex", alignItems:"center", justifyContent:"space-between",
+          padding:"0 32px",
+          background:"rgba(255,255,255,.88)", backdropFilter:"blur(20px) saturate(180%)",
+          borderBottom:"1px solid rgba(0,0,0,.07)",
         }}>
-          <a href="/" style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: 1 }}>
-            <span style={{ fontFamily: serif, fontSize: 22, fontWeight: 600, color: "#18A66D", letterSpacing: "-0.5px" }}>Termin</span>
-            <span style={{ fontFamily: serif, fontSize: 22, fontWeight: 600, color: "#fff", letterSpacing: "-0.5px" }}>Stop</span>
+          <a href="/" style={{ textDecoration:"none", fontSize:17, fontWeight:800, letterSpacing:"-0.5px" }}>
+            <span style={{ color:"#18A66D" }}>Termin</span>
+            <span style={{ color:"#0B0D14" }}>Stop</span>
           </a>
-          <div className="nav-links" style={{ display: "flex", alignItems: "center", gap: 36 }}>
-            {[["So funktioniert's","#wie-es-funktioniert"],["Preise","#preise"],["Login","/login"]].map(([l,h]) => (
-              <a key={h} href={h} style={{ fontFamily: sans, fontSize: 13, color: "rgba(255,255,255,0.45)", textDecoration: "none", fontWeight: 400, letterSpacing: "0.01em", transition: "color 0.2s" }}
-                onMouseEnter={e => (e.currentTarget.style.color="rgba(255,255,255,0.9)")}
-                onMouseLeave={e => (e.currentTarget.style.color="rgba(255,255,255,0.45)")}>{l}</a>
-            ))}
-            <a href="/demo" style={{ fontFamily: sans, fontSize: 13, color: "rgba(255,255,255,0.55)", textDecoration: "none", fontWeight: 500, padding: "7px 18px", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 6, letterSpacing: "0.02em", transition: "color 0.2s, border-color 0.2s" }}
-              onMouseEnter={e => { e.currentTarget.style.color="#fff"; e.currentTarget.style.borderColor="rgba(255,255,255,0.4)" }}
-              onMouseLeave={e => { e.currentTarget.style.color="rgba(255,255,255,0.55)"; e.currentTarget.style.borderColor="rgba(255,255,255,0.15)" }}>Demo</a>
+          <div style={{ display:"flex", alignItems:"center", gap:28 }}>
+            <a href="#wie-es-funktioniert" style={{ fontSize:13, color:"#6B7280", textDecoration:"none", fontWeight:500 }} className="hidden md:block">So funktioniert's</a>
+            <a href="#preise" style={{ fontSize:13, color:"#6B7280", textDecoration:"none", fontWeight:500 }} className="hidden md:block">Preise</a>
+            <a href="/login" style={{ fontSize:13, color:"#6B7280", textDecoration:"none", fontWeight:500 }} className="hidden md:block">Login</a>
+            <a href="/demo" style={{ fontSize:13, color:"#6B7280", textDecoration:"none", fontWeight:500, padding:"6px 16px", border:"1px solid #E5E7EB", borderRadius:980 }} className="hidden md:block">Demo</a>
+            {/* Login-Button nur auf Mobile */}
+            <a href="/login" className="block md:hidden" style={{ fontSize:13, color:"#6B7280", textDecoration:"none", fontWeight:600, padding:"6px 14px", border:"1px solid #E5E7EB", borderRadius:980, background:"rgba(255,255,255,.9)" }}>Login</a>
+            <a href="/lead" className="btn-primary" style={{ fontSize:13, padding:"8px 20px" }}>Kostenlos anfragen</a>
           </div>
-          <MagneticBtn href="/lead" className="btn-emerald" style={{ fontSize: 13, padding: "9px 22px", borderRadius: 7 }}>
-            Kostenlos anfragen
-          </MagneticBtn>
         </nav>
 
-        {/* ══════════════════════════════════════════
-            HERO
-        ══════════════════════════════════════════ */}
-        <section className="grain" style={{
-          minHeight: "100vh", display: "flex", alignItems: "center",
-          background: "linear-gradient(150deg, #020510 0%, #050A18 40%, #060C18 70%, #04080F 100%)",
-          paddingTop: 60, overflow: "hidden", position: "relative",
+        {/* ══ HERO ══ */}
+        <section style={{
+          minHeight:"100vh", display:"flex", alignItems:"center", justifyContent:"center",
+          background:"linear-gradient(170deg,#06091A 0%,#080C1E 55%,#09101F 100%)",
+          paddingTop:52, overflow:"hidden", position:"relative",
         }}>
-          {/* ambient orbs */}
-          <div style={{ position:"absolute", top:"20%", left:"10%", width:500, height:500, borderRadius:"50%", background:"radial-gradient(ellipse, rgba(24,166,109,0.06) 0%, transparent 65%)", pointerEvents:"none" }} />
-          <div style={{ position:"absolute", bottom:"10%", right:"5%", width:400, height:400, borderRadius:"50%", background:"radial-gradient(ellipse, rgba(24,166,109,0.04) 0%, transparent 65%)", pointerEvents:"none" }} />
-          {/* decorative lines */}
-          <div style={{ position:"absolute", top:0, left:"50%", width:1, height:"100%", background:"linear-gradient(180deg,transparent,rgba(255,255,255,0.03),transparent)", pointerEvents:"none" }} />
+          {/* single soft glow */}
+          <div style={{
+            position:"absolute", top:"35%", left:"50%", transform:"translate(-50%,-50%)",
+            width:600, height:480, borderRadius:"50%",
+            background:"radial-gradient(ellipse,rgba(24,166,109,.09) 0%,transparent 68%)",
+            pointerEvents:"none",
+          }} />
 
-          <div style={{ maxWidth:1140, margin:"0 auto", padding:"0 48px", width:"100%", display:"grid", gridTemplateColumns:"1fr 1fr", gap:80, alignItems:"center" }} className="hero-two-col">
+          <div style={{ maxWidth:1120, margin:"0 auto", padding:"0 32px", width:"100%", display:"grid", gridTemplateColumns:"1fr 1fr", gap:80, alignItems:"center" }} className="hero-grid">
+            <style>{`.hero-grid{grid-template-columns:1fr 1fr} @media(max-width:900px){.hero-grid{grid-template-columns:1fr!important;text-align:center}.hero-btns{justify-content:center!important}.hero-stats{justify-content:center!important}}`}</style>
 
             {/* LEFT */}
-            <div className="hero-text">
-              {/* live badge */}
-              <div style={{ display:"inline-flex", alignItems:"center", gap:10, marginBottom:44 }}>
-                <span style={{ position:"relative", display:"flex", width:8, height:8 }}>
-                  <span className="pulse-ring" style={{ position:"absolute", inset:0, borderRadius:"50%", background:"rgba(24,166,109,0.25)" }} />
-                  <span style={{ position:"relative", width:8, height:8, borderRadius:"50%", background:"#18A66D", display:"block" }} />
+            <div>
+              {/* badge */}
+              <div className="badge-pill">
+                <span style={{ position:"relative", display:"flex", width:7, height:7, flexShrink:0 }}>
+                  <span className="pulse-ring" />
+                  <span style={{ position:"relative", display:"inline-flex", borderRadius:"50%", width:7, height:7, background:"#18A66D" }} />
                 </span>
-                <span style={{ fontFamily:sans, fontSize:11, color:"rgba(255,255,255,0.3)", fontWeight:500, letterSpacing:"0.15em", textTransform:"uppercase" }}>
-                  Digitales Terminbüro für{" "}
-                  <span style={{ color:"rgba(255,255,255,0.7)", fontWeight:600 }} key={heroWord} className="word-anim">{words[heroWord]}</span>
+                <span style={{ fontSize:12, color:"rgba(255,255,255,.45)", fontWeight:600, letterSpacing:.2 }}>
+                  Digitales Terminbüro für Ihren&nbsp;<span style={{ color:"#18A66D", fontWeight:800, display:"inline-block" }} key={heroWord} className="word-slot">{words[heroWord]}</span>
                 </span>
               </div>
 
-              {/* headline — serif */}
-              <h1 style={{ fontFamily:serif, fontSize:"clamp(52px,6.5vw,92px)", fontWeight:500, lineHeight:1.0, letterSpacing:"-1px", color:"#fff", marginBottom:8 }}>
-                Ihr Betrieb.
-              </h1>
-              <h1 style={{ fontFamily:serif, fontSize:"clamp(52px,6.5vw,92px)", fontWeight:500, lineHeight:1.0, letterSpacing:"-1px", color:"#fff", marginBottom:8 }}>
-                Digital.
-              </h1>
-              <h1 style={{ fontFamily:serif, fontSize:"clamp(52px,6.5vw,92px)", fontWeight:300, lineHeight:1.0, letterSpacing:"-1px", color:"#18A66D", fontStyle:"italic", marginBottom:40 }}>
-                Automatisch.
+              {/* headline */}
+              <h1 style={{ fontSize:"clamp(40px,5vw,72px)", fontWeight:900, lineHeight:1.04, letterSpacing:"-2px", color:"#fff", margin:"0 0 24px" }}>
+                Ihr Betrieb.<br />
+                Digital.<br />
+                <span style={{ color:"#18A66D" }}>Automatisch.</span>
               </h1>
 
-              <p style={{ fontFamily:sans, fontSize:16, color:"rgba(255,255,255,0.35)", lineHeight:1.75, maxWidth:400, marginBottom:52, fontWeight:300, letterSpacing:"0.01em" }}>
-                Kalender, Kundenkartei, SMS-Erinnerungen und Auswertungen — alles in einem System. In 10 Minuten eingerichtet.
+              <p style={{ fontSize:18, color:"rgba(255,255,255,.42)", lineHeight:1.65, maxWidth:420, margin:"0 0 40px" }}>
+                TerminStop ist Ihr komplettes digitales Terminbüro — mit Kalender, Kundenkartei, automatischen SMS-Erinnerungen und Auswertungen. Alles in einem. In 10 Minuten eingerichtet.
               </p>
 
-              <div className="hero-ctas" style={{ display:"flex", gap:12, flexWrap:"wrap", marginBottom:64 }}>
-                <MagneticBtn href="/lead" className="btn-emerald" style={{ fontSize:14, padding:"14px 32px", borderRadius:8 }}>
-                  Kostenlose Beratung →
-                </MagneticBtn>
-                <MagneticBtn href="/demo" className="btn-ghost-lux" style={{ fontSize:14, padding:"14px 28px", borderRadius:8 }}>
-                  Live-Demo ansehen
-                </MagneticBtn>
+              <div className="hero-btns" style={{ display:"flex", gap:12, flexWrap:"wrap", marginBottom:52 }}>
+                <a href="/lead" className="btn-primary" style={{ fontSize:15, padding:"14px 32px" }}>Kostenlose Beratung →</a>
+                <a href="/demo" className="btn-ghost" style={{ fontSize:15, padding:"14px 28px" }}>Live-Demo ansehen</a>
               </div>
 
               {/* stats */}
-              <div className="hero-stats" style={{ display:"flex", gap:52, paddingTop:40, borderTop:"1px solid rgba(255,255,255,0.06)" }}>
+              <div className="hero-stats" style={{ display:"flex", gap:40, paddingTop:32, borderTop:"1px solid rgba(255,255,255,.07)" }}>
                 {[
                   { to:50, suffix:"+", label:"Betriebe aktiv" },
                   { to:95, suffix:"%", label:"Weniger Ausfälle" },
                   { to:10, suffix:" Min.", label:"Einrichtung" },
                 ].map((s,i) => (
                   <div key={i}>
-                    <div style={{ fontFamily:serif, fontSize:40, fontWeight:500, color:"#fff", letterSpacing:"-1px", lineHeight:1 }}>
-                      <Counter to={s.to} suffix={s.suffix} />
-                    </div>
-                    <div style={{ fontFamily:sans, fontSize:11, color:"rgba(255,255,255,0.25)", marginTop:6, fontWeight:400, letterSpacing:"0.05em", textTransform:"uppercase" }}>{s.label}</div>
+                    <div style={{ fontSize:28, fontWeight:900, color:"#fff", letterSpacing:"-1px" }}><Counter to={s.to} suffix={s.suffix} /></div>
+                    <div style={{ fontSize:12, color:"rgba(255,255,255,.28)", marginTop:2, fontWeight:500 }}>{s.label}</div>
                   </div>
                 ))}
               </div>
             </div>
 
             {/* RIGHT – phone */}
-            <div className="hero-right" style={{ display:"flex", justifyContent:"flex-end" }}>
-              <div className="floating" style={{ position:"relative" }}>
-                <div style={{ position:"absolute", inset:-60, borderRadius:"50%", background:"radial-gradient(ellipse, rgba(24,166,109,0.09) 0%, transparent 60%)", pointerEvents:"none" }} />
-                {/* Outer shell */}
+            <div style={{ display:"flex", justifyContent:"flex-end" }} className="hero-phone-hide">
+              <div className="float-phone" style={{ position:"relative" }}>
                 <div style={{
-                  background:"linear-gradient(145deg,#1a1a1a,#0a0a0a)", padding:14, borderRadius:56,
-                  border:"1px solid rgba(255,255,255,0.07)",
-                  boxShadow:"0 80px 160px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.03) inset, 0 1px 0 rgba(255,255,255,0.08) inset",
+                  position:"absolute", inset:-40, borderRadius:"50%",
+                  background:"radial-gradient(ellipse,rgba(24,166,109,.11) 0%,transparent 65%)",
+                  pointerEvents:"none",
+                }} />
+                <div style={{
+                  background:"#070F09", padding:14, borderRadius:50,
+                  border:"1px solid rgba(24,166,109,.14)",
+                  boxShadow:"0 48px 96px rgba(0,0,0,.55), 0 0 0 1px rgba(24,166,109,.08) inset",
                 }}>
-                  <div style={{ width:290, height:600, borderRadius:44, overflow:"hidden", background:"linear-gradient(180deg,#0a1409 0%,#060d07 100%)", position:"relative" }}>
-                    {/* notch */}
-                    <div style={{ position:"absolute", top:0, left:"50%", transform:"translateX(-50%)", width:90, height:28, background:"#000", borderRadius:"0 0 18px 18px", zIndex:10 }} />
-                    {/* status */}
-                    <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"14px 22px 10px", marginTop:14 }}>
-                      <span style={{ fontFamily:sans, fontSize:11, color:"rgba(255,255,255,0.25)", fontWeight:600 }}>9:41</span>
-                      <div style={{ width:14, height:6, borderRadius:2, border:"1px solid rgba(255,255,255,0.18)", position:"relative" }}>
-                        <div style={{ position:"absolute", left:2, top:1.5, bottom:1.5, width:"70%", background:"#18A66D", borderRadius:1 }} />
+                  <div style={{ width:290, height:590, borderRadius:38, overflow:"hidden", background:"linear-gradient(180deg,#0a1a0d 0%,#060d08 100%)" }}>
+                    {/* status bar */}
+                    <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"20px 24px 12px" }}>
+                      <span style={{ fontSize:11, color:"rgba(255,255,255,.35)", fontWeight:600 }}>9:41</span>
+                      <div style={{ position:"absolute", left:"50%", transform:"translateX(-50%)", top:14, width:54, height:18, background:"#000", borderRadius:9 }} />
+                      <div style={{ width:16, height:7, borderRadius:2, border:"1px solid rgba(255,255,255,.2)", position:"relative" }}>
+                        <div style={{ position:"absolute", left:2, top:2, bottom:2, width:"75%", background:"#18A66D", borderRadius:1 }} />
                       </div>
                     </div>
-                    {/* notification card */}
-                    <div style={{ margin:"4px 14px 14px", background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.07)", borderRadius:20, padding:"13px 15px", display:"flex", alignItems:"center", gap:12 }}>
-                      <div style={{ width:42, height:42, background:"linear-gradient(135deg,#18A66D,#0D7A4E)", borderRadius:13, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
-                        <span style={{ fontFamily:serif, color:"#fff", fontWeight:700, fontSize:18 }}>T</span>
+                    {/* notification */}
+                    <div style={{ margin:"0 12px 12px", background:"rgba(255,255,255,.06)", border:"1px solid rgba(255,255,255,.08)", borderRadius:18, padding:"12px 14px", display:"flex", alignItems:"center", gap:12 }}>
+                      <div style={{ width:40, height:40, background:"#18A66D", borderRadius:12, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+                        <span style={{ color:"#fff", fontWeight:900, fontSize:15 }}>T</span>
                       </div>
-                      <div>
-                        <div style={{ fontFamily:sans, fontSize:11, fontWeight:700, color:"#fff", marginBottom:1 }}>TerminStop</div>
-                        <div style={{ fontFamily:sans, fontSize:10, color:"rgba(255,255,255,0.25)" }}>SMS-Erinnerung · Jetzt</div>
+                      <div style={{ flex:1, minWidth:0 }}>
+                        <div style={{ fontSize:11, fontWeight:700, color:"#fff" }}>TerminStop</div>
+                        <div style={{ fontSize:10, color:"rgba(255,255,255,.3)" }}>SMS-Erinnerung · Jetzt</div>
                       </div>
-                      <div style={{ marginLeft:"auto", width:7, height:7, background:"#18A66D", borderRadius:"50%" }} />
+                      <div style={{ width:8, height:8, background:"#18A66D", borderRadius:"50%" }} />
                     </div>
-                    {/* message */}
+                    {/* chat */}
                     <div style={{ padding:"0 16px", display:"flex", flexDirection:"column", gap:10 }}>
-                      <div style={{
-                        background:"linear-gradient(135deg,#18A66D,#0f8a55)",
-                        color:"#fff", fontFamily:sans, fontSize:12.5, lineHeight:1.7,
-                        borderRadius:"20px 20px 20px 4px", padding:"15px 17px", maxWidth:"88%",
-                        boxShadow:"0 8px 28px rgba(24,166,109,0.28)"
-                      }}>
-                        Hallo Frau Schmidt,<br /><br />
+                      <div style={{ background:"#18A66D", color:"#fff", fontSize:12, lineHeight:1.65, borderRadius:"18px 18px 18px 4px", padding:"14px 16px", maxWidth:"88%", boxShadow:"0 6px 20px rgba(24,166,109,.25)" }}>
+                        Hallo Frau Schmidt 👋<br /><br />
                         Sie haben morgen,<br /><strong>Dienstag um 14:00 Uhr</strong><br />einen Termin bei uns.<br /><br />
                         Wir freuen uns auf Sie!<br />
-                        <span style={{ fontSize:10, color:"rgba(255,255,255,0.4)" }}>– Friseurstudio Elegance</span>
+                        <span style={{ fontSize:10, color:"rgba(255,255,255,.45)" }}>– Friseurstudio Elegance</span>
                       </div>
-                      <div style={{ fontFamily:sans, fontSize:9, color:"rgba(255,255,255,0.18)", paddingLeft:4 }}>✓✓ Zugestellt · 24h vorher</div>
+                      <div style={{ fontSize:9, color:"rgba(255,255,255,.2)", paddingLeft:4 }}>✓✓ Zugestellt · 24h vorher</div>
                       <div style={{ display:"flex", justifyContent:"flex-end" }}>
-                        <div style={{
-                          background:"rgba(255,255,255,0.06)", border:"1px solid rgba(255,255,255,0.08)",
-                          color:"rgba(255,255,255,0.75)", fontFamily:sans, fontSize:12.5, lineHeight:1.65,
-                          borderRadius:"20px 20px 4px 20px", padding:"13px 15px", maxWidth:"78%"
-                        }}>
-                          Danke! Bin pünktlich da
+                        <div style={{ background:"rgba(255,255,255,.09)", border:"1px solid rgba(255,255,255,.1)", color:"rgba(255,255,255,.8)", fontSize:12, lineHeight:1.6, borderRadius:"18px 18px 4px 18px", padding:"12px 14px", maxWidth:"78%" }}>
+                          Danke! Bin pünktlich da 🙂
                         </div>
                       </div>
                     </div>
                     {/* confirmed */}
-                    <div style={{ position:"absolute", bottom:18, left:14, right:14 }}>
-                      <div style={{ background:"rgba(24,166,109,0.1)", border:"1px solid rgba(24,166,109,0.2)", borderRadius:18, padding:"13px 15px", display:"flex", alignItems:"center", gap:12 }}>
-                        <div style={{ width:32, height:32, background:"#18A66D", borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center" }}>
+                    <div style={{ position:"absolute", bottom:20, left:12, right:12 }}>
+                      <div style={{ background:"rgba(24,166,109,.12)", border:"1px solid rgba(24,166,109,.22)", borderRadius:18, padding:"12px 14px", display:"flex", alignItems:"center", gap:12 }}>
+                        <div style={{ width:32, height:32, background:"#18A66D", borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
                           <span style={{ color:"#fff", fontSize:14 }}>✓</span>
                         </div>
                         <div>
-                          <div style={{ fontFamily:sans, fontSize:11, fontWeight:700, color:"#4AE89B" }}>Termin bestätigt</div>
-                          <div style={{ fontFamily:sans, fontSize:10, color:"rgba(255,255,255,0.28)" }}>Kundin erscheint pünktlich</div>
+                          <div style={{ fontSize:11, fontWeight:700, color:"#4AE89B" }}>Termin bestätigt</div>
+                          <div style={{ fontSize:10, color:"rgba(255,255,255,.3)" }}>Kundin erscheint pünktlich</div>
                         </div>
                       </div>
                     </div>
@@ -486,102 +315,90 @@ export default function LandingPage() {
         </section>
 
         {/* ══ INDUSTRY STRIP ══ */}
-        <section style={{ background:"#fafafa", borderTop:"1px solid #EBEBED", borderBottom:"1px solid #EBEBED", padding:"14px 0", overflow:"hidden" }}>
+        <section style={{ background:"#fff", borderTop:"1px solid #F3F4F6", borderBottom:"1px solid #F3F4F6", padding:"14px 0", overflow:"hidden" }}>
           <div style={{ display:"flex" }}>
-            <div className="marquee-track" style={{ display:"flex", gap:56, flexShrink:0 }}>
+            <div className="marquee-wrap" style={{ display:"flex", gap:48, flexShrink:0 }}>
               {[...industries, ...industries].map((b, i) => (
-                <div key={i} style={{ display:"flex", alignItems:"center", gap:12, flexShrink:0 }}>
-                  <div style={{ width:3, height:3, background:"#18A66D", borderRadius:"50%", opacity:0.6 }} />
-                  <span style={{ fontFamily:sans, fontSize:12, color:"#B8BDC8", fontWeight:400, whiteSpace:"nowrap", letterSpacing:"0.08em", textTransform:"uppercase" }}>{b}</span>
+                <div key={i} style={{ display:"flex", alignItems:"center", gap:10, flexShrink:0 }}>
+                  <div style={{ width:5, height:5, background:"#18A66D", borderRadius:"50%", opacity:.7 }} />
+                  <span style={{ fontSize:13, color:"#9CA3AF", fontWeight:500, whiteSpace:"nowrap" }}>{b}</span>
                 </div>
               ))}
             </div>
           </div>
         </section>
 
-        {/* ══════════════════════════════════════════
-            PROBLEM
-        ══════════════════════════════════════════ */}
-        <section className="sec grain" style={{ background:"#fff", padding:"128px 48px", position:"relative" }}>
-          <div style={{ maxWidth:1000, margin:"0 auto" }}>
+        {/* ══ PROBLEM ══ */}
+        <section className="sec-pad" style={{ background:"#fff", padding:"100px 32px" }}>
+          <div style={{ maxWidth:960, margin:"0 auto" }}>
             <Reveal>
-              <div className="sect-label" style={{ marginBottom:28 }}>Das Problem</div>
-              <div style={{ maxWidth:580, marginBottom:80 }}>
-                <h2 style={{ fontFamily:serif, fontSize:"clamp(36px,4.5vw,62px)", fontWeight:500, letterSpacing:"-0.5px", lineHeight:1.05, marginBottom:24, color:"#111318" }}>
-                  Zettelwirtschaft, Telefonate,<br />No-Shows.<br /><em style={{ fontStyle:"italic", fontWeight:300, color:"#6B7280" }}>Täglich.</em>
+              <div style={{ maxWidth:560, marginBottom:64 }}>
+                <div style={{ fontSize:11, fontWeight:700, letterSpacing:3, textTransform:"uppercase", color:"#18A66D", marginBottom:16 }}>Das Problem</div>
+                <h2 style={{ fontSize:"clamp(32px,4vw,52px)", fontWeight:900, letterSpacing:"-1.5px", lineHeight:1.08, margin:"0 0 18px" }}>
+                  Zettelwirtschaft, Telefonate,<br />No-Shows. Täglich.
                 </h2>
-                <p style={{ fontFamily:sans, fontSize:16, color:"#6B7280", lineHeight:1.8, fontWeight:300 }}>
-                  Kein Überblick, kein System — und Kunden, die einfach nicht erscheinen. Das kostet Sie jeden Tag Zeit und Geld.
+                <p style={{ fontSize:17, color:"#6B7280", lineHeight:1.65, margin:0 }}>
+                  Kein Überblick über Kunden, kein digitaler Kalender, kein System — und dazu noch Kunden, die einfach nicht erscheinen. Das kostet Sie jeden Tag Zeit und Geld.
                 </p>
               </div>
             </Reveal>
 
-            <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)" }} className="grid-3 stat-grid-border">
-              <style>{`.stat-grid-border>div+div{border-left:1px solid #EBEBED} @media(max-width:768px){.stat-grid-border>div+div{border-left:none;border-top:1px solid #EBEBED}}`}</style>
+            <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", border:"1px solid #F3F4F6", borderRadius:20, overflow:"hidden" }} className="stat-grid">
+              <style>{`.stat-grid{grid-template-columns:repeat(3,1fr)} @media(max-width:700px){.stat-grid{grid-template-columns:1fr!important}}`}</style>
               {[
-                { to:50,   suffix:"€",  pre:"",     label:"Verlust pro Ausfall",  desc:"Jeder verpasste Termin ist Umsatz, der nicht stattfindet." },
-                { to:9,    suffix:"×",  pre:"bis ", label:"Ausfälle pro Woche",   desc:"Im Schnitt erlebt jeder Betrieb mehrfach pro Woche Ausfälle." },
-                { to:2000, suffix:"€+", pre:"bis ", label:"Verlust pro Monat",    desc:"Was wenig klingt, summiert sich zu Tausenden im Jahr." },
+                { to:50, suffix:"€", pre:"", label:"Verlust pro Ausfall", desc:"Jeder verpasste Termin ist Umsatz, der nicht stattfindet." },
+                { to:9,  suffix:"×", pre:"bis ", label:"Ausfälle pro Woche", desc:"Im Schnitt erlebt jeder Betrieb mehrfach pro Woche Ausfälle." },
+                { to:2000, suffix:"€+", pre:"bis ", label:"Verlust pro Monat", desc:"Was wenig klingt, summiert sich zu Tausenden im Jahr." },
               ].map((item, i) => (
-                <Reveal key={i} delay={i * 100}>
-                  <div style={{ padding:"56px 48px" }}>
-                    <div style={{ fontFamily:serif, fontSize:"clamp(52px,5vw,72px)", fontWeight:500, color:"#111318", marginBottom:16, letterSpacing:"-2px", lineHeight:1 }}>
+                <Reveal key={i} delay={i * 80}>
+                  <div style={{ padding:"48px 40px", background:"#fff", borderRight: i < 2 ? "1px solid #F3F4F6" : "none" }} className={i < 2 ? "stat-item-border" : ""}>
+                    <div style={{ fontSize:52, fontWeight:900, color:"#0B0D14", marginBottom:10, letterSpacing:"-2px", fontVariantNumeric:"tabular-nums" }}>
                       {item.pre}<Counter to={item.to} suffix={item.suffix} />
                     </div>
-                    <div style={{ fontFamily:sans, fontSize:13, fontWeight:600, color:"#111318", marginBottom:10, textTransform:"uppercase", letterSpacing:"0.06em" }}>{item.label}</div>
-                    <div style={{ fontFamily:sans, fontSize:14, color:"#9CA3AF", lineHeight:1.7 }}>{item.desc}</div>
+                    <div style={{ fontSize:14, fontWeight:700, color:"#0B0D14", marginBottom:6 }}>{item.label}</div>
+                    <div style={{ fontSize:14, color:"#9CA3AF", lineHeight:1.6 }}>{item.desc}</div>
                   </div>
                 </Reveal>
               ))}
             </div>
 
-            <div className="h-line-light" style={{ margin:"0 0 0 0" }} />
-
-            <Reveal delay={120}>
-              <div style={{ marginTop:16, background:"#04081A", borderRadius:12, padding:"28px 36px", display:"flex", alignItems:"center", justifyContent:"space-between", gap:24, flexWrap:"wrap" }}>
+            <Reveal delay={150}>
+              <div style={{ marginTop:20, background:"#06091A", borderRadius:20, padding:"28px 36px", display:"flex", alignItems:"center", justifyContent:"space-between", gap:24, flexWrap:"wrap" }}>
                 <div>
-                  <div style={{ fontFamily:serif, fontSize:20, color:"#fff", marginBottom:6, fontWeight:400, letterSpacing:"-0.2px" }}>Die Lösung? Automatisch. Einmal einrichten. Fertig.</div>
-                  <div style={{ fontFamily:sans, fontSize:13.5, color:"rgba(255,255,255,0.28)", fontWeight:300 }}>Kein Aufwand, keine Technik-Kenntnisse. Läuft dauerhaft von selbst.</div>
+                  <div style={{ color:"#fff", fontWeight:700, fontSize:16, marginBottom:4 }}>Die Lösung? Automatisch. Einmal einrichten. Fertig.</div>
+                  <div style={{ color:"rgba(255,255,255,.35)", fontSize:14 }}>Kein Aufwand, keine Technik-Kenntnisse. Läuft dauerhaft von selbst.</div>
                 </div>
-                <MagneticBtn href="/lead" className="btn-emerald" style={{ fontSize:13.5, padding:"12px 26px", borderRadius:7, flexShrink:0 }}>
-                  Jetzt anfragen →
-                </MagneticBtn>
+                <a href="/lead" className="btn-primary" style={{ fontSize:14, padding:"12px 28px", flexShrink:0 }}>Jetzt anfragen →</a>
               </div>
             </Reveal>
           </div>
         </section>
 
-        {/* ══════════════════════════════════════════
-            HOW IT WORKS
-        ══════════════════════════════════════════ */}
-        <section id="wie-es-funktioniert" className="sec" style={{ background:"#04081A", padding:"128px 48px", position:"relative", overflow:"hidden" }}>
-          <div style={{ position:"absolute", top:"50%", right:"-10%", transform:"translateY(-50%)", width:600, height:600, borderRadius:"50%", background:"radial-gradient(ellipse, rgba(24,166,109,0.05) 0%, transparent 65%)", pointerEvents:"none" }} />
-          <div style={{ maxWidth:920, margin:"0 auto", position:"relative" }}>
+        {/* ══ HOW IT WORKS ══ */}
+        <section id="wie-es-funktioniert" className="sec-pad" style={{ background:"#F9FAFB", padding:"100px 32px" }}>
+          <div style={{ maxWidth:960, margin:"0 auto" }}>
             <Reveal>
-              <div className="sect-label" style={{ marginBottom:28, color:"rgba(24,166,109,0.9)" }}>
-                <span style={{ background:"rgba(24,166,109,0.9)" }} />
-                So funktioniert's
-              </div>
-              <div style={{ maxWidth:520, marginBottom:88 }}>
-                <h2 style={{ fontFamily:serif, fontSize:"clamp(36px,4.5vw,62px)", fontWeight:500, letterSpacing:"-0.5px", lineHeight:1.05, color:"#fff", marginBottom:20 }}>
-                  Drei Schritte.<br /><em style={{ fontStyle:"italic", fontWeight:300, color:"rgba(255,255,255,0.4)" }}>Dann läuft es.</em>
+              <div style={{ maxWidth:520, marginBottom:64 }}>
+                <div style={{ fontSize:11, fontWeight:700, letterSpacing:3, textTransform:"uppercase", color:"#18A66D", marginBottom:16 }}>So funktioniert's</div>
+                <h2 style={{ fontSize:"clamp(32px,4vw,52px)", fontWeight:900, letterSpacing:"-1.5px", lineHeight:1.08, margin:"0 0 18px" }}>
+                  Drei Schritte.<br />Dann läuft es.
                 </h2>
-                <p style={{ fontFamily:sans, fontSize:15.5, color:"rgba(255,255,255,0.3)", lineHeight:1.8, fontWeight:300 }}>Kein IT-Studium. Kein Aufwand. Für immer.</p>
+                <p style={{ fontSize:17, color:"#6B7280", lineHeight:1.65, margin:0 }}>Kein IT-Studium. Kein Aufwand. Für immer.</p>
               </div>
             </Reveal>
-            <div style={{ display:"flex", flexDirection:"column" }}>
+            <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
               {[
                 { num:"01", title:"Einmalig einrichten – in unter 10 Minuten", desc:"Wir richten TerminStop gemeinsam mit Ihnen ein: Kalender, Kundenkartei und SMS-Erinnerungen. Persönlicher Onboarding-Support inklusive – kein technisches Vorwissen nötig.", tag:"Persönliche Begleitung" },
-                { num:"02", title:"Ihr digitales Büro läuft – sofort und vollautomatisch", desc:"Termine im Kalender, Kunden in der Kartei, SMS-Erinnerungen gehen automatisch raus – 24h vor jedem Termin. Sie sehen auf einen Blick, wer bestätigt hat und wer nicht.", tag:"Alles in einem" },
+                { num:"02", title:"Ihr digitales Büro läuft – sofort und vollautomatisch", desc:"Termine im Kalender, Kunden in der Kartei, SMS-Erinnerungen gehen automatisch raus – 24h vor jedem Termin, mit Ihrem Namen. Sie sehen auf einen Blick, wer bestätigt hat und wer nicht.", tag:"Alles in einem" },
                 { num:"03", title:"Ihr Betrieb läuft planbarer. Jeden Tag.", desc:"Weniger Ausfälle, mehr Überblick, mehr Umsatz. Kein Hinterhertelefonieren, keine Zettelwirtschaft – TerminStop arbeitet dauerhaft für Sie im Hintergrund.", tag:"95 % Erfolgsquote" },
               ].map((s, i) => (
                 <Reveal key={i} delay={i * 80}>
-                  <div style={{ display:"flex", gap:0, borderTop: i===0 ? "1px solid rgba(255,255,255,0.06)" : "none", borderBottom:"1px solid rgba(255,255,255,0.06)", padding:"44px 0" }}>
-                    <div style={{ fontFamily:serif, fontSize:64, fontWeight:300, color:"rgba(255,255,255,0.07)", flexShrink:0, width:100, lineHeight:1, letterSpacing:"-2px" }}>{s.num}</div>
-                    <div style={{ flex:1 }}>
-                      <div style={{ fontFamily:sans, fontSize:10.5, fontWeight:600, color:"#18A66D", letterSpacing:"0.12em", textTransform:"uppercase", marginBottom:14 }}>{s.tag}</div>
-                      <h3 style={{ fontFamily:serif, fontSize:"clamp(18px,2.5vw,26px)", fontWeight:500, color:"#fff", marginBottom:14, letterSpacing:"-0.3px", lineHeight:1.2 }}>{s.title}</h3>
-                      <p style={{ fontFamily:sans, fontSize:14.5, color:"rgba(255,255,255,0.32)", lineHeight:1.75, fontWeight:300 }}>{s.desc}</p>
+                  <div style={{ background:"#fff", border:"1px solid #F3F4F6", borderRadius:18, padding:"32px 36px", display:"flex", gap:32, alignItems:"flex-start", boxShadow:"0 1px 4px rgba(0,0,0,.04)" }}>
+                    <div style={{ fontSize:64, fontWeight:900, lineHeight:1, color:"rgba(24,166,109,.1)", flexShrink:0, width:80, textAlign:"center", userSelect:"none" }}>{s.num}</div>
+                    <div>
+                      <span style={{ display:"inline-block", background:"#F0FBF5", border:"1px solid rgba(24,166,109,.2)", color:"#18A66D", fontSize:11, fontWeight:700, padding:"4px 12px", borderRadius:980, marginBottom:12 }}>{s.tag}</span>
+                      <h3 style={{ fontSize:18, fontWeight:800, color:"#0B0D14", margin:"0 0 10px", letterSpacing:"-0.3px" }}>{s.title}</h3>
+                      <p style={{ fontSize:15, color:"#6B7280", lineHeight:1.65, margin:0 }}>{s.desc}</p>
                     </div>
                   </div>
                 </Reveal>
@@ -590,102 +407,99 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* ══════════════════════════════════════════
-            FEATURES
-        ══════════════════════════════════════════ */}
-        <section className="sec" style={{ background:"#fff", padding:"128px 48px" }}>
-          <div style={{ maxWidth:1060, margin:"0 auto" }}>
+        {/* ══ 4 FEATURE PILLARS ══ */}
+        <section className="sec-pad" style={{ background:"#F9FAFB", padding:"100px 32px" }}>
+          <div style={{ maxWidth:1080, margin:"0 auto" }}>
             <Reveal>
-              <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-end", marginBottom:88, flexWrap:"wrap", gap:32 }}>
-                <div>
-                  <div className="sect-label" style={{ marginBottom:24 }}>Alles inklusive</div>
-                  <h2 style={{ fontFamily:serif, fontSize:"clamp(36px,4.5vw,62px)", fontWeight:500, letterSpacing:"-0.5px", lineHeight:1.05, color:"#111318" }}>
-                    Kein Einzeltool.<br /><em style={{ fontStyle:"italic", fontWeight:300, color:"#9CA3AF" }}>Ein komplettes System.</em>
-                  </h2>
-                </div>
-                <p style={{ fontFamily:sans, fontSize:15, color:"#6B7280", lineHeight:1.8, maxWidth:320, fontWeight:300 }}>
-                  TerminStop ersetzt Notizbuch, Papierkalender und Erinnerungsanrufe — in einem einzigen System.
+              <div style={{ textAlign:"center", maxWidth:580, margin:"0 auto 64px" }}>
+                <div style={{ fontSize:11, fontWeight:700, letterSpacing:3, textTransform:"uppercase", color:"#18A66D", marginBottom:16 }}>Alles inklusive</div>
+                <h2 style={{ fontSize:"clamp(32px,4vw,52px)", fontWeight:900, letterSpacing:"-1.5px", lineHeight:1.08, margin:"0 0 16px" }}>
+                  Kein Einzeltool.<br />Ein komplettes System.
+                </h2>
+                <p style={{ fontSize:17, color:"#6B7280", lineHeight:1.65, margin:0 }}>
+                  TerminStop ersetzt Notizbuch, Papierkalender und Erinnerungsanrufe — und gibt Ihnen dabei mehr Einblick als je zuvor.
                 </p>
               </div>
             </Reveal>
-
-            <div style={{ display:"grid", gridTemplateColumns:"repeat(2,1fr)", gap:2 }} className="grid-2">
+            <div style={{ display:"grid", gap:20 }} className="features4-grid">
+              <style>{`.features4-grid{grid-template-columns:repeat(2,1fr)} @media(max-width:700px){.features4-grid{grid-template-columns:1fr!important}}`}</style>
               {[
-                { num:"01", title:"Digitaler Kalender",            sub:"Notizbuch adé",    desc:"Tag- und Wochenübersicht für alle Termine. Auf dem Handy, Tablet oder PC — immer aktuell." },
-                { num:"02", title:"Kundenkartei",                  sub:"Voller Überblick",  desc:"Stammkunden anlegen, Verlauf einsehen, Notizen hinterlegen. Sie wissen immer, wer zuverlässig ist." },
-                { num:"03", title:"Automatische SMS-Erinnerungen", sub:"Vollautomatisch",   desc:"24h vor jedem Termin geht eine personalisierte SMS raus — ohne Ihr Zutun. Nie wieder hinterhertelefonieren." },
-                { num:"04", title:"Auswertungen & Einblicke",      sub:"Datengestützt",    desc:"Wie hoch ist Ihre Erfolgsquote? Welche Kunden kommen regelmäßig? Ihr Betrieb schwarz auf weiß." },
+                { icon:"📅", title:"Digitaler Kalender", tag:"Notizbuch adé", desc:"Tag- und Wochenübersicht für alle Termine. Auf dem Handy, Tablet oder PC — immer aktuell, immer dabei. Nie wieder Zettelwirtschaft." },
+                { icon:"👥", title:"Kundenkartei", tag:"Voller Überblick", desc:"Stammkunden anlegen, Verlauf einsehen, Notizen hinterlegen. Sie wissen immer, wer zuverlässig ist — und wer nicht." },
+                { icon:"📱", title:"Automatische SMS-Erinnerungen", tag:"Vollautomatisch", desc:"24h vor jedem Termin geht automatisch eine personalisierte SMS raus — ohne Ihr Zutun. Nie wieder hinterhertelefonieren." },
+                { icon:"📊", title:"Auswertungen & Einblicke", tag:"Datengestützt", desc:"Wie hoch ist Ihre Erfolgsquote? Welche Kunden kommen regelmäßig? Sehen Sie Ihren Betrieb endlich schwarz auf weiß." },
               ].map((f, i) => (
-                <Reveal key={i} delay={i * 60}>
-                  <div className="lux-card" style={{ background:"#FAFAFA", border:"1px solid #EBEBED", padding:"44px 40px", height:"100%", boxSizing:"border-box" as any }}>
-                    <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:28 }}>
-                      <span style={{ fontFamily:sans, fontSize:10.5, fontWeight:600, color:"#18A66D", letterSpacing:"0.1em", textTransform:"uppercase" }}>{f.sub}</span>
-                      <span style={{ fontFamily:serif, fontSize:32, fontWeight:300, color:"rgba(0,0,0,0.07)", letterSpacing:"-1px" }}>{f.num}</span>
+                <Reveal key={i} delay={i * 70}>
+                  <div style={{ background:"#fff", border:"1px solid #F3F4F6", borderRadius:20, padding:"32px", boxShadow:"0 1px 4px rgba(0,0,0,.04)", height:"100%", boxSizing:"border-box" as any }}>
+                    <div style={{ display:"flex", alignItems:"center", gap:14, marginBottom:18 }}>
+                      <div style={{ width:48, height:48, background:"#F0FBF5", borderRadius:14, display:"flex", alignItems:"center", justifyContent:"center", fontSize:22, flexShrink:0 }}>{f.icon}</div>
+                      <div>
+                        <span style={{ display:"inline-block", background:"#F0FBF5", border:"1px solid rgba(24,166,109,.2)", color:"#18A66D", fontSize:10, fontWeight:700, padding:"3px 10px", borderRadius:980, marginBottom:6 }}>{f.tag}</span>
+                        <h3 style={{ fontSize:16, fontWeight:800, color:"#0B0D14", margin:0, letterSpacing:"-0.2px" }}>{f.title}</h3>
+                      </div>
                     </div>
-                    <h3 style={{ fontFamily:serif, fontSize:"clamp(20px,2.2vw,28px)", fontWeight:500, color:"#111318", marginBottom:16, letterSpacing:"-0.3px", lineHeight:1.15 }}>{f.title}</h3>
-                    <p style={{ fontFamily:sans, fontSize:14, color:"#6B7280", lineHeight:1.75, fontWeight:300 }}>{f.desc}</p>
+                    <p style={{ fontSize:14, color:"#6B7280", lineHeight:1.7, margin:0 }}>{f.desc}</p>
                   </div>
                 </Reveal>
               ))}
             </div>
-
-            <Reveal delay={80}>
-              <div style={{ marginTop:2, background:"#04081A", padding:"26px 36px", display:"flex", alignItems:"center", justifyContent:"space-between", gap:24, flexWrap:"wrap" }}>
-                <p style={{ fontFamily:sans, fontSize:14, color:"rgba(255,255,255,0.3)", margin:0, fontWeight:300 }}>
-                  Alles in einem Paket · Kalender + Kundenkartei + SMS + Auswertungen · <strong style={{ color:"rgba(255,255,255,0.6)", fontWeight:500 }}>ab €39/Monat</strong>
-                </p>
-                <MagneticBtn href="/lead" className="btn-emerald" style={{ fontSize:13.5, padding:"11px 22px", borderRadius:7, flexShrink:0 }}>
-                  Kostenlos anfragen →
-                </MagneticBtn>
+            <Reveal delay={100}>
+              <div style={{ marginTop:24, background:"#06091A", borderRadius:20, padding:"24px 32px", display:"flex", alignItems:"center", justifyContent:"space-between", gap:20, flexWrap:"wrap" as any }}>
+                <div style={{ display:"flex", alignItems:"center", gap:16 }}>
+                  <div style={{ width:40, height:40, background:"rgba(24,166,109,.15)", borderRadius:12, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+                    <span style={{ color:"#18A66D", fontWeight:900, fontSize:18 }}>✓</span>
+                  </div>
+                  <div>
+                    <div style={{ color:"#fff", fontWeight:700, fontSize:15, marginBottom:2 }}>Alles in einem Paket — keine versteckten Extras.</div>
+                    <div style={{ color:"rgba(255,255,255,.35)", fontSize:13 }}>Kalender + Kundenkartei + SMS + Auswertungen · ab €39/Monat</div>
+                  </div>
+                </div>
+                <a href="/lead" className="btn-primary" style={{ fontSize:14, padding:"12px 24px", flexShrink:0 }}>Kostenlos anfragen →</a>
               </div>
             </Reveal>
           </div>
         </section>
 
-        {/* ══════════════════════════════════════════
-            SHOWCASE
-        ══════════════════════════════════════════ */}
-        <section className="sec" style={{ background:"#FAFAFA", padding:"128px 48px", borderTop:"1px solid #EBEBED" }}>
-          <div style={{ maxWidth:1060, margin:"0 auto", display:"grid", gridTemplateColumns:"1fr 1fr", gap:96, alignItems:"center" }} className="grid-2 showcase-grid">
-            <style>{`.showcase-grid > :first-child { order: 0 } @media(max-width:768px){ .showcase-grid > :first-child { order: 1 } }`}</style>
+        {/* ══ PRODUCT SHOWCASE ══ */}
+        <section className="sec-pad" style={{ background:"#fff", padding:"100px 32px" }}>
+          <div style={{ maxWidth:1080, margin:"0 auto", display:"grid", gridTemplateColumns:"1fr 1fr", gap:80, alignItems:"center" }} className="showcase-grid">
+            <style>{`.showcase-grid{grid-template-columns:1fr 1fr} @media(max-width:900px){.showcase-grid{grid-template-columns:1fr!important}}`}</style>
 
             {/* phone */}
-            <div className="showcase-phone" style={{ display:"flex", justifyContent:"center" }}>
+            <div style={{ display:"flex", justifyContent:"center" }} className="showcase-phone-hide">
               <div style={{ position:"relative" }}>
-                <div style={{ background:"linear-gradient(145deg,#e8e8e8,#f8f8f8)", padding:12, borderRadius:44, boxShadow:"0 32px 80px rgba(0,0,0,0.1), 0 0 0 1px rgba(0,0,0,0.04)" }}>
-                  <div style={{ width:282, height:566, borderRadius:34, overflow:"hidden", background:"#fff" }}>
-                    {/* header */}
-                    <div style={{ background:"linear-gradient(135deg,#18A66D,#0f8a55)", padding:"28px 20px 22px" }}>
-                      <div style={{ fontFamily:sans, color:"rgba(255,255,255,0.55)", fontSize:11, marginBottom:4, fontWeight:400 }}>Guten Morgen</div>
-                      <div style={{ fontFamily:serif, color:"#fff", fontWeight:500, fontSize:22, marginBottom:12, letterSpacing:"-0.3px" }}>Heute, 6 Termine</div>
+                <div style={{ position:"absolute", inset:-32, borderRadius:"50%", background:"radial-gradient(ellipse,rgba(24,166,109,.06) 0%,transparent 70%)", pointerEvents:"none" }} />
+                <div style={{ background:"#02060A", padding:12, borderRadius:44, border:"1px solid rgba(24,166,109,.1)", boxShadow:"0 32px 64px rgba(0,0,0,.12)" }}>
+                  <div style={{ width:280, height:565, borderRadius:34, overflow:"hidden", background:"#fff" }}>
+                    <div style={{ background:"#18A66D", padding:"32px 20px 24px" }}>
+                      <div style={{ color:"rgba(255,255,255,.6)", fontSize:11, marginBottom:4, fontWeight:500 }}>Guten Morgen 👋</div>
+                      <div style={{ color:"#fff", fontWeight:900, fontSize:20, marginBottom:12 }}>Heute, 6 Termine</div>
                       <div style={{ display:"flex", gap:8 }}>
-                        <div style={{ background:"rgba(255,255,255,0.14)", borderRadius:8, padding:"5px 11px", color:"rgba(255,255,255,0.85)", fontSize:11, fontFamily:sans, fontWeight:500 }}>5 ✓ bestätigt</div>
-                        <div style={{ background:"rgba(255,255,255,0.07)", borderRadius:8, padding:"5px 11px", color:"rgba(255,255,255,0.45)", fontSize:11, fontFamily:sans }}>1 ausstehend</div>
+                        <div style={{ background:"rgba(255,255,255,.15)", borderRadius:10, padding:"6px 12px", color:"rgba(255,255,255,.85)", fontSize:11, fontWeight:600 }}>5 ✓ bestätigt</div>
+                        <div style={{ background:"rgba(255,255,255,.08)", borderRadius:10, padding:"6px 12px", color:"rgba(255,255,255,.5)", fontSize:11 }}>1 ausstehend</div>
                       </div>
                     </div>
-                    {/* next card */}
-                    <div style={{ margin:"-12px 14px 10px", background:"#fff", borderRadius:14, padding:14, boxShadow:"0 4px 20px rgba(0,0,0,0.08)", position:"relative", zIndex:1, border:"1px solid #F0F0F0" }}>
-                      <div style={{ fontFamily:sans, fontSize:10, color:"#9CA3AF", marginBottom:4, fontWeight:600, letterSpacing:"0.06em", textTransform:"uppercase" }}>Nächster Termin</div>
-                      <div style={{ fontFamily:serif, fontSize:16, fontWeight:500, color:"#111318" }}>Maria Schmidt</div>
-                      <div style={{ fontFamily:sans, fontSize:12, color:"#6B7280" }}>14:00 Uhr · Damenhaarschnitt</div>
+                    <div style={{ margin:"0 16px", marginTop:-16, background:"#fff", borderRadius:16, padding:16, border:"1px solid #F3F4F6", boxShadow:"0 4px 16px rgba(0,0,0,.07)", marginBottom:12 }}>
+                      <div style={{ fontSize:10, color:"#9CA3AF", marginBottom:4, fontWeight:700, letterSpacing:1, textTransform:"uppercase" }}>Nächster Termin</div>
+                      <div style={{ fontSize:14, fontWeight:700, color:"#0B0D14" }}>Maria Schmidt</div>
+                      <div style={{ fontSize:12, color:"#6B7280" }}>14:00 Uhr · Damenhaarschnitt</div>
                       <div style={{ marginTop:8, display:"flex", alignItems:"center", gap:6 }}>
-                        <div style={{ width:5, height:5, background:"#18A66D", borderRadius:"50%" }} />
-                        <span style={{ fontFamily:sans, fontSize:10, color:"#18A66D", fontWeight:600 }}>SMS gesendet ✓</span>
+                        <div style={{ width:6, height:6, background:"#18A66D", borderRadius:"50%" }} />
+                        <span style={{ fontSize:10, color:"#18A66D", fontWeight:600 }}>SMS gesendet ✓</span>
                       </div>
                     </div>
-                    {/* list */}
-                    <div style={{ padding:"0 14px", display:"flex", flexDirection:"column", gap:5 }}>
+                    <div style={{ padding:"0 16px", display:"flex", flexDirection:"column", gap:6 }}>
                       {[
                         { time:"09:00", name:"Thomas B.", s:"✓", c:"#18A66D" },
-                        { time:"10:30", name:"Anna L.",   s:"✓", c:"#18A66D" },
-                        { time:"12:00", name:"Klaus M.",  s:"✓", c:"#18A66D" },
-                        { time:"14:00", name:"Maria S.",  s:"→", c:"#F59E0B" },
-                        { time:"16:00", name:"Peter H.",  s:"○", c:"#D1D5DB" },
+                        { time:"10:30", name:"Anna L.", s:"✓", c:"#18A66D" },
+                        { time:"12:00", name:"Klaus M.", s:"✓", c:"#18A66D" },
+                        { time:"14:00", name:"Maria S.", s:"→", c:"#F59E0B" },
+                        { time:"16:00", name:"Peter H.", s:"○", c:"#D1D5DB" },
                       ].map((a, j) => (
-                        <div key={j} style={{ display:"flex", alignItems:"center", gap:10, background:"#FAFAFA", borderRadius:10, padding:"9px 12px" }}>
-                          <span style={{ fontFamily:sans, fontSize:11, color:"#9CA3AF", width:34, flexShrink:0 }}>{a.time}</span>
-                          <span style={{ fontFamily:sans, fontSize:11, color:"#111318", fontWeight:500, flex:1 }}>{a.name}</span>
-                          <span style={{ fontSize:12, fontWeight:700, color:a.c }}>{a.s}</span>
+                        <div key={j} style={{ display:"flex", alignItems:"center", gap:12, background:"#F9FAFB", borderRadius:12, padding:"10px 12px" }}>
+                          <span style={{ fontSize:11, color:"#9CA3AF", width:36, flexShrink:0, fontWeight:500 }}>{a.time}</span>
+                          <span style={{ fontSize:11, color:"#0B0D14", fontWeight:500, flex:1 }}>{a.name}</span>
+                          <span style={{ fontSize:13, fontWeight:700, color:a.c }}>{a.s}</span>
                         </div>
                       ))}
                     </div>
@@ -694,27 +508,23 @@ export default function LandingPage() {
               </div>
             </div>
 
-            <Reveal delay={60}>
+            <Reveal delay={80}>
               <div>
-                <div className="sect-label" style={{ marginBottom:28 }}>Das Dashboard</div>
-                <h2 style={{ fontFamily:serif, fontSize:"clamp(32px,3.8vw,52px)", fontWeight:500, letterSpacing:"-0.5px", lineHeight:1.07, color:"#111318", marginBottom:20 }}>
-                  Alles im Blick.<br /><em style={{ fontStyle:"italic", fontWeight:300, color:"#9CA3AF" }}>Nichts verpassen.</em>
-                </h2>
-                <p style={{ fontFamily:sans, fontSize:15.5, color:"#6B7280", lineHeight:1.8, marginBottom:48, fontWeight:300 }}>
-                  Ihr komplettes Terminmanagement an einem Ort — übersichtlich, einfach, immer aktuell.
-                </p>
-                <div style={{ display:"flex", flexDirection:"column", gap:0 }}>
+                <div style={{ fontSize:11, fontWeight:700, letterSpacing:3, textTransform:"uppercase", color:"#18A66D", marginBottom:16 }}>Das Dashboard</div>
+                <h2 style={{ fontSize:"clamp(28px,3.5vw,46px)", fontWeight:900, letterSpacing:"-1.2px", lineHeight:1.1, margin:"0 0 16px" }}>Alles im Blick.<br />Nichts verpassen.</h2>
+                <p style={{ fontSize:17, color:"#6B7280", lineHeight:1.65, marginBottom:40 }}>Ihr komplettes Terminmanagement an einem Ort – übersichtlich, einfach, immer aktuell.</p>
+                <div style={{ display:"flex", flexDirection:"column", gap:20 }}>
                   {[
-                    { title:"Tagesübersicht auf einen Blick",    desc:"Sehen Sie sofort, welche Kunden kommen – und wer noch nicht bestätigt hat." },
-                    { title:"Automatische SMS-Erinnerungen",     desc:"24h vor jedem Termin geht eine personalisierte Nachricht raus – ohne Ihr Zutun." },
-                    { title:"Kundenkartei",                      desc:"Alle Kontakte und die komplette Terminhistorie an einem Ort." },
-                    { title:"Auswertungen & Einblicke",          desc:"Sehen Sie auf einen Blick, wie sich Ihr Betrieb entwickelt." },
+                    { title:"Tagesübersicht auf einen Blick", desc:"Sehen Sie sofort, welche Kunden kommen – und wer noch nicht bestätigt hat." },
+                    { title:"Automatische SMS-Erinnerungen", desc:"24h vor jedem Termin geht eine personalisierte Nachricht raus – ohne Ihr Zutun." },
+                    { title:"Kundenkartei", desc:"Alle Kontakte und die komplette Terminhistorie an einem Ort." },
+                    { title:"Auswertungen & Einblicke", desc:"Sehen Sie auf einen Blick, wie sich Ihr Betrieb entwickelt." },
                   ].map((f, i) => (
-                    <div key={i} style={{ display:"flex", alignItems:"flex-start", gap:20, padding:"20px 0", borderBottom:"1px solid #F0F0F0" }}>
-                      <div style={{ width:1, height:"100%", minHeight:20, background:"#18A66D", flexShrink:0, marginTop:4, alignSelf:"stretch" }} />
+                    <div key={i} style={{ display:"flex", alignItems:"flex-start", gap:14 }}>
+                      <div style={{ width:6, height:6, background:"#18A66D", borderRadius:"50%", marginTop:8, flexShrink:0 }} />
                       <div>
-                        <div style={{ fontFamily:serif, fontSize:17, fontWeight:500, color:"#111318", marginBottom:4, letterSpacing:"-0.2px" }}>{f.title}</div>
-                        <div style={{ fontFamily:sans, fontSize:13.5, color:"#6B7280", lineHeight:1.65, fontWeight:300 }}>{f.desc}</div>
+                        <div style={{ fontWeight:700, color:"#0B0D14", marginBottom:3, fontSize:15 }}>{f.title}</div>
+                        <div style={{ fontSize:14, color:"#6B7280", lineHeight:1.6 }}>{f.desc}</div>
                       </div>
                     </div>
                   ))}
@@ -724,126 +534,118 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* ══════════════════════════════════════════
-            COMPARISON
-        ══════════════════════════════════════════ */}
-        <section className="sec grain" style={{ background:"#04081A", padding:"128px 48px", position:"relative" }}>
+        {/* ══ COMPETITOR COMPARISON ══ */}
+        <section style={{ background:"#06091A", padding:"100px 32px" }} className="sec-pad">
           <div style={{ maxWidth:960, margin:"0 auto" }}>
             <Reveal>
-              <div className="sect-label" style={{ marginBottom:28, color:"rgba(24,166,109,0.9)" }}>
-                <span style={{ background:"rgba(24,166,109,0.9)" }} />
-                Der Vergleich
-              </div>
-              <div style={{ maxWidth:560, marginBottom:80 }}>
-                <h2 style={{ fontFamily:serif, fontSize:"clamp(36px,4.5vw,62px)", fontWeight:500, letterSpacing:"-0.5px", lineHeight:1.05, color:"#fff", marginBottom:20 }}>
-                  Was andere kosten.<br /><em style={{ fontStyle:"italic", fontWeight:300, color:"#18A66D" }}>Was Sie bekommen.</em>
+              <div style={{ textAlign:"center", maxWidth:580, margin:"0 auto 56px" }}>
+                <div style={{ fontSize:11, fontWeight:700, letterSpacing:3, textTransform:"uppercase", color:"#18A66D", marginBottom:16 }}>Der Vergleich</div>
+                <h2 style={{ fontSize:"clamp(32px,4vw,52px)", fontWeight:900, color:"#fff", letterSpacing:"-1.5px", lineHeight:1.08, margin:"0 0 14px" }}>
+                  Was andere kosten.<br /><span style={{ color:"#18A66D" }}>Was Sie bekommen.</span>
                 </h2>
-                <p style={{ fontFamily:sans, fontSize:15.5, color:"rgba(255,255,255,0.25)", lineHeight:1.8, fontWeight:300 }}>
-                  Buchungsportale klingen verlockend — bis man genau hinschaut.
+                <p style={{ fontSize:16, color:"rgba(255,255,255,.32)", margin:0 }}>
+                  Buchungsportale & Marktplätze klingen verlockend — bis man genau hinschaut.
                 </p>
               </div>
             </Reveal>
 
             <Reveal delay={60}>
-              {/* Desktop */}
-              <div className="comp-desk" style={{ border:"1px solid rgba(255,255,255,0.06)", overflow:"hidden" }}>
-                <div style={{ display:"grid", gridTemplateColumns:"1.8fr 1fr 1fr", borderBottom:"1px solid rgba(255,255,255,0.06)" }}>
-                  <div style={{ padding:"18px 28px" }} />
-                  <div style={{ padding:"18px 20px", textAlign:"center", borderLeft:"1px solid rgba(255,255,255,0.04)", display:"flex", alignItems:"center", justifyContent:"center" }}>
-                    <span style={{ fontFamily:sans, fontSize:12, color:"rgba(255,255,255,0.2)", fontWeight:500, letterSpacing:"0.05em" }}>Klassische Portale</span>
+              {/* ── Desktop Table (hidden on mobile) ── */}
+              <div className="comp-desktop">
+                <style>{`.comp-desktop{display:block} @media(max-width:600px){.comp-desktop{display:none!important}}`}</style>
+                <div style={{ background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.08)", borderRadius:20, overflow:"hidden" }}>
+                  <div style={{ display:"grid", gridTemplateColumns:"1.6fr 1fr 1fr", borderBottom:"1px solid rgba(255,255,255,.08)" }}>
+                    <div style={{ padding:"18px 24px" }} />
+                    <div style={{ padding:"18px 16px", textAlign:"center", borderLeft:"1px solid rgba(255,255,255,.06)", display:"flex", alignItems:"center", justifyContent:"center" }}>
+                      <span style={{ fontSize:13, color:"rgba(255,255,255,.3)", fontWeight:600 }}>Klassische Portale</span>
+                    </div>
+                    <div style={{ padding:"18px 16px", textAlign:"center", background:"rgba(24,166,109,.07)", borderLeft:"1px solid rgba(24,166,109,.18)", display:"flex", alignItems:"center", justifyContent:"center" }}>
+                      <span style={{ fontSize:14, fontWeight:800, color:"#4AE89B" }}>TerminStop ✓</span>
+                    </div>
                   </div>
-                  <div style={{ padding:"18px 20px", textAlign:"center", background:"rgba(24,166,109,0.05)", borderLeft:"1px solid rgba(24,166,109,0.12)", display:"flex", alignItems:"center", justifyContent:"center" }}>
-                    <span style={{ fontFamily:serif, fontSize:15, fontWeight:600, color:"#4AE89B" }}>TerminStop</span>
-                  </div>
+                  {compRows.map((row, i) => (
+                    <div key={i} style={{ display:"grid", gridTemplateColumns:"1.6fr 1fr 1fr", borderBottom: i < compRows.length-1 ? "1px solid rgba(255,255,255,.05)" : "none" }}>
+                      <div style={{ padding:"15px 24px", display:"flex", alignItems:"center" }}>
+                        <span style={{ fontSize:13, color:"rgba(255,255,255,.4)", fontWeight:500 }}>{row.label}</span>
+                      </div>
+                      <div style={{ padding:"15px 16px", borderLeft:"1px solid rgba(255,255,255,.04)", display:"flex", alignItems:"center", justifyContent:"center" }}>
+                        <span style={{ fontSize:12, color:"rgba(255,255,255,.22)", lineHeight:1.5, textAlign:"center" as any }}>{row.them}</span>
+                      </div>
+                      <div style={{ padding:"15px 16px", background:"rgba(24,166,109,.04)", borderLeft:"1px solid rgba(24,166,109,.1)", display:"flex", alignItems:"center", justifyContent:"center" }}>
+                        <span style={{ fontSize:12, color:"rgba(74,232,155,.9)", fontWeight:600, lineHeight:1.5, textAlign:"center" as any }}>{row.us}</span>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-                {compRows.map((row, i) => (
-                  <div key={i} style={{ display:"grid", gridTemplateColumns:"1.8fr 1fr 1fr", borderBottom: i < compRows.length-1 ? "1px solid rgba(255,255,255,0.04)" : "none" }}>
-                    <div style={{ padding:"16px 28px", display:"flex", alignItems:"center" }}>
-                      <span style={{ fontFamily:sans, fontSize:13, color:"rgba(255,255,255,0.3)", fontWeight:400 }}>{row.label}</span>
-                    </div>
-                    <div style={{ padding:"16px 20px", borderLeft:"1px solid rgba(255,255,255,0.03)", display:"flex", alignItems:"center", justifyContent:"center" }}>
-                      <span style={{ fontFamily:sans, fontSize:12, color:"rgba(255,255,255,0.15)", lineHeight:1.5, textAlign:"center" as any }}>{row.them}</span>
-                    </div>
-                    <div style={{ padding:"16px 20px", background:"rgba(24,166,109,0.03)", borderLeft:"1px solid rgba(24,166,109,0.08)", display:"flex", alignItems:"center", justifyContent:"center" }}>
-                      <span style={{ fontFamily:sans, fontSize:12, color:"rgba(74,232,155,0.9)", fontWeight:500, lineHeight:1.5, textAlign:"center" as any }}>{row.us}</span>
-                    </div>
-                  </div>
-                ))}
               </div>
 
-              {/* Mobile */}
-              <div className="comp-mob" style={{ display:"none" }}>
-                <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8, marginBottom:12 }}>
-                  <div style={{ background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.06)", padding:"12px", textAlign:"center" as any, borderRadius:4 }}>
-                    <span style={{ fontFamily:sans, fontSize:11, color:"rgba(255,255,255,0.25)", fontWeight:500 }}>Klassische Portale</span>
+              {/* ── Mobile Cards (hidden on desktop) ── */}
+              <div className="comp-mobile">
+                <style>{`.comp-mobile{display:none} @media(max-width:600px){.comp-mobile{display:block}}`}</style>
+                {/* Column labels */}
+                <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10, marginBottom:14 }}>
+                  <div style={{ background:"rgba(255,255,255,.04)", border:"1px solid rgba(255,255,255,.08)", borderRadius:12, padding:"11px", textAlign:"center" as any }}>
+                    <span style={{ fontSize:12, color:"rgba(255,255,255,.3)", fontWeight:600 }}>Klassische Portale</span>
                   </div>
-                  <div style={{ background:"rgba(24,166,109,0.08)", border:"1px solid rgba(24,166,109,0.2)", padding:"12px", textAlign:"center" as any, borderRadius:4 }}>
-                    <span style={{ fontFamily:serif, fontSize:13, fontWeight:600, color:"#4AE89B" }}>TerminStop</span>
+                  <div style={{ background:"rgba(24,166,109,.1)", border:"1px solid rgba(24,166,109,.25)", borderRadius:12, padding:"11px", textAlign:"center" as any }}>
+                    <span style={{ fontSize:13, fontWeight:800, color:"#4AE89B" }}>TerminStop ✓</span>
                   </div>
                 </div>
-                {compRows.map((row, i) => (
-                  <div key={i} style={{ border:"1px solid rgba(255,255,255,0.05)", marginBottom:6, padding:"14px 16px", borderRadius:4 }}>
-                    <div style={{ fontFamily:sans, fontSize:10, fontWeight:600, color:"rgba(255,255,255,0.2)", letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:10 }}>{row.label}</div>
-                    <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}>
-                      <div style={{ background:"rgba(255,255,255,0.03)", padding:"10px 12px", borderRadius:4 }}>
-                        <span style={{ fontFamily:sans, fontSize:11.5, color:"rgba(255,255,255,0.2)", lineHeight:1.5 }}>{row.them}</span>
-                      </div>
-                      <div style={{ background:"rgba(24,166,109,0.06)", border:"1px solid rgba(24,166,109,0.12)", padding:"10px 12px", borderRadius:4 }}>
-                        <span style={{ fontFamily:sans, fontSize:11.5, color:"rgba(74,232,155,0.9)", fontWeight:500, lineHeight:1.5 }}>{row.us}</span>
+                {/* Each category as a card */}
+                <div style={{ display:"flex", flexDirection:"column" as any, gap:10 }}>
+                  {compRows.map((row, i) => (
+                    <div key={i} style={{ background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.07)", borderRadius:14, padding:"14px 16px" }}>
+                      <div style={{ fontSize:10, fontWeight:700, color:"rgba(255,255,255,.3)", textTransform:"uppercase" as any, letterSpacing:1.5, marginBottom:10 }}>{row.label}</div>
+                      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}>
+                        <div style={{ background:"rgba(255,255,255,.04)", borderRadius:10, padding:"10px 12px" }}>
+                          <span style={{ fontSize:12, color:"rgba(255,255,255,.25)", lineHeight:1.5 }}>{row.them}</span>
+                        </div>
+                        <div style={{ background:"rgba(24,166,109,.07)", border:"1px solid rgba(24,166,109,.15)", borderRadius:10, padding:"10px 12px" }}>
+                          <span style={{ fontSize:12, color:"rgba(74,232,155,.9)", fontWeight:600, lineHeight:1.5 }}>{row.us}</span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             </Reveal>
 
             <Reveal delay={100}>
-              <div style={{ marginTop:48, textAlign:"center" }}>
-                <p style={{ fontFamily:sans, fontSize:13, color:"rgba(255,255,255,0.18)", marginBottom:24, fontWeight:300 }}>
-                  Bei 100 Buchungen/Monat à €50 zahlen Sie über ein Portal bis zu{" "}
-                  <strong style={{ color:"rgba(255,255,255,0.38)", fontWeight:500 }}>€1.500 Provision</strong>.
-                  TerminStop kostet <strong style={{ color:"#4AE89B", fontWeight:500 }}>€39</strong>.
+              <div style={{ marginTop:24, display:"flex", flexDirection:"column" as any, alignItems:"center", gap:16, textAlign:"center" as any }}>
+                <p style={{ fontSize:13, color:"rgba(255,255,255,.22)", margin:0 }}>
+                  Bei 100 Buchungen/Monat à €50 zahlen Sie über ein Buchungsportal bis zu <strong style={{ color:"rgba(255,255,255,.45)" }}>€1.500 Provision</strong>. TerminStop kostet <strong style={{ color:"#4AE89B" }}>€39</strong>.
                 </p>
-                <MagneticBtn href="/lead" className="btn-emerald" style={{ fontSize:15, padding:"14px 32px", borderRadius:8 }}>
-                  Jetzt wechseln →
-                </MagneticBtn>
+                <a href="/lead" className="btn-primary" style={{ fontSize:15, padding:"14px 32px" }}>Jetzt wechseln →</a>
               </div>
             </Reveal>
           </div>
         </section>
 
-        {/* ══════════════════════════════════════════
-            REVIEWS
-        ══════════════════════════════════════════ */}
-        <section className="sec" style={{ background:"#fff", padding:"128px 48px", borderTop:"1px solid #EBEBED" }}>
-          <div style={{ maxWidth:1060, margin:"0 auto" }}>
+        {/* ══ REVIEWS ══ */}
+        <section className="sec-pad" style={{ background:"#fff", padding:"100px 32px" }}>
+          <div style={{ maxWidth:1080, margin:"0 auto" }}>
             <Reveal>
-              <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-end", marginBottom:80, flexWrap:"wrap", gap:24 }}>
-                <div>
-                  <div className="sect-label" style={{ marginBottom:24 }}>Echte Ergebnisse</div>
-                  <h2 style={{ fontFamily:serif, fontSize:"clamp(36px,4.5vw,62px)", fontWeight:500, letterSpacing:"-0.5px", lineHeight:1.05, color:"#111318" }}>
-                    Was Betriebe<br /><em style={{ fontStyle:"italic", fontWeight:300, color:"#9CA3AF" }}>berichten.</em>
-                  </h2>
-                </div>
-                <p style={{ fontFamily:sans, fontSize:14, color:"#9CA3AF", margin:0, fontWeight:300 }}>Keine Versprechen – nur echte Erfahrungen.</p>
+              <div style={{ textAlign:"center", marginBottom:60 }}>
+                <div style={{ fontSize:11, fontWeight:700, letterSpacing:3, textTransform:"uppercase", color:"#18A66D", marginBottom:16 }}>Echte Ergebnisse</div>
+                <h2 style={{ fontSize:"clamp(32px,4vw,52px)", fontWeight:900, letterSpacing:"-1.5px", lineHeight:1.08, margin:"0 0 10px" }}>Was Betriebe berichten.</h2>
+                <p style={{ fontSize:16, color:"#9CA3AF", margin:0 }}>Keine Versprechen – nur echte Erfahrungen.</p>
               </div>
             </Reveal>
-            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:2 }} className="grid-2">
+            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:16 }} className="reviews-grid">
+              <style>{`.reviews-grid{grid-template-columns:1fr 1fr} @media(max-width:700px){.reviews-grid{grid-template-columns:1fr!important}}`}</style>
               {reviews.map((r, i) => (
                 <Reveal key={i} delay={i * 60}>
-                  <div className="lux-card" style={{ background:"#FAFAFA", border:"1px solid #EBEBED", padding:"44px 40px", display:"flex", flexDirection:"column", height:"100%", boxSizing:"border-box" as any }}>
-                    <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:28 }}>
-                      <span style={{ fontFamily:sans, fontSize:10.5, fontWeight:600, color:"#18A66D", letterSpacing:"0.1em", textTransform:"uppercase" }}>{r.result}</span>
-                      <span style={{ color:"#FBBF24", fontSize:11, letterSpacing:"2px" }}>★★★★★</span>
+                  <div style={{ background:"#fff", border:"1px solid #F3F4F6", borderRadius:20, padding:"32px", display:"flex", flexDirection:"column", height:"100%", boxShadow:"0 1px 4px rgba(0,0,0,.04)", transition:"box-shadow .2s" }}>
+                    <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:20 }}>
+                      <div style={{ background:"#F0FBF5", color:"#18A66D", fontSize:11, fontWeight:700, padding:"5px 12px", borderRadius:980 }}>✓ {r.result}</div>
+                      <div style={{ color:"#FBBF24", fontSize:12, letterSpacing:1 }}>★★★★★</div>
                     </div>
-                    <p style={{ fontFamily:serif, fontSize:17, color:"#374151", lineHeight:1.75, flex:1, marginBottom:32, fontStyle:"italic", fontWeight:400 }}>
-                      „{r.text}"
-                    </p>
-                    <div style={{ display:"flex", alignItems:"center", gap:14, paddingTop:24, borderTop:"1px solid #EBEBED" }}>
-                      <div style={{ width:36, height:36, background:"linear-gradient(135deg,#18A66D,#0A7A4F)", color:"#fff", borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, fontFamily:serif, fontSize:15, fontWeight:600 }}>{r.name.charAt(0)}</div>
+                    <p style={{ fontSize:14, color:"#6B7280", lineHeight:1.7, flex:1, marginBottom:24, fontStyle:"italic" }}>„{r.text}"</p>
+                    <div style={{ display:"flex", alignItems:"center", gap:12, paddingTop:20, borderTop:"1px solid #F9FAFB" }}>
+                      <div style={{ width:36, height:36, background:"linear-gradient(135deg,#18A66D,#0A7A4F)", color:"#fff", borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", fontSize:14, fontWeight:900, flexShrink:0 }}>{r.name.charAt(0)}</div>
                       <div>
-                        <div style={{ fontFamily:serif, fontSize:14, fontWeight:600, color:"#111318" }}>{r.name}</div>
-                        <div style={{ fontFamily:sans, fontSize:12, color:"#9CA3AF" }}>{r.role} · {r.city}</div>
+                        <div style={{ fontSize:13, fontWeight:700, color:"#0B0D14" }}>{r.name}</div>
+                        <div style={{ fontSize:12, color:"#9CA3AF" }}>{r.role} · {r.city}</div>
                       </div>
                     </div>
                   </div>
@@ -853,146 +655,128 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* ══════════════════════════════════════════
-            PRICING
-        ══════════════════════════════════════════ */}
-        <section id="preise" className="sec" style={{ background:"#FAFAFA", padding:"128px 48px", borderTop:"1px solid #EBEBED" }}>
-          <div style={{ maxWidth:980, margin:"0 auto" }}>
+        {/* ══ PRICING ══ */}
+        <section id="preise" className="sec-pad" style={{ background:"#F9FAFB", padding:"100px 32px" }}>
+          <div style={{ maxWidth:960, margin:"0 auto" }}>
             <Reveal>
-              <div style={{ textAlign:"center", marginBottom:24 }}>
-                <div className="sect-label" style={{ marginBottom:24, justifyContent:"center" }}>Preise</div>
-                <h2 style={{ fontFamily:serif, fontSize:"clamp(36px,4.5vw,62px)", fontWeight:500, letterSpacing:"-0.5px", lineHeight:1.05, color:"#111318", marginBottom:16 }}>
-                  Einfach. Transparent.<br /><em style={{ fontStyle:"italic", fontWeight:300, color:"#9CA3AF" }}>Ohne Überraschungen.</em>
-                </h2>
-                <p style={{ fontFamily:sans, fontSize:15.5, color:"#6B7280", margin:0, fontWeight:300 }}>Monatlich kündbar, kein Vertrag.</p>
+              <div style={{ textAlign:"center", maxWidth:560, margin:"0 auto 16px" }}>
+                <div style={{ fontSize:11, fontWeight:700, letterSpacing:3, textTransform:"uppercase", color:"#18A66D", marginBottom:16 }}>Preise</div>
+                <h2 style={{ fontSize:"clamp(32px,4vw,52px)", fontWeight:900, letterSpacing:"-1.5px", lineHeight:1.08, margin:"0 0 14px" }}>Einfach. Transparent.<br />Ohne Überraschungen.</h2>
+                <p style={{ fontSize:17, color:"#6B7280", margin:0 }}>Monatlich kündbar, kein Vertrag.</p>
               </div>
             </Reveal>
 
-            <Reveal delay={60}>
-              <div style={{ maxWidth:480, margin:"36px auto 64px", background:"#fff", border:"1px solid rgba(24,166,109,0.15)", padding:"16px 24px", display:"flex", alignItems:"center", gap:16 }}>
-                <span style={{ color:"#18A66D", fontSize:16, fontWeight:300 }}>↑</span>
-                <p style={{ fontFamily:sans, fontSize:13.5, color:"#6B7280", margin:0, lineHeight:1.65, fontWeight:300 }}>
-                  Schon <strong style={{ color:"#111318", fontWeight:500 }}>2–3 verhinderte Ausfälle pro Monat</strong> decken das Pro-Paket vollständig ab.
+            <Reveal delay={80}>
+              <div style={{ maxWidth:560, margin:"32px auto 48px", background:"#fff", border:"1px solid rgba(24,166,109,.15)", borderRadius:16, padding:"18px 24px", display:"flex", alignItems:"center", gap:16 }}>
+                <div style={{ width:36, height:36, background:"#F0FBF5", borderRadius:10, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+                  <span style={{ color:"#18A66D", fontWeight:900, fontSize:16 }}>↑</span>
+                </div>
+                <p style={{ fontSize:14, color:"#6B7280", margin:0, lineHeight:1.6 }}>
+                  Schon <strong style={{ color:"#0B0D14" }}>2–3 verhinderte Ausfälle pro Monat</strong> decken das Pro-Paket vollständig ab.
                 </p>
               </div>
             </Reveal>
 
-            <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:2, alignItems:"start" }} className="grid-3">
+            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:16, alignItems:"start" }} className="pricing-grid">
+              <style>{`.pricing-grid{grid-template-columns:repeat(3,1fr)} @media(max-width:800px){.pricing-grid{grid-template-columns:1fr!important}}`}</style>
               {plans.map((plan, i) => (
                 <Reveal key={i} delay={i * 70}>
                   {plan.popular ? (
-                    <div style={{ background:"#04081A", border:"1px solid rgba(24,166,109,0.2)", padding:"44px 36px", position:"relative", boxShadow:"0 32px 80px rgba(24,166,109,0.08)" }}>
-                      <div style={{ position:"absolute", top:-12, left:"50%", transform:"translateX(-50%)", background:"#18A66D", color:"#fff", fontFamily:sans, fontSize:10.5, fontWeight:600, padding:"4px 18px", letterSpacing:"0.08em", textTransform:"uppercase", whiteSpace:"nowrap" }}>Meistgewählt</div>
-                      <div style={{ fontFamily:sans, fontSize:10.5, fontWeight:600, letterSpacing:"0.12em", textTransform:"uppercase", color:"rgba(74,232,155,0.7)", marginBottom:20 }}>{plan.name}</div>
-                      <div style={{ marginBottom:4 }}>
-                        <span style={{ fontFamily:serif, fontSize:60, fontWeight:400, color:"#fff", letterSpacing:"-3px", lineHeight:1 }}>€{plan.price}</span>
-                        <span style={{ fontFamily:sans, fontSize:13, color:"rgba(255,255,255,0.25)", marginLeft:4 }}>/Monat</span>
+                    <div style={{ background:"#06091A", border:"1.5px solid rgba(24,166,109,.3)", borderRadius:20, padding:"32px 28px", position:"relative", boxShadow:"0 16px 48px rgba(24,166,109,.1)" }}>
+                      <div style={{ position:"absolute", top:-14, left:"50%", transform:"translateX(-50%)", background:"#18A66D", color:"#fff", fontSize:11, fontWeight:700, padding:"5px 16px", borderRadius:980, whiteSpace:"nowrap" }}>✓ Meistgewählt</div>
+                      <div style={{ fontSize:11, fontWeight:700, letterSpacing:2, textTransform:"uppercase", color:"rgba(74,232,155,.8)", marginBottom:16 }}>{plan.name}</div>
+                      <div style={{ marginBottom:6 }}>
+                        <span style={{ fontSize:48, fontWeight:900, color:"#fff", letterSpacing:"-2px" }}>€{plan.price}</span>
+                        <span style={{ fontSize:15, color:"rgba(255,255,255,.35)", marginLeft:4 }}>/Monat</span>
                       </div>
-                      <div style={{ fontFamily:sans, fontSize:12, color:"rgba(255,255,255,0.2)", marginBottom:32, fontWeight:300 }}>{plan.sms} · €{plan.perDay}/Tag</div>
-                      <div style={{ display:"flex", flexDirection:"column", gap:14, marginBottom:40 }}>
+                      <div style={{ fontSize:13, color:"rgba(255,255,255,.3)", marginBottom:28 }}>{plan.sms} · €{plan.perDay}/Tag</div>
+                      <div style={{ display:"flex", flexDirection:"column", gap:12, marginBottom:32 }}>
                         {plan.features.map((f, j) => (
-                          <div key={j} style={{ display:"flex", alignItems:"center", gap:12 }}>
-                            <span style={{ color:"#4AE89B", fontSize:11, flexShrink:0 }}>✓</span>
-                            <span style={{ fontFamily:sans, fontSize:13.5, color:"rgba(255,255,255,0.5)", fontWeight:300 }}>{f}</span>
+                          <div key={j} style={{ display:"flex", alignItems:"center", gap:10 }}>
+                            <span style={{ color:"#4AE89B", fontSize:13, flexShrink:0 }}>✓</span>
+                            <span style={{ fontSize:14, color:"rgba(255,255,255,.65)" }}>{f}</span>
                           </div>
                         ))}
                       </div>
-                      <MagneticBtn href="/lead" className="btn-emerald" style={{ display:"block", textAlign:"center", fontSize:13.5, padding:"14px 0", width:"100%", boxSizing:"border-box", borderRadius:6 }}>
-                        Jetzt anfragen →
-                      </MagneticBtn>
+                      <a href="/lead" className="btn-primary" style={{ display:"block", textAlign:"center", fontSize:14, padding:"14px 0", borderRadius:12, width:"100%", boxSizing:"border-box" }}>Jetzt anfragen →</a>
                     </div>
                   ) : (
-                    <div className="lux-card" style={{ background:"#fff", border:"1px solid #EBEBED", padding:"44px 36px", boxSizing:"border-box" as any }}>
-                      <div style={{ fontFamily:sans, fontSize:10.5, fontWeight:600, letterSpacing:"0.12em", textTransform:"uppercase", color:"#9CA3AF", marginBottom:20 }}>{plan.name}</div>
-                      <div style={{ marginBottom:4 }}>
-                        <span style={{ fontFamily:serif, fontSize:60, fontWeight:400, color:"#111318", letterSpacing:"-3px", lineHeight:1 }}>€{plan.price}</span>
-                        <span style={{ fontFamily:sans, fontSize:13, color:"#9CA3AF", marginLeft:4 }}>/Monat</span>
+                    <div style={{ background:"#fff", border:"1px solid #E5E7EB", borderRadius:20, padding:"32px 28px", boxShadow:"0 1px 4px rgba(0,0,0,.04)" }}>
+                      <div style={{ fontSize:11, fontWeight:700, letterSpacing:2, textTransform:"uppercase", color:"#9CA3AF", marginBottom:16 }}>{plan.name}</div>
+                      <div style={{ marginBottom:6 }}>
+                        <span style={{ fontSize:48, fontWeight:900, color:"#0B0D14", letterSpacing:"-2px" }}>€{plan.price}</span>
+                        <span style={{ fontSize:15, color:"#9CA3AF", marginLeft:4 }}>/Monat</span>
                       </div>
-                      <div style={{ fontFamily:sans, fontSize:12, color:"#9CA3AF", marginBottom:32, fontWeight:300 }}>{plan.sms} · €{plan.perDay}/Tag</div>
-                      <div style={{ display:"flex", flexDirection:"column", gap:14, marginBottom:40 }}>
+                      <div style={{ fontSize:13, color:"#9CA3AF", marginBottom:28 }}>{plan.sms} · €{plan.perDay}/Tag</div>
+                      <div style={{ display:"flex", flexDirection:"column", gap:12, marginBottom:32 }}>
                         {plan.features.map((f, j) => (
-                          <div key={j} style={{ display:"flex", alignItems:"center", gap:12 }}>
-                            <span style={{ color:"#18A66D", fontSize:11, flexShrink:0 }}>✓</span>
-                            <span style={{ fontFamily:sans, fontSize:13.5, color:"#6B7280", fontWeight:300 }}>{f}</span>
+                          <div key={j} style={{ display:"flex", alignItems:"center", gap:10 }}>
+                            <span style={{ color:"#18A66D", fontSize:13, flexShrink:0 }}>✓</span>
+                            <span style={{ fontSize:14, color:"#6B7280" }}>{f}</span>
                           </div>
                         ))}
                       </div>
-                      <MagneticBtn href="/lead" className="btn-outline-lux" style={{ display:"block", textAlign:"center", fontSize:13.5, padding:"14px 0", width:"100%", boxSizing:"border-box", borderRadius:6 }}>
-                        Jetzt anfragen →
-                      </MagneticBtn>
+                      <a href="/lead" className="btn-outline" style={{ display:"block", textAlign:"center", fontSize:14, padding:"14px 0", borderRadius:12, width:"100%", boxSizing:"border-box" }}>Jetzt anfragen →</a>
                     </div>
                   )}
                 </Reveal>
               ))}
             </div>
-            <p style={{ textAlign:"center", fontFamily:sans, fontSize:11.5, color:"#C4C9D4", marginTop:20, fontWeight:300, letterSpacing:"0.02em" }}>
+            <p style={{ textAlign:"center", fontSize:12, color:"#C4C9D4", marginTop:20 }}>
               Auch als €69-, €149- und €189-Paket verfügbar · Alle Preise sind Endpreise · Monatlich kündbar
             </p>
           </div>
         </section>
 
-        {/* ══════════════════════════════════════════
-            FAQ
-        ══════════════════════════════════════════ */}
-        <section className="sec" style={{ background:"#fff", padding:"128px 48px", borderTop:"1px solid #EBEBED" }}>
+        {/* ══ FAQ ══ */}
+        <section className="sec-pad" style={{ background:"#fff", padding:"100px 32px" }}>
           <div style={{ maxWidth:680, margin:"0 auto" }}>
             <Reveal>
-              <div style={{ marginBottom:72 }}>
-                <div className="sect-label" style={{ marginBottom:24 }}>FAQ</div>
-                <h2 style={{ fontFamily:serif, fontSize:"clamp(36px,4.5vw,62px)", fontWeight:500, letterSpacing:"-0.5px", lineHeight:1.05, color:"#111318", marginBottom:12 }}>
-                  Häufige Fragen.
-                </h2>
-                <p style={{ fontFamily:sans, fontSize:15.5, color:"#9CA3AF", fontWeight:300 }}>Alles, was Sie wissen möchten – bevor Sie anfragen.</p>
+              <div style={{ textAlign:"center", marginBottom:56 }}>
+                <div style={{ fontSize:11, fontWeight:700, letterSpacing:3, textTransform:"uppercase", color:"#18A66D", marginBottom:16 }}>FAQ</div>
+                <h2 style={{ fontSize:"clamp(32px,4vw,52px)", fontWeight:900, letterSpacing:"-1.5px", lineHeight:1.08, margin:"0 0 10px" }}>Häufige Fragen.</h2>
+                <p style={{ fontSize:16, color:"#9CA3AF", margin:0 }}>Alles, was Sie wissen möchten – bevor Sie anfragen.</p>
               </div>
             </Reveal>
             <div>
               {faqs.map((faq, i) => (
-                <div key={i} className="faq-row">
+                <div key={i} className="faq-item">
                   <button
                     onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                    style={{ width:"100%", textAlign:"left", padding:"24px 0", display:"flex", justifyContent:"space-between", alignItems:"center", gap:16, background:"none", border:"none", cursor:"none" }}
+                    style={{ width:"100%", textAlign:"left", padding:"22px 0", display:"flex", justifyContent:"space-between", alignItems:"center", gap:16, background:"none", border:"none", cursor:"pointer" }}
                   >
-                    <span style={{ fontFamily:serif, fontSize:18, fontWeight:500, color:"#111318", lineHeight:1.4, letterSpacing:"-0.2px" }}>{faq.q}</span>
-                    <span style={{ color:"#18A66D", fontSize:24, flexShrink:0, fontWeight:300, lineHeight:1, transform: openFaq === i ? "rotate(45deg)" : "none", transition:"transform 0.3s cubic-bezier(0.16,1,0.3,1)", display:"block" }}>+</span>
+                    <span style={{ fontSize:15, fontWeight:600, color:"#0B0D14", lineHeight:1.5 }}>{faq.q}</span>
+                    <span style={{ color:"#18A66D", fontSize:22, flexShrink:0, fontWeight:300, lineHeight:1, transform: openFaq === i ? "rotate(45deg)" : "none", transition:"transform .25s" }}>+</span>
                   </button>
-                  <div style={{
-                    maxHeight: openFaq === i ? "400px" : "0",
-                    overflow:"hidden",
-                    transition:"max-height 0.4s cubic-bezier(0.16,1,0.3,1)"
-                  }}>
-                    <p style={{ fontFamily:sans, paddingBottom:24, fontSize:14.5, color:"#6B7280", lineHeight:1.8, paddingRight:48, fontWeight:300, margin:0 }}>{faq.a}</p>
-                  </div>
+                  {openFaq === i && (
+                    <div style={{ paddingBottom:22, fontSize:14, color:"#6B7280", lineHeight:1.7, paddingRight:32 }}>{faq.a}</div>
+                  )}
                 </div>
               ))}
             </div>
           </div>
         </section>
 
-        {/* ══════════════════════════════════════════
-            FINAL CTA
-        ══════════════════════════════════════════ */}
-        <section className="sec grain" style={{ background:"linear-gradient(155deg,#020510 0%,#050A18 50%,#04080F 100%)", padding:"160px 48px", position:"relative", overflow:"hidden" }}>
-          <div style={{ position:"absolute", top:"50%", left:"50%", transform:"translate(-50%,-50%)", width:800, height:600, borderRadius:"50%", background:"radial-gradient(ellipse, rgba(24,166,109,0.07) 0%, transparent 60%)", pointerEvents:"none" }} />
-          <div style={{ position:"absolute", top:"20%", left:"15%", width:1, height:"60%", background:"linear-gradient(180deg,transparent,rgba(24,166,109,0.12),transparent)", pointerEvents:"none" }} />
-          <div style={{ position:"absolute", top:"20%", right:"15%", width:1, height:"60%", background:"linear-gradient(180deg,transparent,rgba(24,166,109,0.08),transparent)", pointerEvents:"none" }} />
-
-          <div style={{ maxWidth:700, margin:"0 auto", textAlign:"center", position:"relative" }}>
+        {/* ══ FINAL CTA ══ */}
+        <section className="sec-pad" style={{ background:"linear-gradient(170deg,#06091A 0%,#080C1E 100%)", padding:"120px 32px", position:"relative", overflow:"hidden" }}>
+          <div style={{ position:"absolute", top:"50%", left:"50%", transform:"translate(-50%,-50%)", width:600, height:400, borderRadius:"50%", background:"radial-gradient(ellipse,rgba(24,166,109,.08) 0%,transparent 65%)", pointerEvents:"none" }} />
+          <div style={{ maxWidth:600, margin:"0 auto", textAlign:"center", position:"relative" }}>
             <Reveal>
-              <div style={{ fontFamily:sans, display:"inline-flex", alignItems:"center", gap:8, color:"rgba(74,232,155,0.7)", fontSize:11, fontWeight:500, padding:"8px 20px", border:"1px solid rgba(24,166,109,0.15)", marginBottom:52, letterSpacing:"0.12em", textTransform:"uppercase" }}>
-                Kostenlos · Unverbindlich · 15 Minuten
+              <div style={{ display:"inline-flex", alignItems:"center", gap:8, background:"rgba(24,166,109,.08)", border:"1px solid rgba(24,166,109,.18)", color:"rgba(74,232,155,.85)", fontSize:12, fontWeight:600, padding:"7px 18px", borderRadius:980, marginBottom:36 }}>
+                ✓ Kostenlos · Unverbindlich · 15 Minuten
               </div>
-              <h2 style={{ fontFamily:serif, fontSize:"clamp(48px,7vw,96px)", fontWeight:400, color:"#fff", letterSpacing:"-2px", lineHeight:0.98, marginBottom:28 }}>
-                Ihr Betrieb.<br /><em style={{ fontStyle:"italic", fontWeight:300, color:"#18A66D" }}>Endlich digital.</em>
+              <h2 style={{ fontSize:"clamp(36px,5vw,64px)", fontWeight:900, color:"#fff", letterSpacing:"-2px", lineHeight:1.04, margin:"0 0 20px" }}>
+                Ihr Betrieb.<br /><span style={{ color:"#18A66D" }}>Endlich digital.</span>
               </h2>
-              <p style={{ fontFamily:sans, fontSize:16, color:"rgba(255,255,255,0.28)", lineHeight:1.8, maxWidth:480, margin:"0 auto 56px", fontWeight:300 }}>
-                Kalender, Kundenkartei, SMS-Erinnerungen und Auswertungen — in einem System, in 10 Minuten eingerichtet.
+              <p style={{ fontSize:18, color:"rgba(255,255,255,.38)", lineHeight:1.65, maxWidth:480, margin:"0 auto 44px" }}>
+                Kalender, Kundenkartei, SMS-Erinnerungen und Auswertungen — in einem System, in 10 Minuten eingerichtet. Sprechen Sie kurz mit uns und starten Sie noch heute.
               </p>
-              <MagneticBtn href="/lead" className="btn-emerald" style={{ fontSize:16, padding:"18px 44px", borderRadius:8 }}>
+              <a href="/lead" className="btn-primary" style={{ fontSize:16, padding:"16px 40px" }}>
                 Kostenloses Gespräch sichern →
-              </MagneticBtn>
-              <div style={{ marginTop:44, display:"flex", justifyContent:"center", gap:36, flexWrap:"wrap" }}>
+              </a>
+              <div style={{ marginTop:32, display:"flex", justifyContent:"center", gap:28, flexWrap:"wrap" }}>
                 {["Kein Vertrag","Monatlich kündbar","Persönliches Onboarding","In 10 Min. startklar"].map((t, i) => (
-                  <span key={i} style={{ fontFamily:sans, fontSize:12, color:"rgba(255,255,255,0.18)", fontWeight:300, letterSpacing:"0.03em" }}>— {t}</span>
+                  <span key={i} style={{ fontSize:13, color:"rgba(255,255,255,.22)" }}>✓ {t}</span>
                 ))}
               </div>
             </Reveal>
@@ -1000,17 +784,15 @@ export default function LandingPage() {
         </section>
 
         {/* ══ FOOTER ══ */}
-        <footer style={{ background:"#04081A", borderTop:"1px solid rgba(255,255,255,0.05)", padding:"28px 48px" }}>
+        <footer style={{ background:"#fff", borderTop:"1px solid #F3F4F6", padding:"28px 32px" }}>
           <div style={{ maxWidth:960, margin:"0 auto", display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:16 }}>
-            <a href="/" style={{ textDecoration:"none", display:"flex", alignItems:"center", gap:1 }}>
-              <span style={{ fontFamily:serif, fontSize:18, fontWeight:600, color:"#18A66D", letterSpacing:"-0.3px" }}>Termin</span>
-              <span style={{ fontFamily:serif, fontSize:18, fontWeight:600, color:"rgba(255,255,255,0.5)", letterSpacing:"-0.3px" }}>Stop</span>
-            </a>
-            <div style={{ display:"flex", gap:28 }}>
+            <span style={{ fontSize:16, fontWeight:800, letterSpacing:"-0.5px" }}>
+              <span style={{ color:"#18A66D" }}>Termin</span>
+              <span style={{ color:"#0B0D14" }}>Stop</span>
+            </span>
+            <div style={{ display:"flex", gap:24 }}>
               {[["Impressum","/impressum"],["Datenschutz","/datenschutz"],["AGB","/agb"],["AVV","/avv"],["Login","/login"]].map(([l, h]) => (
-                <a key={h} href={h} style={{ fontFamily:sans, fontSize:12, color:"rgba(255,255,255,0.2)", textDecoration:"none", fontWeight:300, letterSpacing:"0.02em", transition:"color 0.2s" }}
-                  onMouseEnter={e => e.currentTarget.style.color="rgba(255,255,255,0.5)"}
-                  onMouseLeave={e => e.currentTarget.style.color="rgba(255,255,255,0.2)"}>{l}</a>
+                <a key={h} href={h} style={{ fontSize:13, color:"#9CA3AF", textDecoration:"none" }}>{l}</a>
               ))}
             </div>
           </div>
