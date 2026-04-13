@@ -146,12 +146,36 @@ export default function AGB() {
               enthalten, gesondert zu entrichten.
             </p>
             <p className="mb-3">
-  Die Zahlung erfolgt per Dauerauftrag des Kunden. Der Kunde verpflichtet sich,
-  einen Dauerauftrag über den vereinbarten Monatsbetrag einzurichten, der jeweils
-  zum 1. eines Kalendermonats auf das Konto des Anbieters überwiesen wird.
-  Die Bankverbindung des Anbieters wird dem Kunden gesondert mitgeteilt.
-</p>
-
+              Die Zahlung erfolgt per Dauerauftrag des Kunden. Der Kunde verpflichtet sich,
+              einen Dauerauftrag über den vereinbarten Monatsbetrag einzurichten, der jeweils
+              zum 1. eines Kalendermonats auf das Konto des Anbieters überwiesen wird.
+              Die Bankverbindung des Anbieters wird dem Kunden gesondert mitgeteilt.
+            </p>
+            <p className="mb-3 font-semibold text-[#1F2A37]">SMS-Kontingent und Mehrverbrauch:</p>
+            <p className="mb-3">
+              Jedes gebuchte Paket enthält ein monatliches SMS-Kontingent gemäß der
+              zum Zeitpunkt des Vertragsschlusses vereinbarten Leistungsbeschreibung.
+              Das Kontingent wird jeweils zum 1. eines Kalendermonats zurückgesetzt.
+            </p>
+            <p className="mb-3">
+              Eine Toleranzzone von 10 % des monatlichen SMS-Kontingents ist im Preis
+              enthalten und wird nicht gesondert berechnet. Wird das gebuchte Kontingent
+              zuzüglich dieser Toleranz von 10 % überschritten, wird jede weitere
+              versendete SMS mit <strong>0,10 € (zehn Cent) netto</strong> in Rechnung gestellt.
+            </p>
+            <p className="mb-3">
+              Der Mehrverbrauch wird am Ende des jeweiligen Kalendermonats ermittelt
+              und dem Kunden in der Folgerechnung gesondert ausgewiesen. Der Anbieter
+              ist berechtigt, den Mehrverbrauch alternativ per separater Rechnung
+              in Rechnung zu stellen. Die Zahlung ist innerhalb von 14 Tagen nach
+              Rechnungsstellung fällig.
+            </p>
+            <p>
+              Der Anbieter weist den Kunden auf einen drohenden Mehrverbrauch hin,
+              sobald 90 % des gebuchten Kontingents erreicht sind. Ein solcher Hinweis
+              erfolgt über die Plattform (Einblicke-Seite). Der Hinweis begründet
+              keinen Anspruch auf kostenfreie Überschreitung des Kontingents.
+            </p>
           </section>
 
           {/* § 5 */}
