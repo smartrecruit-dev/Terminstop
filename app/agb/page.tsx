@@ -37,7 +37,7 @@ export default function AGB() {
             </p>
             <div className="bg-[#F7FAFC] border border-[#E5E7EB] rounded-xl px-5 py-4 mb-3 text-[#1F2A37]">
               <strong>Marvin Passe</strong>, Hinterm Stieberge 16, 31535 Neustadt am Rübenberge, Deutschland<br />
-              E-Mail: terminstop.business@gmail.com · Tel.: 0151 54212634<br />
+              E-Mail: terminstop.business@gmail.com · Tel.: 0151 54219634<br />
               (nachfolgend „Anbieter")
             </div>
             <p className="mb-3">
@@ -60,15 +60,15 @@ export default function AGB() {
             <h2 className="text-base font-bold text-[#1F2A37] mb-3">§ 2 Leistungsbeschreibung</h2>
             <p className="mb-3">
               TerminStop ist eine webbasierte Software-as-a-Service-Lösung (SaaS) zur
-              Terminverwaltung und zum automatisierten Versand von SMS-Erinnerungen an die
-              Endkunden des Kunden. Die Plattform umfasst insbesondere:
+              digitalen Verwaltung von Terminen, Kundendaten und Geschäftsprozessen für
+              kleine Dienstleistungsbetriebe. Die Plattform umfasst insbesondere:
             </p>
             <ul className="list-disc pl-6 space-y-1 mb-3 text-[#4B5563]">
-              <li>Erfassung und Verwaltung von Termindaten</li>
+              <li>Erfassung und Verwaltung von Termindaten sowie Kalenderansicht (Tages- und Wochenansicht)</li>
+              <li>Kundenkartei (Verwaltung von Kundenstammdaten und Terminhistorie)</li>
               <li>Automatischer Versand von SMS-Erinnerungen über den Dienstleister seven.io</li>
               <li>Dashboard zur Übersicht und Verwaltung von Terminen</li>
               <li>Auswertungen und Einblicke zur Terminentwicklung</li>
-              <li>Kalenderansicht (Tages- und Wochenansicht)</li>
             </ul>
             <p className="mb-3">
   Der Anbieter erbringt die Leistungen über die technische Infrastruktur von

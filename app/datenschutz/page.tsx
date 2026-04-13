@@ -38,7 +38,7 @@ export default function Datenschutz() {
               31535 Neustadt am Rübenberge<br />
               Deutschland<br /><br />
               E-Mail: terminstop.business@gmail.com<br />
-              Telefon: 0151 54212634
+              Telefon: 0151 54219634
             </div>
             <p className="mt-3">
               Der Verantwortliche im Sinne der Datenschutz-Grundverordnung (DSGVO)

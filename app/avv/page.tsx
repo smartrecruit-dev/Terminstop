@@ -61,7 +61,7 @@ export default function AVV() {
                   <strong>Marvin Passe</strong><br />
                   Hinterm Stieberge 16, 31535 Neustadt am Rübenberge<br />
                   E-Mail: terminstop.business@gmail.com<br />
-                  Tel.: 0151 54212634
+                  Tel.: 0151 54219634
                 </div>
               </div>
             </div>

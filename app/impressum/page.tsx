@@ -50,7 +50,7 @@ export default function Impressum() {
                 terminstop.business@gmail.com
               </a>
               <br />
-              Telefon: 0151 54212634
+              Telefon: 0151 54219634
             </div>
           </section>
 
