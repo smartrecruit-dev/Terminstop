@@ -85,7 +85,7 @@ export default function BookingPage() {
 
   // Progress: exclude "confirm" from bar count
   function progressPct() {
-    const steps = STEP_ORDER[bookingType].filter(s => s !== "confirm")
+    const steps = STEP_ORDER[bookingType].filter(s => s !== "confirm") as Step[]
     const idx   = steps.indexOf(step)
     return idx < 0 ? 100 : Math.round(((idx) / (steps.length - 1)) * 100)
   }

@@ -78,7 +78,7 @@ export default function RequestsPage() {
     const json = await res.json()
     setActing(null)
     if (json.success) {
-      showToast(action === "confirm" ? "✓ Bestätigt – SMS wurde gesendet" : "Anfrage abgelehnt", action === "confirm")
+      showToast(action === "confirm" ? "✓ Bestätigt – erscheint jetzt im Kalender" : "Anfrage abgelehnt", action === "confirm")
       load()
     } else {
       showToast("Fehler: " + json.error, false)
@@ -290,7 +290,7 @@ function RequestCard({ r, acting, onConfirm, onReject, done }: {
             onClick={onConfirm}
             disabled={!!isLoading}
             className="flex-1 bg-[#059669] hover:bg-[#047857] disabled:opacity-50 text-white font-bold text-sm py-2.5 rounded-xl transition">
-            {isLoading ? "…" : "✓ Bestätigen + SMS"}
+            {isLoading ? "…" : "✓ Bestätigen"}
           </button>
           <button
             onClick={onReject}
