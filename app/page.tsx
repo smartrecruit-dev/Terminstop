@@ -67,25 +67,43 @@ export default function LandingPage() {
   ]
 
   const faqs = [
-    { q: "Ist TerminStop nur für SMS-Erinnerungen?", a: "Nein – SMS-Erinnerungen sind nur eine von vier Funktionen. TerminStop ist Ihr komplettes digitales Terminbüro: mit digitalem Kalender, Kundenkartei mit vollständiger Terminhistorie, automatischen SMS-Erinnerungen und Auswertungen über Ihre Entwicklung. Alles in einem System, monatlich ab €39." },
+    { q: "Ist TerminStop nur für SMS-Erinnerungen?", a: "Nein – SMS-Erinnerungen sind nur eine von vier Funktionen. TerminStop ist Ihr komplettes digitales Terminbüro: mit digitalem Kalender, Kundenkartei mit vollständiger Terminhistorie, automatischen SMS-Erinnerungen und Auswertungen über Ihre Entwicklung. Alles in einem System, ab €1,30 pro Tag." },
     { q: "Muss ich eine App installieren oder etwas technisch einrichten?", a: "Nein. TerminStop läuft komplett im Browser – keine App, keine Software, keine technischen Vorkenntnisse. Die Einrichtung dauert unter 10 Minuten und wir begleiten Sie dabei persönlich." },
-    { q: "Was kostet TerminStop monatlich?", a: "Unsere Pakete starten ab €39 pro Monat – je nach Anzahl Ihrer Termine. Im Beratungsgespräch finden wir gemeinsam das passende Paket. Kein Vertrag, monatlich kündbar." },
+    { q: "Was kostet TerminStop monatlich?", a: "Das hängt davon ab, wie viele Termine Sie im Monat haben. Unser Einstieg liegt bei €1,30 pro Tag – die meisten Betriebe zahlen zwischen €39 und €109 pro Monat. Im kurzen Erstgespräch finden wir gemeinsam das passende Paket. Kein Vertrag, monatlich kündbar." },
     { q: "Funktioniert das auch für meinen Betrieb – ich bin kein IT-Unternehmen?", a: "Genau dafür ist TerminStop gebaut. Die meisten unserer Kunden sind Handwerker, Friseure, Praxen oder KFZ-Betriebe – keine Vorkenntnisse nötig." },
     { q: "Was passiert, wenn ein Kunde nicht auf die SMS antwortet?", a: "Das System erinnert trotzdem – und Sie sehen in der Übersicht, wer bestätigt hat und wer nicht. So können Sie gezielt reagieren, bevor es zu einem Ausfall kommt." },
     { q: "Wie lange dauert es, bis ich erste Ergebnisse sehe?", a: "Die meisten Kunden berichten bereits nach der ersten Woche von weniger Ausfällen. Die Erinnerungen wirken sofort." },
     { q: "Gibt es eine Mindestlaufzeit oder einen Vertrag?", a: "Nein. TerminStop ist monatlich kündbar – ohne Mindestlaufzeit, ohne Kündigungsfristen. Kein Risiko, kein Kleingedrucktes." },
   ]
 
-  const plans = [
-    { name: "Starter", price: 39, sms: "0–100 SMS", perDay: "1,30", popular: false, features: ["Automatische SMS-Erinnerungen", "Terminübersicht & Dashboard", "Kundenkartei", "Persönliches Onboarding", "Support per E-Mail"] },
-    { name: "Pro", price: 109, sms: "250–400 SMS", perDay: "3,63", popular: true, features: ["Automatische SMS-Erinnerungen", "Terminübersicht & Dashboard", "Kundenkartei", "Kalenderansicht", "Auswertungen & Einblicke", "Persönliches Onboarding", "Prioritäts-Support"] },
-    { name: "Max", price: 229, sms: "800–1000 SMS", perDay: "7,63", popular: false, features: ["Automatische SMS-Erinnerungen", "Terminübersicht & Dashboard", "Kundenkartei", "Kalenderansicht", "Auswertungen & Einblicke", "Persönliches Onboarding", "Persönlicher Ansprechpartner", "Individuelle Einrichtung"] },
+  const tiers = [
+    {
+      name: "Einsteiger",
+      for: "Für Betriebe bis ca. 100 Termine / Monat",
+      tag: null,
+      dark: false,
+      features: ["Automatische SMS-Erinnerungen", "Terminübersicht & Dashboard", "Kundenkartei", "Persönliches Onboarding", "Support per E-Mail"],
+    },
+    {
+      name: "Wachstum",
+      for: "Für Betriebe mit 100–400 Terminen / Monat",
+      tag: "✓ Meistgewählt",
+      dark: true,
+      features: ["Automatische SMS-Erinnerungen", "Terminübersicht & Dashboard", "Kundenkartei", "Kalenderansicht", "Auswertungen & Einblicke", "Persönliches Onboarding", "Prioritäts-Support"],
+    },
+    {
+      name: "Profi",
+      for: "Für stark ausgelastete Betriebe",
+      tag: null,
+      dark: false,
+      features: ["Automatische SMS-Erinnerungen", "Terminübersicht & Dashboard", "Kundenkartei", "Kalenderansicht", "Auswertungen & Einblicke", "Persönliches Onboarding", "Persönlicher Ansprechpartner", "Individuelle Einrichtung"],
+    },
   ]
 
   const industries = ["Friseur", "KFZ-Werkstatt", "Arztpraxis", "Handwerk", "Kosmetik", "Physiotherapie", "Tattoo-Studio", "Nagelstudio", "Zahnarzt", "Optiker", "Hundesalon", "Massage"]
 
   const compRows = [
-    { label:"Kosten",               them:"15–30 % Provision pro Buchung",   us:"Ab €39 / Monat — fertig" },
+    { label:"Kosten",               them:"15–30 % Provision pro Buchung",   us:"Ab €1,30 / Tag — individuell" },
     { label:"Vertragslaufzeit",      them:"Oft 12+ Monate gebunden",         us:"Monatlich kündbar" },
     { label:"Ihre Kundendaten",      them:"Gehören der Plattform",           us:"Gehören ausschließlich Ihnen" },
     { label:"SMS-Erinnerungen",      them:"✗ Nicht enthalten",               us:"✓ Vollautomatisch" },
@@ -451,7 +469,7 @@ export default function LandingPage() {
                   </div>
                   <div>
                     <div style={{ color:"#fff", fontWeight:700, fontSize:15, marginBottom:2 }}>Alles in einem Paket — keine versteckten Extras.</div>
-                    <div style={{ color:"rgba(255,255,255,.35)", fontSize:13 }}>Kalender + Kundenkartei + SMS + Auswertungen · ab €39/Monat</div>
+                    <div style={{ color:"rgba(255,255,255,.35)", fontSize:13 }}>Kalender + Kundenkartei + SMS + Auswertungen · ab €1,30/Tag</div>
                   </div>
                 </div>
                 <a href="/lead" className="btn-primary" style={{ fontSize:14, padding:"12px 24px", flexShrink:0 }}>Kostenlos anfragen →</a>
@@ -613,7 +631,7 @@ export default function LandingPage() {
             <Reveal delay={100}>
               <div style={{ marginTop:24, display:"flex", flexDirection:"column" as any, alignItems:"center", gap:16, textAlign:"center" as any }}>
                 <p style={{ fontSize:13, color:"rgba(255,255,255,.22)", margin:0 }}>
-                  Bei 100 Buchungen/Monat à €50 zahlen Sie über ein Buchungsportal bis zu <strong style={{ color:"rgba(255,255,255,.45)" }}>€1.500 Provision</strong>. TerminStop kostet <strong style={{ color:"#4AE89B" }}>€39</strong>.
+                  Bei 100 Buchungen/Monat à €50 zahlen Sie über ein Buchungsportal bis zu <strong style={{ color:"rgba(255,255,255,.45)" }}>€1.500 Provision</strong>. TerminStop kostet <strong style={{ color:"#4AE89B" }}>ab €1,30 / Tag</strong>.
                 </p>
                 <a href="/lead" className="btn-primary" style={{ fontSize:15, padding:"14px 32px" }}>Jetzt wechseln →</a>
               </div>
@@ -659,72 +677,76 @@ export default function LandingPage() {
         <section id="preise" className="sec-pad" style={{ background:"#F9FAFB", padding:"100px 32px" }}>
           <div style={{ maxWidth:960, margin:"0 auto" }}>
             <Reveal>
-              <div style={{ textAlign:"center", maxWidth:560, margin:"0 auto 16px" }}>
-                <div style={{ fontSize:11, fontWeight:700, letterSpacing:3, textTransform:"uppercase", color:"#18A66D", marginBottom:16 }}>Preise</div>
-                <h2 style={{ fontSize:"clamp(32px,4vw,52px)", fontWeight:900, letterSpacing:"-1.5px", lineHeight:1.08, margin:"0 0 14px" }}>Einfach. Transparent.<br />Ohne Überraschungen.</h2>
-                <p style={{ fontSize:17, color:"#6B7280", margin:0 }}>Monatlich kündbar, kein Vertrag.</p>
-              </div>
-            </Reveal>
-
-            <Reveal delay={80}>
-              <div style={{ maxWidth:560, margin:"32px auto 48px", background:"#fff", border:"1px solid rgba(24,166,109,.15)", borderRadius:16, padding:"18px 24px", display:"flex", alignItems:"center", gap:16 }}>
-                <div style={{ width:36, height:36, background:"#F0FBF5", borderRadius:10, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
-                  <span style={{ color:"#18A66D", fontWeight:900, fontSize:16 }}>↑</span>
-                </div>
-                <p style={{ fontSize:14, color:"#6B7280", margin:0, lineHeight:1.6 }}>
-                  Schon <strong style={{ color:"#0B0D14" }}>2–3 verhinderte Ausfälle pro Monat</strong> decken das Pro-Paket vollständig ab.
+              <div style={{ textAlign:"center", maxWidth:600, margin:"0 auto 16px" }}>
+                <div style={{ fontSize:11, fontWeight:700, letterSpacing:3, textTransform:"uppercase", color:"#18A66D", marginBottom:16 }}>Ihr Paket</div>
+                <h2 style={{ fontSize:"clamp(30px,4vw,52px)", fontWeight:900, letterSpacing:"-1.5px", lineHeight:1.08, margin:"0 0 14px" }}>Individuell angepasst.<br />Passend für Ihren Betrieb.</h2>
+                <p style={{ fontSize:16, color:"#6B7280", margin:0, lineHeight:1.6 }}>
+                  Kein Einheitspaket. Wir schauen gemeinsam, wie viele Termine Sie haben —<br className="hidden md:block" /> und finden das Paket, das sich ab dem ersten Monat rechnet.
                 </p>
               </div>
             </Reveal>
 
-            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:16, alignItems:"start" }} className="pricing-grid">
+            {/* Anchor: ab €1,30 / Tag */}
+            <Reveal delay={60}>
+              <div style={{ display:"flex", justifyContent:"center", margin:"32px 0 48px" }}>
+                <div style={{ background:"#fff", border:"1px solid rgba(24,166,109,.2)", borderRadius:20, padding:"20px 32px", display:"flex", alignItems:"center", gap:20, boxShadow:"0 2px 12px rgba(0,0,0,.05)" }}>
+                  <div style={{ textAlign:"center" }}>
+                    <div style={{ fontSize:11, fontWeight:700, letterSpacing:2, textTransform:"uppercase", color:"#9CA3AF", marginBottom:4 }}>Einstieg bereits</div>
+                    <div style={{ fontSize:36, fontWeight:900, color:"#0B0D14", letterSpacing:"-1px", lineHeight:1 }}>ab €1,30 <span style={{ fontSize:16, fontWeight:600, color:"#9CA3AF" }}>/ Tag</span></div>
+                    <div style={{ fontSize:12, color:"#9CA3AF", marginTop:4 }}>Monatlich kündbar · Kein Vertrag</div>
+                  </div>
+                  <div style={{ width:1, height:52, background:"#E5E7EB" }} />
+                  <div style={{ fontSize:13, color:"#6B7280", maxWidth:220, lineHeight:1.55 }}>
+                    Schon <strong style={{ color:"#0B0D14" }}>2–3 verhinderte Ausfälle</strong> decken das Paket vollständig ab.
+                  </div>
+                </div>
+              </div>
+            </Reveal>
+
+            {/* Tier cards */}
+            <div style={{ display:"grid", gap:16, alignItems:"start" }} className="pricing-grid">
               <style>{`.pricing-grid{grid-template-columns:repeat(3,1fr)} @media(max-width:800px){.pricing-grid{grid-template-columns:1fr!important}}`}</style>
-              {plans.map((plan, i) => (
+              {tiers.map((tier, i) => (
                 <Reveal key={i} delay={i * 70}>
-                  {plan.popular ? (
+                  {tier.dark ? (
                     <div style={{ background:"#06091A", border:"1.5px solid rgba(24,166,109,.3)", borderRadius:20, padding:"32px 28px", position:"relative", boxShadow:"0 16px 48px rgba(24,166,109,.1)" }}>
-                      <div style={{ position:"absolute", top:-14, left:"50%", transform:"translateX(-50%)", background:"#18A66D", color:"#fff", fontSize:11, fontWeight:700, padding:"5px 16px", borderRadius:980, whiteSpace:"nowrap" }}>✓ Meistgewählt</div>
-                      <div style={{ fontSize:11, fontWeight:700, letterSpacing:2, textTransform:"uppercase", color:"rgba(74,232,155,.8)", marginBottom:16 }}>{plan.name}</div>
-                      <div style={{ marginBottom:6 }}>
-                        <span style={{ fontSize:48, fontWeight:900, color:"#fff", letterSpacing:"-2px" }}>€{plan.price}</span>
-                        <span style={{ fontSize:15, color:"rgba(255,255,255,.35)", marginLeft:4 }}>/Monat</span>
-                      </div>
-                      <div style={{ fontSize:13, color:"rgba(255,255,255,.3)", marginBottom:28 }}>{plan.sms} · €{plan.perDay}/Tag</div>
+                      <div style={{ position:"absolute", top:-14, left:"50%", transform:"translateX(-50%)", background:"#18A66D", color:"#fff", fontSize:11, fontWeight:700, padding:"5px 16px", borderRadius:980, whiteSpace:"nowrap" }}>{tier.tag}</div>
+                      <div style={{ fontSize:11, fontWeight:700, letterSpacing:2, textTransform:"uppercase", color:"rgba(74,232,155,.8)", marginBottom:8 }}>{tier.name}</div>
+                      <div style={{ fontSize:13, color:"rgba(255,255,255,.4)", marginBottom:24, paddingBottom:20, borderBottom:"1px solid rgba(255,255,255,.08)" }}>{tier.for}</div>
                       <div style={{ display:"flex", flexDirection:"column", gap:12, marginBottom:32 }}>
-                        {plan.features.map((f, j) => (
+                        {tier.features.map((f, j) => (
                           <div key={j} style={{ display:"flex", alignItems:"center", gap:10 }}>
                             <span style={{ color:"#4AE89B", fontSize:13, flexShrink:0 }}>✓</span>
                             <span style={{ fontSize:14, color:"rgba(255,255,255,.65)" }}>{f}</span>
                           </div>
                         ))}
                       </div>
-                      <a href="/lead" className="btn-primary" style={{ display:"block", textAlign:"center", fontSize:14, padding:"14px 0", borderRadius:12, width:"100%", boxSizing:"border-box" }}>Jetzt anfragen →</a>
+                      <a href="/lead" className="btn-primary" style={{ display:"block", textAlign:"center", fontSize:14, padding:"14px 0", borderRadius:12, width:"100%", boxSizing:"border-box" }}>Passendes Paket anfragen →</a>
                     </div>
                   ) : (
                     <div style={{ background:"#fff", border:"1px solid #E5E7EB", borderRadius:20, padding:"32px 28px", boxShadow:"0 1px 4px rgba(0,0,0,.04)" }}>
-                      <div style={{ fontSize:11, fontWeight:700, letterSpacing:2, textTransform:"uppercase", color:"#9CA3AF", marginBottom:16 }}>{plan.name}</div>
-                      <div style={{ marginBottom:6 }}>
-                        <span style={{ fontSize:48, fontWeight:900, color:"#0B0D14", letterSpacing:"-2px" }}>€{plan.price}</span>
-                        <span style={{ fontSize:15, color:"#9CA3AF", marginLeft:4 }}>/Monat</span>
-                      </div>
-                      <div style={{ fontSize:13, color:"#9CA3AF", marginBottom:28 }}>{plan.sms} · €{plan.perDay}/Tag</div>
+                      <div style={{ fontSize:11, fontWeight:700, letterSpacing:2, textTransform:"uppercase", color:"#9CA3AF", marginBottom:8 }}>{tier.name}</div>
+                      <div style={{ fontSize:13, color:"#9CA3AF", marginBottom:24, paddingBottom:20, borderBottom:"1px solid #F3F4F6" }}>{tier.for}</div>
                       <div style={{ display:"flex", flexDirection:"column", gap:12, marginBottom:32 }}>
-                        {plan.features.map((f, j) => (
+                        {tier.features.map((f, j) => (
                           <div key={j} style={{ display:"flex", alignItems:"center", gap:10 }}>
                             <span style={{ color:"#18A66D", fontSize:13, flexShrink:0 }}>✓</span>
                             <span style={{ fontSize:14, color:"#6B7280" }}>{f}</span>
                           </div>
                         ))}
                       </div>
-                      <a href="/lead" className="btn-outline" style={{ display:"block", textAlign:"center", fontSize:14, padding:"14px 0", borderRadius:12, width:"100%", boxSizing:"border-box" }}>Jetzt anfragen →</a>
+                      <a href="/lead" className="btn-outline" style={{ display:"block", textAlign:"center", fontSize:14, padding:"14px 0", borderRadius:12, width:"100%", boxSizing:"border-box" }}>Passendes Paket anfragen →</a>
                     </div>
                   )}
                 </Reveal>
               ))}
             </div>
-            <p style={{ textAlign:"center", fontSize:12, color:"#C4C9D4", marginTop:20 }}>
-              Auch als €69-, €149- und €189-Paket verfügbar · Alle Preise sind Endpreise · Monatlich kündbar
-            </p>
+
+            <Reveal delay={100}>
+              <p style={{ textAlign:"center", fontSize:13, color:"#9CA3AF", marginTop:28, lineHeight:1.7 }}>
+                Die meisten Betriebe zahlen zwischen <strong style={{ color:"#6B7280" }}>€39 und €109 / Monat</strong> · Monatlich kündbar · Alle Preise sind Endpreise
+              </p>
+            </Reveal>
           </div>
         </section>
 
