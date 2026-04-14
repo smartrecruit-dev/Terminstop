@@ -98,7 +98,11 @@ export default function BookingPage({ params }: { params: { slug: string } }) {
       })
 
     if (insertErr) {
-      setError("Fehler beim Speichern. Bitte versuche es erneut.")
+      if (insertErr.message?.includes("RATE_LIMIT")) {
+        setError("Du hast heute bereits 3 Anfragen gesendet. Bitte morgen erneut versuchen oder den Betrieb direkt anrufen.")
+      } else {
+        setError("Fehler beim Speichern. Bitte versuche es erneut.")
+      }
       setSubmitting(false)
       return
     }
