@@ -163,6 +163,7 @@ export default function Dashboard() {
             <a href="/calendar" className="text-sm text-[#6B7280] hover:text-[#1F2A37] hover:bg-[#F7FAFC] px-4 py-2 rounded-lg transition">Kalender</a>
             <a href="/customers" className="text-sm text-[#6B7280] hover:text-[#1F2A37] hover:bg-[#F7FAFC] px-4 py-2 rounded-lg transition">Kunden</a>
             <a href="/insights" className="text-sm text-[#6B7280] hover:text-[#1F2A37] hover:bg-[#F7FAFC] px-4 py-2 rounded-lg transition">Einblicke</a>
+            <a href="/services" className="text-sm text-[#6B7280] hover:text-[#1F2A37] hover:bg-[#F7FAFC] px-4 py-2 rounded-lg transition">Buchung</a>
           </div>
         </div>
 
@@ -184,6 +185,7 @@ export default function Dashboard() {
           { href: "/calendar", label: "Kalender", icon: "📅" },
           { href: "/customers", label: "Kunden", icon: "👥" },
           { href: "/insights", label: "Einblicke", icon: "📊" },
+          { href: "/services", label: "Buchung", icon: "🔗" },
         ].map((item) => (
           <a key={item.href} href={item.href} className={`flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl transition ${item.active ? "text-[#18A66D]" : "text-[#9CA3AF]"}`}>
             <span className="text-lg">{item.icon}</span>
