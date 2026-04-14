@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { supabase } from "../lib/supabaseClient"
+import DashNav from "../components/DashNav"
 
 export default function Insights() {
 
@@ -134,53 +135,7 @@ export default function Insights() {
       style={{ fontFamily: "'Inter', 'Manrope', sans-serif", backgroundColor: "#F7FAFC" }}
     >
 
-      {/* ─── NAVBAR ─── */}
-      <nav className="flex justify-between items-center px-4 md:px-12 py-4 border-b border-[#E5E7EB] bg-white sticky top-0 z-50">
-        <div className="flex items-center gap-4 md:gap-8">
-          <span className="text-base font-bold">
-            <span className="text-[#18A66D]">Termin</span>
-            <span className="text-[#1F2A37]">Stop</span>
-          </span>
-          <div className="hidden md:flex gap-1">
-            <a href="/dashboard" className="text-sm text-[#6B7280] hover:text-[#1F2A37] hover:bg-[#F7FAFC] px-4 py-2 rounded-lg transition">Dashboard</a>
-            <a href="/calendar" className="text-sm text-[#6B7280] hover:text-[#1F2A37] hover:bg-[#F7FAFC] px-4 py-2 rounded-lg transition">Kalender</a>
-            <a href="/customers" className="text-sm text-[#6B7280] hover:text-[#1F2A37] hover:bg-[#F7FAFC] px-4 py-2 rounded-lg transition">Kunden</a>
-            <a href="/insights" className="text-sm font-semibold text-[#1F2A37] bg-[#F7FAFC] px-4 py-2 rounded-lg">Einblicke</a>
-            <a href="/requests" className="text-sm text-[#6B7280] hover:text-[#1F2A37] hover:bg-[#F7FAFC] px-4 py-2 rounded-lg transition">Anfragen</a>
-            <a href="/services" className="text-sm text-[#6B7280] hover:text-[#1F2A37] hover:bg-[#F7FAFC] px-4 py-2 rounded-lg transition">Buchung</a>
-          </div>
-        </div>
-        <div className="flex items-center gap-3">
-          <div className="hidden md:flex items-center gap-2 text-xs text-[#18A66D] font-medium">
-            <span className="w-1.5 h-1.5 bg-[#18A66D] rounded-full animate-pulse" />
-            System aktiv
-          </div>
-          <button onClick={handleLogout} className="text-sm text-[#6B7280] hover:text-[#1F2A37] transition px-3 py-1.5 rounded-lg hover:bg-[#F7FAFC]">
-            Logout
-          </button>
-        </div>
-      </nav>
-
-      {/* ─── MOBILE BOTTOM NAV ─── */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-[#E5E7EB] z-50 flex justify-around items-center px-2 py-2">
-        {[
-          { href: "/dashboard", label: "Dashboard", icon: "🏠" },
-          { href: "/calendar", label: "Kalender", icon: "📅" },
-          { href: "/customers", label: "Kunden", icon: "👥" },
-          { href: "/insights", label: "Einblicke", icon: "📊", active: true },
-          { href: "/requests", label: "Anfragen",  icon: "🔔" },
-          { href: "/services", label: "Buchung",   icon: "🔗" },
-        ].map((item) => (
-          <a key={item.href} href={item.href} className={`flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl transition ${item.active ? "text-[#18A66D]" : "text-[#9CA3AF]"}`}>
-            <span className="text-lg">{item.icon}</span>
-            <span className="text-[10px] font-medium">{item.label}</span>
-          </a>
-        ))}
-        <button onClick={handleLogout} className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl text-[#9CA3AF]">
-          <span className="text-lg">🚪</span>
-          <span className="text-[10px] font-medium">Logout</span>
-        </button>
-      </div>
+      <DashNav active="/insights" companyId={companyId} onLogout={handleLogout} />
 
       <div className="max-w-5xl mx-auto px-4 md:px-10 py-8 pb-24 md:pb-10">
 

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { supabase } from "../lib/supabaseClient"
+import DashNav from "../components/DashNav"
 
 type Service = {
   id: string
@@ -148,52 +149,7 @@ export default function ServicesPage() {
     <div className="min-h-screen text-[#1F2A37] overflow-x-hidden"
       style={{ fontFamily:"'Inter','Manrope',sans-serif", backgroundColor:"#F7FAFC" }}>
 
-      {/* ── NAVBAR ── */}
-      <nav className="flex justify-between items-center px-4 md:px-12 py-4 border-b border-[#E5E7EB] bg-white sticky top-0 z-50">
-        <div className="flex items-center gap-4 md:gap-8">
-          <span className="text-base font-bold">
-            <span className="text-[#18A66D]">Termin</span><span className="text-[#1F2A37]">Stop</span>
-          </span>
-          <div className="hidden md:flex gap-1">
-            {[
-              { href:"/dashboard", label:"Dashboard" },
-              { href:"/calendar",  label:"Kalender" },
-              { href:"/customers", label:"Kunden" },
-              { href:"/insights",  label:"Einblicke" },
-              { href:"/services",  label:"Buchung", active:true },
-            ].map(item => (
-              <a key={item.href} href={item.href}
-                className={`text-sm px-4 py-2 rounded-lg transition ${item.active
-                  ? "font-semibold text-[#1F2A37] bg-[#F7FAFC]"
-                  : "text-[#6B7280] hover:text-[#1F2A37] hover:bg-[#F7FAFC]"}`}>
-                {item.label}
-              </a>
-            ))}
-          </div>
-        </div>
-        <button onClick={handleLogout}
-          className="text-sm text-[#6B7280] hover:text-[#1F2A37] transition px-3 py-1.5 rounded-lg hover:bg-[#F7FAFC]">
-          Logout
-        </button>
-      </nav>
-
-      {/* ── MOBILE NAV ── */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-[#E5E7EB] z-50 flex justify-around items-center px-2 py-2">
-        {[
-          { href:"/dashboard", label:"Start",     icon:"🏠" },
-          { href:"/calendar",  label:"Kalender",  icon:"📅" },
-          { href:"/customers", label:"Kunden",    icon:"👥" },
-          { href:"/insights",  label:"Einblicke", icon:"📊" },
-          { href:"/services",  label:"Buchung",   icon:"🔗", active:true },
-        ].map(item => (
-          <a key={item.href} href={item.href}
-            className={`flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-xl transition ${
-              item.active ? "text-[#18A66D]" : "text-[#9CA3AF]"}`}>
-            <span className="text-lg">{item.icon}</span>
-            <span className="text-[10px] font-medium">{item.label}</span>
-          </a>
-        ))}
-      </div>
+      <DashNav active="/services" companyId={companyId} onLogout={handleLogout} />
 
       <div className="max-w-2xl mx-auto px-4 py-8 pb-28 md:pb-12">
 

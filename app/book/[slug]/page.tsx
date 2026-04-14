@@ -30,6 +30,27 @@ const STEP_ORDER: Record<BookingType, Step[]> = {
   callback: ["type","contact","confirm"],
 }
 
+// ── Color palette ─────────────────────────────────────────────
+const C = {
+  bg:        "#F0FDF9",
+  headerTop: "#022C22",
+  headerBot: "#065F46",
+  accent:    "#10B981",
+  accentDark:"#059669",
+  accentGlow:"rgba(16,185,129,0.28)",
+  amber:     "#F59E0B",
+  amberBg:   "#FFFBEB",
+  amberBdr:  "#FDE68A",
+  card:      "#FFFFFF",
+  cardBdr:   "#D1FAE5",
+  inputBdr:  "#D1FAE5",
+  inputBg:   "#F0FDF9",
+  textPrimary: "#022C22",
+  textSub:   "#047857",
+  textMuted: "#6B7280",
+  highlight: "#ECFDF5",
+}
+
 export default function BookingPage() {
   const params = useParams()
   const slug   = params?.slug as string
@@ -83,7 +104,6 @@ export default function BookingPage() {
     if (idx > 0) setStep(steps[idx - 1])
   }
 
-  // Progress: exclude "confirm" from bar count
   function progressPct() {
     const steps = STEP_ORDER[bookingType].filter(s => s !== "confirm") as Step[]
     const idx   = steps.indexOf(step)
@@ -128,12 +148,12 @@ export default function BookingPage() {
 
   const today = new Date().toISOString().split("T")[0]
 
-  // ─── Loading ─────────────────────────────────────────────────────
+  // ─── Loading ─────────────────────────────────────────────────
   if (loading) return (
     <Scaffold>
       <div style={{ display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", flex:1, gap:12, padding:"60px 0" }}>
         <Spinner />
-        <p style={{ color:"#94A3B8", fontSize:14 }}>Wird geladen …</p>
+        <p style={{ color:C.textMuted, fontSize:14 }}>Wird geladen …</p>
       </div>
       <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
     </Scaffold>
@@ -143,65 +163,74 @@ export default function BookingPage() {
     <Scaffold>
       <div style={{ display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", flex:1, padding:"60px 24px", textAlign:"center" }}>
         <div style={{ fontSize:56, marginBottom:16 }}>🔍</div>
-        <h1 style={{ fontSize:22, fontWeight:800, color:"#1E293B", margin:"0 0 8px" }}>Link nicht gefunden</h1>
-        <p style={{ color:"#64748B", lineHeight:1.6, fontSize:15, margin:0 }}>Dieser Buchungslink ist nicht aktiv.<br/>Bitte wende dich direkt an den Betrieb.</p>
+        <h1 style={{ fontSize:22, fontWeight:800, color:C.textPrimary, margin:"0 0 8px" }}>Link nicht gefunden</h1>
+        <p style={{ color:C.textMuted, lineHeight:1.6, fontSize:15, margin:0 }}>Dieser Buchungslink ist nicht aktiv.<br/>Bitte wende dich direkt an den Betrieb.</p>
       </div>
     </Scaffold>
   )
 
-  // ─── Done ────────────────────────────────────────────────────────
+  // ─── Done ────────────────────────────────────────────────────
   if (step === "done") return (
     <Scaffold>
       <div style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", padding:"40px 24px", textAlign:"center" }}>
-        <div style={{ width:80, height:80, background:"linear-gradient(135deg,#4F6EF7,#7C3AED)", borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", fontSize:36, marginBottom:20 }}>✓</div>
-        <h2 style={{ fontSize:24, fontWeight:800, color:"#1E293B", margin:"0 0 10px" }}>
+        <div style={{ width:80, height:80, background:`linear-gradient(135deg,${C.accent},${C.accentDark})`, borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", fontSize:36, marginBottom:20, boxShadow:`0 8px 30px ${C.accentGlow}` }}>✓</div>
+        <h2 style={{ fontSize:24, fontWeight:800, color:C.textPrimary, margin:"0 0 10px" }}>
           {bookingType === "callback" ? "Rückruf angefragt!" : "Anfrage gesendet!"}
         </h2>
-        <p style={{ color:"#64748B", lineHeight:1.65, fontSize:15, margin:"0 0 28px", maxWidth:340 }}>
-          Deine Anfrage bei <strong style={{ color:"#1E293B" }}>{company?.name}</strong> ist eingegangen.
+        <p style={{ color:C.textMuted, lineHeight:1.65, fontSize:15, margin:"0 0 28px", maxWidth:340 }}>
+          Deine Anfrage bei <strong style={{ color:C.textPrimary }}>{company?.name}</strong> ist eingegangen.
           {bookingType === "callback"
             ? " Du wirst so bald wie möglich zurückgerufen."
             : " Du wirst kontaktiert, sobald der Termin bestätigt ist."}
         </p>
-        <div style={{ background:"#F8FAFF", borderRadius:20, padding:"4px 0", border:"1px solid #EEF2FF", width:"100%", maxWidth:400 }}>
+        <div style={{ background:C.highlight, borderRadius:20, padding:"4px 0", border:`1px solid ${C.cardBdr}`, width:"100%", maxWidth:400 }}>
           {bookingType !== "callback" && date && <SummaryRow label="Wunschtermin" value={formatDT(date, time)} />}
           {selectedService && <SummaryRow label="Leistung" value={selectedService.name} />}
           {requestText && <SummaryRow label="Anliegen" value={requestText} />}
           <SummaryRow label="Name"    value={name} />
           <SummaryRow label="Telefon" value={phone} last />
         </div>
-        <p style={{ marginTop:24, fontSize:13, color:"#94A3B8" }}>Du kannst dieses Fenster jetzt schließen.</p>
+        <p style={{ marginTop:24, fontSize:13, color:C.textMuted }}>Du kannst dieses Fenster jetzt schließen.</p>
       </div>
     </Scaffold>
   )
 
-  // ─── Header ──────────────────────────────────────────────────────
+  // ─── Header ──────────────────────────────────────────────────
   const showProgress = step !== "type"
 
   return (
-    <div style={{ minHeight:"100dvh", background:"#F1F5FF", fontFamily:"'Inter',system-ui,sans-serif", display:"flex", flexDirection:"column" }}>
+    <div style={{ minHeight:"100dvh", background:C.bg, fontFamily:"'Inter',system-ui,sans-serif", display:"flex", flexDirection:"column" }}>
 
       {/* ── Top bar ── */}
-      <div style={{ background:"linear-gradient(135deg,#4F6EF7 0%,#7C3AED 100%)", padding:"env(safe-area-inset-top,0px) 0 0" }}>
-        <div style={{ maxWidth:520, margin:"0 auto", padding:"20px 20px 24px" }}>
+      <div style={{ background:`linear-gradient(160deg,${C.headerTop} 0%,${C.headerBot} 100%)`, padding:"env(safe-area-inset-top,0px) 0 0", position:"relative", overflow:"hidden" }}>
+        {/* decorative circles */}
+        <div style={{ position:"absolute", top:-40, right:-40, width:160, height:160, borderRadius:"50%", background:"rgba(16,185,129,0.12)", pointerEvents:"none" }} />
+        <div style={{ position:"absolute", bottom:-20, left:-20, width:100, height:100, borderRadius:"50%", background:"rgba(16,185,129,0.08)", pointerEvents:"none" }} />
+
+        <div style={{ maxWidth:520, margin:"0 auto", padding:"22px 20px 28px", position:"relative" }}>
           {showProgress && (
             <button onClick={goBack}
-              style={{ background:"rgba(255,255,255,0.15)", border:"none", borderRadius:20, color:"#fff", fontSize:13, fontWeight:600, padding:"6px 14px", cursor:"pointer", marginBottom:14, display:"inline-flex", alignItems:"center", gap:6 }}>
+              style={{ background:"rgba(255,255,255,0.12)", border:"1px solid rgba(255,255,255,0.2)", backdropFilter:"blur(4px)", borderRadius:20, color:"rgba(255,255,255,0.9)", fontSize:13, fontWeight:600, padding:"6px 14px", cursor:"pointer", marginBottom:16, display:"inline-flex", alignItems:"center", gap:6 }}>
               ← Zurück
             </button>
           )}
-          <p style={{ color:"rgba(255,255,255,0.6)", fontSize:11, fontWeight:700, letterSpacing:1.5, textTransform:"uppercase", margin:"0 0 4px" }}>
-            Online-Buchung
-          </p>
-          <h1 style={{ color:"#fff", fontSize:22, fontWeight:800, margin:0, letterSpacing:-0.3 }}>{company?.name}</h1>
+          <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:6 }}>
+            <div style={{ width:32, height:32, background:`linear-gradient(135deg,${C.accent},#34D399)`, borderRadius:10, display:"flex", alignItems:"center", justifyContent:"center", fontSize:16, boxShadow:"0 2px 10px rgba(16,185,129,0.4)" }}>
+              📅
+            </div>
+            <p style={{ color:"rgba(255,255,255,0.55)", fontSize:11, fontWeight:700, letterSpacing:1.5, textTransform:"uppercase", margin:0 }}>
+              Online-Buchung
+            </p>
+          </div>
+          <h1 style={{ color:"#fff", fontSize:24, fontWeight:800, margin:0, letterSpacing:-0.5, textShadow:"0 1px 8px rgba(0,0,0,0.2)" }}>{company?.name}</h1>
           {company?.booking_note && (
-            <p style={{ color:"rgba(255,255,255,0.75)", fontSize:13, margin:"8px 0 0", lineHeight:1.6 }}>{company.booking_note}</p>
+            <p style={{ color:"rgba(255,255,255,0.7)", fontSize:13, margin:"8px 0 0", lineHeight:1.6 }}>{company.booking_note}</p>
           )}
 
           {/* Progress bar */}
           {showProgress && (
-            <div style={{ marginTop:16, height:3, background:"rgba(255,255,255,0.2)", borderRadius:4, overflow:"hidden" }}>
-              <div style={{ height:"100%", background:"rgba(255,255,255,0.9)", borderRadius:4, width:`${progressPct()}%`, transition:"width 0.4s ease" }} />
+            <div style={{ marginTop:18, height:4, background:"rgba(255,255,255,0.15)", borderRadius:4, overflow:"hidden" }}>
+              <div style={{ height:"100%", background:`linear-gradient(90deg,${C.accent},#34D399)`, borderRadius:4, width:`${progressPct()}%`, transition:"width 0.4s ease", boxShadow:"0 0 8px rgba(16,185,129,0.5)" }} />
             </div>
           )}
         </div>
@@ -209,7 +238,7 @@ export default function BookingPage() {
 
       {/* ── Content card ── */}
       <div style={{ flex:1, maxWidth:520, margin:"0 auto", width:"100%", padding:"0 12px 32px" }}>
-        <div style={{ background:"#fff", borderRadius:"24px 24px 20px 20px", marginTop:-12, boxShadow:"0 8px 40px rgba(79,110,247,0.1)", padding:"28px 20px 24px", minHeight:400 }}>
+        <div style={{ background:C.card, borderRadius:"24px 24px 20px 20px", marginTop:-14, boxShadow:"0 10px 50px rgba(5,150,105,0.12)", padding:"28px 20px 24px", minHeight:400, border:`1px solid ${C.cardBdr}` }}>
 
           {/* ── STEP: type ── */}
           {step === "type" && (
@@ -254,25 +283,24 @@ export default function BookingPage() {
                 {services.map(svc => (
                   <button key={svc.id}
                     onClick={() => { setSelectedService(svc); goNext() }}
-                    style={{ background: selectedService?.id === svc.id ? "#F0F4FF" : "#F8FAFF", border:`2px solid ${selectedService?.id === svc.id ? "#4F6EF7" : "#EEF2FF"}`, borderRadius:16, padding:"16px 18px", textAlign:"left", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"space-between", gap:12, transition:"all 0.15s" }}>
+                    style={{ background: selectedService?.id === svc.id ? C.highlight : "#FAFFFE", border:`2px solid ${selectedService?.id === svc.id ? C.accentDark : C.cardBdr}`, borderRadius:16, padding:"16px 18px", textAlign:"left", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"space-between", gap:12, transition:"all 0.15s" }}>
                     <div style={{ flex:1, minWidth:0 }}>
-                      <p style={{ fontWeight:700, color:"#1E293B", margin:"0 0 3px", fontSize:15, lineHeight:1.3 }}>{svc.name}</p>
-                      <p style={{ color:"#94A3B8", margin:0, fontSize:13 }}>{formatDur(svc.duration)}</p>
+                      <p style={{ fontWeight:700, color:C.textPrimary, margin:"0 0 3px", fontSize:15, lineHeight:1.3 }}>{svc.name}</p>
+                      <p style={{ color:C.textMuted, margin:0, fontSize:13 }}>{formatDur(svc.duration)}</p>
                     </div>
                     <div style={{ display:"flex", alignItems:"center", gap:10, flexShrink:0 }}>
-                      {svc.price != null && <span style={{ fontWeight:800, color:"#4F6EF7", fontSize:16 }}>{formatPrice(svc.price)}</span>}
-                      <div style={{ width:30, height:30, background:"linear-gradient(135deg,#4F6EF7,#7C3AED)", borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontSize:14, fontWeight:700 }}>›</div>
+                      {svc.price != null && <span style={{ fontWeight:800, color:C.amber, fontSize:16, background:C.amberBg, padding:"2px 8px", borderRadius:8 }}>{formatPrice(svc.price)}</span>}
+                      <div style={{ width:30, height:30, background:`linear-gradient(135deg,${C.accent},${C.accentDark})`, borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontSize:14, fontWeight:700, boxShadow:`0 2px 8px ${C.accentGlow}` }}>›</div>
                     </div>
                   </button>
                 ))}
 
-                {/* Wunsch eingeben */}
                 <div style={{ marginTop:4 }}>
-                  <p style={{ fontSize:13, color:"#94A3B8", marginBottom:8 }}>Oder kurz beschreiben was du brauchst:</p>
+                  <p style={{ fontSize:13, color:C.textMuted, marginBottom:8 }}>Oder kurz beschreiben was du brauchst:</p>
                   <textarea value={requestText} onChange={e => setRequestText(e.target.value)}
                     placeholder="z.B. Farbbehandlung, Nagelpflege, Beratung …"
                     rows={2}
-                    style={{ width:"100%", padding:"12px 14px", border:"2px solid #EEF2FF", borderRadius:14, fontSize:14, color:"#1E293B", outline:"none", resize:"none", boxSizing:"border-box", fontFamily:"inherit", background:"#F8FAFF" }} />
+                    style={{ width:"100%", padding:"12px 14px", border:`2px solid ${C.inputBdr}`, borderRadius:14, fontSize:14, color:C.textPrimary, outline:"none", resize:"none", boxSizing:"border-box", fontFamily:"inherit", background:C.inputBg }} />
                   {requestText.trim() && (
                     <Btn onClick={() => { setSelectedService(null); goNext() }} style={{ marginTop:8 }}>
                       Weiter mit freiem Wunsch →
@@ -288,19 +316,19 @@ export default function BookingPage() {
             <div>
               <h2 style={sh2}>Wann passt es?</h2>
               {selectedService && (
-                <div style={{ background:"#F0F4FF", borderRadius:10, padding:"8px 14px", marginBottom:16, display:"inline-flex", gap:8, alignItems:"center" }}>
-                  <span style={{ fontSize:13, fontWeight:600, color:"#4F6EF7" }}>{selectedService.name}</span>
-                  <span style={{ color:"#C7D2FE" }}>·</span>
-                  <span style={{ fontSize:13, color:"#64748B" }}>{formatDur(selectedService.duration)}</span>
+                <div style={{ background:C.highlight, borderRadius:10, padding:"8px 14px", marginBottom:16, display:"inline-flex", gap:8, alignItems:"center", border:`1px solid ${C.cardBdr}` }}>
+                  <span style={{ fontSize:13, fontWeight:600, color:C.accentDark }}>{selectedService.name}</span>
+                  <span style={{ color:C.cardBdr }}>·</span>
+                  <span style={{ fontSize:13, color:C.textMuted }}>{formatDur(selectedService.duration)}</span>
                 </div>
               )}
               {bookingType === "open" && (
                 <div style={{ marginBottom:16 }}>
-                  <label style={slabel}>Was ist dein Anliegen? <span style={{ fontWeight:400, color:"#94A3B8" }}>(optional)</span></label>
+                  <label style={slabel}>Was ist dein Anliegen? <span style={{ fontWeight:400, color:C.textMuted }}>(optional)</span></label>
                   <textarea value={requestText} onChange={e => setRequestText(e.target.value)}
                     placeholder="z.B. Beratungsgespräch, Inspektion, Haare schneiden …"
                     rows={2}
-                    style={{ width:"100%", padding:"13px 14px", border:"2px solid #EEF2FF", borderRadius:14, fontSize:14, color:"#1E293B", outline:"none", resize:"none", boxSizing:"border-box", fontFamily:"inherit" }} />
+                    style={{ width:"100%", padding:"13px 14px", border:`2px solid ${C.inputBdr}`, borderRadius:14, fontSize:14, color:C.textPrimary, outline:"none", resize:"none", boxSizing:"border-box", fontFamily:"inherit", background:C.inputBg }} />
                 </div>
               )}
               <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
@@ -331,11 +359,11 @@ export default function BookingPage() {
 
               {bookingType === "callback" && (
                 <div style={{ marginBottom:16 }}>
-                  <label style={slabel}>Was ist dein Anliegen? <span style={{ fontWeight:400, color:"#94A3B8" }}>(optional)</span></label>
+                  <label style={slabel}>Was ist dein Anliegen? <span style={{ fontWeight:400, color:C.textMuted }}>(optional)</span></label>
                   <textarea value={requestText} onChange={e => setRequestText(e.target.value)}
                     placeholder="z.B. Frage zum Preis, Beratung, allgemeine Infos …"
                     rows={2}
-                    style={{ width:"100%", padding:"13px 14px", border:"2px solid #EEF2FF", borderRadius:14, fontSize:14, color:"#1E293B", outline:"none", resize:"none", boxSizing:"border-box", fontFamily:"inherit" }} />
+                    style={{ width:"100%", padding:"13px 14px", border:`2px solid ${C.inputBdr}`, borderRadius:14, fontSize:14, color:C.textPrimary, outline:"none", resize:"none", boxSizing:"border-box", fontFamily:"inherit", background:C.inputBg }} />
                 </div>
               )}
 
@@ -349,11 +377,11 @@ export default function BookingPage() {
                   <input type="tel" value={phone} onChange={e => setPhone(e.target.value)} placeholder="0151 12345678" style={sinput} />
                 </label>
                 <label>
-                  <span style={slabel}>Anmerkung <span style={{ fontWeight:400, color:"#94A3B8" }}>(optional)</span></span>
+                  <span style={slabel}>Anmerkung <span style={{ fontWeight:400, color:C.textMuted }}>(optional)</span></span>
                   <textarea value={note} onChange={e => setNote(e.target.value)}
                     placeholder="z.B. bitte kurz klingeln"
                     rows={2}
-                    style={{ width:"100%", padding:"13px 14px", border:"2px solid #EEF2FF", borderRadius:14, fontSize:14, color:"#1E293B", outline:"none", resize:"none", boxSizing:"border-box", fontFamily:"inherit" }} />
+                    style={{ width:"100%", padding:"13px 14px", border:`2px solid ${C.inputBdr}`, borderRadius:14, fontSize:14, color:C.textPrimary, outline:"none", resize:"none", boxSizing:"border-box", fontFamily:"inherit", background:C.inputBg }} />
                 </label>
               </div>
               <Btn onClick={goNext} disabled={!name.trim() || !phone.trim()} style={{ marginTop:20 }}>Weiter →</Btn>
@@ -366,7 +394,7 @@ export default function BookingPage() {
               <h2 style={sh2}>Alles korrekt?</h2>
               <p style={sp}>Überprüfe kurz deine Angaben.</p>
 
-              <div style={{ background:"#F8FAFF", borderRadius:18, padding:"4px 0", border:"1px solid #EEF2FF", marginBottom:16 }}>
+              <div style={{ background:C.highlight, borderRadius:18, padding:"4px 0", border:`1px solid ${C.cardBdr}`, marginBottom:16 }}>
                 <SummaryRow label="Betrieb"  value={company?.name || ""} />
                 {bookingType === "service" && selectedService && <SummaryRow label="Leistung" value={selectedService.name} />}
                 {bookingType === "service" && selectedService && <SummaryRow label="Dauer"    value={formatDur(selectedService.duration)} />}
@@ -379,7 +407,7 @@ export default function BookingPage() {
                 {note && <SummaryRow label="Anmerkung" value={note} last />}
               </div>
 
-              <div style={{ background:"#EFF6FF", border:"1px solid #BFDBFE", borderRadius:12, padding:"12px 14px", marginBottom:16, fontSize:13, color:"#1D4ED8", lineHeight:1.6 }}>
+              <div style={{ background:C.amberBg, border:`1px solid ${C.amberBdr}`, borderRadius:12, padding:"12px 14px", marginBottom:16, fontSize:13, color:"#92400E", lineHeight:1.6 }}>
                 ℹ️ {bookingType === "callback"
                   ? `${company?.name} wird dich so bald wie möglich zurückrufen.`
                   : `Dies ist eine Anfrage. ${company?.name} bestätigt den Termin und meldet sich bei dir.`}
@@ -395,7 +423,7 @@ export default function BookingPage() {
                 {submitting ? "Wird gesendet …" : bookingType === "callback" ? "Rückruf anfragen ✓" : "Anfrage absenden ✓"}
               </Btn>
 
-              <p style={{ textAlign:"center", fontSize:12, color:"#94A3B8", marginTop:12, lineHeight:1.5 }}>
+              <p style={{ textAlign:"center", fontSize:12, color:C.textMuted, marginTop:12, lineHeight:1.5 }}>
                 Mit dem Absenden stimmst du der Verarbeitung deiner Kontaktdaten zu.
               </p>
             </div>
@@ -403,16 +431,16 @@ export default function BookingPage() {
         </div>
 
         {/* Footer */}
-        <p style={{ textAlign:"center", fontSize:12, color:"#94A3B8", marginTop:16 }}>
-          Powered by <span style={{ color:"#4F6EF7", fontWeight:700 }}>TerminStop</span>
+        <p style={{ textAlign:"center", fontSize:12, color:C.textMuted, marginTop:16 }}>
+          Powered by <span style={{ color:C.accentDark, fontWeight:700 }}>TerminStop</span>
         </p>
       </div>
 
       <style>{`
         @keyframes spin { to { transform: rotate(360deg); } }
-        input[type="date"]:focus, input[type="time"]:focus, input[type="text"]:focus, input[type="tel"]:focus {
-          border-color: #4F6EF7 !important;
-          box-shadow: 0 0 0 3px rgba(79,110,247,0.12);
+        input[type="date"]:focus, input[type="time"]:focus, input[type="text"]:focus, input[type="tel"]:focus, textarea:focus {
+          border-color: ${C.accentDark} !important;
+          box-shadow: 0 0 0 3px rgba(5,150,105,0.15);
         }
         * { -webkit-tap-highlight-color: transparent; }
       `}</style>
@@ -421,37 +449,37 @@ export default function BookingPage() {
 }
 
 // ── Shared styles ─────────────────────────────────────────────
-const sh2: React.CSSProperties = { fontSize:21, fontWeight:800, color:"#1E293B", margin:"0 0 4px", letterSpacing:-0.3 }
-const sp:  React.CSSProperties = { color:"#64748B", fontSize:14, margin:"0 0 4px", lineHeight:1.5 }
+const sh2: React.CSSProperties = { fontSize:21, fontWeight:800, color:"#022C22", margin:"0 0 4px", letterSpacing:-0.3 }
+const sp:  React.CSSProperties = { color:"#6B7280", fontSize:14, margin:"0 0 4px", lineHeight:1.5 }
 const slabel: React.CSSProperties = { display:"block", fontSize:13, fontWeight:700, color:"#374151", marginBottom:6 }
-const sinput: React.CSSProperties = { width:"100%", padding:"14px 16px", border:"2px solid #EEF2FF", borderRadius:14, fontSize:15, color:"#1E293B", outline:"none", boxSizing:"border-box", fontFamily:"inherit", background:"#FAFBFF", transition:"border-color 0.15s" }
+const sinput: React.CSSProperties = { width:"100%", padding:"14px 16px", border:"2px solid #D1FAE5", borderRadius:14, fontSize:15, color:"#022C22", outline:"none", boxSizing:"border-box", fontFamily:"inherit", background:"#F0FDF9", transition:"border-color 0.15s, box-shadow 0.15s" }
 
 // ── Components ────────────────────────────────────────────────
 
 function Scaffold({ children }: { children: React.ReactNode }) {
   return (
-    <div style={{ minHeight:"100dvh", background:"linear-gradient(135deg,#F0F4FF 0%,#F8FAFF 100%)", fontFamily:"'Inter',system-ui,sans-serif", display:"flex", flexDirection:"column" }}>
+    <div style={{ minHeight:"100dvh", background:"linear-gradient(160deg,#F0FDF9 0%,#ECFDF5 100%)", fontFamily:"'Inter',system-ui,sans-serif", display:"flex", flexDirection:"column" }}>
       {children}
     </div>
   )
 }
 
 function Spinner() {
-  return <div style={{ width:40, height:40, border:"3px solid #E8EEFF", borderTopColor:"#4F6EF7", borderRadius:"50%", animation:"spin 0.7s linear infinite" }} />
+  return <div style={{ width:40, height:40, border:"3px solid #D1FAE5", borderTopColor:"#059669", borderRadius:"50%", animation:"spin 0.7s linear infinite" }} />
 }
 
 function TypeCard({ icon, title, sub, active, onClick }: { icon:string; title:string; sub:string; active:boolean; onClick:()=>void }) {
   return (
     <button onClick={onClick}
-      style={{ background: active ? "#F0F4FF" : "#F8FAFF", border:`2px solid ${active ? "#4F6EF7" : "#EEF2FF"}`, borderRadius:18, padding:"16px 18px", textAlign:"left", cursor:"pointer", display:"flex", alignItems:"center", gap:14, transition:"all 0.15s", width:"100%" }}>
-      <div style={{ width:44, height:44, background: active ? "linear-gradient(135deg,#4F6EF7,#7C3AED)" : "#EEF2FF", borderRadius:14, display:"flex", alignItems:"center", justifyContent:"center", fontSize:20, flexShrink:0, transition:"all 0.15s" }}>
+      style={{ background: active ? "#ECFDF5" : "#FAFFFE", border:`2px solid ${active ? "#059669" : "#D1FAE5"}`, borderRadius:18, padding:"16px 18px", textAlign:"left", cursor:"pointer", display:"flex", alignItems:"center", gap:14, transition:"all 0.15s", width:"100%", boxShadow: active ? "0 4px 16px rgba(5,150,105,0.14)" : "none" }}>
+      <div style={{ width:46, height:46, background: active ? "linear-gradient(135deg,#10B981,#059669)" : "#ECFDF5", borderRadius:14, display:"flex", alignItems:"center", justifyContent:"center", fontSize:20, flexShrink:0, transition:"all 0.15s", boxShadow: active ? "0 4px 14px rgba(16,185,129,0.3)" : "none" }}>
         {icon}
       </div>
       <div style={{ flex:1, minWidth:0 }}>
-        <p style={{ fontWeight:700, color:"#1E293B", margin:"0 0 3px", fontSize:15 }}>{title}</p>
-        <p style={{ color:"#94A3B8", margin:0, fontSize:13, lineHeight:1.3 }}>{sub}</p>
+        <p style={{ fontWeight:700, color:"#022C22", margin:"0 0 3px", fontSize:15 }}>{title}</p>
+        <p style={{ color:"#6B7280", margin:0, fontSize:13, lineHeight:1.3 }}>{sub}</p>
       </div>
-      <div style={{ color: active ? "#4F6EF7" : "#CBD5E1", fontSize:18, flexShrink:0 }}>›</div>
+      <div style={{ color: active ? "#059669" : "#A7F3D0", fontSize:20, flexShrink:0, fontWeight:700 }}>›</div>
     </button>
   )
 }
@@ -459,7 +487,7 @@ function TypeCard({ icon, title, sub, active, onClick }: { icon:string; title:st
 function Btn({ onClick, disabled, children, style }: { onClick:()=>void; disabled?:boolean; children:React.ReactNode; style?:React.CSSProperties }) {
   return (
     <button onClick={onClick} disabled={disabled}
-      style={{ width:"100%", padding:"15px 0", background: disabled ? "#E2E8F0" : "linear-gradient(135deg,#4F6EF7 0%,#7C3AED 100%)", color: disabled ? "#94A3B8" : "#fff", border:"none", borderRadius:14, fontSize:15, fontWeight:700, cursor: disabled ? "not-allowed" : "pointer", transition:"all 0.2s", letterSpacing:0.2, boxShadow: disabled ? "none" : "0 4px 20px rgba(79,110,247,0.35)", ...style }}>
+      style={{ width:"100%", padding:"15px 0", background: disabled ? "#E5E7EB" : "linear-gradient(135deg,#10B981 0%,#059669 100%)", color: disabled ? "#9CA3AF" : "#fff", border:"none", borderRadius:14, fontSize:15, fontWeight:700, cursor: disabled ? "not-allowed" : "pointer", transition:"all 0.2s", letterSpacing:0.2, boxShadow: disabled ? "none" : "0 6px 24px rgba(5,150,105,0.35)", ...style }}>
       {children}
     </button>
   )
@@ -467,9 +495,9 @@ function Btn({ onClick, disabled, children, style }: { onClick:()=>void; disable
 
 function SummaryRow({ label, value, last }: { label:string; value:string; last?:boolean }) {
   return (
-    <div style={{ display:"flex", justifyContent:"space-between", gap:12, padding:"11px 18px", borderBottom: last ? "none" : "1px solid #EEF2FF" }}>
-      <span style={{ fontSize:13, color:"#94A3B8", flexShrink:0 }}>{label}</span>
-      <span style={{ fontSize:13, color:"#1E293B", fontWeight:600, textAlign:"right", wordBreak:"break-word" }}>{value}</span>
+    <div style={{ display:"flex", justifyContent:"space-between", gap:12, padding:"11px 18px", borderBottom: last ? "none" : "1px solid #D1FAE5" }}>
+      <span style={{ fontSize:13, color:"#6B7280", flexShrink:0 }}>{label}</span>
+      <span style={{ fontSize:13, color:"#022C22", fontWeight:600, textAlign:"right", wordBreak:"break-word" }}>{value}</span>
     </div>
   )
 }

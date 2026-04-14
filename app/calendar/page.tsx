@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { supabase } from "../lib/supabaseClient"
+import DashNav from "../components/DashNav"
 
 export default function CalendarPage() {
 
@@ -83,32 +84,7 @@ export default function CalendarPage() {
       style={{ fontFamily: "'Inter', 'Manrope', sans-serif", backgroundColor: "#F7FAFC" }}
     >
 
-      {/* ─── NAVBAR ─── */}
-      <nav className="flex justify-between items-center px-4 md:px-12 py-4 border-b border-[#E5E7EB] bg-white sticky top-0 z-50">
-        <div className="flex items-center gap-8">
-          <span className="text-base font-bold mr-2">
-            <span className="text-[#18A66D]">Termin</span>
-            <span className="text-[#1F2A37]">Stop</span>
-          </span>
-          <div className="hidden md:flex gap-1">
-            <a href="/dashboard" className="text-sm text-[#6B7280] hover:text-[#1F2A37] hover:bg-[#F7FAFC] px-4 py-2 rounded-lg transition">Dashboard</a>
-            <a href="/calendar" className="text-sm font-semibold text-[#1F2A37] bg-[#F7FAFC] px-4 py-2 rounded-lg">Kalender</a>
-            <a href="/customers" className="text-sm text-[#6B7280] hover:text-[#1F2A37] hover:bg-[#F7FAFC] px-4 py-2 rounded-lg transition">Kunden</a>
-            <a href="/insights" className="text-sm text-[#6B7280] hover:text-[#1F2A37] hover:bg-[#F7FAFC] px-4 py-2 rounded-lg transition">Einblicke</a>
-            <a href="/requests" className="text-sm text-[#6B7280] hover:text-[#1F2A37] hover:bg-[#F7FAFC] px-4 py-2 rounded-lg transition">Anfragen</a>
-            <a href="/services" className="text-sm text-[#6B7280] hover:text-[#1F2A37] hover:bg-[#F7FAFC] px-4 py-2 rounded-lg transition">Buchung</a>
-          </div>
-        </div>
-        <div className="flex items-center gap-4">
-          <div className="hidden md:flex items-center gap-2 text-xs text-[#18A66D] font-medium">
-            <span className="w-1.5 h-1.5 bg-[#18A66D] rounded-full animate-pulse" />
-            System aktiv
-          </div>
-          <button onClick={handleLogout} className="text-sm text-[#6B7280] hover:text-[#1F2A37] transition px-3 py-1.5 rounded-lg hover:bg-[#F7FAFC]">
-            Logout
-          </button>
-        </div>
-      </nav>
+      <DashNav active="/calendar" companyId={companyId} onLogout={handleLogout} />
 
       <div className="max-w-6xl mx-auto px-4 md:px-10 py-8 pb-24 md:pb-10">
 
@@ -376,37 +352,6 @@ export default function CalendarPage() {
         )}
       </div>
 
-      {/* ─── MOBILE BOTTOM NAV ─── */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-[#E5E7EB] z-50 flex justify-around items-center py-2 px-2">
-        <a href="/dashboard" className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl text-[#9CA3AF]">
-          <span className="text-xl">🏠</span>
-          <span className="text-[10px] font-medium">Start</span>
-        </a>
-        <a href="/calendar" className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl text-[#18A66D]">
-          <span className="text-xl">📅</span>
-          <span className="text-[10px] font-bold">Kalender</span>
-        </a>
-        <a href="/customers" className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl text-[#9CA3AF]">
-          <span className="text-xl">👥</span>
-          <span className="text-[10px] font-medium">Kunden</span>
-        </a>
-        <a href="/insights" className="flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-xl text-[#9CA3AF]">
-          <span className="text-xl">📊</span>
-          <span className="text-[10px] font-medium">Einblicke</span>
-        </a>
-        <a href="/requests" className="flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-xl text-[#9CA3AF]">
-          <span className="text-xl">🔔</span>
-          <span className="text-[10px] font-medium">Anfragen</span>
-        </a>
-        <a href="/services" className="flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-xl text-[#9CA3AF]">
-          <span className="text-xl">🔗</span>
-          <span className="text-[10px] font-medium">Buchung</span>
-        </a>
-        <button onClick={handleLogout} className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl text-[#9CA3AF]">
-          <span className="text-xl">🚪</span>
-          <span className="text-[10px] font-medium">Logout</span>
-        </button>
-      </nav>
 
       {/* ─── DETAIL POPUP ─── */}
       {selected && (

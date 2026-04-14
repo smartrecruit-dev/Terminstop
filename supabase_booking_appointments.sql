@@ -31,17 +31,28 @@ ALTER TABLE appointments
 ALTER TABLE appointments ENABLE ROW LEVEL SECURITY;
 
 -- Betrieb darf nur eigene Termine lesen/schreiben
-CREATE POLICY IF NOT EXISTS "company_own_appointments" ON appointments
-  FOR ALL USING (
-    company_id::text = (
-      SELECT raw_user_meta_data->>'company_id'
-      FROM auth.users WHERE id = auth.uid()
-    )
-  );
+DO $$ BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies WHERE tablename = 'appointments' AND policyname = 'company_own_appointments'
+  ) THEN
+    CREATE POLICY "company_own_appointments" ON appointments
+      FOR ALL USING (
+        company_id::text = (
+          SELECT raw_user_meta_data->>'company_id'
+          FROM auth.users WHERE id = auth.uid()
+        )
+      );
+  END IF;
+END $$;
 
--- Kunden dürfen Termine anlegen (öffentlich, anonym)
-CREATE POLICY IF NOT EXISTS "public_insert_appointments" ON appointments
-  FOR INSERT WITH CHECK (true);
+DO $$ BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies WHERE tablename = 'appointments' AND policyname = 'public_insert_appointments'
+  ) THEN
+    CREATE POLICY "public_insert_appointments" ON appointments
+      FOR INSERT WITH CHECK (true);
+  END IF;
+END $$;
 
 -- Index für schnelle Abfragen
 CREATE INDEX IF NOT EXISTS idx_appointments_company    ON appointments(company_id);
