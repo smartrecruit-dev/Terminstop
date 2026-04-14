@@ -135,6 +135,7 @@ export default function CustomersPage() {
             <a href="/calendar" className="text-sm text-[#6B7280] hover:text-[#1F2A37] hover:bg-[#F7FAFC] px-4 py-2 rounded-lg transition">Kalender</a>
             <a href="/customers" className="text-sm font-semibold text-[#1F2A37] bg-[#F7FAFC] px-4 py-2 rounded-lg">Kunden</a>
             <a href="/insights" className="text-sm text-[#6B7280] hover:text-[#1F2A37] hover:bg-[#F7FAFC] px-4 py-2 rounded-lg transition">Einblicke</a>
+            <a href="/requests" className="text-sm text-[#6B7280] hover:text-[#1F2A37] hover:bg-[#F7FAFC] px-4 py-2 rounded-lg transition">Anfragen</a>
             <a href="/services" className="text-sm text-[#6B7280] hover:text-[#1F2A37] hover:bg-[#F7FAFC] px-4 py-2 rounded-lg transition">Buchung</a>
           </div>
         </div>
@@ -428,11 +429,15 @@ export default function CustomersPage() {
           <span className="text-xl">👥</span>
           <span className="text-[10px] font-bold">Kunden</span>
         </a>
-        <a href="/insights" className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl text-[#9CA3AF]">
+        <a href="/insights" className="flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-xl text-[#9CA3AF]">
           <span className="text-xl">📊</span>
           <span className="text-[10px] font-medium">Einblicke</span>
         </a>
-        <a href="/services" className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl text-[#9CA3AF]">
+        <a href="/requests" className="flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-xl text-[#9CA3AF]">
+          <span className="text-xl">🔔</span>
+          <span className="text-[10px] font-medium">Anfragen</span>
+        </a>
+        <a href="/services" className="flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-xl text-[#9CA3AF]">
           <span className="text-xl">🔗</span>
           <span className="text-[10px] font-medium">Buchung</span>
         </a>

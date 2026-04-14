@@ -28,6 +28,9 @@ export default function CalendarPage() {
       .from("appointments")
       .select("*")
       .eq("company_id", companyId)
+      .not("status", "eq", "cancelled")
+      // Online-Anfragen erst nach Bestätigung anzeigen
+      .or("online_booking.is.null,online_booking.eq.false,status.eq.confirmed")
       .order("date", { ascending: true })
       .order("time", { ascending: true })
     if (data) setAppointments(data)
@@ -92,6 +95,7 @@ export default function CalendarPage() {
             <a href="/calendar" className="text-sm font-semibold text-[#1F2A37] bg-[#F7FAFC] px-4 py-2 rounded-lg">Kalender</a>
             <a href="/customers" className="text-sm text-[#6B7280] hover:text-[#1F2A37] hover:bg-[#F7FAFC] px-4 py-2 rounded-lg transition">Kunden</a>
             <a href="/insights" className="text-sm text-[#6B7280] hover:text-[#1F2A37] hover:bg-[#F7FAFC] px-4 py-2 rounded-lg transition">Einblicke</a>
+            <a href="/requests" className="text-sm text-[#6B7280] hover:text-[#1F2A37] hover:bg-[#F7FAFC] px-4 py-2 rounded-lg transition">Anfragen</a>
             <a href="/services" className="text-sm text-[#6B7280] hover:text-[#1F2A37] hover:bg-[#F7FAFC] px-4 py-2 rounded-lg transition">Buchung</a>
           </div>
         </div>
@@ -386,11 +390,15 @@ export default function CalendarPage() {
           <span className="text-xl">👥</span>
           <span className="text-[10px] font-medium">Kunden</span>
         </a>
-        <a href="/insights" className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl text-[#9CA3AF]">
+        <a href="/insights" className="flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-xl text-[#9CA3AF]">
           <span className="text-xl">📊</span>
           <span className="text-[10px] font-medium">Einblicke</span>
         </a>
-        <a href="/services" className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl text-[#9CA3AF]">
+        <a href="/requests" className="flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-xl text-[#9CA3AF]">
+          <span className="text-xl">🔔</span>
+          <span className="text-[10px] font-medium">Anfragen</span>
+        </a>
+        <a href="/services" className="flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-xl text-[#9CA3AF]">
           <span className="text-xl">🔗</span>
           <span className="text-[10px] font-medium">Buchung</span>
         </a>
