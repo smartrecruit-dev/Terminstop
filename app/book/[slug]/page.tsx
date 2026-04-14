@@ -88,13 +88,13 @@ export default function BookingPage({ params }: { params: { slug: string } }) {
     const { error: insertErr } = await supabase
       .from("appointments")
       .insert({
-        company_id:   company.id,
-        service_id:   selectedService.id,
-        customer_name: name.trim(),
-        customer_phone: phone.trim(),
-        note:         note.trim() || null,
-        appointment_at: appointmentAt,
-        status:       "pending",
+        company_id: company.id,
+        name:       `${name.trim()} [Online: ${selectedService.name}]`,
+        phone:      phone.trim(),
+        note:       note.trim() || null,
+        date:       date,
+        time:       time,
+        status:     "pending",
       })
 
     if (insertErr) {
