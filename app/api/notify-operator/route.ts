@@ -6,6 +6,20 @@ const supabaseAdmin = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
 
+// In-Memory Rate-Limit: max 5 Anfragen pro IP pro Minute
+const rateLimitMap = new Map<string, { count: number; resetAt: number }>()
+function isRateLimited(ip: string): boolean {
+  const now = Date.now()
+  const entry = rateLimitMap.get(ip)
+  if (!entry || now > entry.resetAt) {
+    rateLimitMap.set(ip, { count: 1, resetAt: now + 60_000 })
+    return false
+  }
+  if (entry.count >= 5) return true
+  entry.count++
+  return false
+}
+
 function formatPhone(phone: string) {
   let cleaned = phone.replace(/\s+/g, "")
   if (cleaned.startsWith("0")) cleaned = "+49" + cleaned.substring(1)
@@ -15,6 +29,12 @@ function formatPhone(phone: string) {
 
 export async function POST(req: NextRequest) {
   try {
+    // Rate-Limiting
+    const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown"
+    if (isRateLimited(ip)) {
+      return NextResponse.json({ error: "Zu viele Anfragen" }, { status: 429 })
+    }
+
     const { company_id, booking_type, customer_name, service_name, date, time } = await req.json()
 
     if (!company_id) {
@@ -29,7 +49,6 @@ export async function POST(req: NextRequest) {
       .single()
 
     if (!company?.notification_phone) {
-      // Kein Telefon hinterlegt — still überspringen
       return NextResponse.json({ skipped: true, reason: "Kein notification_phone hinterlegt" })
     }
 

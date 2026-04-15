@@ -21,7 +21,9 @@ function formatDur(m: number) {
 }
 
 export default function ServicesPage() {
-  const [companyId, setCompanyId]     = useState<string | null>(null)
+    useEffect(() => { document.title = "Online-Buchung | TerminStop" }, [])
+
+const [companyId, setCompanyId]     = useState<string | null>(null)
   const [companyName, setCompanyName] = useState("")
   const [slug, setSlug]               = useState<string | null>(null)
   const [bookingAddon, setBookingAddon] = useState<boolean | null>(null)

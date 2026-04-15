@@ -6,7 +6,9 @@ import DashNav from "../components/DashNav"
 
 export default function Insights() {
 
-  const [appointments, setAppointments] = useState<any[]>([])
+    useEffect(() => { document.title = "Einblicke | TerminStop" }, [])
+
+const [appointments, setAppointments] = useState<any[]>([])
   const [companyId, setCompanyId] = useState<string | null>(null)
   const [companyName, setCompanyName] = useState("")
   const [smsCount, setSmsCount] = useState<number>(0)

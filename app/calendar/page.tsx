@@ -6,7 +6,9 @@ import DashNav from "../components/DashNav"
 
 export default function CalendarPage() {
 
-  const [appointments, setAppointments] = useState<any[]>([])
+    useEffect(() => { document.title = "Kalender | TerminStop" }, [])
+
+const [appointments, setAppointments] = useState<any[]>([])
   const [companyId, setCompanyId] = useState<string | null>(null)
   const [companyName, setCompanyName] = useState("")
   const [view, setView] = useState<"day" | "week">("day")

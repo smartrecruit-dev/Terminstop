@@ -3,11 +3,14 @@
 import { useEffect, useState } from "react"
 import { supabase } from "../lib/supabaseClient"
 import DashNav from "../components/DashNav"
+import QRCode from "../components/QRCode"
 
 type Section = "benachrichtigungen" | "buchungsseite" | "konto"
 
 export default function SettingsPage() {
-  const [companyId,   setCompanyId]   = useState<string | null>(null)
+    useEffect(() => { document.title = "Einstellungen | TerminStop" }, [])
+
+const [companyId,   setCompanyId]   = useState<string | null>(null)
   const [companyName, setCompanyName] = useState("")
   const [loading,     setLoading]     = useState(true)
   const [section,     setSection]     = useState<Section>("benachrichtigungen")
@@ -285,13 +288,22 @@ export default function SettingsPage() {
                 </div>
 
                 {slug && (
-                  <div style={{ background:"#F9FAFB", border:`1px solid ${BD}`, borderRadius:12, padding:"12px 16px", marginBottom:20, display:"flex", alignItems:"center", justifyContent:"space-between", gap:12, flexWrap:"wrap" }}>
-                    <span style={{ fontSize:13, color:M }}>Deine Buchungsseite:</span>
-                    <a href={`/book/${slug}`} target="_blank" rel="noreferrer"
-                      style={{ fontSize:13, color:G, fontWeight:700, textDecoration:"none" }}>
-                      terminstop.de/book/{slug} ↗
-                    </a>
-                  </div>
+                  <>
+                    <div style={{ background:"#F9FAFB", border:`1px solid ${BD}`, borderRadius:12, padding:"12px 16px", marginBottom:20, display:"flex", alignItems:"center", justifyContent:"space-between", gap:12, flexWrap:"wrap" }}>
+                      <span style={{ fontSize:13, color:M }}>Deine Buchungsseite:</span>
+                      <a href={`/book/${slug}`} target="_blank" rel="noreferrer"
+                        style={{ fontSize:13, color:G, fontWeight:700, textDecoration:"none" }}>
+                        terminstop.de/book/{slug} ↗
+                      </a>
+                    </div>
+                    <div style={{ marginBottom:24 }}>
+                      <p style={{ fontSize:13, fontWeight:700, color:T, margin:"0 0 12px" }}>QR-Code für Kunden</p>
+                      <QRCode
+                        url={`https://terminstop.de/book/${slug}`}
+                        label="Kunden scannen diesen Code, um direkt auf deine Buchungsseite zu gelangen."
+                      />
+                    </div>
+                  </>
                 )}
 
                 <div style={{ display:"flex", alignItems:"center", gap:12, flexWrap:"wrap" }}>

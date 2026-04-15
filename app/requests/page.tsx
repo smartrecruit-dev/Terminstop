@@ -33,7 +33,9 @@ function formatDate(d: string | null, t: string | null) {
 }
 
 export default function RequestsPage() {
-  const [companyId,    setCompanyId]    = useState<string | null>(null)
+    useEffect(() => { document.title = "Anfragen | TerminStop" }, [])
+
+const [companyId,    setCompanyId]    = useState<string | null>(null)
   const [companyName,  setCompanyName]  = useState("")
   const [bookingAddon, setBookingAddon] = useState<boolean | null>(null)
   const [requests,     setRequests]     = useState<Request[]>([])
@@ -75,9 +77,11 @@ export default function RequestsPage() {
 
   async function act(id: string, action: "confirm" | "reject") {
     setActing(id)
+    const { data: { session } } = await supabase.auth.getSession()
+    const token = session?.access_token || ""
     const res = await fetch("/api/confirm-booking", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
       body: JSON.stringify({ appointmentId: id, action, companyName })
     })
     const json = await res.json()

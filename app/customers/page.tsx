@@ -3,13 +3,17 @@
 import { useState, useEffect } from "react"
 import { supabase } from "../lib/supabaseClient"
 import DashNav from "../components/DashNav"
+import PageSkeleton from "../components/PageSkeleton"
 
 export default function CustomersPage() {
 
-  const [companyId, setCompanyId] = useState<string | null>(null)
+    useEffect(() => { document.title = "Kunden | TerminStop" }, [])
+
+const [companyId, setCompanyId] = useState<string | null>(null)
   const [companyName, setCompanyName] = useState("")
   const [customers, setCustomers] = useState<any[]>([])
   const [appointments, setAppointments] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState("")
   const [selected, setSelected] = useState<any | null>(null)
 
@@ -56,6 +60,7 @@ export default function CustomersPage() {
       .eq("company_id", companyId)
       .order("date", { ascending: false })
     if (data) setAppointments(data)
+    setLoading(false)
   }
 
   async function handleSave(e: any) {
@@ -120,6 +125,13 @@ export default function CustomersPage() {
   const customerAppointments = selected
     ? appointments.filter(a => a.phone === selected.phone)
     : []
+
+  if (loading) return (
+    <div className="min-h-screen" style={{ backgroundColor: "#F7FAFC" }}>
+      <DashNav active="/customers" companyId={companyId} onLogout={handleLogout} />
+      <PageSkeleton />
+    </div>
+  )
 
   return (
     <div className="min-h-screen text-[#1F2A37] overflow-x-hidden" style={{ fontFamily: "'Inter', 'Manrope', sans-serif", backgroundColor: "#F7FAFC" }}>

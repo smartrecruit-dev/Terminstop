@@ -56,6 +56,17 @@ async function sendConfirmationSMS(phone: string, name: string, date: string | n
 
 export async function POST(req: NextRequest) {
   try {
+    // Auth-Check: Supabase JWT aus Authorization-Header validieren
+    const authHeader = req.headers.get("authorization") || ""
+    const token = authHeader.replace("Bearer ", "").trim()
+    if (!token) {
+      return NextResponse.json({ error: "Nicht autorisiert" }, { status: 401 })
+    }
+    const { data: { user }, error: authErr } = await supabaseAdmin.auth.getUser(token)
+    if (authErr || !user) {
+      return NextResponse.json({ error: "Ungültige Sitzung" }, { status: 401 })
+    }
+
     const { appointmentId, action, companyName } = await req.json()
     if (!appointmentId || !action) {
       return NextResponse.json({ error: "appointmentId und action erforderlich" }, { status: 400 })
