@@ -357,14 +357,14 @@ export default function BookingPage() {
 
             <div style={{ background:BG, border:`1.5px solid ${BD}`, borderRadius:14, padding:"16px" }}>
               <p style={{ fontSize:13, fontWeight:700, color:T, margin:"0 0 10px" }}>Oder kurz beschreiben:</p>
-              <textarea value={requestText} onChange={e => setRequestText(e.target.value)}
-                placeholder="z.B. Farbbehandlung, Beratung, Nagelpflege …"
-                rows={2}
-                style={{ ...inp, resize:"none", marginBottom:requestText.trim() ? 10 : 0 }} />
+              <LimitedTextarea value={requestText} onChange={setRequestText}
+                placeholder="z.B. Farbbehandlung, Beratung, Nagelpflege …" rows={2} />
               {requestText.trim() && (
-                <PrimaryBtn onClick={() => { setSelectedService(null); goNext() }}>
-                  Weiter mit dieser Beschreibung →
-                </PrimaryBtn>
+                <div style={{ marginTop:10 }}>
+                  <PrimaryBtn onClick={() => { setSelectedService(null); goNext() }}>
+                    Weiter mit dieser Beschreibung →
+                  </PrimaryBtn>
+                </div>
               )}
             </div>
           </div>
@@ -389,9 +389,8 @@ export default function BookingPage() {
             {bookingType === "open" && (
               <div style={{ marginBottom:18 }}>
                 <label style={lbl}>Dein Anliegen <span style={{ fontWeight:400, color:M2 }}>(optional)</span></label>
-                <textarea value={requestText} onChange={e => setRequestText(e.target.value)}
-                  placeholder="z.B. Inspektion, Beratung, Haarschnitt …"
-                  rows={2} style={{ ...inp, resize:"none" }} />
+                <LimitedTextarea value={requestText} onChange={setRequestText}
+                  placeholder="z.B. Inspektion, Beratung, Haarschnitt …" rows={2} />
               </div>
             )}
 
@@ -425,9 +424,8 @@ export default function BookingPage() {
             {bookingType === "callback" && (
               <div style={{ marginBottom:18 }}>
                 <label style={lbl}>Was ist dein Anliegen? <span style={{ fontWeight:400, color:M2 }}>(optional)</span></label>
-                <textarea value={requestText} onChange={e => setRequestText(e.target.value)}
-                  placeholder="z.B. Frage zum Preis, Beratung …"
-                  rows={2} style={{ ...inp, resize:"none" }} />
+                <LimitedTextarea value={requestText} onChange={setRequestText}
+                  placeholder="z.B. Frage zum Preis, Beratung …" rows={2} />
               </div>
             )}
 
@@ -444,9 +442,8 @@ export default function BookingPage() {
               </div>
               <div>
                 <label style={lbl}>Anmerkung <span style={{ fontWeight:400, color:M2 }}>(optional)</span></label>
-                <textarea value={note} onChange={e => setNote(e.target.value)}
-                  placeholder="z.B. bitte kurz klingeln"
-                  rows={2} style={{ ...inp, resize:"none" }} />
+                <LimitedTextarea value={note} onChange={setNote}
+                  placeholder="z.B. bitte kurz klingeln" rows={2} />
               </div>
             </div>
 
@@ -549,6 +546,35 @@ function PrimaryBtn({ onClick, disabled, children }: { onClick:()=>void; disable
 /* ── Spinner ─────────────────────────────────────────────────── */
 function Spin() {
   return <div style={{ width:16, height:16, border:"2px solid rgba(255,255,255,0.3)", borderTopColor:"#fff", borderRadius:"50%", animation:"spin .7s linear infinite", flexShrink:0 }} />
+}
+
+/* ── Limited Textarea (max 160 Zeichen) ──────────────────────── */
+const MAX = 160
+function LimitedTextarea({ value, onChange, placeholder, rows = 2 }: {
+  value: string; onChange: (v: string) => void; placeholder?: string; rows?: number
+}) {
+  const left = MAX - value.length
+  const warn = left <= 20
+  return (
+    <div style={{ position:"relative" }}>
+      <textarea
+        value={value}
+        onChange={e => onChange(e.target.value.slice(0, MAX))}
+        placeholder={placeholder}
+        rows={rows}
+        maxLength={MAX}
+        style={{ ...inp, resize:"none", paddingBottom:24 }}
+      />
+      <span style={{
+        position:"absolute", bottom:8, right:12,
+        fontSize:11, fontWeight:600,
+        color: warn ? (left <= 0 ? "#DC2626" : "#F59E0B") : M2,
+        pointerEvents:"none",
+      }}>
+        {left} Zeichen übrig
+      </span>
+    </div>
+  )
 }
 
 /* ── Summary Row ─────────────────────────────────────────────── */
