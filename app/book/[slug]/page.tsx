@@ -78,10 +78,10 @@ export default function BookingPage() {
     setLoading(true)
     const { data: co, error: coErr } = await supabase
       .from("companies")
-      .select("id, name, booking_note, booking_active")
+      .select("id, name, booking_note, booking_active, booking_addon")
       .eq("slug", slug)
       .single()
-    if (coErr || !co || co.booking_active === false) {
+    if (coErr || !co || co.booking_active === false || co.booking_addon === false) {
       setNotFound(true); setLoading(false); return
     }
     setCompany({ id: co.id, name: co.name, booking_note: co.booking_note })

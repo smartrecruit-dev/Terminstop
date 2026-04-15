@@ -24,6 +24,7 @@ export default function ServicesPage() {
   const [companyId, setCompanyId]     = useState<string | null>(null)
   const [companyName, setCompanyName] = useState("")
   const [slug, setSlug]               = useState<string | null>(null)
+  const [bookingAddon, setBookingAddon] = useState<boolean | null>(null)
   const [services, setServices]       = useState<Service[]>([])
   const [loading, setLoading]         = useState(true)
 
@@ -56,8 +57,12 @@ export default function ServicesPage() {
   async function loadAll() {
     setLoading(true)
     const { data: co } = await supabase
-      .from("companies").select("slug").eq("id", companyId!).single()
-    if (co) { setSlug(co.slug || null); setSlugEdit(co.slug || "") }
+      .from("companies").select("slug, booking_addon").eq("id", companyId!).single()
+    if (co) {
+      setSlug(co.slug || null)
+      setSlugEdit(co.slug || "")
+      setBookingAddon(co.booking_addon ?? false)
+    }
 
     const { data } = await supabase
       .from("services").select("*")
@@ -155,13 +160,67 @@ export default function ServicesPage() {
 
         {/* Page title */}
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-[#1F2A37]">Online-Buchung</h1>
+          <div className="flex items-center gap-3 mb-1">
+            <h1 className="text-2xl font-bold text-[#1F2A37]">Online-Buchung</h1>
+            {bookingAddon === false && (
+              <span style={{ background:"#FEF3C7", border:"1px solid #FDE68A", color:"#92400E", fontSize:11, fontWeight:700, padding:"3px 10px", borderRadius:20 }}>
+                Add-on nicht aktiv
+              </span>
+            )}
+            {bookingAddon === true && (
+              <span style={{ background:"#D1FAE5", border:"1px solid #6EE7B7", color:"#065F46", fontSize:11, fontWeight:700, padding:"3px 10px", borderRadius:20 }}>
+                ✓ Add-on aktiv
+              </span>
+            )}
+          </div>
           <p className="text-sm text-[#6B7280] mt-1">
             Verwalten Sie Ihre Leistungen und teilen Sie Ihren persönlichen Buchungslink.
           </p>
         </div>
 
+        {/* ── ADD-ON GESPERRT ── */}
+        {bookingAddon === false && (
+          <div style={{
+            background:"#fff", border:"2px dashed #E5E7EB", borderRadius:20,
+            padding:"40px 28px", textAlign:"center", marginBottom:24
+          }}>
+            <div style={{ fontSize:48, marginBottom:16 }}>🔗</div>
+            <h2 style={{ fontSize:18, fontWeight:800, color:"#1F2A37", marginBottom:8 }}>
+              Online-Buchung ist noch nicht freigeschaltet
+            </h2>
+            <p style={{ fontSize:14, color:"#6B7280", lineHeight:1.65, maxWidth:380, margin:"0 auto 24px" }}>
+              Mit dem Online-Buchungs-Add-on können Ihre Kunden rund um die Uhr über QR-Code oder Link Termine anfragen — ohne anzurufen.
+            </p>
+            <div style={{ display:"flex", flexDirection:"column", gap:10, maxWidth:320, margin:"0 auto 28px" }}>
+              {[
+                "Eigene Buchungsseite mit Ihrem Namen",
+                "QR-Code zum Ausdrucken oder Aufstellen",
+                "Anfragen direkt in Ihrem Dashboard",
+                "Automatische SMS bei Bestätigung",
+              ].map((f, i) => (
+                <div key={i} style={{ display:"flex", alignItems:"center", gap:10, textAlign:"left" }}>
+                  <span style={{ color:"#18A66D", fontSize:14, flexShrink:0 }}>✓</span>
+                  <span style={{ fontSize:13, color:"#374151" }}>{f}</span>
+                </div>
+              ))}
+            </div>
+            <a href="mailto:info@terminstop.de?subject=Online-Buchung Add-on anfragen"
+              style={{
+                display:"inline-flex", alignItems:"center", gap:8,
+                background:"#18A66D", color:"#fff", textDecoration:"none",
+                fontSize:14, fontWeight:700, padding:"12px 28px", borderRadius:12,
+                boxShadow:"0 4px 16px rgba(24,166,109,0.25)"
+              }}>
+              Add-on anfragen →
+            </a>
+            <p style={{ fontSize:12, color:"#9CA3AF", marginTop:12 }}>
+              Sprechen Sie uns einfach an — wir schalten es für Sie frei.
+            </p>
+          </div>
+        )}
+
         {/* ── BUCHUNGSLINK ── */}
+        {bookingAddon === true && (<>
         <div className="bg-white rounded-2xl border border-[#E5E7EB] shadow-sm mb-5">
           <div className="px-5 py-4 border-b border-[#F3F4F6]">
             <p className="text-xs font-semibold text-[#6B7280] uppercase tracking-wider">Ihr persönlicher Link</p>
@@ -390,6 +449,7 @@ export default function ServicesPage() {
             </p>
           </div>
         </div>
+        </>)}
 
       </div>
     </div>
