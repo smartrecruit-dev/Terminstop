@@ -143,6 +143,21 @@ export default function BookingPage() {
         : "Etwas ist schiefgelaufen. Bitte versuche es erneut.")
       setSubmitting(false); return
     }
+
+    // Betreiber per SMS benachrichtigen (fire & forget — blockiert nicht)
+    fetch("/api/notify-operator", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        company_id:    company.id,
+        booking_type:  bookingType,
+        customer_name: name.trim(),
+        service_name:  selectedService?.name || null,
+        date:          bookingType === "callback" ? null : date || null,
+        time:          bookingType === "callback" ? null : time || null,
+      }),
+    }).catch(() => { /* SMS-Fehler soll Buchung nicht blockieren */ })
+
     setStep("done"); setSubmitting(false)
   }
 

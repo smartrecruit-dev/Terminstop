@@ -12,6 +12,7 @@ const DESKTOP_LINKS = [
   { href: "/insights",  label: "Einblicke" },
   { href: "/requests",  label: "Anfragen"  },
   { href: "/services",  label: "Buchung"   },
+  { href: "/settings",  label: "⚙️ Einstellungen" },
 ]
 
 const MOBILE_LINKS: NavItem[] = [
