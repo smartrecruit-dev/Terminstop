@@ -173,6 +173,32 @@ export default function Dashboard() {
           </div>
         </div>
 
+        {/* ─── ONBOARDING HINT (nur wenn noch keine Termine) ─── */}
+        {appointments.length === 0 && (
+          <div className="bg-white border border-[#E5E7EB] rounded-2xl p-5 mb-8 shadow-sm">
+            <div className="flex items-center gap-2 mb-4">
+              <span className="text-base font-bold text-[#1F2A37]">Willkommen bei TerminStop 👋</span>
+              <span className="text-xs bg-[#F0FBF5] text-[#18A66D] border border-[#6EE7B7] px-2 py-0.5 rounded-full font-semibold">Erste Schritte</span>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              {[
+                { step:"1", label:"Ersten Termin anlegen", desc:"Tragen Sie Name, Telefon, Datum und Uhrzeit ein — rechts im Formular.", icon:"📅", done: false },
+                { step:"2", label:"Kunden eintragen", desc:"Speichern Sie Stammkunden in der Kundenkartei für schnellen Zugriff.", icon:"👥", href:"/customers" },
+                { step:"3", label:"SMS laufen automatisch", desc:"Sobald ein Termin eingetragen ist, geht 24h vorher eine SMS raus.", icon:"📱", done: true },
+              ].map((s, i) => (
+                <a key={i} href={s.href || "#"} style={{ textDecoration:"none" }}
+                  className="flex items-start gap-3 bg-[#F7FAFC] border border-[#E5E7EB] rounded-xl p-4 hover:border-[#18A66D]/40 transition">
+                  <div className="w-8 h-8 bg-[#18A66D] text-white rounded-lg flex items-center justify-center font-bold text-sm shrink-0">{s.step}</div>
+                  <div>
+                    <div className="text-sm font-semibold text-[#1F2A37] mb-0.5">{s.icon} {s.label}</div>
+                    <div className="text-xs text-[#6B7280] leading-relaxed">{s.desc}</div>
+                  </div>
+                </a>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* ─── KPI CARDS ─── */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
 

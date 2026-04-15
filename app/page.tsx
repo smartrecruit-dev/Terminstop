@@ -370,7 +370,7 @@ export default function LandingPage() {
         </section>
 
         {/* ══ PROBLEM ══ */}
-        <section className="sec-pad" style={{ background:"#fff", padding:"100px 32px" }}>
+        <section className="sec-pad" style={{ background:"#fff", padding:"72px 32px" }}>
           <div style={{ maxWidth:960, margin:"0 auto" }}>
             <Reveal>
               <div style={{ maxWidth:560, marginBottom:64 }}>
@@ -403,20 +403,11 @@ export default function LandingPage() {
               ))}
             </div>
 
-            <Reveal delay={150}>
-              <div style={{ marginTop:20, background:"#06091A", borderRadius:20, padding:"28px 36px", display:"flex", alignItems:"center", justifyContent:"space-between", gap:24, flexWrap:"wrap" }}>
-                <div>
-                  <div style={{ color:"#fff", fontWeight:700, fontSize:16, marginBottom:4 }}>Die Lösung? Automatisch. Einmal einrichten. Fertig.</div>
-                  <div style={{ color:"rgba(255,255,255,.35)", fontSize:14 }}>Kein Aufwand, keine Technik-Kenntnisse. Läuft dauerhaft von selbst.</div>
-                </div>
-                <a href="/lead" className="btn-primary" style={{ fontSize:14, padding:"12px 28px", flexShrink:0 }}>Jetzt anfragen →</a>
-              </div>
-            </Reveal>
           </div>
         </section>
 
         {/* ══ HOW IT WORKS ══ */}
-        <section id="wie-es-funktioniert" className="sec-pad" style={{ background:"#F9FAFB", padding:"100px 32px" }}>
+        <section id="wie-es-funktioniert" className="sec-pad" style={{ background:"#F9FAFB", padding:"72px 32px" }}>
           <div style={{ maxWidth:960, margin:"0 auto" }}>
             <Reveal>
               <div style={{ maxWidth:520, marginBottom:64 }}>
@@ -449,7 +440,7 @@ export default function LandingPage() {
         </section>
 
         {/* ══ 4 FEATURE PILLARS ══ */}
-        <section className="sec-pad" style={{ background:"#F9FAFB", padding:"100px 32px" }}>
+        <section className="sec-pad" style={{ background:"#F9FAFB", padding:"72px 32px" }}>
           <div style={{ maxWidth:1080, margin:"0 auto" }}>
             <Reveal>
               <div style={{ textAlign:"center", maxWidth:580, margin:"0 auto 64px" }}>
@@ -484,99 +475,11 @@ export default function LandingPage() {
                 </Reveal>
               ))}
             </div>
-            <Reveal delay={100}>
-              <div style={{ marginTop:24, background:"#06091A", borderRadius:20, padding:"24px 32px", display:"flex", alignItems:"center", justifyContent:"space-between", gap:20, flexWrap:"wrap" as any }}>
-                <div style={{ display:"flex", alignItems:"center", gap:16 }}>
-                  <div style={{ width:40, height:40, background:"rgba(24,166,109,.15)", borderRadius:12, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
-                    <span style={{ color:"#18A66D", fontWeight:900, fontSize:18 }}>✓</span>
-                  </div>
-                  <div>
-                    <div style={{ color:"#fff", fontWeight:700, fontSize:15, marginBottom:2 }}>Alles in einem Paket — keine versteckten Extras.</div>
-                    <div style={{ color:"rgba(255,255,255,.35)", fontSize:13 }}>Kalender + Kundenkartei + SMS + Auswertungen · ab €1,30/Tag</div>
-                  </div>
-                </div>
-                <a href="/lead" className="btn-primary" style={{ fontSize:14, padding:"12px 24px", flexShrink:0 }}>Kostenlos anfragen →</a>
-              </div>
-            </Reveal>
-          </div>
-        </section>
-
-        {/* ══ PRODUCT SHOWCASE ══ */}
-        <section className="sec-pad" style={{ background:"#fff", padding:"100px 32px" }}>
-          <div style={{ maxWidth:1080, margin:"0 auto", display:"grid", gridTemplateColumns:"1fr 1fr", gap:80, alignItems:"center" }} className="showcase-grid">
-            <style>{`.showcase-grid{grid-template-columns:1fr 1fr} @media(max-width:900px){.showcase-grid{grid-template-columns:1fr!important}}`}</style>
-
-            {/* phone */}
-            <div style={{ display:"flex", justifyContent:"center" }} className="showcase-phone-hide">
-              <div style={{ position:"relative" }}>
-                <div style={{ position:"absolute", inset:-32, borderRadius:"50%", background:"radial-gradient(ellipse,rgba(24,166,109,.06) 0%,transparent 70%)", pointerEvents:"none" }} />
-                <div style={{ background:"#02060A", padding:12, borderRadius:44, border:"1px solid rgba(24,166,109,.1)", boxShadow:"0 32px 64px rgba(0,0,0,.12)" }}>
-                  <div style={{ width:280, height:565, borderRadius:34, overflow:"hidden", background:"#fff" }}>
-                    <div style={{ background:"#18A66D", padding:"32px 20px 24px" }}>
-                      <div style={{ color:"rgba(255,255,255,.6)", fontSize:11, marginBottom:4, fontWeight:500 }}>Guten Morgen 👋</div>
-                      <div style={{ color:"#fff", fontWeight:900, fontSize:20, marginBottom:12 }}>Heute, 6 Termine</div>
-                      <div style={{ display:"flex", gap:8 }}>
-                        <div style={{ background:"rgba(255,255,255,.15)", borderRadius:10, padding:"6px 12px", color:"rgba(255,255,255,.85)", fontSize:11, fontWeight:600 }}>5 ✓ bestätigt</div>
-                        <div style={{ background:"rgba(255,255,255,.08)", borderRadius:10, padding:"6px 12px", color:"rgba(255,255,255,.5)", fontSize:11 }}>1 ausstehend</div>
-                      </div>
-                    </div>
-                    <div style={{ margin:"0 16px", marginTop:-16, background:"#fff", borderRadius:16, padding:16, border:"1px solid #F3F4F6", boxShadow:"0 4px 16px rgba(0,0,0,.07)", marginBottom:12 }}>
-                      <div style={{ fontSize:10, color:"#9CA3AF", marginBottom:4, fontWeight:700, letterSpacing:1, textTransform:"uppercase" }}>Nächster Termin</div>
-                      <div style={{ fontSize:14, fontWeight:700, color:"#0B0D14" }}>Maria Schmidt</div>
-                      <div style={{ fontSize:12, color:"#6B7280" }}>14:00 Uhr · Damenhaarschnitt</div>
-                      <div style={{ marginTop:8, display:"flex", alignItems:"center", gap:6 }}>
-                        <div style={{ width:6, height:6, background:"#18A66D", borderRadius:"50%" }} />
-                        <span style={{ fontSize:10, color:"#18A66D", fontWeight:600 }}>SMS gesendet ✓</span>
-                      </div>
-                    </div>
-                    <div style={{ padding:"0 16px", display:"flex", flexDirection:"column", gap:6 }}>
-                      {[
-                        { time:"09:00", name:"Thomas B.", s:"✓", c:"#18A66D" },
-                        { time:"10:30", name:"Anna L.", s:"✓", c:"#18A66D" },
-                        { time:"12:00", name:"Klaus M.", s:"✓", c:"#18A66D" },
-                        { time:"14:00", name:"Maria S.", s:"→", c:"#F59E0B" },
-                        { time:"16:00", name:"Peter H.", s:"○", c:"#D1D5DB" },
-                      ].map((a, j) => (
-                        <div key={j} style={{ display:"flex", alignItems:"center", gap:12, background:"#F9FAFB", borderRadius:12, padding:"10px 12px" }}>
-                          <span style={{ fontSize:11, color:"#9CA3AF", width:36, flexShrink:0, fontWeight:500 }}>{a.time}</span>
-                          <span style={{ fontSize:11, color:"#0B0D14", fontWeight:500, flex:1 }}>{a.name}</span>
-                          <span style={{ fontSize:13, fontWeight:700, color:a.c }}>{a.s}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <Reveal delay={80}>
-              <div>
-                <div style={{ fontSize:11, fontWeight:700, letterSpacing:3, textTransform:"uppercase", color:"#18A66D", marginBottom:16 }}>Das Dashboard</div>
-                <h2 style={{ fontSize:"clamp(28px,3.5vw,46px)", fontWeight:900, letterSpacing:"-1.2px", lineHeight:1.1, margin:"0 0 16px" }}>Alles im Blick.<br />Nichts verpassen.</h2>
-                <p style={{ fontSize:17, color:"#6B7280", lineHeight:1.65, marginBottom:40 }}>Ihr komplettes Terminmanagement an einem Ort – übersichtlich, einfach, immer aktuell.</p>
-                <div style={{ display:"flex", flexDirection:"column", gap:20 }}>
-                  {[
-                    { title:"Tagesübersicht auf einen Blick", desc:"Sehen Sie sofort, welche Kunden kommen – und wer noch nicht bestätigt hat." },
-                    { title:"Automatische SMS-Erinnerungen", desc:"24h vor jedem Termin geht eine personalisierte Nachricht raus – ohne Ihr Zutun." },
-                    { title:"Kundenkartei", desc:"Alle Kontakte und die komplette Terminhistorie an einem Ort." },
-                    { title:"Auswertungen & Einblicke", desc:"Sehen Sie auf einen Blick, wie sich Ihr Betrieb entwickelt." },
-                  ].map((f, i) => (
-                    <div key={i} style={{ display:"flex", alignItems:"flex-start", gap:14 }}>
-                      <div style={{ width:6, height:6, background:"#18A66D", borderRadius:"50%", marginTop:8, flexShrink:0 }} />
-                      <div>
-                        <div style={{ fontWeight:700, color:"#0B0D14", marginBottom:3, fontSize:15 }}>{f.title}</div>
-                        <div style={{ fontSize:14, color:"#6B7280", lineHeight:1.6 }}>{f.desc}</div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </Reveal>
           </div>
         </section>
 
         {/* ══ COMPETITOR COMPARISON ══ */}
-        <section style={{ background:"#06091A", padding:"100px 32px" }} className="sec-pad">
+        <section style={{ background:"#06091A", padding:"72px 32px" }} className="sec-pad">
           <div style={{ maxWidth:960, margin:"0 auto" }}>
             <Reveal>
               <div style={{ textAlign:"center", maxWidth:580, margin:"0 auto 56px" }}>
@@ -663,27 +566,26 @@ export default function LandingPage() {
         </section>
 
         {/* ══ REVIEWS ══ */}
-        <section className="sec-pad" style={{ background:"#fff", padding:"100px 32px" }}>
-          <div style={{ maxWidth:1080, margin:"0 auto" }}>
+        <section className="sec-pad" style={{ background:"#fff", padding:"72px 32px" }}>
+          <div style={{ maxWidth:900, margin:"0 auto" }}>
             <Reveal>
-              <div style={{ textAlign:"center", marginBottom:60 }}>
+              <div style={{ textAlign:"center", marginBottom:48 }}>
                 <div style={{ fontSize:11, fontWeight:700, letterSpacing:3, textTransform:"uppercase", color:"#18A66D", marginBottom:16 }}>Echte Ergebnisse</div>
-                <h2 style={{ fontSize:"clamp(32px,4vw,52px)", fontWeight:900, letterSpacing:"-1.5px", lineHeight:1.08, margin:"0 0 10px" }}>Was Betriebe berichten.</h2>
-                <p style={{ fontSize:16, color:"#9CA3AF", margin:0 }}>Keine Versprechen – nur echte Erfahrungen.</p>
+                <h2 style={{ fontSize:"clamp(28px,3.5vw,44px)", fontWeight:900, letterSpacing:"-1.5px", lineHeight:1.08, margin:"0 0 10px" }}>Was Betriebe berichten.</h2>
               </div>
             </Reveal>
             <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:16 }} className="reviews-grid">
               <style>{`.reviews-grid{grid-template-columns:1fr 1fr} @media(max-width:700px){.reviews-grid{grid-template-columns:1fr!important}}`}</style>
-              {reviews.map((r, i) => (
+              {reviews.slice(0, 2).map((r, i) => (
                 <Reveal key={i} delay={i * 60}>
-                  <div style={{ background:"#fff", border:"1px solid #F3F4F6", borderRadius:20, padding:"32px", display:"flex", flexDirection:"column", height:"100%", boxShadow:"0 1px 4px rgba(0,0,0,.04)", transition:"box-shadow .2s" }}>
-                    <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:20 }}>
+                  <div style={{ background:"#fff", border:"1px solid #F3F4F6", borderRadius:20, padding:"28px", display:"flex", flexDirection:"column", height:"100%", boxShadow:"0 1px 4px rgba(0,0,0,.04)" }}>
+                    <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:18 }}>
                       <div style={{ background:"#F0FBF5", color:"#18A66D", fontSize:11, fontWeight:700, padding:"5px 12px", borderRadius:980 }}>✓ {r.result}</div>
                       <div style={{ color:"#FBBF24", fontSize:12, letterSpacing:1 }}>★★★★★</div>
                     </div>
-                    <p style={{ fontSize:14, color:"#6B7280", lineHeight:1.7, flex:1, marginBottom:24, fontStyle:"italic" }}>„{r.text}"</p>
-                    <div style={{ display:"flex", alignItems:"center", gap:12, paddingTop:20, borderTop:"1px solid #F9FAFB" }}>
-                      <div style={{ width:36, height:36, background:"linear-gradient(135deg,#18A66D,#0A7A4F)", color:"#fff", borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", fontSize:14, fontWeight:900, flexShrink:0 }}>{r.name.charAt(0)}</div>
+                    <p style={{ fontSize:14, color:"#6B7280", lineHeight:1.7, flex:1, marginBottom:20, fontStyle:"italic" }}>„{r.text}"</p>
+                    <div style={{ display:"flex", alignItems:"center", gap:12, paddingTop:16, borderTop:"1px solid #F9FAFB" }}>
+                      <div style={{ width:34, height:34, background:"linear-gradient(135deg,#18A66D,#0A7A4F)", color:"#fff", borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", fontSize:13, fontWeight:900, flexShrink:0 }}>{r.name.charAt(0)}</div>
                       <div>
                         <div style={{ fontSize:13, fontWeight:700, color:"#0B0D14" }}>{r.name}</div>
                         <div style={{ fontSize:12, color:"#9CA3AF" }}>{r.role} · {r.city}</div>
@@ -697,7 +599,7 @@ export default function LandingPage() {
         </section>
 
         {/* ══ PRICING ══ */}
-        <section id="preise" className="sec-pad" style={{ background:"#F9FAFB", padding:"100px 32px" }}>
+        <section id="preise" className="sec-pad" style={{ background:"#F9FAFB", padding:"72px 32px" }}>
           <div style={{ maxWidth:960, margin:"0 auto" }}>
             <Reveal>
               <div style={{ textAlign:"center", maxWidth:600, margin:"0 auto 16px" }}>
@@ -799,7 +701,7 @@ export default function LandingPage() {
         </section>
 
         {/* ══ ADD-ON: ONLINE BUCHUNG ══ */}
-        <section id="online-buchung" className="sec-pad" style={{ background:"#06091A", padding:"100px 32px", position:"relative", overflow:"hidden" }}>
+        <section id="online-buchung" className="sec-pad" style={{ background:"#06091A", padding:"72px 32px", position:"relative", overflow:"hidden" }}>
           {/* background glows */}
           <div style={{ position:"absolute", top:"20%", right:"-10%", width:500, height:400, borderRadius:"50%", background:"radial-gradient(ellipse,rgba(24,166,109,.07) 0%,transparent 65%)", pointerEvents:"none" }} />
           <div style={{ position:"absolute", bottom:"10%", left:"-5%", width:350, height:300, borderRadius:"50%", background:"radial-gradient(ellipse,rgba(79,110,247,.05) 0%,transparent 65%)", pointerEvents:"none" }} />
@@ -840,48 +742,6 @@ export default function LandingPage() {
               ))}
             </div>
 
-            {/* How it looks — mini preview */}
-            <Reveal delay={80}>
-              <div style={{ marginTop:48, background:"rgba(255,255,255,.03)", border:"1px solid rgba(24,166,109,.15)", borderRadius:24, padding:"36px", display:"grid", gap:48, alignItems:"center" }} className="addon-preview-grid">
-                <style>{`.addon-preview-grid{grid-template-columns:1fr 1fr} @media(max-width:800px){.addon-preview-grid{grid-template-columns:1fr!important}}`}</style>
-
-                {/* Left: process steps */}
-                <div>
-                  <div style={{ fontSize:11, fontWeight:700, letterSpacing:3, textTransform:"uppercase" as any, color:"rgba(74,232,155,.7)", marginBottom:24 }}>So funktioniert's</div>
-                  <div style={{ display:"flex", flexDirection:"column" as any, gap:20 }}>
-                    {[
-                      { num:"01", text:"Kunde scannt QR-Code oder öffnet Ihren Buchungslink" },
-                      { num:"02", text:"Kunde wählt Leistung, Datum und gibt seine Nummer an" },
-                      { num:"03", text:"Anfrage landet bei Ihnen im Dashboard" },
-                      { num:"04", text:"Sie bestätigen mit einem Klick — Kunde bekommt sofort eine SMS" },
-                    ].map((s, i) => (
-                      <div key={i} style={{ display:"flex", alignItems:"flex-start", gap:16 }}>
-                        <div style={{ width:32, height:32, background:"rgba(24,166,109,.12)", border:"1px solid rgba(24,166,109,.2)", borderRadius:10, display:"flex", alignItems:"center", justifyContent:"center", fontSize:11, fontWeight:800, color:"#4AE89B", flexShrink:0 }}>{s.num}</div>
-                        <p style={{ fontSize:14, color:"rgba(255,255,255,.5)", lineHeight:1.6, margin:"4px 0 0" }}>{s.text}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Right: benefits */}
-                <div>
-                  <div style={{ fontSize:11, fontWeight:700, letterSpacing:3, textTransform:"uppercase" as any, color:"rgba(74,232,155,.7)", marginBottom:24 }}>Was es bringt</div>
-                  <div style={{ display:"flex", flexDirection:"column" as any, gap:14 }}>
-                    {[
-                      { stat:"24/7", label:"Buchungen auch nachts, am Wochenende und im Urlaub" },
-                      { stat:"0",    label:"Telefonate für neue Terminanfragen — alles läuft digital" },
-                      { stat:"100%", label:"Kontrolle — Sie bestätigen jeden Termin selbst" },
-                    ].map((b, i) => (
-                      <div key={i} style={{ display:"flex", alignItems:"center", gap:18, background:"rgba(255,255,255,.03)", borderRadius:14, padding:"16px 20px" }}>
-                        <div style={{ fontSize:22, fontWeight:900, color:"#4AE89B", letterSpacing:"-1px", flexShrink:0, width:60 }}>{b.stat}</div>
-                        <p style={{ fontSize:13, color:"rgba(255,255,255,.4)", lineHeight:1.55, margin:0 }}>{b.label}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </Reveal>
-
             {/* CTA */}
             <Reveal delay={100}>
               <div style={{ marginTop:40, display:"flex", flexDirection:"column" as any, alignItems:"center", gap:16, textAlign:"center" as any }}>
@@ -897,7 +757,7 @@ export default function LandingPage() {
         </section>
 
         {/* ══ FAQ ══ */}
-        <section className="sec-pad" style={{ background:"#fff", padding:"100px 32px" }}>
+        <section className="sec-pad" style={{ background:"#fff", padding:"72px 32px" }}>
           <div style={{ maxWidth:680, margin:"0 auto" }}>
             <Reveal>
               <div style={{ textAlign:"center", marginBottom:56 }}>
