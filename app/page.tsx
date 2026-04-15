@@ -31,15 +31,15 @@ function Reveal({ children, delay = 0, className = "" }: { children: React.React
   const ref = useRef<HTMLDivElement>(null)
   const [vis, setVis] = useState(false)
   useEffect(() => {
-    const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setVis(true); obs.disconnect() } }, { threshold: 0.08 })
+    const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setVis(true); obs.disconnect() } }, { threshold: 0.06 })
     if (ref.current) obs.observe(ref.current)
     return () => obs.disconnect()
   }, [])
   return (
     <div ref={ref} className={className} style={{
       opacity: vis ? 1 : 0,
-      transform: vis ? "translateY(0)" : "translateY(28px)",
-      transition: `opacity 0.75s cubic-bezier(.16,1,.3,1) ${delay}ms, transform 0.75s cubic-bezier(.16,1,.3,1) ${delay}ms`
+      transform: vis ? "translateY(0)" : "translateY(20px)",
+      transition: `opacity 0.6s ease ${delay}ms, transform 0.6s ease ${delay}ms`
     }}>
       {children}
     </div>
@@ -74,65 +74,51 @@ export default function LandingPage() {
   ]
 
   const tiers = [
-    { name: "Einsteiger", for: "Bis ca. 100 Termine / Monat", tag: null, dark: false, features: ["Automatische SMS-Erinnerungen", "Terminübersicht & Dashboard", "Kundenkartei", "Persönliches Onboarding", "Support per E-Mail"] },
-    { name: "Wachstum", for: "100–400 Termine / Monat", tag: "Meistgewählt", dark: true, features: ["Automatische SMS-Erinnerungen", "Terminübersicht & Dashboard", "Kundenkartei", "Kalenderansicht", "Auswertungen & Einblicke", "Persönliches Onboarding", "Prioritäts-Support"] },
-    { name: "Profi", for: "Stark ausgelastete Betriebe", tag: null, dark: false, features: ["Automatische SMS-Erinnerungen", "Terminübersicht & Dashboard", "Kundenkartei", "Kalenderansicht", "Auswertungen & Einblicke", "Persönlicher Ansprechpartner", "Individuelle Einrichtung"] },
+    { name: "Einsteiger", for: "Bis ca. 100 Termine / Monat", tag: null, highlight: false, features: ["Automatische SMS-Erinnerungen", "Terminübersicht & Dashboard", "Kundenkartei", "Persönliches Onboarding", "Support per E-Mail"] },
+    { name: "Wachstum", for: "100–400 Termine / Monat", tag: "Meistgewählt", highlight: true, features: ["Automatische SMS-Erinnerungen", "Terminübersicht & Dashboard", "Kundenkartei", "Kalenderansicht", "Auswertungen & Einblicke", "Persönliches Onboarding", "Prioritäts-Support"] },
+    { name: "Profi", for: "Stark ausgelastete Betriebe", tag: null, highlight: false, features: ["Automatische SMS-Erinnerungen", "Terminübersicht & Dashboard", "Kundenkartei", "Kalenderansicht", "Auswertungen & Einblicke", "Persönlicher Ansprechpartner", "Individuelle Einrichtung"] },
   ]
 
   const industries = ["Friseur", "KFZ-Werkstatt", "Arztpraxis", "Handwerk", "Kosmetik", "Physiotherapie", "Tattoo-Studio", "Nagelstudio", "Zahnarzt", "Optiker", "Hundesalon", "Massage"]
 
   const addonFeatures = [
-    { icon: "⬡", title: "Eigene Buchungsseite", desc: "Ihre persönliche URL — Kunden buchen direkt, ohne Telefonanruf." },
-    { icon: "⬡", title: "QR-Code zum Aufstellen", desc: "An der Kasse oder im Schaufenster — Kunden scannen und buchen sofort." },
-    { icon: "⬡", title: "Anfragen im Dashboard", desc: "Alle Online-Buchungen landen direkt bei Ihnen. Sie bestätigen mit einem Klick." },
-    { icon: "⬡", title: "Automatische Bestätigungs-SMS", desc: "Sobald Sie bestätigen, bekommt der Kunde sofort eine SMS — ohne Ihr Zutun." },
-    { icon: "⬡", title: "Leistungen wählbar", desc: "Kunden können Ihre Leistungen auswählen oder einfach einen offenen Termin anfragen." },
-    { icon: "⬡", title: "Rückruf-Funktion", desc: "Kunden können auch einen Rückruf anfragen — Sie werden benachrichtigt." },
+    { icon: "🔗", title: "Eigene Buchungsseite", desc: "Ihre persönliche URL — Kunden buchen direkt, ohne Telefonanruf." },
+    { icon: "📲", title: "QR-Code zum Aufstellen", desc: "An der Kasse oder im Schaufenster — Kunden scannen und buchen sofort." },
+    { icon: "📥", title: "Anfragen im Dashboard", desc: "Alle Online-Buchungen landen direkt bei Ihnen. Sie bestätigen mit einem Klick." },
+    { icon: "✉️", title: "Automatische Bestätigungs-SMS", desc: "Sobald Sie bestätigen, bekommt der Kunde sofort eine SMS — ohne Ihr Zutun." },
+    { icon: "🗂️", title: "Leistungen wählbar", desc: "Kunden können Ihre Leistungen auswählen oder einfach einen offenen Termin anfragen." },
+    { icon: "📞", title: "Rückruf-Funktion", desc: "Kunden können auch einen Rückruf anfragen — Sie werden benachrichtigt." },
   ]
 
   const F = "-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', sans-serif"
 
-  // Farben
-  const BG      = "#04060F"
-  const SURF    = "#080C18"
-  const SURF2   = "#0C1121"
-  const BORDER  = "rgba(255,255,255,0.07)"
-  const BORDER2 = "rgba(255,255,255,0.12)"
   const GREEN   = "#18A66D"
-  const GREEN2  = "#0EA060"
-  const GLOW    = "rgba(24,166,109,0.15)"
-  const TXT     = "#F0F4FF"
-  const MUTED   = "rgba(240,244,255,0.45)"
-  const MUTED2  = "rgba(240,244,255,0.25)"
+  const GREEN_L = "#F0FBF6"
+  const GREEN_B = "#D1F5E3"
+  const TXT     = "#111827"
+  const MUTED   = "#6B7280"
+  const MUTED2  = "#9CA3AF"
+  const BG      = "#FFFFFF"
+  const BG2     = "#F9FAFB"
+  const BG3     = "#F3F4F6"
+  const BORDER  = "#E5E7EB"
+  const BORDER2 = "#D1D5DB"
 
   return (
     <>
       <style>{`
         @keyframes wordIn {
-          0%   { opacity:0; transform:translateY(10px) skewY(2deg); }
-          15%, 85% { opacity:1; transform:translateY(0) skewY(0); }
-          100% { opacity:0; transform:translateY(-10px) skewY(-2deg); }
+          0%   { opacity:0; transform:translateY(8px); }
+          15%, 85% { opacity:1; transform:translateY(0); }
+          100% { opacity:0; transform:translateY(-8px); }
         }
         @keyframes marquee {
           0%   { transform:translateX(0); }
           100% { transform:translateX(-50%); }
         }
-        @keyframes float {
-          0%,100% { transform:translateY(0); }
-          50%     { transform:translateY(-12px); }
-        }
-        @keyframes shimmer {
-          0%   { background-position: -200% center; }
-          100% { background-position: 200% center; }
-        }
-        @keyframes pulseGlow {
-          0%,100% { opacity:.5; transform:scale(1); }
-          50%     { opacity:1; transform:scale(1.08); }
-        }
 
         .word-slot { animation: wordIn 2.8s cubic-bezier(.16,1,.3,1); }
-        .marquee-wrap { animation: marquee 36s linear infinite; }
-        .float-el { animation: float 7s ease-in-out infinite; }
+        .marquee-wrap { animation: marquee 38s linear infinite; }
 
         .nav-desktop-only { display:none!important; }
         @media(min-width:768px){ .nav-desktop-only { display:inline-flex!important; } }
@@ -140,95 +126,72 @@ export default function LandingPage() {
         .nav-cta-long  { display:none; }
         @media(min-width:768px){ .nav-cta-short { display:none; } .nav-cta-long { display:inline; } }
 
-        .card-hover {
-          transition: border-color .25s, box-shadow .25s, transform .25s;
+        .card-lift {
+          transition: box-shadow .22s ease, transform .22s ease, border-color .22s ease;
         }
-        .card-hover:hover {
-          border-color: rgba(24,166,109,0.3) !important;
-          box-shadow: 0 0 0 1px rgba(24,166,109,0.15), 0 20px 60px rgba(0,0,0,0.4) !important;
+        .card-lift:hover {
+          box-shadow: 0 8px 32px rgba(0,0,0,0.09) !important;
           transform: translateY(-2px);
+          border-color: #D1D5DB !important;
         }
 
         .btn-primary {
           display:inline-flex; align-items:center; justify-content:center; gap:8px;
-          background: linear-gradient(135deg, #18A66D 0%, #0EA060 100%);
+          background: #18A66D;
           color:#fff; border:none; border-radius:10px;
           font-weight:700; cursor:pointer; text-decoration:none;
-          transition: box-shadow .2s, transform .15s, opacity .15s;
-          box-shadow: 0 0 0 1px rgba(24,166,109,0.4), 0 4px 24px rgba(24,166,109,0.3);
-          letter-spacing:-0.2px;
+          transition: background .18s, box-shadow .18s, transform .15s;
+          box-shadow: 0 2px 10px rgba(24,166,109,0.25);
+          letter-spacing:-0.1px;
         }
         .btn-primary:hover {
-          box-shadow: 0 0 0 1px rgba(24,166,109,0.6), 0 8px 36px rgba(24,166,109,0.45);
+          background: #15955F;
+          box-shadow: 0 4px 20px rgba(24,166,109,0.35);
           transform: translateY(-1px);
-          opacity:.95;
-        }
-
-        .btn-ghost {
-          display:inline-flex; align-items:center; justify-content:center; gap:8px;
-          background: rgba(255,255,255,0.05);
-          color: rgba(240,244,255,0.7);
-          border: 1px solid rgba(255,255,255,0.1);
-          border-radius:10px; font-weight:600; cursor:pointer; text-decoration:none;
-          transition: background .2s, border-color .2s, color .2s;
-        }
-        .btn-ghost:hover {
-          background: rgba(255,255,255,0.09);
-          border-color: rgba(255,255,255,0.2);
-          color: #F0F4FF;
         }
 
         .btn-outline {
-          display:inline-flex; align-items:center; justify-content:center;
-          background:transparent; color:rgba(240,244,255,0.6);
-          border:1px solid rgba(255,255,255,0.1); border-radius:10px;
-          font-weight:600; cursor:pointer; text-decoration:none;
-          transition: border-color .2s, color .2s, background .2s;
+          display:inline-flex; align-items:center; justify-content:center; gap:8px;
+          background: #fff;
+          color: #374151;
+          border: 1.5px solid #E5E7EB;
+          border-radius:10px; font-weight:600; cursor:pointer; text-decoration:none;
+          transition: border-color .18s, background .18s, color .18s;
         }
-        .btn-outline:hover { border-color:rgba(24,166,109,0.5); color:#18A66D; background:rgba(24,166,109,0.06); }
-
-        .gradient-text {
-          background: linear-gradient(135deg, #fff 30%, rgba(255,255,255,0.5) 100%);
-          -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-          background-clip: text;
-        }
-        .gradient-text-green {
-          background: linear-gradient(135deg, #18A66D 0%, #4AE89B 100%);
-          -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-          background-clip: text;
+        .btn-outline:hover {
+          border-color: #18A66D;
+          color: #18A66D;
+          background: #F0FBF6;
         }
 
-        .noise-overlay {
-          position:absolute; inset:0; pointer-events:none; z-index:1;
-          background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
-          background-repeat: repeat; background-size: 200px 200px;
-          opacity:.4;
+        .btn-white {
+          display:inline-flex; align-items:center; justify-content:center; gap:8px;
+          background: #fff; color: #18A66D;
+          border: none; border-radius:10px;
+          font-weight:700; cursor:pointer; text-decoration:none;
+          transition: background .18s, transform .15s;
+          box-shadow: 0 2px 12px rgba(0,0,0,0.12);
         }
+        .btn-white:hover { background:#F0FBF6; transform:translateY(-1px); }
 
-        .grid-bg {
-          position:absolute; inset:0; pointer-events:none;
-          background-image:
-            linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
-          background-size: 64px 64px;
-          mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black 40%, transparent 100%);
-        }
+        .faq-item { border-bottom: 1px solid #F3F4F6; }
+        .faq-item:first-child { border-top: 1px solid #F3F4F6; }
+        .faq-btn { background:none; border:none; cursor:pointer; width:100%; text-align:left; }
+        .faq-btn:hover { background:#FAFAFA; }
 
-        .tag {
+        .tag-green {
           display:inline-flex; align-items:center; gap:6px;
-          background: rgba(24,166,109,0.1);
-          border: 1px solid rgba(24,166,109,0.25);
-          color: #4AE89B;
-          font-size:11px; font-weight:700; letter-spacing:0.5px;
-          padding:5px 12px; border-radius:980px;
+          background: #F0FBF6;
+          border: 1px solid #BBF7D0;
+          color: #16A34A;
+          font-size:11px; font-weight:700; letter-spacing:0.4px;
+          padding:5px 13px; border-radius:980px;
         }
-
-        .faq-item { border-bottom: 1px solid rgba(255,255,255,0.06); }
-        .faq-item:first-child { border-top: 1px solid rgba(255,255,255,0.06); }
 
         @media(max-width:768px){
-          .sec-pad { padding-top:64px!important; padding-bottom:64px!important; padding-left:20px!important; padding-right:20px!important; }
+          .sec-pad { padding-top:60px!important; padding-bottom:60px!important; padding-left:20px!important; padding-right:20px!important; }
           .hide-mobile { display:none!important; }
+          .hero-h1 { font-size:42px!important; letter-spacing:-2px!important; }
         }
         @media(min-width:769px){
           .show-mobile-only { display:none!important; }
@@ -242,30 +205,30 @@ export default function LandingPage() {
         ══════════════════════════════════════════════ */}
         <nav style={{
           position:"fixed", top:0, left:0, right:0, zIndex:100,
-          height:56,
+          height:60,
           display:"flex", alignItems:"center", justifyContent:"space-between",
           padding:"0 28px",
-          background:"rgba(4,6,15,0.8)",
-          backdropFilter:"blur(24px) saturate(160%)",
+          background:"rgba(255,255,255,0.92)",
+          backdropFilter:"blur(20px) saturate(150%)",
           borderBottom:`1px solid ${BORDER}`,
         }}>
-          <a href="/" style={{ textDecoration:"none", fontSize:16, fontWeight:800, letterSpacing:"-0.5px", display:"flex", alignItems:"center", gap:8 }}>
-            <div style={{ width:28, height:28, background:"linear-gradient(135deg,#18A66D,#0EA060)", borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center" }}>
-              <span style={{ color:"#fff", fontWeight:900, fontSize:13 }}>T</span>
+          <a href="/" style={{ textDecoration:"none", fontSize:16, fontWeight:800, letterSpacing:"-0.5px", display:"flex", alignItems:"center", gap:9 }}>
+            <div style={{ width:30, height:30, background:GREEN, borderRadius:9, display:"flex", alignItems:"center", justifyContent:"center" }}>
+              <span style={{ color:"#fff", fontWeight:900, fontSize:14 }}>T</span>
             </div>
-            <span style={{ color:TXT }}>TerminStop</span>
+            <span style={{ color:TXT }}>Termin<span style={{ color:GREEN }}>Stop</span></span>
           </a>
 
-          <div style={{ display:"flex", alignItems:"center", gap:6 }}>
-            <a href="#wie-es-funktioniert" className="nav-desktop-only" style={{ fontSize:13, color:MUTED, textDecoration:"none", fontWeight:500, padding:"6px 12px", borderRadius:8, transition:"color .2s" }}>So funktioniert's</a>
-            <a href="#preise" className="nav-desktop-only" style={{ fontSize:13, color:MUTED, textDecoration:"none", fontWeight:500, padding:"6px 12px", borderRadius:8 }}>Preise</a>
-            <a href="#online-buchung" className="nav-desktop-only" style={{ fontSize:13, color:GREEN, textDecoration:"none", fontWeight:600, padding:"6px 12px", borderRadius:8, alignItems:"center", gap:6 }}>
-              <span style={{ background:"rgba(24,166,109,0.12)", border:"1px solid rgba(24,166,109,0.25)", borderRadius:980, padding:"2px 8px", fontSize:10, color:"#4AE89B", fontWeight:700, marginRight:4 }}>Neu</span>
+          <div style={{ display:"flex", alignItems:"center", gap:4 }}>
+            <a href="#wie-es-funktioniert" className="nav-desktop-only" style={{ fontSize:14, color:MUTED, textDecoration:"none", fontWeight:500, padding:"6px 12px", borderRadius:8, transition:"color .2s" }}>So funktioniert's</a>
+            <a href="#preise" className="nav-desktop-only" style={{ fontSize:14, color:MUTED, textDecoration:"none", fontWeight:500, padding:"6px 12px", borderRadius:8 }}>Preise</a>
+            <a href="#online-buchung" className="nav-desktop-only" style={{ fontSize:14, color:GREEN, textDecoration:"none", fontWeight:600, padding:"6px 12px", borderRadius:8, alignItems:"center", gap:6 }}>
+              <span style={{ background:GREEN_L, border:`1px solid ${GREEN_B}`, borderRadius:980, padding:"2px 8px", fontSize:10, color:GREEN, fontWeight:700, marginRight:4 }}>Neu</span>
               Online-Buchung
             </a>
-            <a href="/login" className="nav-desktop-only" style={{ fontSize:13, color:MUTED, textDecoration:"none", fontWeight:500, padding:"6px 12px", borderRadius:8 }}>Login</a>
-            <a href="/login" className="show-mobile-only" style={{ fontSize:13, color:MUTED, textDecoration:"none", fontWeight:600, padding:"7px 14px", border:`1px solid ${BORDER2}`, borderRadius:9, background:"rgba(255,255,255,0.04)", whiteSpace:"nowrap" }}>Login</a>
-            <a href="/lead" className="btn-primary" style={{ fontSize:13, padding:"8px 18px", marginLeft:4 }}>
+            <a href="/login" className="nav-desktop-only" style={{ fontSize:14, color:MUTED, textDecoration:"none", fontWeight:500, padding:"6px 12px", borderRadius:8 }}>Login</a>
+            <a href="/login" className="show-mobile-only btn-outline" style={{ fontSize:13, padding:"7px 14px" }}>Login</a>
+            <a href="/lead" className="btn-primary" style={{ fontSize:14, padding:"9px 20px", marginLeft:4 }}>
               <span className="nav-cta-short">Anfragen →</span>
               <span className="nav-cta-long">Kostenlos anfragen</span>
             </a>
@@ -278,62 +241,64 @@ export default function LandingPage() {
         <section style={{
           minHeight:"100vh",
           display:"flex", alignItems:"center", justifyContent:"center",
-          paddingTop:56, position:"relative", overflow:"hidden",
-          background:`radial-gradient(ellipse 100% 70% at 50% -10%, rgba(24,166,109,0.12) 0%, transparent 65%), ${BG}`,
+          paddingTop:60, position:"relative", overflow:"hidden",
+          background:`linear-gradient(180deg, #F0FBF6 0%, #FFFFFF 55%)`,
         }}>
-          <div className="grid-bg" />
-          <div className="noise-overlay" />
+          {/* Subtle grid */}
+          <div style={{
+            position:"absolute", inset:0, pointerEvents:"none",
+            backgroundImage:"linear-gradient(rgba(24,166,109,0.05) 1px,transparent 1px),linear-gradient(90deg,rgba(24,166,109,0.05) 1px,transparent 1px)",
+            backgroundSize:"48px 48px",
+            maskImage:"radial-gradient(ellipse 80% 60% at 50% 0%,black 30%,transparent 100%)",
+          }} />
 
-          {/* Glow orbs */}
-          <div style={{ position:"absolute", top:"25%", left:"50%", transform:"translateX(-50%)", width:800, height:500, borderRadius:"50%", background:`radial-gradient(ellipse, rgba(24,166,109,0.07) 0%, transparent 65%)`, pointerEvents:"none", zIndex:1 }} />
-
-          <div style={{ maxWidth:760, margin:"0 auto", padding:"0 24px", textAlign:"center", position:"relative", zIndex:2 }}>
+          <div style={{ maxWidth:780, margin:"0 auto", padding:"60px 24px 80px", textAlign:"center", position:"relative", zIndex:2 }}>
 
             {/* Badge */}
-            <div style={{ display:"inline-flex", alignItems:"center", gap:8, background:"rgba(255,255,255,0.04)", border:`1px solid ${BORDER2}`, borderRadius:980, padding:"6px 16px", marginBottom:32 }}>
-              <span style={{ width:6, height:6, background:GREEN, borderRadius:"50%", display:"inline-block", boxShadow:`0 0 6px ${GREEN}` }} />
-              <span style={{ fontSize:12, color:MUTED, fontWeight:500 }}>
+            <div style={{ display:"inline-flex", alignItems:"center", gap:8, background:GREEN_L, border:`1px solid ${GREEN_B}`, borderRadius:980, padding:"6px 16px", marginBottom:32 }}>
+              <span style={{ width:6, height:6, background:GREEN, borderRadius:"50%", display:"inline-block" }} />
+              <span style={{ fontSize:13, color:GREEN, fontWeight:600 }}>
                 Digitales Terminbüro für Ihren&nbsp;
-                <span style={{ color:TXT, fontWeight:700 }} key={heroWord} className="word-slot">{words[heroWord]}</span>
+                <span style={{ fontWeight:800 }} key={heroWord} className="word-slot">{words[heroWord]}</span>
               </span>
             </div>
 
             {/* Headline */}
-            <h1 style={{
-              fontSize:"clamp(44px,7vw,88px)",
+            <h1 className="hero-h1" style={{
+              fontSize:"clamp(44px,7vw,80px)",
               fontWeight:900, lineHeight:1.0,
-              letterSpacing:"-3px",
-              margin:"0 0 28px",
+              letterSpacing:"-2.5px",
+              margin:"0 0 24px",
               color:TXT,
             }}>
               Ihr Betrieb.{" "}
               <br />
-              <span className="gradient-text-green">Automatisch.</span>
+              <span style={{ color:GREEN }}>Automatisch.</span>
             </h1>
 
-            <p style={{ fontSize:"clamp(16px,2vw,19px)", color:MUTED, lineHeight:1.7, maxWidth:520, margin:"0 auto 44px", fontWeight:400 }}>
+            <p style={{ fontSize:"clamp(16px,2vw,19px)", color:MUTED, lineHeight:1.75, maxWidth:520, margin:"0 auto 44px", fontWeight:400 }}>
               TerminStop ersetzt Zettelwirtschaft und Hinterhertelefonieren — mit Kalender, Kundenkartei und automatischen SMS-Erinnerungen. In 10 Minuten eingerichtet.
             </p>
 
             {/* CTAs */}
             <div style={{ display:"flex", gap:12, justifyContent:"center", flexWrap:"wrap", marginBottom:64 }}>
-              <a href="/lead" className="btn-primary" style={{ fontSize:15, padding:"14px 32px" }}>
+              <a href="/lead" className="btn-primary" style={{ fontSize:16, padding:"15px 34px" }}>
                 Kostenlose Beratung →
               </a>
-              <a href="/demo" className="btn-ghost" style={{ fontSize:15, padding:"14px 28px" }}>
+              <a href="/demo" className="btn-outline" style={{ fontSize:16, padding:"15px 28px" }}>
                 Live-Demo ansehen
               </a>
             </div>
 
             {/* Stats */}
-            <div style={{ display:"flex", justifyContent:"center", gap:0, background:"rgba(255,255,255,0.03)", border:`1px solid ${BORDER}`, borderRadius:16, overflow:"hidden" }}>
+            <div style={{ display:"flex", justifyContent:"center", background:BG, border:`1px solid ${BORDER}`, borderRadius:16, overflow:"hidden", boxShadow:"0 2px 16px rgba(0,0,0,0.06)" }}>
               {[
                 { to:50, suffix:"+", label:"Betriebe aktiv" },
                 { to:95, suffix:"%", label:"Weniger Ausfälle" },
                 { to:10, suffix:" Min", label:"Einrichtung" },
               ].map((s, i) => (
-                <div key={i} style={{ flex:1, padding:"20px 24px", borderRight: i < 2 ? `1px solid ${BORDER}` : "none", textAlign:"center" }}>
-                  <div style={{ fontSize:"clamp(22px,3vw,32px)", fontWeight:900, color:TXT, letterSpacing:"-1px" }}>
+                <div key={i} style={{ flex:1, padding:"22px 24px", borderRight: i < 2 ? `1px solid ${BORDER}` : "none", textAlign:"center" }}>
+                  <div style={{ fontSize:"clamp(24px,3vw,34px)", fontWeight:900, color:TXT, letterSpacing:"-1px" }}>
                     <Counter to={s.to} suffix={s.suffix} />
                   </div>
                   <div style={{ fontSize:12, color:MUTED2, marginTop:4, fontWeight:500 }}>{s.label}</div>
@@ -347,13 +312,13 @@ export default function LandingPage() {
         {/* ══════════════════════════════════════════════
             INDUSTRY STRIP
         ══════════════════════════════════════════════ */}
-        <div style={{ borderTop:`1px solid ${BORDER}`, borderBottom:`1px solid ${BORDER}`, padding:"12px 0", overflow:"hidden", background:SURF }}>
+        <div style={{ borderTop:`1px solid ${BORDER}`, borderBottom:`1px solid ${BORDER}`, padding:"12px 0", overflow:"hidden", background:BG2 }}>
           <div style={{ display:"flex" }}>
             <div className="marquee-wrap" style={{ display:"flex", gap:48, flexShrink:0 }}>
               {[...industries, ...industries].map((b, i) => (
                 <div key={i} style={{ display:"flex", alignItems:"center", gap:8, flexShrink:0 }}>
                   <div style={{ width:4, height:4, background:GREEN, borderRadius:"50%", opacity:.6 }} />
-                  <span style={{ fontSize:12, color:MUTED2, fontWeight:500, whiteSpace:"nowrap" }}>{b}</span>
+                  <span style={{ fontSize:13, color:MUTED2, fontWeight:500, whiteSpace:"nowrap" }}>{b}</span>
                 </div>
               ))}
             </div>
@@ -363,12 +328,12 @@ export default function LandingPage() {
         {/* ══════════════════════════════════════════════
             PROBLEM
         ══════════════════════════════════════════════ */}
-        <section className="sec-pad" style={{ padding:"88px 32px", background:BG }}>
+        <section className="sec-pad" style={{ padding:"96px 32px", background:BG }}>
           <div style={{ maxWidth:1040, margin:"0 auto" }}>
             <Reveal>
-              <div style={{ maxWidth:480, marginBottom:56 }}>
-                <div className="tag" style={{ marginBottom:20 }}>Das Problem</div>
-                <h2 style={{ fontSize:"clamp(30px,4vw,50px)", fontWeight:900, letterSpacing:"-1.5px", lineHeight:1.08, margin:"0 0 16px", color:TXT }}>
+              <div style={{ maxWidth:500, marginBottom:56 }}>
+                <div className="tag-green" style={{ marginBottom:18 }}>Das Problem</div>
+                <h2 style={{ fontSize:"clamp(28px,4vw,48px)", fontWeight:900, letterSpacing:"-1.5px", lineHeight:1.08, margin:"0 0 14px", color:TXT }}>
                   Ausfälle kosten Sie täglich Geld.
                 </h2>
                 <p style={{ fontSize:16, color:MUTED, lineHeight:1.7, margin:0 }}>
@@ -377,16 +342,16 @@ export default function LandingPage() {
               </div>
             </Reveal>
 
-            <div style={{ display:"grid", gap:1, background:BORDER, borderRadius:20, overflow:"hidden" }} className="stat-grid">
+            <div style={{ display:"grid", gap:16 }} className="stat-grid">
               <style>{`.stat-grid{grid-template-columns:repeat(3,1fr)} @media(max-width:700px){.stat-grid{grid-template-columns:1fr!important}}`}</style>
               {[
-                { to:50, suffix:"€", pre:"bis ", label:"Verlust pro Ausfall", desc:"Jeder verpasste Termin ist Umsatz, der nicht stattfindet.", col:"#F0F4FF" },
-                { to:9, suffix:"×", pre:"bis ", label:"Ausfälle pro Woche", desc:"Im Schnitt erlebt jeder Betrieb mehrfach wöchentlich Ausfälle.", col:"#F0F4FF" },
-                { to:2000, suffix:"€", pre:"bis ", label:"Verlust pro Monat", desc:"Was wenig klingt, summiert sich zu Tausenden im Jahr.", col:GREEN },
+                { to:50, suffix:"€", pre:"bis ", label:"Verlust pro Ausfall", desc:"Jeder verpasste Termin ist Umsatz, der nicht stattfindet.", accent:false },
+                { to:9, suffix:"×", pre:"bis ", label:"Ausfälle pro Woche", desc:"Im Schnitt erlebt jeder Betrieb mehrfach wöchentlich Ausfälle.", accent:false },
+                { to:2000, suffix:"€", pre:"bis ", label:"Verlust pro Monat", desc:"Was wenig klingt, summiert sich zu Tausenden im Jahr.", accent:true },
               ].map((item, i) => (
                 <Reveal key={i} delay={i * 80}>
-                  <div style={{ padding:"44px 36px", background:SURF }}>
-                    <div style={{ fontSize:"clamp(40px,5vw,60px)", fontWeight:900, color:item.col, marginBottom:12, letterSpacing:"-2px", fontVariantNumeric:"tabular-nums" }}>
+                  <div className="card-lift" style={{ padding:"36px 32px", background: item.accent ? GREEN_L : BG2, border:`1px solid ${item.accent ? GREEN_B : BORDER}`, borderRadius:16, height:"100%", boxSizing:"border-box" }}>
+                    <div style={{ fontSize:"clamp(38px,5vw,56px)", fontWeight:900, color: item.accent ? GREEN : TXT, marginBottom:10, letterSpacing:"-2px", fontVariantNumeric:"tabular-nums", lineHeight:1 }}>
                       {item.pre}<Counter to={item.to} suffix={item.suffix} />
                     </div>
                     <div style={{ fontSize:14, fontWeight:700, color:TXT, marginBottom:8 }}>{item.label}</div>
@@ -401,29 +366,29 @@ export default function LandingPage() {
         {/* ══════════════════════════════════════════════
             HOW IT WORKS
         ══════════════════════════════════════════════ */}
-        <section id="wie-es-funktioniert" className="sec-pad" style={{ padding:"88px 32px", background:SURF }}>
-          <div style={{ maxWidth:900, margin:"0 auto" }}>
+        <section id="wie-es-funktioniert" className="sec-pad" style={{ padding:"96px 32px", background:BG2 }}>
+          <div style={{ maxWidth:860, margin:"0 auto" }}>
             <Reveal>
-              <div style={{ textAlign:"center", maxWidth:500, margin:"0 auto 64px" }}>
-                <div className="tag" style={{ marginBottom:20 }}>So funktioniert's</div>
-                <h2 style={{ fontSize:"clamp(30px,4vw,50px)", fontWeight:900, letterSpacing:"-1.5px", lineHeight:1.08, margin:"0 0 14px", color:TXT }}>
+              <div style={{ textAlign:"center", maxWidth:500, margin:"0 auto 60px" }}>
+                <div className="tag-green" style={{ marginBottom:18 }}>So funktioniert's</div>
+                <h2 style={{ fontSize:"clamp(28px,4vw,48px)", fontWeight:900, letterSpacing:"-1.5px", lineHeight:1.08, margin:"0 0 14px", color:TXT }}>
                   Drei Schritte.<br />Dann läuft alles.
                 </h2>
                 <p style={{ fontSize:16, color:MUTED, margin:0, lineHeight:1.65 }}>Kein IT-Studium. Kein Aufwand. Für immer.</p>
               </div>
             </Reveal>
 
-            <div style={{ display:"flex", flexDirection:"column", gap:2 }}>
+            <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
               {[
                 { num:"01", tag:"Persönliche Begleitung", title:"Einmalig einrichten — in unter 10 Minuten", desc:"Wir richten TerminStop gemeinsam mit Ihnen ein. Kalender, Kundenkartei und SMS-Erinnerungen. Persönlicher Onboarding-Support inklusive." },
                 { num:"02", tag:"Vollautomatisch", title:"Ihr digitales Büro läuft — sofort und automatisch", desc:"Termine im Kalender, Kunden in der Kartei, SMS-Erinnerungen gehen 24h vor jedem Termin automatisch raus — mit Ihrem Namen." },
                 { num:"03", tag:"95% Erfolgsquote", title:"Ihr Betrieb läuft planbarer. Jeden Tag.", desc:"Weniger Ausfälle, mehr Überblick, mehr Umsatz. TerminStop arbeitet dauerhaft für Sie im Hintergrund." },
               ].map((s, i) => (
                 <Reveal key={i} delay={i * 80}>
-                  <div className="card-hover" style={{ background:SURF2, border:`1px solid ${BORDER}`, borderRadius:16, padding:"28px 32px", display:"flex", gap:28, alignItems:"flex-start" }}>
-                    <div style={{ fontSize:48, fontWeight:900, lineHeight:1, color:"rgba(255,255,255,0.06)", flexShrink:0, width:60, textAlign:"center", userSelect:"none", fontVariantNumeric:"tabular-nums" }}>{s.num}</div>
+                  <div className="card-lift" style={{ background:BG, border:`1px solid ${BORDER}`, borderRadius:14, padding:"28px 32px", display:"flex", gap:28, alignItems:"flex-start", boxShadow:"0 1px 6px rgba(0,0,0,0.04)" }}>
+                    <div style={{ fontSize:44, fontWeight:900, lineHeight:1, color:BG3, flexShrink:0, width:56, textAlign:"center", userSelect:"none", fontVariantNumeric:"tabular-nums" }}>{s.num}</div>
                     <div>
-                      <span style={{ display:"inline-block", background:"rgba(24,166,109,0.08)", border:"1px solid rgba(24,166,109,0.2)", color:"#4AE89B", fontSize:10, fontWeight:700, padding:"3px 10px", borderRadius:980, marginBottom:10, letterSpacing:".5px" }}>{s.tag}</span>
+                      <span style={{ display:"inline-block", background:GREEN_L, border:`1px solid ${GREEN_B}`, color:GREEN, fontSize:10, fontWeight:700, padding:"3px 10px", borderRadius:980, marginBottom:10, letterSpacing:".4px" }}>{s.tag}</span>
                       <h3 style={{ fontSize:17, fontWeight:800, color:TXT, margin:"0 0 8px", letterSpacing:"-0.3px" }}>{s.title}</h3>
                       <p style={{ fontSize:14, color:MUTED, lineHeight:1.7, margin:0 }}>{s.desc}</p>
                     </div>
@@ -435,14 +400,14 @@ export default function LandingPage() {
         </section>
 
         {/* ══════════════════════════════════════════════
-            FEATURES BENTO
+            FEATURES
         ══════════════════════════════════════════════ */}
-        <section className="sec-pad" style={{ padding:"88px 32px", background:BG }}>
+        <section className="sec-pad" style={{ padding:"96px 32px", background:BG }}>
           <div style={{ maxWidth:1040, margin:"0 auto" }}>
             <Reveal>
               <div style={{ textAlign:"center", maxWidth:500, margin:"0 auto 56px" }}>
-                <div className="tag" style={{ marginBottom:20 }}>Alles inklusive</div>
-                <h2 style={{ fontSize:"clamp(30px,4vw,50px)", fontWeight:900, letterSpacing:"-1.5px", lineHeight:1.08, margin:"0 0 14px", color:TXT }}>
+                <div className="tag-green" style={{ marginBottom:18 }}>Alles inklusive</div>
+                <h2 style={{ fontSize:"clamp(28px,4vw,48px)", fontWeight:900, letterSpacing:"-1.5px", lineHeight:1.08, margin:"0 0 14px", color:TXT }}>
                   Kein Einzeltool.<br />Ein komplettes System.
                 </h2>
                 <p style={{ fontSize:16, color:MUTED, lineHeight:1.65, margin:0 }}>
@@ -451,61 +416,31 @@ export default function LandingPage() {
               </div>
             </Reveal>
 
-            {/* Bento Grid */}
-            <div style={{ display:"grid", gap:3 }} className="bento-grid">
+            <div style={{ display:"grid", gap:16 }} className="features-grid">
               <style>{`
-                .bento-grid { grid-template-columns: repeat(2, 1fr); grid-template-rows: auto; }
-                @media(max-width:700px){ .bento-grid { grid-template-columns: 1fr !important; } }
+                .features-grid { grid-template-columns: repeat(2,1fr); }
+                @media(max-width:700px){ .features-grid { grid-template-columns:1fr!important; } }
               `}</style>
 
-              {/* Big card top left */}
-              <Reveal delay={0}>
-                <div className="card-hover" style={{ background:SURF, border:`1px solid ${BORDER}`, borderRadius:18, padding:"36px", gridRow:"span 1", height:"100%", boxSizing:"border-box", position:"relative", overflow:"hidden" }}>
-                  <div style={{ position:"absolute", top:-40, right:-40, width:180, height:180, background:`radial-gradient(ellipse, ${GLOW} 0%, transparent 70%)`, pointerEvents:"none" }} />
-                  <div style={{ width:44, height:44, background:"rgba(24,166,109,0.1)", border:"1px solid rgba(24,166,109,0.2)", borderRadius:13, display:"flex", alignItems:"center", justifyContent:"center", fontSize:20, marginBottom:20 }}>📅</div>
-                  <div style={{ fontSize:10, fontWeight:700, color:"#4AE89B", letterSpacing:1.5, textTransform:"uppercase", marginBottom:10 }}>Vollautomatisch</div>
-                  <h3 style={{ fontSize:20, fontWeight:800, color:TXT, margin:"0 0 10px", letterSpacing:"-0.4px" }}>SMS-Erinnerungen</h3>
-                  <p style={{ fontSize:14, color:MUTED, lineHeight:1.7, margin:0 }}>24h vor jedem Termin geht eine personalisierte SMS raus — mit Ihrem Namen, ohne Ihr Zutun. Nie wieder hinterhertelefonieren.</p>
-                </div>
-              </Reveal>
-
-              {/* Top right */}
-              <Reveal delay={60}>
-                <div className="card-hover" style={{ background:SURF, border:`1px solid ${BORDER}`, borderRadius:18, padding:"36px", height:"100%", boxSizing:"border-box", position:"relative", overflow:"hidden" }}>
-                  <div style={{ position:"absolute", bottom:-40, left:-40, width:160, height:160, background:`radial-gradient(ellipse, rgba(99,102,241,0.08) 0%, transparent 70%)`, pointerEvents:"none" }} />
-                  <div style={{ width:44, height:44, background:"rgba(99,102,241,0.1)", border:"1px solid rgba(99,102,241,0.2)", borderRadius:13, display:"flex", alignItems:"center", justifyContent:"center", fontSize:20, marginBottom:20 }}>👥</div>
-                  <div style={{ fontSize:10, fontWeight:700, color:"#818CF8", letterSpacing:1.5, textTransform:"uppercase", marginBottom:10 }}>Voller Überblick</div>
-                  <h3 style={{ fontSize:20, fontWeight:800, color:TXT, margin:"0 0 10px", letterSpacing:"-0.4px" }}>Kundenkartei</h3>
-                  <p style={{ fontSize:14, color:MUTED, lineHeight:1.7, margin:0 }}>Stammkunden anlegen, Verlauf einsehen, Notizen hinterlegen. Sie wissen immer, wer zuverlässig ist — und wer nicht.</p>
-                </div>
-              </Reveal>
-
-              {/* Bottom left */}
-              <Reveal delay={100}>
-                <div className="card-hover" style={{ background:SURF, border:`1px solid ${BORDER}`, borderRadius:18, padding:"36px", height:"100%", boxSizing:"border-box", position:"relative", overflow:"hidden" }}>
-                  <div style={{ position:"absolute", top:-30, right:-30, width:140, height:140, background:`radial-gradient(ellipse, rgba(245,158,11,0.07) 0%, transparent 70%)`, pointerEvents:"none" }} />
-                  <div style={{ width:44, height:44, background:"rgba(245,158,11,0.1)", border:"1px solid rgba(245,158,11,0.2)", borderRadius:13, display:"flex", alignItems:"center", justifyContent:"center", fontSize:20, marginBottom:20 }}>🗓️</div>
-                  <div style={{ fontSize:10, fontWeight:700, color:"#FCD34D", letterSpacing:1.5, textTransform:"uppercase", marginBottom:10 }}>Immer aktuell</div>
-                  <h3 style={{ fontSize:20, fontWeight:800, color:TXT, margin:"0 0 10px", letterSpacing:"-0.4px" }}>Digitaler Kalender</h3>
-                  <p style={{ fontSize:14, color:MUTED, lineHeight:1.7, margin:0 }}>Tag- und Wochenansicht auf dem Handy, Tablet oder PC. Nie wieder Zettelwirtschaft — alles an einem Ort.</p>
-                </div>
-              </Reveal>
-
-              {/* Bottom right */}
-              <Reveal delay={140}>
-                <div className="card-hover" style={{ background:SURF, border:`1px solid ${BORDER}`, borderRadius:18, padding:"36px", height:"100%", boxSizing:"border-box", position:"relative", overflow:"hidden" }}>
-                  <div style={{ position:"absolute", bottom:-30, right:-30, width:140, height:140, background:`radial-gradient(ellipse, rgba(236,72,153,0.07) 0%, transparent 70%)`, pointerEvents:"none" }} />
-                  <div style={{ width:44, height:44, background:"rgba(236,72,153,0.1)", border:"1px solid rgba(236,72,153,0.2)", borderRadius:13, display:"flex", alignItems:"center", justifyContent:"center", fontSize:20, marginBottom:20 }}>📊</div>
-                  <div style={{ fontSize:10, fontWeight:700, color:"#F9A8D4", letterSpacing:1.5, textTransform:"uppercase", marginBottom:10 }}>Datengestützt</div>
-                  <h3 style={{ fontSize:20, fontWeight:800, color:TXT, margin:"0 0 10px", letterSpacing:"-0.4px" }}>Auswertungen</h3>
-                  <p style={{ fontSize:14, color:MUTED, lineHeight:1.7, margin:0 }}>Wie hoch ist Ihre Erfolgsquote? Welche Kunden kommen regelmäßig? Sehen Sie Ihren Betrieb schwarz auf weiß.</p>
-                </div>
-              </Reveal>
+              {[
+                { icon:"📅", color:"#10B981", bg:"#ECFDF5", border:"#A7F3D0", label:"Vollautomatisch", title:"SMS-Erinnerungen", desc:"24h vor jedem Termin geht eine personalisierte SMS raus — mit Ihrem Namen, ohne Ihr Zutun. Nie wieder hinterhertelefonieren." },
+                { icon:"👥", color:"#6366F1", bg:"#EEF2FF", border:"#C7D2FE", label:"Voller Überblick", title:"Kundenkartei", desc:"Stammkunden anlegen, Verlauf einsehen, Notizen hinterlegen. Sie wissen immer, wer zuverlässig ist — und wer nicht." },
+                { icon:"🗓️", color:"#F59E0B", bg:"#FFFBEB", border:"#FDE68A", label:"Immer aktuell", title:"Digitaler Kalender", desc:"Tag- und Wochenansicht auf dem Handy, Tablet oder PC. Nie wieder Zettelwirtschaft — alles an einem Ort." },
+                { icon:"📊", color:"#EC4899", bg:"#FDF2F8", border:"#FBCFE8", label:"Datengestützt", title:"Auswertungen", desc:"Wie hoch ist Ihre Erfolgsquote? Welche Kunden kommen regelmäßig? Sehen Sie Ihren Betrieb schwarz auf weiß." },
+              ].map((f, i) => (
+                <Reveal key={i} delay={i * 60}>
+                  <div className="card-lift" style={{ background:BG, border:`1px solid ${BORDER}`, borderRadius:16, padding:"32px", height:"100%", boxSizing:"border-box", boxShadow:"0 1px 6px rgba(0,0,0,0.04)" }}>
+                    <div style={{ width:46, height:46, background:f.bg, border:`1px solid ${f.border}`, borderRadius:12, display:"flex", alignItems:"center", justifyContent:"center", fontSize:21, marginBottom:18 }}>{f.icon}</div>
+                    <div style={{ fontSize:10, fontWeight:700, color:f.color, letterSpacing:1.5, textTransform:"uppercase", marginBottom:8 }}>{f.label}</div>
+                    <h3 style={{ fontSize:19, fontWeight:800, color:TXT, margin:"0 0 10px", letterSpacing:"-0.4px" }}>{f.title}</h3>
+                    <p style={{ fontSize:14, color:MUTED, lineHeight:1.75, margin:0 }}>{f.desc}</p>
+                  </div>
+                </Reveal>
+              ))}
             </div>
 
-            {/* CTA below bento */}
             <Reveal delay={80}>
-              <div style={{ marginTop:16, background:SURF, border:`1px solid ${BORDER}`, borderRadius:16, padding:"20px 28px", display:"flex", alignItems:"center", justifyContent:"space-between", gap:20, flexWrap:"wrap" }}>
+              <div style={{ marginTop:16, background:GREEN_L, border:`1px solid ${GREEN_B}`, borderRadius:14, padding:"20px 28px", display:"flex", alignItems:"center", justifyContent:"space-between", gap:20, flexWrap:"wrap" }}>
                 <div>
                   <span style={{ color:TXT, fontWeight:700, fontSize:15 }}>Alles in einem Paket. Ab €1,30/Tag.</span>
                   <span style={{ color:MUTED, fontSize:13, marginLeft:12 }}>Monatlich kündbar · Kein Vertrag</span>
@@ -519,26 +454,26 @@ export default function LandingPage() {
         {/* ══════════════════════════════════════════════
             REVIEWS
         ══════════════════════════════════════════════ */}
-        <section className="sec-pad" style={{ padding:"88px 32px", background:SURF }}>
-          <div style={{ maxWidth:900, margin:"0 auto" }}>
+        <section className="sec-pad" style={{ padding:"96px 32px", background:BG2 }}>
+          <div style={{ maxWidth:860, margin:"0 auto" }}>
             <Reveal>
               <div style={{ textAlign:"center", marginBottom:52 }}>
-                <div className="tag" style={{ marginBottom:20 }}>Echte Ergebnisse</div>
-                <h2 style={{ fontSize:"clamp(28px,3.5vw,44px)", fontWeight:900, letterSpacing:"-1.5px", lineHeight:1.08, margin:0, color:TXT }}>Was Betriebe berichten.</h2>
+                <div className="tag-green" style={{ marginBottom:18 }}>Echte Ergebnisse</div>
+                <h2 style={{ fontSize:"clamp(26px,3.5vw,42px)", fontWeight:900, letterSpacing:"-1.5px", lineHeight:1.08, margin:0, color:TXT }}>Was Betriebe berichten.</h2>
               </div>
             </Reveal>
-            <div style={{ display:"grid", gap:12 }} className="reviews-grid">
+            <div style={{ display:"grid", gap:16 }} className="reviews-grid">
               <style>{`.reviews-grid{grid-template-columns:1fr 1fr} @media(max-width:700px){.reviews-grid{grid-template-columns:1fr!important}}`}</style>
               {reviews.map((r, i) => (
                 <Reveal key={i} delay={i * 80}>
-                  <div className="card-hover" style={{ background:SURF2, border:`1px solid ${BORDER}`, borderRadius:18, padding:"28px", display:"flex", flexDirection:"column", height:"100%" }}>
+                  <div className="card-lift" style={{ background:BG, border:`1px solid ${BORDER}`, borderRadius:16, padding:"28px", display:"flex", flexDirection:"column", height:"100%", boxShadow:"0 1px 6px rgba(0,0,0,0.04)" }}>
                     <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:18 }}>
-                      <div style={{ background:"rgba(24,166,109,0.1)", border:"1px solid rgba(24,166,109,0.2)", color:"#4AE89B", fontSize:11, fontWeight:700, padding:"5px 12px", borderRadius:980 }}>✓ {r.result}</div>
-                      <div style={{ color:"#FBBF24", fontSize:12, letterSpacing:2 }}>★★★★★</div>
+                      <div style={{ background:GREEN_L, border:`1px solid ${GREEN_B}`, color:GREEN, fontSize:11, fontWeight:700, padding:"5px 12px", borderRadius:980 }}>✓ {r.result}</div>
+                      <div style={{ color:"#F59E0B", fontSize:13, letterSpacing:2 }}>★★★★★</div>
                     </div>
-                    <p style={{ fontSize:14, color:MUTED, lineHeight:1.75, flex:1, marginBottom:20, fontStyle:"italic" }}>„{r.text}"</p>
+                    <p style={{ fontSize:14, color:MUTED, lineHeight:1.8, flex:1, marginBottom:20 }}>„{r.text}"</p>
                     <div style={{ display:"flex", alignItems:"center", gap:12, paddingTop:18, borderTop:`1px solid ${BORDER}` }}>
-                      <div style={{ width:36, height:36, background:"linear-gradient(135deg,#18A66D,#0A7A4F)", color:"#fff", borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", fontSize:14, fontWeight:900, flexShrink:0 }}>{r.name.charAt(0)}</div>
+                      <div style={{ width:36, height:36, background:GREEN, color:"#fff", borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", fontSize:14, fontWeight:900, flexShrink:0 }}>{r.name.charAt(0)}</div>
                       <div>
                         <div style={{ fontSize:13, fontWeight:700, color:TXT }}>{r.name}</div>
                         <div style={{ fontSize:12, color:MUTED2 }}>{r.role} · {r.city}</div>
@@ -554,12 +489,12 @@ export default function LandingPage() {
         {/* ══════════════════════════════════════════════
             PRICING
         ══════════════════════════════════════════════ */}
-        <section id="preise" className="sec-pad" style={{ padding:"88px 32px", background:BG }}>
+        <section id="preise" className="sec-pad" style={{ padding:"96px 32px", background:BG }}>
           <div style={{ maxWidth:1000, margin:"0 auto" }}>
             <Reveal>
               <div style={{ textAlign:"center", maxWidth:560, margin:"0 auto 16px" }}>
-                <div className="tag" style={{ marginBottom:20 }}>Ihr Paket</div>
-                <h2 style={{ fontSize:"clamp(30px,4vw,50px)", fontWeight:900, letterSpacing:"-1.5px", lineHeight:1.08, margin:"0 0 14px", color:TXT }}>
+                <div className="tag-green" style={{ marginBottom:18 }}>Ihr Paket</div>
+                <h2 style={{ fontSize:"clamp(28px,4vw,48px)", fontWeight:900, letterSpacing:"-1.5px", lineHeight:1.08, margin:"0 0 14px", color:TXT }}>
                   Individuell angepasst.<br />Passend für Ihren Betrieb.
                 </h2>
                 <p style={{ fontSize:16, color:MUTED, margin:0, lineHeight:1.65 }}>
@@ -570,13 +505,13 @@ export default function LandingPage() {
 
             <Reveal delay={60}>
               <div style={{ display:"flex", justifyContent:"center", margin:"32px 0 44px" }}>
-                <div style={{ background:SURF, border:`1px solid rgba(24,166,109,0.2)`, borderRadius:16, padding:"18px 28px", display:"flex", alignItems:"center", gap:20, boxShadow:`0 0 40px rgba(24,166,109,0.07)` }}>
+                <div style={{ background:GREEN_L, border:`1px solid ${GREEN_B}`, borderRadius:14, padding:"18px 28px", display:"flex", alignItems:"center", gap:20 }}>
                   <div style={{ textAlign:"center" }}>
                     <div style={{ fontSize:11, fontWeight:700, letterSpacing:2, textTransform:"uppercase", color:MUTED2, marginBottom:4 }}>Einstieg bereits ab</div>
                     <div style={{ fontSize:34, fontWeight:900, color:TXT, letterSpacing:"-1px", lineHeight:1 }}>€1,30 <span style={{ fontSize:15, fontWeight:500, color:MUTED }}>/ Tag</span></div>
                     <div style={{ fontSize:11, color:MUTED2, marginTop:4 }}>Monatlich kündbar · Kein Vertrag</div>
                   </div>
-                  <div style={{ width:1, height:48, background:BORDER }} />
+                  <div style={{ width:1, height:48, background:GREEN_B }} />
                   <div style={{ fontSize:13, color:MUTED, maxWidth:200, lineHeight:1.6 }}>
                     Schon <strong style={{ color:TXT }}>2–3 verhinderte Ausfälle</strong> decken das Paket vollständig ab.
                   </div>
@@ -584,117 +519,86 @@ export default function LandingPage() {
               </div>
             </Reveal>
 
-            <div style={{ display:"grid", gap:3 }} className="pricing-grid">
+            <div style={{ display:"grid", gap:16 }} className="pricing-grid">
               <style>{`.pricing-grid{grid-template-columns:repeat(3,1fr)} @media(max-width:800px){.pricing-grid{grid-template-columns:1fr!important}}`}</style>
               {tiers.map((tier, i) => (
                 <Reveal key={i} delay={i * 70}>
-                  {tier.dark ? (
-                    <div style={{ background:`linear-gradient(160deg, rgba(24,166,109,0.12) 0%, ${SURF2} 60%)`, border:"1px solid rgba(24,166,109,0.3)", borderRadius:18, padding:"32px 28px", position:"relative", boxShadow:`0 0 60px rgba(24,166,109,0.08)`, height:"100%", boxSizing:"border-box" }}>
-                      <div style={{ position:"absolute", top:-14, left:"50%", transform:"translateX(-50%)", background:"linear-gradient(135deg,#18A66D,#0EA060)", color:"#fff", fontSize:11, fontWeight:700, padding:"5px 18px", borderRadius:980, whiteSpace:"nowrap", boxShadow:"0 4px 16px rgba(24,166,109,0.4)" }}>✓ Meistgewählt</div>
-                      <div style={{ fontSize:11, fontWeight:700, letterSpacing:2, textTransform:"uppercase", color:"#4AE89B", marginBottom:8 }}>{tier.name}</div>
-                      <div style={{ fontSize:13, color:MUTED2, marginBottom:24, paddingBottom:20, borderBottom:`1px solid rgba(255,255,255,0.08)` }}>{tier.for}</div>
+                  {tier.highlight ? (
+                    <div style={{ background:GREEN, border:`1px solid ${GREEN}`, borderRadius:18, padding:"32px 28px", position:"relative", boxShadow:`0 8px 40px rgba(24,166,109,0.25)`, height:"100%", boxSizing:"border-box" }}>
+                      <div style={{ position:"absolute", top:-14, left:"50%", transform:"translateX(-50%)", background:TXT, color:"#fff", fontSize:11, fontWeight:700, padding:"5px 18px", borderRadius:980, whiteSpace:"nowrap" }}>✓ Meistgewählt</div>
+                      <div style={{ fontSize:11, fontWeight:700, letterSpacing:2, textTransform:"uppercase", color:"rgba(255,255,255,0.75)", marginBottom:8 }}>{tier.name}</div>
+                      <div style={{ fontSize:13, color:"rgba(255,255,255,0.65)", marginBottom:24, paddingBottom:20, borderBottom:"1px solid rgba(255,255,255,0.2)" }}>{tier.for}</div>
                       <div style={{ display:"flex", flexDirection:"column", gap:11, marginBottom:32 }}>
                         {tier.features.map((f, j) => (
                           <div key={j} style={{ display:"flex", alignItems:"center", gap:10 }}>
-                            <span style={{ color:"#4AE89B", fontSize:12, flexShrink:0 }}>✓</span>
-                            <span style={{ fontSize:13, color:"rgba(240,244,255,0.7)" }}>{f}</span>
+                            <span style={{ color:"#fff", fontSize:12, flexShrink:0 }}>✓</span>
+                            <span style={{ fontSize:14, color:"rgba(255,255,255,0.9)", fontWeight:500 }}>{f}</span>
                           </div>
                         ))}
                       </div>
-                      <a href="/lead" className="btn-primary" style={{ display:"block", textAlign:"center", fontSize:14, padding:"13px 0", borderRadius:10, width:"100%", boxSizing:"border-box" }}>Paket anfragen →</a>
+                      <a href="/lead" className="btn-white" style={{ width:"100%", fontSize:14, padding:"13px 20px", boxSizing:"border-box" }}>Jetzt anfragen →</a>
                     </div>
                   ) : (
-                    <div className="card-hover" style={{ background:SURF, border:`1px solid ${BORDER}`, borderRadius:18, padding:"32px 28px", height:"100%", boxSizing:"border-box" }}>
+                    <div className="card-lift" style={{ background:BG, border:`1px solid ${BORDER}`, borderRadius:18, padding:"32px 28px", height:"100%", boxSizing:"border-box", boxShadow:"0 1px 6px rgba(0,0,0,0.04)" }}>
                       <div style={{ fontSize:11, fontWeight:700, letterSpacing:2, textTransform:"uppercase", color:MUTED2, marginBottom:8 }}>{tier.name}</div>
                       <div style={{ fontSize:13, color:MUTED2, marginBottom:24, paddingBottom:20, borderBottom:`1px solid ${BORDER}` }}>{tier.for}</div>
                       <div style={{ display:"flex", flexDirection:"column", gap:11, marginBottom:32 }}>
                         {tier.features.map((f, j) => (
                           <div key={j} style={{ display:"flex", alignItems:"center", gap:10 }}>
                             <span style={{ color:GREEN, fontSize:12, flexShrink:0 }}>✓</span>
-                            <span style={{ fontSize:13, color:MUTED }}>{f}</span>
+                            <span style={{ fontSize:14, color:MUTED, fontWeight:500 }}>{f}</span>
                           </div>
                         ))}
                       </div>
-                      <a href="/lead" className="btn-outline" style={{ display:"block", textAlign:"center", fontSize:14, padding:"13px 0", borderRadius:10, width:"100%", boxSizing:"border-box" }}>Paket anfragen →</a>
+                      <a href="/lead" className="btn-outline" style={{ width:"100%", fontSize:14, padding:"13px 20px", boxSizing:"border-box" }}>Jetzt anfragen →</a>
                     </div>
                   )}
                 </Reveal>
               ))}
             </div>
-
-            <Reveal delay={100}>
-              <p style={{ textAlign:"center", fontSize:13, color:MUTED2, marginTop:24 }}>
-                Die meisten Betriebe zahlen zwischen <strong style={{ color:MUTED }}>€39 und €109 / Monat</strong> · Monatlich kündbar · Alle Preise sind Endpreise (§19 UStG)
-              </p>
-            </Reveal>
-
-            {/* Add-on teaser */}
-            <Reveal delay={120}>
-              <a href="#online-buchung" style={{ textDecoration:"none", display:"block", marginTop:16 }}>
-                <div className="card-hover" style={{ background:SURF, border:"1px dashed rgba(24,166,109,0.3)", borderRadius:16, padding:"18px 24px", display:"flex", alignItems:"center", justifyContent:"space-between", gap:16, flexWrap:"wrap", cursor:"pointer" }}>
-                  <div style={{ display:"flex", alignItems:"center", gap:14 }}>
-                    <div style={{ width:38, height:38, background:"rgba(24,166,109,0.1)", borderRadius:11, display:"flex", alignItems:"center", justifyContent:"center", fontSize:18, flexShrink:0 }}>🔗</div>
-                    <div>
-                      <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:2 }}>
-                        <span style={{ fontSize:14, fontWeight:700, color:TXT }}>Add-on: Online-Buchung</span>
-                        <span style={{ background:"rgba(24,166,109,0.1)", border:"1px solid rgba(24,166,109,0.25)", color:"#4AE89B", fontSize:10, fontWeight:700, padding:"2px 8px", borderRadius:980 }}>Optional</span>
-                      </div>
-                      <p style={{ fontSize:13, color:MUTED, margin:0 }}>QR-Code + eigene Buchungsseite + SMS-Bestätigung — zu jedem Paket zubuchbar.</p>
-                    </div>
-                  </div>
-                  <span style={{ fontSize:13, color:GREEN, fontWeight:600, flexShrink:0 }}>Mehr erfahren →</span>
-                </div>
-              </a>
-            </Reveal>
           </div>
         </section>
 
         {/* ══════════════════════════════════════════════
-            ADD-ON: ONLINE BUCHUNG
+            ADD-ON
         ══════════════════════════════════════════════ */}
-        <section id="online-buchung" className="sec-pad" style={{ padding:"88px 32px", background:SURF, position:"relative", overflow:"hidden" }}>
-          <div style={{ position:"absolute", top:"10%", right:"-5%", width:500, height:400, borderRadius:"50%", background:`radial-gradient(ellipse, rgba(24,166,109,0.06) 0%, transparent 65%)`, pointerEvents:"none" }} />
-          <div style={{ position:"absolute", bottom:"5%", left:"-5%", width:400, height:320, borderRadius:"50%", background:`radial-gradient(ellipse, rgba(99,102,241,0.04) 0%, transparent 65%)`, pointerEvents:"none" }} />
-
-          <div style={{ maxWidth:1000, margin:"0 auto", position:"relative" }}>
+        <section id="online-buchung" className="sec-pad" style={{ padding:"96px 32px", background:BG2 }}>
+          <div style={{ maxWidth:1040, margin:"0 auto" }}>
             <Reveal>
-              <div style={{ maxWidth:560, marginBottom:52 }}>
-                <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:20 }}>
-                  <div className="tag">Optionales Add-on</div>
-                  <div style={{ height:1, flex:1, background:BORDER }} />
-                </div>
-                <h2 style={{ fontSize:"clamp(30px,4vw,50px)", fontWeight:900, color:TXT, letterSpacing:"-1.5px", lineHeight:1.08, margin:"0 0 14px" }}>
-                  Online-Buchung.<br /><span className="gradient-text-green">Kunden buchen sich selbst.</span>
+              <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:28, flexWrap:"wrap" }}>
+                <div className="tag-green">Add-on</div>
+                <span style={{ fontSize:13, color:MUTED }}>Optional zubuchbar zu jedem Paket</span>
+              </div>
+              <div style={{ maxWidth:600, marginBottom:52 }}>
+                <h2 style={{ fontSize:"clamp(28px,4vw,48px)", fontWeight:900, letterSpacing:"-1.5px", lineHeight:1.08, margin:"0 0 14px", color:TXT }}>
+                  Online-Buchung —<br />Kunden buchen rund um die Uhr.
                 </h2>
-                <p style={{ fontSize:16, color:MUTED, lineHeight:1.65, margin:0 }}>
-                  Ergänzen Sie TerminStop um eine eigene Buchungsseite mit QR-Code — so können Kunden rund um die Uhr Termine anfragen, ohne dass Sie ans Telefon müssen.
+                <p style={{ fontSize:16, color:MUTED, lineHeight:1.7, margin:0 }}>
+                  Geben Sie Ihrem Betrieb eine eigene Buchungsseite. Kunden scannen den QR-Code und fragen Termine an — Sie bestätigen mit einem Klick.
                 </p>
               </div>
             </Reveal>
 
-            <div style={{ display:"grid", gap:3 }} className="addon-grid">
-              <style>{`.addon-grid{grid-template-columns:repeat(3,1fr)} @media(max-width:900px){.addon-grid{grid-template-columns:repeat(2,1fr)!important}} @media(max-width:560px){.addon-grid{grid-template-columns:1fr!important}}`}</style>
+            <div style={{ display:"grid", gap:12 }} className="addon-grid">
+              <style>{`.addon-grid{grid-template-columns:repeat(3,1fr)} @media(max-width:800px){.addon-grid{grid-template-columns:repeat(2,1fr)!important}} @media(max-width:500px){.addon-grid{grid-template-columns:1fr!important}}`}</style>
               {addonFeatures.map((f, i) => (
                 <Reveal key={i} delay={i * 50}>
-                  <div className="card-hover" style={{ background:SURF2, border:`1px solid ${BORDER}`, borderRadius:16, padding:"22px", height:"100%", boxSizing:"border-box" }}>
-                    <div style={{ width:36, height:36, background:"rgba(24,166,109,0.08)", border:"1px solid rgba(24,166,109,0.15)", borderRadius:10, display:"flex", alignItems:"center", justifyContent:"center", marginBottom:14 }}>
-                      <span style={{ color:"#4AE89B", fontSize:14, fontWeight:700 }}>✓</span>
-                    </div>
-                    <div style={{ fontSize:14, fontWeight:700, color:TXT, marginBottom:6, letterSpacing:"-0.2px" }}>{f.title}</div>
+                  <div className="card-lift" style={{ background:BG, border:`1px solid ${BORDER}`, borderRadius:14, padding:"22px", height:"100%", boxSizing:"border-box", boxShadow:"0 1px 6px rgba(0,0,0,0.04)" }}>
+                    <div style={{ fontSize:22, marginBottom:12 }}>{f.icon}</div>
+                    <div style={{ fontSize:14, fontWeight:700, color:TXT, marginBottom:6 }}>{f.title}</div>
                     <div style={{ fontSize:13, color:MUTED, lineHeight:1.65 }}>{f.desc}</div>
                   </div>
                 </Reveal>
               ))}
             </div>
 
-            <Reveal delay={100}>
-              <div style={{ marginTop:32, display:"flex", flexDirection:"column", alignItems:"center", gap:14, textAlign:"center" }}>
-                <p style={{ fontSize:13, color:MUTED2, margin:0 }}>
-                  Das Add-on ist für jeden TerminStop-Kunden optional zubuchbar — fragen Sie uns einfach im Gespräch danach.
-                </p>
-                <a href="/lead" className="btn-primary" style={{ fontSize:15, padding:"14px 36px" }}>
-                  Online-Buchung mit anfragen →
-                </a>
+            <Reveal delay={80}>
+              <div style={{ marginTop:16, background:BG, border:`1px solid ${BORDER}`, borderRadius:14, padding:"22px 28px", display:"flex", alignItems:"center", justifyContent:"space-between", gap:20, flexWrap:"wrap", boxShadow:"0 1px 6px rgba(0,0,0,0.04)" }}>
+                <div>
+                  <span style={{ color:TXT, fontWeight:700, fontSize:15 }}>Online-Buchung als Add-on hinzubuchen.</span>
+                  <span style={{ color:MUTED, fontSize:13, marginLeft:12 }}>Auf Anfrage · Zu jedem Paket</span>
+                </div>
+                <a href="/lead" className="btn-primary" style={{ fontSize:13, padding:"10px 22px", flexShrink:0 }}>Jetzt anfragen →</a>
               </div>
             </Reveal>
           </div>
@@ -703,31 +607,25 @@ export default function LandingPage() {
         {/* ══════════════════════════════════════════════
             FAQ
         ══════════════════════════════════════════════ */}
-        <section className="sec-pad" style={{ padding:"88px 32px", background:BG }}>
-          <div style={{ maxWidth:660, margin:"0 auto" }}>
+        <section className="sec-pad" style={{ padding:"96px 32px", background:BG }}>
+          <div style={{ maxWidth:720, margin:"0 auto" }}>
             <Reveal>
               <div style={{ textAlign:"center", marginBottom:52 }}>
-                <div className="tag" style={{ marginBottom:20 }}>FAQ</div>
-                <h2 style={{ fontSize:"clamp(28px,3.5vw,44px)", fontWeight:900, letterSpacing:"-1.5px", lineHeight:1.08, margin:"0 0 10px", color:TXT }}>Häufige Fragen.</h2>
-                <p style={{ fontSize:15, color:MUTED, margin:0 }}>Alles, was Sie wissen möchten — bevor Sie anfragen.</p>
+                <div className="tag-green" style={{ marginBottom:18 }}>FAQ</div>
+                <h2 style={{ fontSize:"clamp(26px,3.5vw,42px)", fontWeight:900, letterSpacing:"-1.5px", lineHeight:1.08, margin:0, color:TXT }}>Häufige Fragen.</h2>
               </div>
             </Reveal>
             <div>
               {faqs.map((faq, i) => (
-                <Reveal key={i} delay={i * 40}>
-                  <div className="faq-item">
-                    <button
-                      onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                      style={{ width:"100%", textAlign:"left", padding:"20px 0", display:"flex", justifyContent:"space-between", alignItems:"center", gap:16, background:"none", border:"none", cursor:"pointer" }}
-                    >
-                      <span style={{ fontSize:15, fontWeight:600, color:TXT, lineHeight:1.5 }}>{faq.q}</span>
-                      <span style={{ color:GREEN, fontSize:20, flexShrink:0, fontWeight:300, lineHeight:1, transform: openFaq === i ? "rotate(45deg)" : "none", transition:"transform .25s cubic-bezier(.16,1,.3,1)" }}>+</span>
-                    </button>
-                    {openFaq === i && (
-                      <div style={{ paddingBottom:20, fontSize:14, color:MUTED, lineHeight:1.75, paddingRight:32 }}>{faq.a}</div>
-                    )}
-                  </div>
-                </Reveal>
+                <div key={i} className="faq-item">
+                  <button className="faq-btn" onClick={() => setOpenFaq(openFaq === i ? null : i)} style={{ padding:"20px 16px", borderRadius:8, display:"flex", justifyContent:"space-between", alignItems:"center", gap:16 }}>
+                    <span style={{ fontSize:15, fontWeight:700, color:TXT, textAlign:"left", lineHeight:1.4 }}>{faq.q}</span>
+                    <span style={{ color:openFaq === i ? GREEN : MUTED2, fontSize:18, flexShrink:0, transition:"transform .2s", transform: openFaq === i ? "rotate(45deg)" : "none" }}>+</span>
+                  </button>
+                  {openFaq === i && (
+                    <div style={{ padding:"0 16px 20px", fontSize:14, color:MUTED, lineHeight:1.75 }}>{faq.a}</div>
+                  )}
+                </div>
               ))}
             </div>
           </div>
@@ -736,61 +634,50 @@ export default function LandingPage() {
         {/* ══════════════════════════════════════════════
             FINAL CTA
         ══════════════════════════════════════════════ */}
-        <section className="sec-pad" style={{ padding:"100px 32px", background:SURF, position:"relative", overflow:"hidden" }}>
-          <div style={{ position:"absolute", top:"50%", left:"50%", transform:"translate(-50%,-50%)", width:700, height:500, borderRadius:"50%", background:`radial-gradient(ellipse, rgba(24,166,109,0.1) 0%, transparent 65%)`, pointerEvents:"none" }} />
-          <div className="grid-bg" />
-
-          <div style={{ maxWidth:660, margin:"0 auto", textAlign:"center", position:"relative", zIndex:2 }}>
-            <Reveal>
-              <div className="tag" style={{ marginBottom:24 }}>Jetzt starten</div>
-              <h2 style={{ fontSize:"clamp(36px,5vw,64px)", fontWeight:900, letterSpacing:"-2.5px", lineHeight:1.04, margin:"0 0 20px", color:TXT }}>
-                Weniger Ausfälle.<br />
-                <span className="gradient-text-green">Ab morgen.</span>
+        <section className="sec-pad" style={{ padding:"96px 32px", background:GREEN }}>
+          <Reveal>
+            <div style={{ maxWidth:600, margin:"0 auto", textAlign:"center" }}>
+              <h2 style={{ fontSize:"clamp(28px,4vw,50px)", fontWeight:900, letterSpacing:"-1.5px", lineHeight:1.08, margin:"0 0 20px", color:"#fff" }}>
+                Starten Sie noch heute.
               </h2>
-              <p style={{ fontSize:17, color:MUTED, lineHeight:1.65, maxWidth:440, margin:"0 auto 44px" }}>
-                Kostenlose Beratung, persönliches Onboarding, monatlich kündbar. Kein Risiko.
+              <p style={{ fontSize:17, color:"rgba(255,255,255,0.8)", lineHeight:1.7, margin:"0 0 44px" }}>
+                Kostenlose Beratung, persönliches Onboarding, monatlich kündbar.<br />Kein Risiko, kein Kleingedrucktes.
               </p>
               <div style={{ display:"flex", gap:12, justifyContent:"center", flexWrap:"wrap" }}>
-                <a href="/lead" className="btn-primary" style={{ fontSize:16, padding:"16px 40px" }}>
-                  Kostenlos anfragen →
-                </a>
-                <a href="/demo" className="btn-ghost" style={{ fontSize:16, padding:"16px 32px" }}>
-                  Demo ansehen
-                </a>
+                <a href="/lead" className="btn-white" style={{ fontSize:16, padding:"15px 34px" }}>Kostenlose Beratung →</a>
+                <a href="/demo" style={{ display:"inline-flex", alignItems:"center", fontSize:16, padding:"15px 28px", color:"rgba(255,255,255,0.85)", fontWeight:600, textDecoration:"none", borderRadius:10, border:"1.5px solid rgba(255,255,255,0.35)", transition:"border-color .2s, background .2s" }}>Demo ansehen</a>
               </div>
-              <p style={{ marginTop:28, fontSize:12, color:MUTED2 }}>
-                Ab €1,30/Tag · Keine Mindestlaufzeit · In 10 Minuten eingerichtet
-              </p>
-            </Reveal>
-          </div>
+            </div>
+          </Reveal>
         </section>
 
         {/* ══════════════════════════════════════════════
             FOOTER
         ══════════════════════════════════════════════ */}
-        <footer style={{ background:BG, borderTop:`1px solid ${BORDER}`, padding:"32px", display:"flex", alignItems:"center", justifyContent:"space-between", flexWrap:"wrap", gap:16 }}>
-          <a href="/" style={{ textDecoration:"none", fontSize:15, fontWeight:800, letterSpacing:"-0.5px", display:"flex", alignItems:"center", gap:8 }}>
-            <div style={{ width:24, height:24, background:"linear-gradient(135deg,#18A66D,#0EA060)", borderRadius:7, display:"flex", alignItems:"center", justifyContent:"center" }}>
-              <span style={{ color:"#fff", fontWeight:900, fontSize:11 }}>T</span>
+        <footer style={{ background:BG2, borderTop:`1px solid ${BORDER}`, padding:"40px 32px" }}>
+          <div style={{ maxWidth:1040, margin:"0 auto", display:"flex", alignItems:"center", justifyContent:"space-between", flexWrap:"wrap", gap:20 }}>
+            <div style={{ display:"flex", alignItems:"center", gap:9 }}>
+              <div style={{ width:28, height:28, background:GREEN, borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center" }}>
+                <span style={{ color:"#fff", fontWeight:900, fontSize:13 }}>T</span>
+              </div>
+              <span style={{ fontSize:15, fontWeight:800, color:TXT, letterSpacing:"-0.4px" }}>Termin<span style={{ color:GREEN }}>Stop</span></span>
             </div>
-            <span style={{ color:TXT }}>TerminStop</span>
-          </a>
-          <div style={{ display:"flex", gap:20, flexWrap:"wrap" }}>
-            {[
-              { label:"Impressum", href:"/impressum" },
-              { label:"Datenschutz", href:"/datenschutz" },
-              { label:"AGB", href:"/agb" },
-              { label:"AVV", href:"/avv" },
-              { label:"Login", href:"/login" },
-            ].map((l, i) => (
-              <a key={i} href={l.href} style={{ fontSize:12, color:MUTED2, textDecoration:"none", fontWeight:500, transition:"color .2s" }}
-                onMouseEnter={e => (e.currentTarget.style.color = MUTED)}
-                onMouseLeave={e => (e.currentTarget.style.color = MUTED2)}>
-                {l.label}
-              </a>
-            ))}
+            <div style={{ display:"flex", gap:20, flexWrap:"wrap" }}>
+              {[
+                { href:"/impressum", label:"Impressum" },
+                { href:"/datenschutz", label:"Datenschutz" },
+                { href:"/agb", label:"AGB" },
+                { href:"/avv", label:"AVV" },
+              ].map(l => (
+                <a key={l.href} href={l.href} style={{ fontSize:13, color:MUTED2, textDecoration:"none", fontWeight:500, transition:"color .2s" }}
+                  onMouseEnter={e => (e.currentTarget.style.color = TXT)}
+                  onMouseLeave={e => (e.currentTarget.style.color = MUTED2)}>
+                  {l.label}
+                </a>
+              ))}
+            </div>
+            <div style={{ fontSize:12, color:MUTED2 }}>© {new Date().getFullYear()} TerminStop</div>
           </div>
-          <div style={{ fontSize:12, color:MUTED2 }}>© {new Date().getFullYear()} TerminStop · Marvin Passe</div>
         </footer>
 
       </div>
