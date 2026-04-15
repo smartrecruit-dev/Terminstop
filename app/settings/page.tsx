@@ -122,9 +122,17 @@ export default function SettingsPage() {
     setTimeout(() => setNameMsg(""), 3000)
   }
 
+  function validatePassword(pw: string): string | null {
+    if (pw.length < 8) return "Mindestens 8 Zeichen erforderlich."
+    if (!/[!@#$%^&*()\-_=+[\]{};:'",.<>?/\\|`~]/.test(pw))
+      return "Mindestens ein Sonderzeichen erforderlich (!@#$%...)."
+    return null
+  }
+
   async function savePassword() {
     setPwErr(""); setPwMsg("")
-    if (pwNew.length < 6) { setPwErr("Mindestens 6 Zeichen."); return }
+    const validErr = validatePassword(pwNew)
+    if (validErr) { setPwErr(validErr); return }
     if (pwNew !== pwConfirm) { setPwErr("Passwörter stimmen nicht überein."); return }
     setPwSaving(true)
     const { error } = await supabase.auth.updateUser({ password: pwNew })
@@ -286,12 +294,24 @@ export default function SettingsPage() {
                   </div>
                 )}
 
-                <div style={{ display:"flex", alignItems:"center", gap:12 }}>
+                <div style={{ display:"flex", alignItems:"center", gap:12, flexWrap:"wrap" }}>
                   <button onClick={saveBookingSettings} disabled={bookingSaving}
                     className={`px-5 py-2.5 rounded-xl text-sm font-bold transition ${bookingSaving ? "bg-[#E5E7EB] text-[#9CA3AF] cursor-not-allowed" : "bg-[#18A66D] text-white hover:bg-[#15955F]"}`}>
                     {bookingSaving ? "Speichert …" : "Speichern"}
                   </button>
                   {bookingMsg && <span style={{ fontSize:13, color: bookingMsg.startsWith("✓") ? G : "#DC2626", fontWeight:600 }}>{bookingMsg}</span>}
+                </div>
+
+                {/* Link zu Leistungen */}
+                <div style={{ marginTop:20, background:GL, border:`1px solid ${GB}`, borderRadius:12, padding:"14px 16px", display:"flex", alignItems:"center", justifyContent:"space-between", gap:12, flexWrap:"wrap" }}>
+                  <div>
+                    <div style={{ fontSize:13, fontWeight:700, color:T, marginBottom:2 }}>Leistungen verwalten</div>
+                    <div style={{ fontSize:12, color:M }}>Welche Dienste Kunden auf deiner Buchungsseite auswählen können.</div>
+                  </div>
+                  <a href="/services"
+                    style={{ flexShrink:0, fontSize:13, fontWeight:700, color:G, textDecoration:"none", background:"#fff", border:`1px solid ${GB}`, borderRadius:10, padding:"8px 14px", whiteSpace:"nowrap" }}>
+                    Leistungen bearbeiten →
+                  </a>
                 </div>
               </div>
             )}
@@ -326,7 +346,7 @@ export default function SettingsPage() {
                 <div style={{ background:"#fff", border:`1px solid ${BD}`, borderRadius:16, padding:"28px", boxShadow:"0 1px 4px rgba(0,0,0,0.04)" }}>
                   <h2 style={{ fontSize:17, fontWeight:800, color:T, margin:"0 0 6px", letterSpacing:"-.3px" }}>🔐 Passwort ändern</h2>
                   <p style={{ fontSize:14, color:M, margin:"0 0 20px", lineHeight:1.6 }}>
-                    Mindestens 6 Zeichen.
+                    Mindestens 8 Zeichen und ein Sonderzeichen (!@#$%...).
                   </p>
 
                   {pwErr && (

@@ -31,8 +31,12 @@ export default function ResetPasswordPage() {
     e.preventDefault()
     setError("")
 
-    if (password.length < 6) {
-      setError("Das Passwort muss mindestens 6 Zeichen lang sein.")
+    if (password.length < 8) {
+      setError("Das Passwort muss mindestens 8 Zeichen lang sein.")
+      return
+    }
+    if (!/[!@#$%^&*()\-_=+[\]{};:'",.<>?/\\|`~]/.test(password)) {
+      setError("Das Passwort muss mindestens ein Sonderzeichen enthalten (!@#$%...).")
       return
     }
     if (password !== confirm) {
@@ -125,7 +129,7 @@ export default function ResetPasswordPage() {
                 type={showPw ? "text" : "password"}
                 value={password}
                 onChange={e => setPassword(e.target.value)}
-                placeholder="Mindestens 6 Zeichen"
+                placeholder="Mind. 8 Zeichen + Sonderzeichen"
                 required
                 style={{ width:"100%", padding:"13px 44px 13px 16px", border:"1.5px solid #E5E7EB", borderRadius:12, fontSize:15, color:"#111827", outline:"none", boxSizing:"border-box", fontFamily:"inherit", background:"#F9FAFB" }}
                 onFocus={e => e.currentTarget.style.borderColor = G}

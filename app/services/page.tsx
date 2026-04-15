@@ -160,7 +160,8 @@ export default function ServicesPage() {
 
         {/* Page title */}
         <div className="mb-8">
-          <div className="flex items-center gap-3 mb-1">
+          <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", gap:12, marginBottom:4, flexWrap:"wrap" }}>
+            <div className="flex items-center gap-3 mb-1">
             <h1 className="text-2xl font-bold text-[#1F2A37]">Online-Buchung</h1>
             {bookingAddon === false && (
               <span style={{ background:"#FEF3C7", border:"1px solid #FDE68A", color:"#92400E", fontSize:11, fontWeight:700, padding:"3px 10px", borderRadius:20 }}>
@@ -172,6 +173,12 @@ export default function ServicesPage() {
                 ✓ Add-on aktiv
               </span>
             )}
+          </div>
+            </div>
+            <a href="/settings"
+              style={{ flexShrink:0, fontSize:13, fontWeight:700, color:"#18A66D", textDecoration:"none", background:"#F0FBF6", border:"1px solid #D1F5E3", borderRadius:10, padding:"7px 14px", whiteSpace:"nowrap" }}>
+              ⚙️ Buchungsseite einrichten →
+            </a>
           </div>
           <p className="text-sm text-[#6B7280] mt-1">
             Verwalten Sie Ihre Leistungen und teilen Sie Ihren persönlichen Buchungslink.
