@@ -29,6 +29,10 @@ async function sendSMS(to: string, message: string) {
   return result
 }
 
+function cleanName(raw: string) {
+  return raw.replace(/\s*\[.*?\]\s*/g, "").trim()
+}
+
 function formatPhone(phone: string) {
   let cleaned = phone.replace(/\s+/g, "")
   if (cleaned.startsWith("0")) cleaned = "+49" + cleaned.substring(1)
@@ -102,7 +106,7 @@ export async function GET(req: NextRequest) {
             .single()
 
           const companyName = company?.name || "unserem Unternehmen"
-          const customerName = a.name || "Kunde"
+          const customerName = cleanName(a.name || "Kunde")
           const message = `Hallo ${customerName}, Ihr Termin bei ${companyName} ist morgen um ${a.time} Uhr. Wir freuen uns auf Sie!`
 
           const result = await sendSMS(formatPhone(a.phone), message)

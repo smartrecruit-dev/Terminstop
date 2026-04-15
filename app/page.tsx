@@ -74,6 +74,7 @@ export default function LandingPage() {
     { q: "Was passiert, wenn ein Kunde nicht auf die SMS antwortet?", a: "Das System erinnert trotzdem – und Sie sehen in der Übersicht, wer bestätigt hat und wer nicht. So können Sie gezielt reagieren, bevor es zu einem Ausfall kommt." },
     { q: "Wie lange dauert es, bis ich erste Ergebnisse sehe?", a: "Die meisten Kunden berichten bereits nach der ersten Woche von weniger Ausfällen. Die Erinnerungen wirken sofort." },
     { q: "Gibt es eine Mindestlaufzeit oder einen Vertrag?", a: "Nein. TerminStop ist monatlich kündbar – ohne Mindestlaufzeit, ohne Kündigungsfristen. Kein Risiko, kein Kleingedrucktes." },
+    { q: "Was ist das Add-on Online-Buchung?", a: "Das Online-Buchungs-Add-on gibt Ihrem Betrieb eine eigene Buchungsseite mit QR-Code. Kunden können damit rund um die Uhr Termine anfragen – ohne anzurufen. Die Anfragen landen direkt in Ihrem Dashboard. Sie bestätigen mit einem Klick, und der Kunde bekommt automatisch eine SMS. Das Add-on ist zu jedem TerminStop-Paket optional zubuchbar." },
   ]
 
   const tiers = [
@@ -98,6 +99,15 @@ export default function LandingPage() {
       dark: false,
       features: ["Automatische SMS-Erinnerungen", "Terminübersicht & Dashboard", "Kundenkartei", "Kalenderansicht", "Auswertungen & Einblicke", "Persönliches Onboarding", "Persönlicher Ansprechpartner", "Individuelle Einrichtung"],
     },
+  ]
+
+  const addonFeatures = [
+    { icon: "🔗", title: "Eigene Buchungsseite", desc: "Ihre persönliche URL — Kunden buchen direkt, ohne Telefonanruf." },
+    { icon: "📲", title: "QR-Code zum Aufstellen", desc: "Stellen Sie den QR-Code an der Kasse oder im Schaufenster auf — Kunden scannen und buchen sofort." },
+    { icon: "📋", title: "Anfragen im Dashboard", desc: "Alle Online-Buchungen landen als Anfragen bei Ihnen. Sie bestätigen mit einem Klick." },
+    { icon: "✉️", title: "Automatische SMS bei Bestätigung", desc: "Sobald Sie bestätigen, bekommt der Kunde automatisch eine SMS — ohne Ihr Zutun." },
+    { icon: "✂️", title: "Ihre Leistungen wählbar", desc: "Kunden können direkt Ihre Leistungen auswählen oder einfach einen offenen Termin anfragen." },
+    { icon: "📞", title: "Rückruf-Funktion", desc: "Kunden können auch einen Rückruf anfragen — Sie werden in Ihrer App benachrichtigt." },
   ]
 
   const industries = ["Friseur", "KFZ-Werkstatt", "Arztpraxis", "Handwerk", "Kosmetik", "Physiotherapie", "Tattoo-Studio", "Nagelstudio", "Zahnarzt", "Optiker", "Hundesalon", "Massage"]
@@ -196,6 +206,10 @@ export default function LandingPage() {
           <div style={{ display:"flex", alignItems:"center", gap:28 }}>
             <a href="#wie-es-funktioniert" style={{ fontSize:13, color:"#6B7280", textDecoration:"none", fontWeight:500 }} className="hidden md:block">So funktioniert's</a>
             <a href="#preise" style={{ fontSize:13, color:"#6B7280", textDecoration:"none", fontWeight:500 }} className="hidden md:block">Preise</a>
+            <a href="#online-buchung" style={{ fontSize:13, color:"#18A66D", textDecoration:"none", fontWeight:700, display:"inline-flex", alignItems:"center", gap:5 }} className="hidden md:block">
+              <span style={{ background:"#F0FBF5", border:"1px solid rgba(24,166,109,.3)", borderRadius:980, padding:"3px 10px", fontSize:11 }}>Neu</span>
+              Online-Buchung
+            </a>
             <a href="/login" style={{ fontSize:13, color:"#6B7280", textDecoration:"none", fontWeight:500 }} className="hidden md:block">Login</a>
             <a href="/demo" style={{ fontSize:13, color:"#6B7280", textDecoration:"none", fontWeight:500, padding:"6px 16px", border:"1px solid #E5E7EB", borderRadius:980 }} className="hidden md:block">Demo</a>
             {/* Login-Button nur auf Mobile */}
@@ -746,6 +760,129 @@ export default function LandingPage() {
               <p style={{ textAlign:"center", fontSize:13, color:"#9CA3AF", marginTop:28, lineHeight:1.7 }}>
                 Die meisten Betriebe zahlen zwischen <strong style={{ color:"#6B7280" }}>€39 und €109 / Monat</strong> · Monatlich kündbar · Alle Preise sind Endpreise
               </p>
+            </Reveal>
+
+            {/* Add-on teaser */}
+            <Reveal delay={120}>
+              <a href="#online-buchung" style={{ textDecoration:"none", display:"block", marginTop:20 }}>
+                <div style={{
+                  background:"linear-gradient(135deg,rgba(24,166,109,.06) 0%,rgba(24,166,109,.02) 100%)",
+                  border:"1px dashed rgba(24,166,109,.35)", borderRadius:18,
+                  padding:"20px 28px", display:"flex", alignItems:"center",
+                  justifyContent:"space-between", gap:20, flexWrap:"wrap" as any,
+                  cursor:"pointer", transition:"border-color .2s"
+                }}>
+                  <div style={{ display:"flex", alignItems:"center", gap:14 }}>
+                    <div style={{ width:40, height:40, background:"rgba(24,166,109,.1)", borderRadius:12, display:"flex", alignItems:"center", justifyContent:"center", fontSize:20, flexShrink:0 }}>🔗</div>
+                    <div>
+                      <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:3 }}>
+                        <span style={{ fontSize:14, fontWeight:800, color:"#0B0D14" }}>Add-on: Online-Buchung</span>
+                        <span style={{ background:"#F0FBF5", border:"1px solid rgba(24,166,109,.3)", color:"#18A66D", fontSize:10, fontWeight:700, padding:"2px 8px", borderRadius:980 }}>Optional</span>
+                      </div>
+                      <p style={{ fontSize:13, color:"#6B7280", margin:0 }}>QR-Code + eigene Buchungsseite + SMS-Bestätigung — zu jedem Paket zubuchbar.</p>
+                    </div>
+                  </div>
+                  <span style={{ fontSize:13, color:"#18A66D", fontWeight:600, flexShrink:0 }}>Mehr erfahren →</span>
+                </div>
+              </a>
+            </Reveal>
+          </div>
+        </section>
+
+        {/* ══ ADD-ON: ONLINE BUCHUNG ══ */}
+        <section id="online-buchung" className="sec-pad" style={{ background:"#06091A", padding:"100px 32px", position:"relative", overflow:"hidden" }}>
+          {/* background glows */}
+          <div style={{ position:"absolute", top:"20%", right:"-10%", width:500, height:400, borderRadius:"50%", background:"radial-gradient(ellipse,rgba(24,166,109,.07) 0%,transparent 65%)", pointerEvents:"none" }} />
+          <div style={{ position:"absolute", bottom:"10%", left:"-5%", width:350, height:300, borderRadius:"50%", background:"radial-gradient(ellipse,rgba(79,110,247,.05) 0%,transparent 65%)", pointerEvents:"none" }} />
+
+          <div style={{ maxWidth:960, margin:"0 auto", position:"relative" }}>
+            <Reveal>
+              <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:20 }}>
+                <div style={{ background:"rgba(24,166,109,.12)", border:"1px solid rgba(24,166,109,.25)", color:"#4AE89B", fontSize:11, fontWeight:700, padding:"5px 14px", borderRadius:980, letterSpacing:1.5, textTransform:"uppercase" as any }}>
+                  Optionales Add-on
+                </div>
+                <div style={{ height:1, flex:1, background:"rgba(255,255,255,.06)" }} />
+              </div>
+              <div style={{ maxWidth:640, marginBottom:60 }}>
+                <h2 style={{ fontSize:"clamp(32px,4vw,52px)", fontWeight:900, color:"#fff", letterSpacing:"-1.5px", lineHeight:1.08, margin:"0 0 16px" }}>
+                  Online-Buchung.<br /><span style={{ color:"#18A66D" }}>Kunden buchen sich selbst.</span>
+                </h2>
+                <p style={{ fontSize:17, color:"rgba(255,255,255,.38)", lineHeight:1.65, margin:0 }}>
+                  Ergänzen Sie Ihr TerminStop-Paket um eine eigene Buchungsseite mit QR-Code — so können Kunden rund um die Uhr Termine anfragen, ohne dass Sie ans Telefon müssen.
+                </p>
+              </div>
+            </Reveal>
+
+            {/* Feature grid */}
+            <div style={{ display:"grid", gap:14 }} className="addon-grid">
+              <style>{`.addon-grid{grid-template-columns:repeat(3,1fr)} @media(max-width:900px){.addon-grid{grid-template-columns:repeat(2,1fr)!important}} @media(max-width:560px){.addon-grid{grid-template-columns:1fr!important}}`}</style>
+              {addonFeatures.map((f, i) => (
+                <Reveal key={i} delay={i * 50}>
+                  <div style={{
+                    background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.08)",
+                    borderRadius:18, padding:"24px", transition:"border-color .2s",
+                    height:"100%", boxSizing:"border-box" as any
+                  }}>
+                    <div style={{ fontSize:28, marginBottom:14 }}>{f.icon}</div>
+                    <div style={{ fontSize:14, fontWeight:700, color:"#fff", marginBottom:8, letterSpacing:"-0.2px" }}>{f.title}</div>
+                    <div style={{ fontSize:13, color:"rgba(255,255,255,.32)", lineHeight:1.65 }}>{f.desc}</div>
+                  </div>
+                </Reveal>
+              ))}
+            </div>
+
+            {/* How it looks — mini preview */}
+            <Reveal delay={80}>
+              <div style={{ marginTop:48, background:"rgba(255,255,255,.03)", border:"1px solid rgba(24,166,109,.15)", borderRadius:24, padding:"36px", display:"grid", gap:48, alignItems:"center" }} className="addon-preview-grid">
+                <style>{`.addon-preview-grid{grid-template-columns:1fr 1fr} @media(max-width:800px){.addon-preview-grid{grid-template-columns:1fr!important}}`}</style>
+
+                {/* Left: process steps */}
+                <div>
+                  <div style={{ fontSize:11, fontWeight:700, letterSpacing:3, textTransform:"uppercase" as any, color:"rgba(74,232,155,.7)", marginBottom:24 }}>So funktioniert's</div>
+                  <div style={{ display:"flex", flexDirection:"column" as any, gap:20 }}>
+                    {[
+                      { num:"01", text:"Kunde scannt QR-Code oder öffnet Ihren Buchungslink" },
+                      { num:"02", text:"Kunde wählt Leistung, Datum und gibt seine Nummer an" },
+                      { num:"03", text:"Anfrage landet bei Ihnen im Dashboard" },
+                      { num:"04", text:"Sie bestätigen mit einem Klick — Kunde bekommt sofort eine SMS" },
+                    ].map((s, i) => (
+                      <div key={i} style={{ display:"flex", alignItems:"flex-start", gap:16 }}>
+                        <div style={{ width:32, height:32, background:"rgba(24,166,109,.12)", border:"1px solid rgba(24,166,109,.2)", borderRadius:10, display:"flex", alignItems:"center", justifyContent:"center", fontSize:11, fontWeight:800, color:"#4AE89B", flexShrink:0 }}>{s.num}</div>
+                        <p style={{ fontSize:14, color:"rgba(255,255,255,.5)", lineHeight:1.6, margin:"4px 0 0" }}>{s.text}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Right: benefits */}
+                <div>
+                  <div style={{ fontSize:11, fontWeight:700, letterSpacing:3, textTransform:"uppercase" as any, color:"rgba(74,232,155,.7)", marginBottom:24 }}>Was es bringt</div>
+                  <div style={{ display:"flex", flexDirection:"column" as any, gap:14 }}>
+                    {[
+                      { stat:"24/7", label:"Buchungen auch nachts, am Wochenende und im Urlaub" },
+                      { stat:"0",    label:"Telefonate für neue Terminanfragen — alles läuft digital" },
+                      { stat:"100%", label:"Kontrolle — Sie bestätigen jeden Termin selbst" },
+                    ].map((b, i) => (
+                      <div key={i} style={{ display:"flex", alignItems:"center", gap:18, background:"rgba(255,255,255,.03)", borderRadius:14, padding:"16px 20px" }}>
+                        <div style={{ fontSize:22, fontWeight:900, color:"#4AE89B", letterSpacing:"-1px", flexShrink:0, width:60 }}>{b.stat}</div>
+                        <p style={{ fontSize:13, color:"rgba(255,255,255,.4)", lineHeight:1.55, margin:0 }}>{b.label}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </Reveal>
+
+            {/* CTA */}
+            <Reveal delay={100}>
+              <div style={{ marginTop:40, display:"flex", flexDirection:"column" as any, alignItems:"center", gap:16, textAlign:"center" as any }}>
+                <p style={{ fontSize:13, color:"rgba(255,255,255,.25)", margin:0 }}>
+                  Das Add-on ist für jeden TerminStop-Kunden optional zubuchbar — fragen Sie uns einfach im Gespräch danach.
+                </p>
+                <a href="/lead" className="btn-primary" style={{ fontSize:15, padding:"14px 36px" }}>
+                  Online-Buchung mit anfragen →
+                </a>
+              </div>
             </Reveal>
           </div>
         </section>
