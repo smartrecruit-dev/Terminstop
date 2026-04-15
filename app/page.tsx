@@ -151,6 +151,13 @@ export default function LandingPage() {
         .badge-pill { display:inline-flex; align-items:center; gap:8px; border:1px solid rgba(255,255,255,.1); border-radius:980px; padding:5px 14px; margin-bottom:32px; background:rgba(255,255,255,.04); max-width:100%; flex-wrap:wrap; }
         @media(max-width:600px){ .badge-pill { font-size:11px; padding:5px 10px; } }
 
+        /* Navbar: Desktop-only items */
+        .nav-desktop-only { display:none!important; }
+        @media(min-width:768px){ .nav-desktop-only { display:inline-flex!important; } }
+        .nav-cta-short { display:inline; }
+        .nav-cta-long  { display:none; }
+        @media(min-width:768px){ .nav-cta-short { display:none; } .nav-cta-long { display:inline; } }
+
         /* Buttons */
         .btn-primary {
           display:inline-flex; align-items:center; justify-content:center;
@@ -203,18 +210,20 @@ export default function LandingPage() {
             <span style={{ color:"#18A66D" }}>Termin</span>
             <span style={{ color:"#0B0D14" }}>Stop</span>
           </a>
-          <div style={{ display:"flex", alignItems:"center", gap:28 }}>
+          <div style={{ display:"flex", alignItems:"center", gap:16 }}>
             <a href="#wie-es-funktioniert" style={{ fontSize:13, color:"#6B7280", textDecoration:"none", fontWeight:500 }} className="hidden md:block">So funktioniert's</a>
             <a href="#preise" style={{ fontSize:13, color:"#6B7280", textDecoration:"none", fontWeight:500 }} className="hidden md:block">Preise</a>
-            <a href="#online-buchung" style={{ fontSize:13, color:"#18A66D", textDecoration:"none", fontWeight:700, display:"inline-flex", alignItems:"center", gap:5 }} className="hidden md:block">
+            <a href="#online-buchung" style={{ fontSize:13, color:"#18A66D", textDecoration:"none", fontWeight:700, alignItems:"center", gap:5 }} className="nav-desktop-only">
               <span style={{ background:"#F0FBF5", border:"1px solid rgba(24,166,109,.3)", borderRadius:980, padding:"3px 10px", fontSize:11 }}>Neu</span>
               Online-Buchung
             </a>
             <a href="/login" style={{ fontSize:13, color:"#6B7280", textDecoration:"none", fontWeight:500 }} className="hidden md:block">Login</a>
-            <a href="/demo" style={{ fontSize:13, color:"#6B7280", textDecoration:"none", fontWeight:500, padding:"6px 16px", border:"1px solid #E5E7EB", borderRadius:980 }} className="hidden md:block">Demo</a>
-            {/* Login-Button nur auf Mobile */}
-            <a href="/login" className="block md:hidden" style={{ fontSize:13, color:"#6B7280", textDecoration:"none", fontWeight:600, padding:"6px 14px", border:"1px solid #E5E7EB", borderRadius:980, background:"rgba(255,255,255,.9)" }}>Login</a>
-            <a href="/lead" className="btn-primary" style={{ fontSize:13, padding:"8px 20px" }}>Kostenlos anfragen</a>
+            {/* Login nur auf Mobile */}
+            <a href="/login" className="block md:hidden" style={{ fontSize:13, color:"#6B7280", textDecoration:"none", fontWeight:600, padding:"5px 12px", border:"1px solid #E5E7EB", borderRadius:980, background:"rgba(255,255,255,.9)", whiteSpace:"nowrap" }}>Login</a>
+            <a href="/lead" className="btn-primary" style={{ fontSize:13, padding:"8px 16px", whiteSpace:"nowrap" }}>
+              <span className="nav-cta-short">Anfragen →</span>
+              <span className="nav-cta-long">Kostenlos anfragen</span>
+            </a>
           </div>
         </nav>
 

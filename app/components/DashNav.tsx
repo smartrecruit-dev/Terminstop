@@ -15,12 +15,11 @@ const DESKTOP_LINKS = [
 ]
 
 const MOBILE_LINKS: NavItem[] = [
-  { href: "/dashboard", label: "Start",     icon: "🏠" },
-  { href: "/calendar",  label: "Kalender",  icon: "📅" },
-  { href: "/customers", label: "Kunden",    icon: "👥" },
-  { href: "/insights",  label: "Einblicke", icon: "📊" },
-  { href: "/requests",  label: "Anfragen",  icon: "🔔" },
-  { href: "/services",  label: "Buchung",   icon: "🔗" },
+  { href: "/dashboard", label: "Start",    icon: "🏠" },
+  { href: "/calendar",  label: "Kalender", icon: "📅" },
+  { href: "/customers", label: "Kunden",   icon: "👥" },
+  { href: "/requests",  label: "Anfragen", icon: "🔔" },
+  { href: "/services",  label: "Buchung",  icon: "🔗" },
 ]
 
 export default function DashNav({
@@ -85,13 +84,13 @@ export default function DashNav({
       </nav>
 
       {/* Mobile bottom nav */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-[#E5E7EB] z-50 flex justify-around items-center px-1 py-2">
+      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-[#E5E7EB] z-50 flex justify-around items-center px-2 py-2 pb-safe" style={{ paddingBottom:"max(8px, env(safe-area-inset-bottom))" }}>
         {MOBILE_LINKS.map(item => (
           <a key={item.href} href={item.href}
-            className={`relative flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-xl transition ${
+            className={`relative flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl transition ${
               active === item.href ? "text-[#18A66D]" : "text-[#9CA3AF]"
             }`}>
-            <span className="text-lg">{item.icon}</span>
+            <span className="text-xl">{item.icon}</span>
             <span className="text-[10px] font-medium">{item.label}</span>
             {item.href === "/requests" && pendingCount > 0 && (
               <span style={{ position:"absolute", top:0, right:2, background:"#EF4444", color:"#fff", fontSize:9, fontWeight:700, minWidth:15, height:15, borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", padding:"0 2px" }}>
@@ -100,11 +99,6 @@ export default function DashNav({
             )}
           </a>
         ))}
-        <button onClick={onLogout}
-          className="flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-xl text-[#9CA3AF]">
-          <span className="text-lg">🚪</span>
-          <span className="text-[10px] font-medium">Logout</span>
-        </button>
       </div>
     </>
   )
