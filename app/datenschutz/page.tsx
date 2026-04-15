@@ -159,6 +159,10 @@ export default function Datenschutz() {
               <li>Unternehmensname</li>
               <li>Unternehmensspezifische Termindaten (Datum, Uhrzeit, Notizen)</li>
               <li>Namen und Telefonnummern der Terminempfänger des Kunden</li>
+              <li>
+                Bei aktiviertem Online-Buchungs-Add-on zusätzlich: Buchungsanfragen
+                von Endkunden (Name, Telefonnummer, gewünschte Dienstleistung, Anfragetext)
+              </li>
             </ul>
             <p className="mb-3">
               Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO (Vertragserfüllung).
@@ -196,13 +200,54 @@ export default function Datenschutz() {
     eine Drittlandübermittlung findet nicht statt. Weitere Informationen:
     {" "}<a href="https://www.seven.io/en/company/privacy/" target="_blank" rel="noopener noreferrer" className="text-[#18A66D] hover:underline">seven.io/privacy</a>
   </p>
-  <p>
+  <p className="mb-3">
     Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO (Vertragserfüllung gegenüber
     dem B2B-Kunden). Die Verantwortung für das Vorliegen einer geeigneten
     Rechtsgrundlage gegenüber den Terminempfängern liegt beim jeweiligen B2B-Kunden.
   </p>
+  <p>
+    Bei Nutzung des Online-Buchungs-Add-ons wird zusätzlich eine Bestätigungs-SMS
+    ausgelöst, sobald der B2B-Kunde eine Buchungsanfrage im Dashboard manuell bestätigt.
+    Diese SMS informiert den Endkunden über den bestätigten Termin (Name, Datum, Uhrzeit).
+    Auch hier liegt die Verantwortung für eine geeignete Rechtsgrundlage sowie die
+    Unterrichtung der Endkunden beim jeweiligen B2B-Kunden.
+  </p>
 </section>
 
+
+          {/* § 7a Online-Buchungs-Add-on */}
+          <section>
+            <h2 className="text-base font-bold text-[#1F2A37] mb-3">7a. Online-Buchungs-Add-on (öffentliche Buchungsseite)</h2>
+            <p className="mb-3">
+              Unternehmen, die das optionale Online-Buchungs-Add-on nutzen, erhalten eine
+              öffentlich erreichbare Buchungsseite, über die deren Endkunden Terminanfragen
+              stellen können. Beim Ausfüllen des Buchungsformulars werden folgende Daten
+              erhoben:
+            </p>
+            <ul className="list-disc pl-6 space-y-1 mb-3 text-[#4B5563]">
+              <li>Name des Endkunden</li>
+              <li>Mobilfunknummer des Endkunden</li>
+              <li>Gewünschte Dienstleistung</li>
+              <li>Freitext / Anmerkung zur Anfrage (optional)</li>
+            </ul>
+            <p className="mb-3">
+              Diese Daten werden in der Datenbank von Supabase gespeichert und dem
+              jeweiligen B2B-Kunden (Verantwortlicher) im Dashboard angezeigt, damit er
+              die Anfrage bearbeiten und bestätigen oder ablehnen kann.
+            </p>
+            <p className="mb-3">
+              <strong>Verantwortlichkeit:</strong> Für die Verarbeitung der über das Buchungsformular
+              übermittelten Endkundendaten ist der jeweilige B2B-Kunde als datenschutzrechtlich
+              Verantwortlicher im Sinne von Art. 4 Nr. 7 DSGVO zuständig. TerminStop handelt
+              insoweit als Auftragsverarbeiter gemäß Art. 28 DSGVO. Der B2B-Kunde ist
+              verpflichtet, seine Endkunden über die Datenverarbeitung zu informieren und
+              die erforderliche Rechtsgrundlage sicherzustellen.
+            </p>
+            <p>
+              Rechtsgrundlage auf Seiten von TerminStop für die technische Verarbeitung:
+              Art. 6 Abs. 1 lit. b DSGVO (Vertragserfüllung gegenüber dem B2B-Kunden).
+            </p>
+          </section>
 
           {/* § 8 Datenbank */}
           <section>
@@ -261,6 +306,7 @@ export default function Datenschutz() {
                     { cat: "Lead-Anfragen (Beratungsformular)", dur: "6 Monate nach letztem Kontakt" },
                     { cat: "Kundendaten (B2B-Account)", dur: "Dauer des Vertrages + 30 Tage nach Kündigung" },
                     { cat: "Termindaten inkl. Endkundendaten", dur: "Dauer des Vertrages + 30 Tage nach Kündigung" },
+                    { cat: "Buchungsanfragen (Online-Buchungs-Add-on)", dur: "Dauer des Vertrages + 30 Tage nach Kündigung" },
                     { cat: "Rechnungs- und Vertragsdaten", dur: "10 Jahre (gesetzliche Aufbewahrungspflicht §§ 147 AO, 257 HGB)" },
                   ].map((row, i) => (
                     <tr key={i} className="bg-white">

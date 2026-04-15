@@ -69,6 +69,11 @@ export default function AGB() {
               <li>Automatischer Versand von SMS-Erinnerungen über den Dienstleister seven.io</li>
               <li>Dashboard zur Übersicht und Verwaltung von Terminen</li>
               <li>Auswertungen und Einblicke zur Terminentwicklung</li>
+              <li>
+                <strong>Online-Buchungs-Add-on (optional, separat buchbar):</strong> Öffentliche
+                Buchungsseite für Endkunden, Verwaltung eingehender Buchungsanfragen im Dashboard,
+                SMS-Bestätigung nach manueller Freigabe durch den Kunden
+              </li>
             </ul>
             <p className="mb-3">
   Der Anbieter erbringt die Leistungen über die technische Infrastruktur von
@@ -151,6 +156,14 @@ export default function AGB() {
               zum 1. eines Kalendermonats auf das Konto des Anbieters überwiesen wird.
               Die Bankverbindung des Anbieters wird dem Kunden gesondert mitgeteilt.
             </p>
+            <p className="mb-3 font-semibold text-[#1F2A37]">Online-Buchungs-Add-on:</p>
+            <p className="mb-3">
+              Das Online-Buchungs-Add-on ist eine optionale Zusatzleistung, die separat gebucht
+              werden kann. Die Aktivierung erfolgt nach individueller Vereinbarung mit dem Anbieter.
+              Preise und Konditionen werden dem Kunden vor Aktivierung gesondert mitgeteilt.
+              Das Add-on kann unabhängig vom Hauptvertrag aktiviert oder deaktiviert werden;
+              eine Deaktivierung berührt die Weiternutzung der übrigen Plattformfunktionen nicht.
+            </p>
             <p className="mb-3 font-semibold text-[#1F2A37]">SMS-Kontingent und Mehrverbrauch:</p>
             <p className="mb-3">
               Jedes gebuchte Paket enthält ein monatliches SMS-Kontingent gemäß der
@@ -208,7 +221,14 @@ export default function AGB() {
               </li>
               <li>
                 den Anbieter unverzüglich zu informieren, wenn der Verdacht besteht, dass
-                Zugangsdaten in unbefugte Hände gelangt sind.
+                Zugangsdaten in unbefugte Hände gelangt sind;
+              </li>
+              <li>
+                bei Nutzung des Online-Buchungs-Add-ons sicherzustellen, dass er gegenüber
+                den Endkunden, die über die öffentliche Buchungsseite Anfragen stellen, eine
+                geeignete Datenschutzerklärung bereitstellt und die erforderliche Rechtsgrundlage
+                für die Verarbeitung der übermittelten Daten (Name, Telefonnummer, Anfragetext)
+                vorliegt.
               </li>
             </ul>
             <p>
@@ -236,6 +256,13 @@ export default function AGB() {
     Automatisierte Erinnerungsprozesse werden über zeitgesteuerte Aufgaben
     (Cron-Jobs) ausgeführt. Der Anbieter ist bemüht, diese zuverlässig zu betreiben,
     übernimmt jedoch keine Garantie für die minutengenaue Ausführung.
+  </p>
+  <p className="mb-3">
+    Bei Nutzung des Online-Buchungs-Add-ons wird zusätzlich eine Bestätigungs-SMS
+    versendet, sobald der Kunde eine eingehende Buchungsanfrage im Dashboard manuell
+    bestätigt. Diese SMS enthält Name, Datum und Uhrzeit des bestätigten Termins.
+    Der Versand erfolgt ebenfalls über seven.io. Der Kunde trägt die Verantwortung
+    dafür, dass die Endkunden über diesen SMS-Versand informiert sind.
   </p>
   <p>
     Der Kunde ist verpflichtet, beim Eintragen von Telefonnummern das korrekte

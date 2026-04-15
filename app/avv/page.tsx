@@ -91,6 +91,13 @@ export default function AVV() {
               <li>Speicherung von Termindaten (Datum, Uhrzeit, Notizen)</li>
               <li>Automatisierter Versand von SMS-Erinnerungen an Terminempfänger</li>
               <li>Verwaltung und Anzeige von Terminstatus (offen / erledigt)</li>
+              <li>
+                Bei aktiviertem Online-Buchungs-Add-on: Entgegennahme und Speicherung
+                von Buchungsanfragen, die Endkunden über die öffentliche Buchungsseite
+                einreichen (Name, Telefonnummer, Dienstleistungswunsch, Anfragetext);
+                Anzeige dieser Anfragen im Dashboard des Verantwortlichen; Versand einer
+                Bestätigungs-SMS nach manueller Freigabe durch den Verantwortlichen
+              </li>
             </ul>
             <p className="mb-3">
               Der Zweck der Verarbeitung ist die technische Bereitstellung und der Betrieb der
@@ -117,6 +124,11 @@ export default function AVV() {
               <li>Mobilfunknummer</li>
               <li>Termindaten (Datum, Uhrzeit)</li>
               <li>Freitextnotizen zum Termin (optional, durch Verantwortlichen eingetragen)</li>
+              <li>
+                Bei Online-Buchungs-Add-on zusätzlich: Buchungsanfragen von Endkunden
+                (Name, Telefonnummer, gewünschte Dienstleistung, Anfragetext) –
+                eingereicht über die öffentliche Buchungsseite des Verantwortlichen
+              </li>
             </ul>
 
             <p className="mb-3">
@@ -258,6 +270,12 @@ export default function AVV() {
               <li>
                 seine eigenen Kunden / Patienten über die Verarbeitung ihrer Daten
                 (insbesondere den SMS-Versand) in seiner Datenschutzerklärung zu informieren;
+              </li>
+              <li>
+                bei Nutzung des Online-Buchungs-Add-ons sicherzustellen, dass Endkunden,
+                die über die öffentliche Buchungsseite Anfragen stellen, vor der Übermittlung
+                ihrer Daten über die Datenverarbeitung informiert werden (z. B. durch einen
+                Datenschutzhinweis auf der Buchungsseite oder in den eigenen Geschäftsbedingungen);
               </li>
               <li>
                 Anfragen betroffener Personen (Auskunft, Löschung etc.) unverzüglich
