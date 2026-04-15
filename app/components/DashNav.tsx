@@ -15,11 +15,11 @@ const DESKTOP_LINKS = [
 ]
 
 const MOBILE_LINKS: NavItem[] = [
-  { href: "/dashboard", label: "Start",    icon: "🏠" },
-  { href: "/calendar",  label: "Kalender", icon: "📅" },
-  { href: "/customers", label: "Kunden",   icon: "👥" },
-  { href: "/requests",  label: "Anfragen", icon: "🔔" },
-  { href: "/services",  label: "Buchung",  icon: "🔗" },
+  { href: "/dashboard", label: "Start",     icon: "🏠" },
+  { href: "/calendar",  label: "Kalender",  icon: "📅" },
+  { href: "/customers", label: "Kunden",    icon: "👥" },
+  { href: "/requests",  label: "Anfragen",  icon: "🔔" },
+  { href: "/insights",  label: "Einblicke", icon: "📊" },
 ]
 
 export default function DashNav({
