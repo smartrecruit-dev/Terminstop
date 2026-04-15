@@ -71,6 +71,9 @@ export async function GET(req: NextRequest) {
       .from("appointments")
       .select("*")
       .eq("reminded", false)
+      .neq("status", "cancelled")
+      // Online-Buchungen nur erinnern wenn bereits bestätigt
+      .or("online_booking.is.null,online_booking.eq.false,status.eq.confirmed")
 
     if (error) {
       console.log("DB ERROR:", error)
