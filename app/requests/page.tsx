@@ -264,7 +264,7 @@ export default function RequestsPage() {
             )}
 
           </div>
-        )}
+        ) : null}
       </div>
     </div>
   )
