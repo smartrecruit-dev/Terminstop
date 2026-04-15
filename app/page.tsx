@@ -31,15 +31,15 @@ function Reveal({ children, delay = 0, className = "" }: { children: React.React
   const ref = useRef<HTMLDivElement>(null)
   const [vis, setVis] = useState(false)
   useEffect(() => {
-    const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setVis(true); obs.disconnect() } }, { threshold: 0.1 })
+    const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setVis(true); obs.disconnect() } }, { threshold: 0.08 })
     if (ref.current) obs.observe(ref.current)
     return () => obs.disconnect()
   }, [])
   return (
     <div ref={ref} className={className} style={{
       opacity: vis ? 1 : 0,
-      transform: vis ? "translateY(0)" : "translateY(24px)",
-      transition: `opacity 0.7s ease ${delay}ms, transform 0.7s ease ${delay}ms`
+      transform: vis ? "translateY(0)" : "translateY(28px)",
+      transition: `opacity 0.75s cubic-bezier(.16,1,.3,1) ${delay}ms, transform 0.75s cubic-bezier(.16,1,.3,1) ${delay}ms`
     }}>
       {children}
     </div>
@@ -55,383 +55,342 @@ export default function LandingPage() {
   const words = ["Friseur.", "Werkstatt.", "Praxis.", "Betrieb."]
 
   useEffect(() => {
-    const t = setInterval(() => setHeroWord(w => (w + 1) % words.length), 2600)
+    const t = setInterval(() => setHeroWord(w => (w + 1) % words.length), 2800)
     return () => clearInterval(t)
   }, [])
 
   const reviews = [
     { text: "Seit wir TerminStop nutzen, sind unsere Ausfälle in den ersten zwei Wochen um mehr als die Hälfte zurückgegangen.", name: "Thomas M.", role: "Autohaus", city: "München", result: "−58% Ausfälle" },
     { text: "Ich hab 10 Minuten gebraucht um es einzurichten. Seitdem läuft es einfach. Meine Kunden kommen pünktlicher und ich muss nicht mehr hinterhertelefonieren.", name: "Sandra K.", role: "Friseurstudio", city: "Hamburg", result: "−3h / Woche" },
-    { text: "Wir haben das System vor 3 Monaten eingeführt. Seitdem haben wir kaum noch kurzfristige Absagen. Der Aufwand war minimal, der Effekt enorm.", name: "Dr. Andreas B.", role: "Physiotherapiepraxis", city: "Berlin", result: "Keine Absagen mehr" },
-    { text: "Ich war skeptisch, ob SMS wirklich funktioniert. Nach dem ersten Monat war ich überzeugt. Unsere Auslastung ist spürbar gestiegen.", name: "Markus S.", role: "KFZ-Werkstatt", city: "Stuttgart", result: "+18% Auslastung" },
   ]
 
   const faqs = [
-    { q: "Ist TerminStop nur für SMS-Erinnerungen?", a: "Nein – SMS-Erinnerungen sind nur eine von vier Funktionen. TerminStop ist Ihr komplettes digitales Terminbüro: mit digitalem Kalender, Kundenkartei mit vollständiger Terminhistorie, automatischen SMS-Erinnerungen und Auswertungen über Ihre Entwicklung. Alles in einem System, ab €1,30 pro Tag." },
+    { q: "Ist TerminStop nur für SMS-Erinnerungen?", a: "Nein – SMS-Erinnerungen sind nur eine von vier Funktionen. TerminStop ist Ihr komplettes digitales Terminbüro: mit digitalem Kalender, Kundenkartei, automatischen SMS-Erinnerungen und Auswertungen. Alles in einem System, ab €1,30 pro Tag." },
     { q: "Muss ich eine App installieren oder etwas technisch einrichten?", a: "Nein. TerminStop läuft komplett im Browser – keine App, keine Software, keine technischen Vorkenntnisse. Die Einrichtung dauert unter 10 Minuten und wir begleiten Sie dabei persönlich." },
     { q: "Was kostet TerminStop monatlich?", a: "Das hängt davon ab, wie viele Termine Sie im Monat haben. Unser Einstieg liegt bei €1,30 pro Tag – die meisten Betriebe zahlen zwischen €39 und €109 pro Monat. Im kurzen Erstgespräch finden wir gemeinsam das passende Paket. Kein Vertrag, monatlich kündbar." },
     { q: "Funktioniert das auch für meinen Betrieb – ich bin kein IT-Unternehmen?", a: "Genau dafür ist TerminStop gebaut. Die meisten unserer Kunden sind Handwerker, Friseure, Praxen oder KFZ-Betriebe – keine Vorkenntnisse nötig." },
-    { q: "Was passiert, wenn ein Kunde nicht auf die SMS antwortet?", a: "Das System erinnert trotzdem – und Sie sehen in der Übersicht, wer bestätigt hat und wer nicht. So können Sie gezielt reagieren, bevor es zu einem Ausfall kommt." },
-    { q: "Wie lange dauert es, bis ich erste Ergebnisse sehe?", a: "Die meisten Kunden berichten bereits nach der ersten Woche von weniger Ausfällen. Die Erinnerungen wirken sofort." },
     { q: "Gibt es eine Mindestlaufzeit oder einen Vertrag?", a: "Nein. TerminStop ist monatlich kündbar – ohne Mindestlaufzeit, ohne Kündigungsfristen. Kein Risiko, kein Kleingedrucktes." },
-    { q: "Was ist das Add-on Online-Buchung?", a: "Das Online-Buchungs-Add-on gibt Ihrem Betrieb eine eigene Buchungsseite mit QR-Code. Kunden können damit rund um die Uhr Termine anfragen – ohne anzurufen. Die Anfragen landen direkt in Ihrem Dashboard. Sie bestätigen mit einem Klick, und der Kunde bekommt automatisch eine SMS. Das Add-on ist zu jedem TerminStop-Paket optional zubuchbar." },
+    { q: "Was ist das Add-on Online-Buchung?", a: "Das Online-Buchungs-Add-on gibt Ihrem Betrieb eine eigene Buchungsseite mit QR-Code. Kunden können damit rund um die Uhr Termine anfragen – ohne anzurufen. Die Anfragen landen direkt in Ihrem Dashboard. Sie bestätigen mit einem Klick, und der Kunde bekommt automatisch eine SMS." },
   ]
 
   const tiers = [
-    {
-      name: "Einsteiger",
-      for: "Für Betriebe bis ca. 100 Termine / Monat",
-      tag: null,
-      dark: false,
-      features: ["Automatische SMS-Erinnerungen", "Terminübersicht & Dashboard", "Kundenkartei", "Persönliches Onboarding", "Support per E-Mail"],
-    },
-    {
-      name: "Wachstum",
-      for: "Für Betriebe mit 100–400 Terminen / Monat",
-      tag: "✓ Meistgewählt",
-      dark: true,
-      features: ["Automatische SMS-Erinnerungen", "Terminübersicht & Dashboard", "Kundenkartei", "Kalenderansicht", "Auswertungen & Einblicke", "Persönliches Onboarding", "Prioritäts-Support"],
-    },
-    {
-      name: "Profi",
-      for: "Für stark ausgelastete Betriebe",
-      tag: null,
-      dark: false,
-      features: ["Automatische SMS-Erinnerungen", "Terminübersicht & Dashboard", "Kundenkartei", "Kalenderansicht", "Auswertungen & Einblicke", "Persönliches Onboarding", "Persönlicher Ansprechpartner", "Individuelle Einrichtung"],
-    },
-  ]
-
-  const addonFeatures = [
-    { icon: "🔗", title: "Eigene Buchungsseite", desc: "Ihre persönliche URL — Kunden buchen direkt, ohne Telefonanruf." },
-    { icon: "📲", title: "QR-Code zum Aufstellen", desc: "Stellen Sie den QR-Code an der Kasse oder im Schaufenster auf — Kunden scannen und buchen sofort." },
-    { icon: "📋", title: "Anfragen im Dashboard", desc: "Alle Online-Buchungen landen als Anfragen bei Ihnen. Sie bestätigen mit einem Klick." },
-    { icon: "✉️", title: "Automatische SMS bei Bestätigung", desc: "Sobald Sie bestätigen, bekommt der Kunde automatisch eine SMS — ohne Ihr Zutun." },
-    { icon: "✂️", title: "Ihre Leistungen wählbar", desc: "Kunden können direkt Ihre Leistungen auswählen oder einfach einen offenen Termin anfragen." },
-    { icon: "📞", title: "Rückruf-Funktion", desc: "Kunden können auch einen Rückruf anfragen — Sie werden in Ihrer App benachrichtigt." },
+    { name: "Einsteiger", for: "Bis ca. 100 Termine / Monat", tag: null, dark: false, features: ["Automatische SMS-Erinnerungen", "Terminübersicht & Dashboard", "Kundenkartei", "Persönliches Onboarding", "Support per E-Mail"] },
+    { name: "Wachstum", for: "100–400 Termine / Monat", tag: "Meistgewählt", dark: true, features: ["Automatische SMS-Erinnerungen", "Terminübersicht & Dashboard", "Kundenkartei", "Kalenderansicht", "Auswertungen & Einblicke", "Persönliches Onboarding", "Prioritäts-Support"] },
+    { name: "Profi", for: "Stark ausgelastete Betriebe", tag: null, dark: false, features: ["Automatische SMS-Erinnerungen", "Terminübersicht & Dashboard", "Kundenkartei", "Kalenderansicht", "Auswertungen & Einblicke", "Persönlicher Ansprechpartner", "Individuelle Einrichtung"] },
   ]
 
   const industries = ["Friseur", "KFZ-Werkstatt", "Arztpraxis", "Handwerk", "Kosmetik", "Physiotherapie", "Tattoo-Studio", "Nagelstudio", "Zahnarzt", "Optiker", "Hundesalon", "Massage"]
 
-  const compRows = [
-    { label:"Kosten",               them:"15–30 % Provision pro Buchung",   us:"Ab €1,30 / Tag — individuell" },
-    { label:"Vertragslaufzeit",      them:"Oft 12+ Monate gebunden",         us:"Monatlich kündbar" },
-    { label:"Ihre Kundendaten",      them:"Gehören der Plattform",           us:"Gehören ausschließlich Ihnen" },
-    { label:"SMS-Erinnerungen",      them:"✗ Nicht enthalten",               us:"✓ Vollautomatisch" },
-    { label:"Eigene Kundenkartei",   them:"✗ Nicht enthalten",               us:"✓ Mit Verlauf & Notizen" },
-    { label:"Auswertungen",          them:"Kaum / eingeschränkt",            us:"✓ Vollständig inklusive" },
-    { label:"Kundenbindung",         them:"Kunden vergleichen Preise",       us:"Direktkontakt — kein Vergleich" },
+  const addonFeatures = [
+    { icon: "⬡", title: "Eigene Buchungsseite", desc: "Ihre persönliche URL — Kunden buchen direkt, ohne Telefonanruf." },
+    { icon: "⬡", title: "QR-Code zum Aufstellen", desc: "An der Kasse oder im Schaufenster — Kunden scannen und buchen sofort." },
+    { icon: "⬡", title: "Anfragen im Dashboard", desc: "Alle Online-Buchungen landen direkt bei Ihnen. Sie bestätigen mit einem Klick." },
+    { icon: "⬡", title: "Automatische Bestätigungs-SMS", desc: "Sobald Sie bestätigen, bekommt der Kunde sofort eine SMS — ohne Ihr Zutun." },
+    { icon: "⬡", title: "Leistungen wählbar", desc: "Kunden können Ihre Leistungen auswählen oder einfach einen offenen Termin anfragen." },
+    { icon: "⬡", title: "Rückruf-Funktion", desc: "Kunden können auch einen Rückruf anfragen — Sie werden benachrichtigt." },
   ]
 
   const F = "-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', sans-serif"
+
+  // Farben
+  const BG      = "#04060F"
+  const SURF    = "#080C18"
+  const SURF2   = "#0C1121"
+  const BORDER  = "rgba(255,255,255,0.07)"
+  const BORDER2 = "rgba(255,255,255,0.12)"
+  const GREEN   = "#18A66D"
+  const GREEN2  = "#0EA060"
+  const GLOW    = "rgba(24,166,109,0.15)"
+  const TXT     = "#F0F4FF"
+  const MUTED   = "rgba(240,244,255,0.45)"
+  const MUTED2  = "rgba(240,244,255,0.25)"
 
   return (
     <>
       <style>{`
         @keyframes wordIn {
-          0%   { opacity:0; transform:translateY(8px); }
-          12%, 88% { opacity:1; transform:translateY(0); }
-          100% { opacity:0; transform:translateY(-8px); }
-        }
-        @keyframes float {
-          0%,100% { transform:translateY(0px); }
-          50%      { transform:translateY(-14px); }
-        }
-        @keyframes pulse-ring {
-          0%   { transform:scale(1); opacity:.5; }
-          100% { transform:scale(2.2); opacity:0; }
+          0%   { opacity:0; transform:translateY(10px) skewY(2deg); }
+          15%, 85% { opacity:1; transform:translateY(0) skewY(0); }
+          100% { opacity:0; transform:translateY(-10px) skewY(-2deg); }
         }
         @keyframes marquee {
           0%   { transform:translateX(0); }
           100% { transform:translateX(-50%); }
         }
-        .float-phone { animation: float 8s ease-in-out infinite; }
-        .pulse-ring  { position:absolute; inset:0; border-radius:50%; background:rgba(24,166,109,.2); animation:pulse-ring 2.2s cubic-bezier(0,.2,.2,1) infinite; }
-        .marquee-wrap { animation: marquee 32s linear infinite; }
-        .word-slot { animation: wordIn 2.6s ease-in-out; }
-        .badge-pill { display:inline-flex; align-items:center; gap:8px; border:1px solid rgba(255,255,255,.1); border-radius:980px; padding:5px 14px; margin-bottom:32px; background:rgba(255,255,255,.04); max-width:100%; flex-wrap:wrap; }
-        @media(max-width:600px){ .badge-pill { font-size:11px; padding:5px 10px; } }
+        @keyframes float {
+          0%,100% { transform:translateY(0); }
+          50%     { transform:translateY(-12px); }
+        }
+        @keyframes shimmer {
+          0%   { background-position: -200% center; }
+          100% { background-position: 200% center; }
+        }
+        @keyframes pulseGlow {
+          0%,100% { opacity:.5; transform:scale(1); }
+          50%     { opacity:1; transform:scale(1.08); }
+        }
 
-        /* Navbar: Desktop-only items */
+        .word-slot { animation: wordIn 2.8s cubic-bezier(.16,1,.3,1); }
+        .marquee-wrap { animation: marquee 36s linear infinite; }
+        .float-el { animation: float 7s ease-in-out infinite; }
+
         .nav-desktop-only { display:none!important; }
         @media(min-width:768px){ .nav-desktop-only { display:inline-flex!important; } }
         .nav-cta-short { display:inline; }
         .nav-cta-long  { display:none; }
         @media(min-width:768px){ .nav-cta-short { display:none; } .nav-cta-long { display:inline; } }
 
-        /* Buttons */
-        .btn-primary {
-          display:inline-flex; align-items:center; justify-content:center;
-          background:#18A66D; color:#fff; border:none; border-radius:980px;
-          font-weight:700; cursor:pointer; text-decoration:none;
-          transition:background .18s, box-shadow .18s;
-          box-shadow:0 2px 12px rgba(24,166,109,.28);
+        .card-hover {
+          transition: border-color .25s, box-shadow .25s, transform .25s;
         }
-        .btn-primary:hover { background:#149A60; box-shadow:0 4px 20px rgba(24,166,109,.38); }
+        .card-hover:hover {
+          border-color: rgba(24,166,109,0.3) !important;
+          box-shadow: 0 0 0 1px rgba(24,166,109,0.15), 0 20px 60px rgba(0,0,0,0.4) !important;
+          transform: translateY(-2px);
+        }
+
+        .btn-primary {
+          display:inline-flex; align-items:center; justify-content:center; gap:8px;
+          background: linear-gradient(135deg, #18A66D 0%, #0EA060 100%);
+          color:#fff; border:none; border-radius:10px;
+          font-weight:700; cursor:pointer; text-decoration:none;
+          transition: box-shadow .2s, transform .15s, opacity .15s;
+          box-shadow: 0 0 0 1px rgba(24,166,109,0.4), 0 4px 24px rgba(24,166,109,0.3);
+          letter-spacing:-0.2px;
+        }
+        .btn-primary:hover {
+          box-shadow: 0 0 0 1px rgba(24,166,109,0.6), 0 8px 36px rgba(24,166,109,0.45);
+          transform: translateY(-1px);
+          opacity:.95;
+        }
 
         .btn-ghost {
-          display:inline-flex; align-items:center; justify-content:center;
-          background:transparent; color:rgba(255,255,255,.55); border:1px solid rgba(255,255,255,.14);
-          border-radius:980px; font-weight:600; cursor:pointer; text-decoration:none;
-          transition:color .18s, border-color .18s, background .18s;
+          display:inline-flex; align-items:center; justify-content:center; gap:8px;
+          background: rgba(255,255,255,0.05);
+          color: rgba(240,244,255,0.7);
+          border: 1px solid rgba(255,255,255,0.1);
+          border-radius:10px; font-weight:600; cursor:pointer; text-decoration:none;
+          transition: background .2s, border-color .2s, color .2s;
         }
-        .btn-ghost:hover { color:#fff; border-color:rgba(255,255,255,.35); background:rgba(255,255,255,.05); }
+        .btn-ghost:hover {
+          background: rgba(255,255,255,0.09);
+          border-color: rgba(255,255,255,0.2);
+          color: #F0F4FF;
+        }
 
         .btn-outline {
           display:inline-flex; align-items:center; justify-content:center;
-          background:transparent; color:#374151; border:1px solid #E5E7EB;
-          border-radius:980px; font-weight:600; cursor:pointer; text-decoration:none;
-          transition:border-color .18s, color .18s, background .18s;
+          background:transparent; color:rgba(240,244,255,0.6);
+          border:1px solid rgba(255,255,255,0.1); border-radius:10px;
+          font-weight:600; cursor:pointer; text-decoration:none;
+          transition: border-color .2s, color .2s, background .2s;
         }
-        .btn-outline:hover { border-color:#18A66D; color:#18A66D; background:#F0FBF5; }
+        .btn-outline:hover { border-color:rgba(24,166,109,0.5); color:#18A66D; background:rgba(24,166,109,0.06); }
 
-        /* Accordion */
-        .faq-item { border-bottom:1px solid #F3F4F6; }
-        .faq-item:first-child { border-top:1px solid #F3F4F6; }
+        .gradient-text {
+          background: linear-gradient(135deg, #fff 30%, rgba(255,255,255,0.5) 100%);
+          -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+          background-clip: text;
+        }
+        .gradient-text-green {
+          background: linear-gradient(135deg, #18A66D 0%, #4AE89B 100%);
+          -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+          background-clip: text;
+        }
 
-        /* Mobile layout */
+        .noise-overlay {
+          position:absolute; inset:0; pointer-events:none; z-index:1;
+          background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+          background-repeat: repeat; background-size: 200px 200px;
+          opacity:.4;
+        }
+
+        .grid-bg {
+          position:absolute; inset:0; pointer-events:none;
+          background-image:
+            linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+          background-size: 64px 64px;
+          mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black 40%, transparent 100%);
+        }
+
+        .tag {
+          display:inline-flex; align-items:center; gap:6px;
+          background: rgba(24,166,109,0.1);
+          border: 1px solid rgba(24,166,109,0.25);
+          color: #4AE89B;
+          font-size:11px; font-weight:700; letter-spacing:0.5px;
+          padding:5px 12px; border-radius:980px;
+        }
+
+        .faq-item { border-bottom: 1px solid rgba(255,255,255,0.06); }
+        .faq-item:first-child { border-top: 1px solid rgba(255,255,255,0.06); }
+
         @media(max-width:768px){
-          .sec-pad{padding-top:64px!important;padding-bottom:64px!important;padding-left:20px!important;padding-right:20px!important}
-          .hero-phone-hide{display:none!important}
-          .showcase-phone-hide{display:none!important}
+          .sec-pad { padding-top:64px!important; padding-bottom:64px!important; padding-left:20px!important; padding-right:20px!important; }
+          .hide-mobile { display:none!important; }
+        }
+        @media(min-width:769px){
+          .show-mobile-only { display:none!important; }
         }
       `}</style>
 
-      <div style={{ fontFamily: F, color: "#0B0D14" }}>
+      <div style={{ fontFamily: F, color: TXT, background: BG, overflowX:"hidden" }}>
 
-        {/* ══ NAVBAR ══ */}
+        {/* ══════════════════════════════════════════════
+            NAVBAR
+        ══════════════════════════════════════════════ */}
         <nav style={{
-          position:"fixed", top:0, left:0, right:0, zIndex:50,
-          height:52, display:"flex", alignItems:"center", justifyContent:"space-between",
-          padding:"0 32px",
-          background:"rgba(255,255,255,.88)", backdropFilter:"blur(20px) saturate(180%)",
-          borderBottom:"1px solid rgba(0,0,0,.07)",
+          position:"fixed", top:0, left:0, right:0, zIndex:100,
+          height:56,
+          display:"flex", alignItems:"center", justifyContent:"space-between",
+          padding:"0 28px",
+          background:"rgba(4,6,15,0.8)",
+          backdropFilter:"blur(24px) saturate(160%)",
+          borderBottom:`1px solid ${BORDER}`,
         }}>
-          <a href="/" style={{ textDecoration:"none", fontSize:17, fontWeight:800, letterSpacing:"-0.5px" }}>
-            <span style={{ color:"#18A66D" }}>Termin</span>
-            <span style={{ color:"#0B0D14" }}>Stop</span>
+          <a href="/" style={{ textDecoration:"none", fontSize:16, fontWeight:800, letterSpacing:"-0.5px", display:"flex", alignItems:"center", gap:8 }}>
+            <div style={{ width:28, height:28, background:"linear-gradient(135deg,#18A66D,#0EA060)", borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center" }}>
+              <span style={{ color:"#fff", fontWeight:900, fontSize:13 }}>T</span>
+            </div>
+            <span style={{ color:TXT }}>TerminStop</span>
           </a>
-          <div style={{ display:"flex", alignItems:"center", gap:16 }}>
-            <a href="#wie-es-funktioniert" style={{ fontSize:13, color:"#6B7280", textDecoration:"none", fontWeight:500 }} className="hidden md:block">So funktioniert's</a>
-            <a href="#preise" style={{ fontSize:13, color:"#6B7280", textDecoration:"none", fontWeight:500 }} className="hidden md:block">Preise</a>
-            <a href="#online-buchung" style={{ fontSize:13, color:"#18A66D", textDecoration:"none", fontWeight:700, alignItems:"center", gap:5 }} className="nav-desktop-only">
-              <span style={{ background:"#F0FBF5", border:"1px solid rgba(24,166,109,.3)", borderRadius:980, padding:"3px 10px", fontSize:11 }}>Neu</span>
+
+          <div style={{ display:"flex", alignItems:"center", gap:6 }}>
+            <a href="#wie-es-funktioniert" className="nav-desktop-only" style={{ fontSize:13, color:MUTED, textDecoration:"none", fontWeight:500, padding:"6px 12px", borderRadius:8, transition:"color .2s" }}>So funktioniert's</a>
+            <a href="#preise" className="nav-desktop-only" style={{ fontSize:13, color:MUTED, textDecoration:"none", fontWeight:500, padding:"6px 12px", borderRadius:8 }}>Preise</a>
+            <a href="#online-buchung" className="nav-desktop-only" style={{ fontSize:13, color:GREEN, textDecoration:"none", fontWeight:600, padding:"6px 12px", borderRadius:8, alignItems:"center", gap:6 }}>
+              <span style={{ background:"rgba(24,166,109,0.12)", border:"1px solid rgba(24,166,109,0.25)", borderRadius:980, padding:"2px 8px", fontSize:10, color:"#4AE89B", fontWeight:700, marginRight:4 }}>Neu</span>
               Online-Buchung
             </a>
-            <a href="/login" style={{ fontSize:13, color:"#6B7280", textDecoration:"none", fontWeight:500 }} className="hidden md:block">Login</a>
-            {/* Login nur auf Mobile */}
-            <a href="/login" className="block md:hidden" style={{ fontSize:13, color:"#6B7280", textDecoration:"none", fontWeight:600, padding:"5px 12px", border:"1px solid #E5E7EB", borderRadius:980, background:"rgba(255,255,255,.9)", whiteSpace:"nowrap" }}>Login</a>
-            <a href="/lead" className="btn-primary" style={{ fontSize:13, padding:"8px 16px", whiteSpace:"nowrap" }}>
+            <a href="/login" className="nav-desktop-only" style={{ fontSize:13, color:MUTED, textDecoration:"none", fontWeight:500, padding:"6px 12px", borderRadius:8 }}>Login</a>
+            <a href="/login" className="show-mobile-only" style={{ fontSize:13, color:MUTED, textDecoration:"none", fontWeight:600, padding:"7px 14px", border:`1px solid ${BORDER2}`, borderRadius:9, background:"rgba(255,255,255,0.04)", whiteSpace:"nowrap" }}>Login</a>
+            <a href="/lead" className="btn-primary" style={{ fontSize:13, padding:"8px 18px", marginLeft:4 }}>
               <span className="nav-cta-short">Anfragen →</span>
               <span className="nav-cta-long">Kostenlos anfragen</span>
             </a>
           </div>
         </nav>
 
-        {/* ══ HERO ══ */}
+        {/* ══════════════════════════════════════════════
+            HERO
+        ══════════════════════════════════════════════ */}
         <section style={{
-          minHeight:"100vh", display:"flex", alignItems:"center", justifyContent:"center",
-          background:"linear-gradient(170deg,#06091A 0%,#080C1E 55%,#09101F 100%)",
-          paddingTop:52, overflow:"hidden", position:"relative",
+          minHeight:"100vh",
+          display:"flex", alignItems:"center", justifyContent:"center",
+          paddingTop:56, position:"relative", overflow:"hidden",
+          background:`radial-gradient(ellipse 100% 70% at 50% -10%, rgba(24,166,109,0.12) 0%, transparent 65%), ${BG}`,
         }}>
-          {/* single soft glow */}
-          <div style={{
-            position:"absolute", top:"35%", left:"50%", transform:"translate(-50%,-50%)",
-            width:600, height:480, borderRadius:"50%",
-            background:"radial-gradient(ellipse,rgba(24,166,109,.09) 0%,transparent 68%)",
-            pointerEvents:"none",
-          }} />
+          <div className="grid-bg" />
+          <div className="noise-overlay" />
 
-          <div style={{ maxWidth:1120, margin:"0 auto", padding:"0 32px", width:"100%", display:"grid", gridTemplateColumns:"1fr 1fr", gap:80, alignItems:"center" }} className="hero-grid">
-            <style>{`.hero-grid{grid-template-columns:1fr 1fr} @media(max-width:900px){.hero-grid{grid-template-columns:1fr!important;text-align:center}.hero-btns{justify-content:center!important}.hero-stats{justify-content:center!important}}`}</style>
+          {/* Glow orbs */}
+          <div style={{ position:"absolute", top:"25%", left:"50%", transform:"translateX(-50%)", width:800, height:500, borderRadius:"50%", background:`radial-gradient(ellipse, rgba(24,166,109,0.07) 0%, transparent 65%)`, pointerEvents:"none", zIndex:1 }} />
 
-            {/* LEFT */}
-            <div>
-              {/* badge */}
-              <div className="badge-pill">
-                <span style={{ position:"relative", display:"flex", width:7, height:7, flexShrink:0 }}>
-                  <span className="pulse-ring" />
-                  <span style={{ position:"relative", display:"inline-flex", borderRadius:"50%", width:7, height:7, background:"#18A66D" }} />
-                </span>
-                <span style={{ fontSize:12, color:"rgba(255,255,255,.45)", fontWeight:600, letterSpacing:.2 }}>
-                  Digitales Terminbüro für Ihren&nbsp;<span style={{ color:"#18A66D", fontWeight:800, display:"inline-block" }} key={heroWord} className="word-slot">{words[heroWord]}</span>
-                </span>
-              </div>
+          <div style={{ maxWidth:760, margin:"0 auto", padding:"0 24px", textAlign:"center", position:"relative", zIndex:2 }}>
 
-              {/* headline */}
-              <h1 style={{ fontSize:"clamp(40px,5vw,72px)", fontWeight:900, lineHeight:1.04, letterSpacing:"-2px", color:"#fff", margin:"0 0 24px" }}>
-                Ihr Betrieb.<br />
-                Digital.<br />
-                <span style={{ color:"#18A66D" }}>Automatisch.</span>
-              </h1>
-
-              <p style={{ fontSize:18, color:"rgba(255,255,255,.42)", lineHeight:1.65, maxWidth:420, margin:"0 0 40px" }}>
-                TerminStop ist Ihr komplettes digitales Terminbüro — mit Kalender, Kundenkartei, automatischen SMS-Erinnerungen und Auswertungen. Alles in einem. In 10 Minuten eingerichtet.
-              </p>
-
-              <div className="hero-btns" style={{ display:"flex", gap:12, flexWrap:"wrap", marginBottom:52 }}>
-                <a href="/lead" className="btn-primary" style={{ fontSize:15, padding:"14px 32px" }}>Kostenlose Beratung →</a>
-                <a href="/demo" className="btn-ghost" style={{ fontSize:15, padding:"14px 28px" }}>Live-Demo ansehen</a>
-              </div>
-
-              {/* stats */}
-              <div className="hero-stats" style={{ display:"flex", gap:40, paddingTop:32, borderTop:"1px solid rgba(255,255,255,.07)" }}>
-                {[
-                  { to:50, suffix:"+", label:"Betriebe aktiv" },
-                  { to:95, suffix:"%", label:"Weniger Ausfälle" },
-                  { to:10, suffix:" Min.", label:"Einrichtung" },
-                ].map((s,i) => (
-                  <div key={i}>
-                    <div style={{ fontSize:28, fontWeight:900, color:"#fff", letterSpacing:"-1px" }}><Counter to={s.to} suffix={s.suffix} /></div>
-                    <div style={{ fontSize:12, color:"rgba(255,255,255,.28)", marginTop:2, fontWeight:500 }}>{s.label}</div>
-                  </div>
-                ))}
-              </div>
+            {/* Badge */}
+            <div style={{ display:"inline-flex", alignItems:"center", gap:8, background:"rgba(255,255,255,0.04)", border:`1px solid ${BORDER2}`, borderRadius:980, padding:"6px 16px", marginBottom:32 }}>
+              <span style={{ width:6, height:6, background:GREEN, borderRadius:"50%", display:"inline-block", boxShadow:`0 0 6px ${GREEN}` }} />
+              <span style={{ fontSize:12, color:MUTED, fontWeight:500 }}>
+                Digitales Terminbüro für Ihren&nbsp;
+                <span style={{ color:TXT, fontWeight:700 }} key={heroWord} className="word-slot">{words[heroWord]}</span>
+              </span>
             </div>
 
-            {/* RIGHT – phone */}
-            <div style={{ display:"flex", justifyContent:"flex-end" }} className="hero-phone-hide">
-              <div className="float-phone" style={{ position:"relative" }}>
-                <div style={{
-                  position:"absolute", inset:-40, borderRadius:"50%",
-                  background:"radial-gradient(ellipse,rgba(24,166,109,.11) 0%,transparent 65%)",
-                  pointerEvents:"none",
-                }} />
-                <div style={{
-                  background:"#070F09", padding:14, borderRadius:50,
-                  border:"1px solid rgba(24,166,109,.14)",
-                  boxShadow:"0 48px 96px rgba(0,0,0,.55), 0 0 0 1px rgba(24,166,109,.08) inset",
-                }}>
-                  <div style={{ width:290, height:590, borderRadius:38, overflow:"hidden", background:"linear-gradient(180deg,#0a1a0d 0%,#060d08 100%)" }}>
-                    {/* status bar */}
-                    <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"20px 24px 12px" }}>
-                      <span style={{ fontSize:11, color:"rgba(255,255,255,.35)", fontWeight:600 }}>9:41</span>
-                      <div style={{ position:"absolute", left:"50%", transform:"translateX(-50%)", top:14, width:54, height:18, background:"#000", borderRadius:9 }} />
-                      <div style={{ width:16, height:7, borderRadius:2, border:"1px solid rgba(255,255,255,.2)", position:"relative" }}>
-                        <div style={{ position:"absolute", left:2, top:2, bottom:2, width:"75%", background:"#18A66D", borderRadius:1 }} />
-                      </div>
-                    </div>
-                    {/* notification */}
-                    <div style={{ margin:"0 12px 12px", background:"rgba(255,255,255,.06)", border:"1px solid rgba(255,255,255,.08)", borderRadius:18, padding:"12px 14px", display:"flex", alignItems:"center", gap:12 }}>
-                      <div style={{ width:40, height:40, background:"#18A66D", borderRadius:12, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
-                        <span style={{ color:"#fff", fontWeight:900, fontSize:15 }}>T</span>
-                      </div>
-                      <div style={{ flex:1, minWidth:0 }}>
-                        <div style={{ fontSize:11, fontWeight:700, color:"#fff" }}>TerminStop</div>
-                        <div style={{ fontSize:10, color:"rgba(255,255,255,.3)" }}>SMS-Erinnerung · Jetzt</div>
-                      </div>
-                      <div style={{ width:8, height:8, background:"#18A66D", borderRadius:"50%" }} />
-                    </div>
-                    {/* chat */}
-                    <div style={{ padding:"0 16px", display:"flex", flexDirection:"column", gap:10 }}>
-                      <div style={{ background:"#18A66D", color:"#fff", fontSize:12, lineHeight:1.65, borderRadius:"18px 18px 18px 4px", padding:"14px 16px", maxWidth:"88%", boxShadow:"0 6px 20px rgba(24,166,109,.25)" }}>
-                        Hallo Frau Schmidt 👋<br /><br />
-                        Sie haben morgen,<br /><strong>Dienstag um 14:00 Uhr</strong><br />einen Termin bei uns.<br /><br />
-                        Wir freuen uns auf Sie!<br />
-                        <span style={{ fontSize:10, color:"rgba(255,255,255,.45)" }}>– Friseurstudio Elegance</span>
-                      </div>
-                      <div style={{ fontSize:9, color:"rgba(255,255,255,.2)", paddingLeft:4 }}>✓✓ Zugestellt · 24h vorher</div>
-                      <div style={{ display:"flex", justifyContent:"flex-end" }}>
-                        <div style={{ background:"rgba(255,255,255,.09)", border:"1px solid rgba(255,255,255,.1)", color:"rgba(255,255,255,.8)", fontSize:12, lineHeight:1.6, borderRadius:"18px 18px 4px 18px", padding:"12px 14px", maxWidth:"78%" }}>
-                          Danke! Bin pünktlich da 🙂
-                        </div>
-                      </div>
-                    </div>
-                    {/* confirmed */}
-                    <div style={{ position:"absolute", bottom:20, left:12, right:12 }}>
-                      <div style={{ background:"rgba(24,166,109,.12)", border:"1px solid rgba(24,166,109,.22)", borderRadius:18, padding:"12px 14px", display:"flex", alignItems:"center", gap:12 }}>
-                        <div style={{ width:32, height:32, background:"#18A66D", borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
-                          <span style={{ color:"#fff", fontSize:14 }}>✓</span>
-                        </div>
-                        <div>
-                          <div style={{ fontSize:11, fontWeight:700, color:"#4AE89B" }}>Termin bestätigt</div>
-                          <div style={{ fontSize:10, color:"rgba(255,255,255,.3)" }}>Kundin erscheint pünktlich</div>
-                        </div>
-                      </div>
-                    </div>
+            {/* Headline */}
+            <h1 style={{
+              fontSize:"clamp(44px,7vw,88px)",
+              fontWeight:900, lineHeight:1.0,
+              letterSpacing:"-3px",
+              margin:"0 0 28px",
+              color:TXT,
+            }}>
+              Ihr Betrieb.{" "}
+              <br />
+              <span className="gradient-text-green">Automatisch.</span>
+            </h1>
+
+            <p style={{ fontSize:"clamp(16px,2vw,19px)", color:MUTED, lineHeight:1.7, maxWidth:520, margin:"0 auto 44px", fontWeight:400 }}>
+              TerminStop ersetzt Zettelwirtschaft und Hinterhertelefonieren — mit Kalender, Kundenkartei und automatischen SMS-Erinnerungen. In 10 Minuten eingerichtet.
+            </p>
+
+            {/* CTAs */}
+            <div style={{ display:"flex", gap:12, justifyContent:"center", flexWrap:"wrap", marginBottom:64 }}>
+              <a href="/lead" className="btn-primary" style={{ fontSize:15, padding:"14px 32px" }}>
+                Kostenlose Beratung →
+              </a>
+              <a href="/demo" className="btn-ghost" style={{ fontSize:15, padding:"14px 28px" }}>
+                Live-Demo ansehen
+              </a>
+            </div>
+
+            {/* Stats */}
+            <div style={{ display:"flex", justifyContent:"center", gap:0, background:"rgba(255,255,255,0.03)", border:`1px solid ${BORDER}`, borderRadius:16, overflow:"hidden" }}>
+              {[
+                { to:50, suffix:"+", label:"Betriebe aktiv" },
+                { to:95, suffix:"%", label:"Weniger Ausfälle" },
+                { to:10, suffix:" Min", label:"Einrichtung" },
+              ].map((s, i) => (
+                <div key={i} style={{ flex:1, padding:"20px 24px", borderRight: i < 2 ? `1px solid ${BORDER}` : "none", textAlign:"center" }}>
+                  <div style={{ fontSize:"clamp(22px,3vw,32px)", fontWeight:900, color:TXT, letterSpacing:"-1px" }}>
+                    <Counter to={s.to} suffix={s.suffix} />
                   </div>
+                  <div style={{ fontSize:12, color:MUTED2, marginTop:4, fontWeight:500 }}>{s.label}</div>
                 </div>
-              </div>
+              ))}
             </div>
+
           </div>
         </section>
 
-        {/* ══ INDUSTRY STRIP ══ */}
-        <section style={{ background:"#fff", borderTop:"1px solid #F3F4F6", borderBottom:"1px solid #F3F4F6", padding:"14px 0", overflow:"hidden" }}>
+        {/* ══════════════════════════════════════════════
+            INDUSTRY STRIP
+        ══════════════════════════════════════════════ */}
+        <div style={{ borderTop:`1px solid ${BORDER}`, borderBottom:`1px solid ${BORDER}`, padding:"12px 0", overflow:"hidden", background:SURF }}>
           <div style={{ display:"flex" }}>
             <div className="marquee-wrap" style={{ display:"flex", gap:48, flexShrink:0 }}>
               {[...industries, ...industries].map((b, i) => (
-                <div key={i} style={{ display:"flex", alignItems:"center", gap:10, flexShrink:0 }}>
-                  <div style={{ width:5, height:5, background:"#18A66D", borderRadius:"50%", opacity:.7 }} />
-                  <span style={{ fontSize:13, color:"#9CA3AF", fontWeight:500, whiteSpace:"nowrap" }}>{b}</span>
+                <div key={i} style={{ display:"flex", alignItems:"center", gap:8, flexShrink:0 }}>
+                  <div style={{ width:4, height:4, background:GREEN, borderRadius:"50%", opacity:.6 }} />
+                  <span style={{ fontSize:12, color:MUTED2, fontWeight:500, whiteSpace:"nowrap" }}>{b}</span>
                 </div>
               ))}
             </div>
           </div>
-        </section>
+        </div>
 
-        {/* ══ PROBLEM ══ */}
-        <section className="sec-pad" style={{ background:"#fff", padding:"72px 32px" }}>
-          <div style={{ maxWidth:960, margin:"0 auto" }}>
+        {/* ══════════════════════════════════════════════
+            PROBLEM
+        ══════════════════════════════════════════════ */}
+        <section className="sec-pad" style={{ padding:"88px 32px", background:BG }}>
+          <div style={{ maxWidth:1040, margin:"0 auto" }}>
             <Reveal>
-              <div style={{ maxWidth:560, marginBottom:64 }}>
-                <div style={{ fontSize:11, fontWeight:700, letterSpacing:3, textTransform:"uppercase", color:"#18A66D", marginBottom:16 }}>Das Problem</div>
-                <h2 style={{ fontSize:"clamp(32px,4vw,52px)", fontWeight:900, letterSpacing:"-1.5px", lineHeight:1.08, margin:"0 0 18px" }}>
-                  Zettelwirtschaft, Telefonate,<br />No-Shows. Täglich.
+              <div style={{ maxWidth:480, marginBottom:56 }}>
+                <div className="tag" style={{ marginBottom:20 }}>Das Problem</div>
+                <h2 style={{ fontSize:"clamp(30px,4vw,50px)", fontWeight:900, letterSpacing:"-1.5px", lineHeight:1.08, margin:"0 0 16px", color:TXT }}>
+                  Ausfälle kosten Sie täglich Geld.
                 </h2>
-                <p style={{ fontSize:17, color:"#6B7280", lineHeight:1.65, margin:0 }}>
-                  Kein Überblick über Kunden, kein digitaler Kalender, kein System — und dazu noch Kunden, die einfach nicht erscheinen. Das kostet Sie jeden Tag Zeit und Geld.
+                <p style={{ fontSize:16, color:MUTED, lineHeight:1.7, margin:0 }}>
+                  Kein Überblick, kein System — und Kunden, die einfach nicht erscheinen. Das summiert sich.
                 </p>
               </div>
             </Reveal>
 
-            <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", border:"1px solid #F3F4F6", borderRadius:20, overflow:"hidden" }} className="stat-grid">
+            <div style={{ display:"grid", gap:1, background:BORDER, borderRadius:20, overflow:"hidden" }} className="stat-grid">
               <style>{`.stat-grid{grid-template-columns:repeat(3,1fr)} @media(max-width:700px){.stat-grid{grid-template-columns:1fr!important}}`}</style>
               {[
-                { to:50, suffix:"€", pre:"", label:"Verlust pro Ausfall", desc:"Jeder verpasste Termin ist Umsatz, der nicht stattfindet." },
-                { to:9,  suffix:"×", pre:"bis ", label:"Ausfälle pro Woche", desc:"Im Schnitt erlebt jeder Betrieb mehrfach pro Woche Ausfälle." },
-                { to:2000, suffix:"€+", pre:"bis ", label:"Verlust pro Monat", desc:"Was wenig klingt, summiert sich zu Tausenden im Jahr." },
+                { to:50, suffix:"€", pre:"bis ", label:"Verlust pro Ausfall", desc:"Jeder verpasste Termin ist Umsatz, der nicht stattfindet.", col:"#F0F4FF" },
+                { to:9, suffix:"×", pre:"bis ", label:"Ausfälle pro Woche", desc:"Im Schnitt erlebt jeder Betrieb mehrfach wöchentlich Ausfälle.", col:"#F0F4FF" },
+                { to:2000, suffix:"€", pre:"bis ", label:"Verlust pro Monat", desc:"Was wenig klingt, summiert sich zu Tausenden im Jahr.", col:GREEN },
               ].map((item, i) => (
                 <Reveal key={i} delay={i * 80}>
-                  <div style={{ padding:"48px 40px", background:"#fff", borderRight: i < 2 ? "1px solid #F3F4F6" : "none" }} className={i < 2 ? "stat-item-border" : ""}>
-                    <div style={{ fontSize:52, fontWeight:900, color:"#0B0D14", marginBottom:10, letterSpacing:"-2px", fontVariantNumeric:"tabular-nums" }}>
+                  <div style={{ padding:"44px 36px", background:SURF }}>
+                    <div style={{ fontSize:"clamp(40px,5vw,60px)", fontWeight:900, color:item.col, marginBottom:12, letterSpacing:"-2px", fontVariantNumeric:"tabular-nums" }}>
                       {item.pre}<Counter to={item.to} suffix={item.suffix} />
                     </div>
-                    <div style={{ fontSize:14, fontWeight:700, color:"#0B0D14", marginBottom:6 }}>{item.label}</div>
-                    <div style={{ fontSize:14, color:"#9CA3AF", lineHeight:1.6 }}>{item.desc}</div>
-                  </div>
-                </Reveal>
-              ))}
-            </div>
-
-          </div>
-        </section>
-
-        {/* ══ HOW IT WORKS ══ */}
-        <section id="wie-es-funktioniert" className="sec-pad" style={{ background:"#F9FAFB", padding:"72px 32px" }}>
-          <div style={{ maxWidth:960, margin:"0 auto" }}>
-            <Reveal>
-              <div style={{ maxWidth:520, marginBottom:64 }}>
-                <div style={{ fontSize:11, fontWeight:700, letterSpacing:3, textTransform:"uppercase", color:"#18A66D", marginBottom:16 }}>So funktioniert's</div>
-                <h2 style={{ fontSize:"clamp(32px,4vw,52px)", fontWeight:900, letterSpacing:"-1.5px", lineHeight:1.08, margin:"0 0 18px" }}>
-                  Drei Schritte.<br />Dann läuft es.
-                </h2>
-                <p style={{ fontSize:17, color:"#6B7280", lineHeight:1.65, margin:0 }}>Kein IT-Studium. Kein Aufwand. Für immer.</p>
-              </div>
-            </Reveal>
-            <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
-              {[
-                { num:"01", title:"Einmalig einrichten – in unter 10 Minuten", desc:"Wir richten TerminStop gemeinsam mit Ihnen ein: Kalender, Kundenkartei und SMS-Erinnerungen. Persönlicher Onboarding-Support inklusive – kein technisches Vorwissen nötig.", tag:"Persönliche Begleitung" },
-                { num:"02", title:"Ihr digitales Büro läuft – sofort und vollautomatisch", desc:"Termine im Kalender, Kunden in der Kartei, SMS-Erinnerungen gehen automatisch raus – 24h vor jedem Termin, mit Ihrem Namen. Sie sehen auf einen Blick, wer bestätigt hat und wer nicht.", tag:"Alles in einem" },
-                { num:"03", title:"Ihr Betrieb läuft planbarer. Jeden Tag.", desc:"Weniger Ausfälle, mehr Überblick, mehr Umsatz. Kein Hinterhertelefonieren, keine Zettelwirtschaft – TerminStop arbeitet dauerhaft für Sie im Hintergrund.", tag:"95 % Erfolgsquote" },
-              ].map((s, i) => (
-                <Reveal key={i} delay={i * 80}>
-                  <div style={{ background:"#fff", border:"1px solid #F3F4F6", borderRadius:18, padding:"32px 36px", display:"flex", gap:32, alignItems:"flex-start", boxShadow:"0 1px 4px rgba(0,0,0,.04)" }}>
-                    <div style={{ fontSize:64, fontWeight:900, lineHeight:1, color:"rgba(24,166,109,.1)", flexShrink:0, width:80, textAlign:"center", userSelect:"none" }}>{s.num}</div>
-                    <div>
-                      <span style={{ display:"inline-block", background:"#F0FBF5", border:"1px solid rgba(24,166,109,.2)", color:"#18A66D", fontSize:11, fontWeight:700, padding:"4px 12px", borderRadius:980, marginBottom:12 }}>{s.tag}</span>
-                      <h3 style={{ fontSize:18, fontWeight:800, color:"#0B0D14", margin:"0 0 10px", letterSpacing:"-0.3px" }}>{s.title}</h3>
-                      <p style={{ fontSize:15, color:"#6B7280", lineHeight:1.65, margin:0 }}>{s.desc}</p>
-                    </div>
+                    <div style={{ fontSize:14, fontWeight:700, color:TXT, marginBottom:8 }}>{item.label}</div>
+                    <div style={{ fontSize:13, color:MUTED, lineHeight:1.65 }}>{item.desc}</div>
                   </div>
                 </Reveal>
               ))}
@@ -439,156 +398,150 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* ══ 4 FEATURE PILLARS ══ */}
-        <section className="sec-pad" style={{ background:"#F9FAFB", padding:"72px 32px" }}>
-          <div style={{ maxWidth:1080, margin:"0 auto" }}>
-            <Reveal>
-              <div style={{ textAlign:"center", maxWidth:580, margin:"0 auto 64px" }}>
-                <div style={{ fontSize:11, fontWeight:700, letterSpacing:3, textTransform:"uppercase", color:"#18A66D", marginBottom:16 }}>Alles inklusive</div>
-                <h2 style={{ fontSize:"clamp(32px,4vw,52px)", fontWeight:900, letterSpacing:"-1.5px", lineHeight:1.08, margin:"0 0 16px" }}>
-                  Kein Einzeltool.<br />Ein komplettes System.
-                </h2>
-                <p style={{ fontSize:17, color:"#6B7280", lineHeight:1.65, margin:0 }}>
-                  TerminStop ersetzt Notizbuch, Papierkalender und Erinnerungsanrufe — und gibt Ihnen dabei mehr Einblick als je zuvor.
-                </p>
-              </div>
-            </Reveal>
-            <div style={{ display:"grid", gap:20 }} className="features4-grid">
-              <style>{`.features4-grid{grid-template-columns:repeat(2,1fr)} @media(max-width:700px){.features4-grid{grid-template-columns:1fr!important}}`}</style>
-              {[
-                { icon:"📅", title:"Digitaler Kalender", tag:"Notizbuch adé", desc:"Tag- und Wochenübersicht für alle Termine. Auf dem Handy, Tablet oder PC — immer aktuell, immer dabei. Nie wieder Zettelwirtschaft." },
-                { icon:"👥", title:"Kundenkartei", tag:"Voller Überblick", desc:"Stammkunden anlegen, Verlauf einsehen, Notizen hinterlegen. Sie wissen immer, wer zuverlässig ist — und wer nicht." },
-                { icon:"📱", title:"Automatische SMS-Erinnerungen", tag:"Vollautomatisch", desc:"24h vor jedem Termin geht automatisch eine personalisierte SMS raus — ohne Ihr Zutun. Nie wieder hinterhertelefonieren." },
-                { icon:"📊", title:"Auswertungen & Einblicke", tag:"Datengestützt", desc:"Wie hoch ist Ihre Erfolgsquote? Welche Kunden kommen regelmäßig? Sehen Sie Ihren Betrieb endlich schwarz auf weiß." },
-              ].map((f, i) => (
-                <Reveal key={i} delay={i * 70}>
-                  <div style={{ background:"#fff", border:"1px solid #F3F4F6", borderRadius:20, padding:"32px", boxShadow:"0 1px 4px rgba(0,0,0,.04)", height:"100%", boxSizing:"border-box" as any }}>
-                    <div style={{ display:"flex", alignItems:"center", gap:14, marginBottom:18 }}>
-                      <div style={{ width:48, height:48, background:"#F0FBF5", borderRadius:14, display:"flex", alignItems:"center", justifyContent:"center", fontSize:22, flexShrink:0 }}>{f.icon}</div>
-                      <div>
-                        <span style={{ display:"inline-block", background:"#F0FBF5", border:"1px solid rgba(24,166,109,.2)", color:"#18A66D", fontSize:10, fontWeight:700, padding:"3px 10px", borderRadius:980, marginBottom:6 }}>{f.tag}</span>
-                        <h3 style={{ fontSize:16, fontWeight:800, color:"#0B0D14", margin:0, letterSpacing:"-0.2px" }}>{f.title}</h3>
-                      </div>
-                    </div>
-                    <p style={{ fontSize:14, color:"#6B7280", lineHeight:1.7, margin:0 }}>{f.desc}</p>
-                  </div>
-                </Reveal>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ══ COMPETITOR COMPARISON ══ */}
-        <section style={{ background:"#06091A", padding:"72px 32px" }} className="sec-pad">
-          <div style={{ maxWidth:960, margin:"0 auto" }}>
-            <Reveal>
-              <div style={{ textAlign:"center", maxWidth:580, margin:"0 auto 56px" }}>
-                <div style={{ fontSize:11, fontWeight:700, letterSpacing:3, textTransform:"uppercase", color:"#18A66D", marginBottom:16 }}>Der Vergleich</div>
-                <h2 style={{ fontSize:"clamp(32px,4vw,52px)", fontWeight:900, color:"#fff", letterSpacing:"-1.5px", lineHeight:1.08, margin:"0 0 14px" }}>
-                  Was andere kosten.<br /><span style={{ color:"#18A66D" }}>Was Sie bekommen.</span>
-                </h2>
-                <p style={{ fontSize:16, color:"rgba(255,255,255,.32)", margin:0 }}>
-                  Buchungsportale & Marktplätze klingen verlockend — bis man genau hinschaut.
-                </p>
-              </div>
-            </Reveal>
-
-            <Reveal delay={60}>
-              {/* ── Desktop Table (hidden on mobile) ── */}
-              <div className="comp-desktop">
-                <style>{`.comp-desktop{display:block} @media(max-width:600px){.comp-desktop{display:none!important}}`}</style>
-                <div style={{ background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.08)", borderRadius:20, overflow:"hidden" }}>
-                  <div style={{ display:"grid", gridTemplateColumns:"1.6fr 1fr 1fr", borderBottom:"1px solid rgba(255,255,255,.08)" }}>
-                    <div style={{ padding:"18px 24px" }} />
-                    <div style={{ padding:"18px 16px", textAlign:"center", borderLeft:"1px solid rgba(255,255,255,.06)", display:"flex", alignItems:"center", justifyContent:"center" }}>
-                      <span style={{ fontSize:13, color:"rgba(255,255,255,.3)", fontWeight:600 }}>Klassische Portale</span>
-                    </div>
-                    <div style={{ padding:"18px 16px", textAlign:"center", background:"rgba(24,166,109,.07)", borderLeft:"1px solid rgba(24,166,109,.18)", display:"flex", alignItems:"center", justifyContent:"center" }}>
-                      <span style={{ fontSize:14, fontWeight:800, color:"#4AE89B" }}>TerminStop ✓</span>
-                    </div>
-                  </div>
-                  {compRows.map((row, i) => (
-                    <div key={i} style={{ display:"grid", gridTemplateColumns:"1.6fr 1fr 1fr", borderBottom: i < compRows.length-1 ? "1px solid rgba(255,255,255,.05)" : "none" }}>
-                      <div style={{ padding:"15px 24px", display:"flex", alignItems:"center" }}>
-                        <span style={{ fontSize:13, color:"rgba(255,255,255,.4)", fontWeight:500 }}>{row.label}</span>
-                      </div>
-                      <div style={{ padding:"15px 16px", borderLeft:"1px solid rgba(255,255,255,.04)", display:"flex", alignItems:"center", justifyContent:"center" }}>
-                        <span style={{ fontSize:12, color:"rgba(255,255,255,.22)", lineHeight:1.5, textAlign:"center" as any }}>{row.them}</span>
-                      </div>
-                      <div style={{ padding:"15px 16px", background:"rgba(24,166,109,.04)", borderLeft:"1px solid rgba(24,166,109,.1)", display:"flex", alignItems:"center", justifyContent:"center" }}>
-                        <span style={{ fontSize:12, color:"rgba(74,232,155,.9)", fontWeight:600, lineHeight:1.5, textAlign:"center" as any }}>{row.us}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* ── Mobile Cards (hidden on desktop) ── */}
-              <div className="comp-mobile">
-                <style>{`.comp-mobile{display:none} @media(max-width:600px){.comp-mobile{display:block}}`}</style>
-                {/* Column labels */}
-                <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10, marginBottom:14 }}>
-                  <div style={{ background:"rgba(255,255,255,.04)", border:"1px solid rgba(255,255,255,.08)", borderRadius:12, padding:"11px", textAlign:"center" as any }}>
-                    <span style={{ fontSize:12, color:"rgba(255,255,255,.3)", fontWeight:600 }}>Klassische Portale</span>
-                  </div>
-                  <div style={{ background:"rgba(24,166,109,.1)", border:"1px solid rgba(24,166,109,.25)", borderRadius:12, padding:"11px", textAlign:"center" as any }}>
-                    <span style={{ fontSize:13, fontWeight:800, color:"#4AE89B" }}>TerminStop ✓</span>
-                  </div>
-                </div>
-                {/* Each category as a card */}
-                <div style={{ display:"flex", flexDirection:"column" as any, gap:10 }}>
-                  {compRows.map((row, i) => (
-                    <div key={i} style={{ background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.07)", borderRadius:14, padding:"14px 16px" }}>
-                      <div style={{ fontSize:10, fontWeight:700, color:"rgba(255,255,255,.3)", textTransform:"uppercase" as any, letterSpacing:1.5, marginBottom:10 }}>{row.label}</div>
-                      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}>
-                        <div style={{ background:"rgba(255,255,255,.04)", borderRadius:10, padding:"10px 12px" }}>
-                          <span style={{ fontSize:12, color:"rgba(255,255,255,.25)", lineHeight:1.5 }}>{row.them}</span>
-                        </div>
-                        <div style={{ background:"rgba(24,166,109,.07)", border:"1px solid rgba(24,166,109,.15)", borderRadius:10, padding:"10px 12px" }}>
-                          <span style={{ fontSize:12, color:"rgba(74,232,155,.9)", fontWeight:600, lineHeight:1.5 }}>{row.us}</span>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </Reveal>
-
-            <Reveal delay={100}>
-              <div style={{ marginTop:24, display:"flex", flexDirection:"column" as any, alignItems:"center", gap:16, textAlign:"center" as any }}>
-                <p style={{ fontSize:13, color:"rgba(255,255,255,.22)", margin:0 }}>
-                  Bei 100 Buchungen/Monat à €50 zahlen Sie über ein Buchungsportal bis zu <strong style={{ color:"rgba(255,255,255,.45)" }}>€1.500 Provision</strong>. TerminStop kostet <strong style={{ color:"#4AE89B" }}>ab €1,30 / Tag</strong>.
-                </p>
-                <a href="/lead" className="btn-primary" style={{ fontSize:15, padding:"14px 32px" }}>Jetzt wechseln →</a>
-              </div>
-            </Reveal>
-          </div>
-        </section>
-
-        {/* ══ REVIEWS ══ */}
-        <section className="sec-pad" style={{ background:"#fff", padding:"72px 32px" }}>
+        {/* ══════════════════════════════════════════════
+            HOW IT WORKS
+        ══════════════════════════════════════════════ */}
+        <section id="wie-es-funktioniert" className="sec-pad" style={{ padding:"88px 32px", background:SURF }}>
           <div style={{ maxWidth:900, margin:"0 auto" }}>
             <Reveal>
-              <div style={{ textAlign:"center", marginBottom:48 }}>
-                <div style={{ fontSize:11, fontWeight:700, letterSpacing:3, textTransform:"uppercase", color:"#18A66D", marginBottom:16 }}>Echte Ergebnisse</div>
-                <h2 style={{ fontSize:"clamp(28px,3.5vw,44px)", fontWeight:900, letterSpacing:"-1.5px", lineHeight:1.08, margin:"0 0 10px" }}>Was Betriebe berichten.</h2>
+              <div style={{ textAlign:"center", maxWidth:500, margin:"0 auto 64px" }}>
+                <div className="tag" style={{ marginBottom:20 }}>So funktioniert's</div>
+                <h2 style={{ fontSize:"clamp(30px,4vw,50px)", fontWeight:900, letterSpacing:"-1.5px", lineHeight:1.08, margin:"0 0 14px", color:TXT }}>
+                  Drei Schritte.<br />Dann läuft alles.
+                </h2>
+                <p style={{ fontSize:16, color:MUTED, margin:0, lineHeight:1.65 }}>Kein IT-Studium. Kein Aufwand. Für immer.</p>
               </div>
             </Reveal>
-            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:16 }} className="reviews-grid">
-              <style>{`.reviews-grid{grid-template-columns:1fr 1fr} @media(max-width:700px){.reviews-grid{grid-template-columns:1fr!important}}`}</style>
-              {reviews.slice(0, 2).map((r, i) => (
-                <Reveal key={i} delay={i * 60}>
-                  <div style={{ background:"#fff", border:"1px solid #F3F4F6", borderRadius:20, padding:"28px", display:"flex", flexDirection:"column", height:"100%", boxShadow:"0 1px 4px rgba(0,0,0,.04)" }}>
-                    <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:18 }}>
-                      <div style={{ background:"#F0FBF5", color:"#18A66D", fontSize:11, fontWeight:700, padding:"5px 12px", borderRadius:980 }}>✓ {r.result}</div>
-                      <div style={{ color:"#FBBF24", fontSize:12, letterSpacing:1 }}>★★★★★</div>
+
+            <div style={{ display:"flex", flexDirection:"column", gap:2 }}>
+              {[
+                { num:"01", tag:"Persönliche Begleitung", title:"Einmalig einrichten — in unter 10 Minuten", desc:"Wir richten TerminStop gemeinsam mit Ihnen ein. Kalender, Kundenkartei und SMS-Erinnerungen. Persönlicher Onboarding-Support inklusive." },
+                { num:"02", tag:"Vollautomatisch", title:"Ihr digitales Büro läuft — sofort und automatisch", desc:"Termine im Kalender, Kunden in der Kartei, SMS-Erinnerungen gehen 24h vor jedem Termin automatisch raus — mit Ihrem Namen." },
+                { num:"03", tag:"95% Erfolgsquote", title:"Ihr Betrieb läuft planbarer. Jeden Tag.", desc:"Weniger Ausfälle, mehr Überblick, mehr Umsatz. TerminStop arbeitet dauerhaft für Sie im Hintergrund." },
+              ].map((s, i) => (
+                <Reveal key={i} delay={i * 80}>
+                  <div className="card-hover" style={{ background:SURF2, border:`1px solid ${BORDER}`, borderRadius:16, padding:"28px 32px", display:"flex", gap:28, alignItems:"flex-start" }}>
+                    <div style={{ fontSize:48, fontWeight:900, lineHeight:1, color:"rgba(255,255,255,0.06)", flexShrink:0, width:60, textAlign:"center", userSelect:"none", fontVariantNumeric:"tabular-nums" }}>{s.num}</div>
+                    <div>
+                      <span style={{ display:"inline-block", background:"rgba(24,166,109,0.08)", border:"1px solid rgba(24,166,109,0.2)", color:"#4AE89B", fontSize:10, fontWeight:700, padding:"3px 10px", borderRadius:980, marginBottom:10, letterSpacing:".5px" }}>{s.tag}</span>
+                      <h3 style={{ fontSize:17, fontWeight:800, color:TXT, margin:"0 0 8px", letterSpacing:"-0.3px" }}>{s.title}</h3>
+                      <p style={{ fontSize:14, color:MUTED, lineHeight:1.7, margin:0 }}>{s.desc}</p>
                     </div>
-                    <p style={{ fontSize:14, color:"#6B7280", lineHeight:1.7, flex:1, marginBottom:20, fontStyle:"italic" }}>„{r.text}"</p>
-                    <div style={{ display:"flex", alignItems:"center", gap:12, paddingTop:16, borderTop:"1px solid #F9FAFB" }}>
-                      <div style={{ width:34, height:34, background:"linear-gradient(135deg,#18A66D,#0A7A4F)", color:"#fff", borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", fontSize:13, fontWeight:900, flexShrink:0 }}>{r.name.charAt(0)}</div>
+                  </div>
+                </Reveal>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ══════════════════════════════════════════════
+            FEATURES BENTO
+        ══════════════════════════════════════════════ */}
+        <section className="sec-pad" style={{ padding:"88px 32px", background:BG }}>
+          <div style={{ maxWidth:1040, margin:"0 auto" }}>
+            <Reveal>
+              <div style={{ textAlign:"center", maxWidth:500, margin:"0 auto 56px" }}>
+                <div className="tag" style={{ marginBottom:20 }}>Alles inklusive</div>
+                <h2 style={{ fontSize:"clamp(30px,4vw,50px)", fontWeight:900, letterSpacing:"-1.5px", lineHeight:1.08, margin:"0 0 14px", color:TXT }}>
+                  Kein Einzeltool.<br />Ein komplettes System.
+                </h2>
+                <p style={{ fontSize:16, color:MUTED, lineHeight:1.65, margin:0 }}>
+                  TerminStop ersetzt Notizbuch, Papierkalender und Erinnerungsanrufe.
+                </p>
+              </div>
+            </Reveal>
+
+            {/* Bento Grid */}
+            <div style={{ display:"grid", gap:3 }} className="bento-grid">
+              <style>{`
+                .bento-grid { grid-template-columns: repeat(2, 1fr); grid-template-rows: auto; }
+                @media(max-width:700px){ .bento-grid { grid-template-columns: 1fr !important; } }
+              `}</style>
+
+              {/* Big card top left */}
+              <Reveal delay={0}>
+                <div className="card-hover" style={{ background:SURF, border:`1px solid ${BORDER}`, borderRadius:18, padding:"36px", gridRow:"span 1", height:"100%", boxSizing:"border-box", position:"relative", overflow:"hidden" }}>
+                  <div style={{ position:"absolute", top:-40, right:-40, width:180, height:180, background:`radial-gradient(ellipse, ${GLOW} 0%, transparent 70%)`, pointerEvents:"none" }} />
+                  <div style={{ width:44, height:44, background:"rgba(24,166,109,0.1)", border:"1px solid rgba(24,166,109,0.2)", borderRadius:13, display:"flex", alignItems:"center", justifyContent:"center", fontSize:20, marginBottom:20 }}>📅</div>
+                  <div style={{ fontSize:10, fontWeight:700, color:"#4AE89B", letterSpacing:1.5, textTransform:"uppercase", marginBottom:10 }}>Vollautomatisch</div>
+                  <h3 style={{ fontSize:20, fontWeight:800, color:TXT, margin:"0 0 10px", letterSpacing:"-0.4px" }}>SMS-Erinnerungen</h3>
+                  <p style={{ fontSize:14, color:MUTED, lineHeight:1.7, margin:0 }}>24h vor jedem Termin geht eine personalisierte SMS raus — mit Ihrem Namen, ohne Ihr Zutun. Nie wieder hinterhertelefonieren.</p>
+                </div>
+              </Reveal>
+
+              {/* Top right */}
+              <Reveal delay={60}>
+                <div className="card-hover" style={{ background:SURF, border:`1px solid ${BORDER}`, borderRadius:18, padding:"36px", height:"100%", boxSizing:"border-box", position:"relative", overflow:"hidden" }}>
+                  <div style={{ position:"absolute", bottom:-40, left:-40, width:160, height:160, background:`radial-gradient(ellipse, rgba(99,102,241,0.08) 0%, transparent 70%)`, pointerEvents:"none" }} />
+                  <div style={{ width:44, height:44, background:"rgba(99,102,241,0.1)", border:"1px solid rgba(99,102,241,0.2)", borderRadius:13, display:"flex", alignItems:"center", justifyContent:"center", fontSize:20, marginBottom:20 }}>👥</div>
+                  <div style={{ fontSize:10, fontWeight:700, color:"#818CF8", letterSpacing:1.5, textTransform:"uppercase", marginBottom:10 }}>Voller Überblick</div>
+                  <h3 style={{ fontSize:20, fontWeight:800, color:TXT, margin:"0 0 10px", letterSpacing:"-0.4px" }}>Kundenkartei</h3>
+                  <p style={{ fontSize:14, color:MUTED, lineHeight:1.7, margin:0 }}>Stammkunden anlegen, Verlauf einsehen, Notizen hinterlegen. Sie wissen immer, wer zuverlässig ist — und wer nicht.</p>
+                </div>
+              </Reveal>
+
+              {/* Bottom left */}
+              <Reveal delay={100}>
+                <div className="card-hover" style={{ background:SURF, border:`1px solid ${BORDER}`, borderRadius:18, padding:"36px", height:"100%", boxSizing:"border-box", position:"relative", overflow:"hidden" }}>
+                  <div style={{ position:"absolute", top:-30, right:-30, width:140, height:140, background:`radial-gradient(ellipse, rgba(245,158,11,0.07) 0%, transparent 70%)`, pointerEvents:"none" }} />
+                  <div style={{ width:44, height:44, background:"rgba(245,158,11,0.1)", border:"1px solid rgba(245,158,11,0.2)", borderRadius:13, display:"flex", alignItems:"center", justifyContent:"center", fontSize:20, marginBottom:20 }}>🗓️</div>
+                  <div style={{ fontSize:10, fontWeight:700, color:"#FCD34D", letterSpacing:1.5, textTransform:"uppercase", marginBottom:10 }}>Immer aktuell</div>
+                  <h3 style={{ fontSize:20, fontWeight:800, color:TXT, margin:"0 0 10px", letterSpacing:"-0.4px" }}>Digitaler Kalender</h3>
+                  <p style={{ fontSize:14, color:MUTED, lineHeight:1.7, margin:0 }}>Tag- und Wochenansicht auf dem Handy, Tablet oder PC. Nie wieder Zettelwirtschaft — alles an einem Ort.</p>
+                </div>
+              </Reveal>
+
+              {/* Bottom right */}
+              <Reveal delay={140}>
+                <div className="card-hover" style={{ background:SURF, border:`1px solid ${BORDER}`, borderRadius:18, padding:"36px", height:"100%", boxSizing:"border-box", position:"relative", overflow:"hidden" }}>
+                  <div style={{ position:"absolute", bottom:-30, right:-30, width:140, height:140, background:`radial-gradient(ellipse, rgba(236,72,153,0.07) 0%, transparent 70%)`, pointerEvents:"none" }} />
+                  <div style={{ width:44, height:44, background:"rgba(236,72,153,0.1)", border:"1px solid rgba(236,72,153,0.2)", borderRadius:13, display:"flex", alignItems:"center", justifyContent:"center", fontSize:20, marginBottom:20 }}>📊</div>
+                  <div style={{ fontSize:10, fontWeight:700, color:"#F9A8D4", letterSpacing:1.5, textTransform:"uppercase", marginBottom:10 }}>Datengestützt</div>
+                  <h3 style={{ fontSize:20, fontWeight:800, color:TXT, margin:"0 0 10px", letterSpacing:"-0.4px" }}>Auswertungen</h3>
+                  <p style={{ fontSize:14, color:MUTED, lineHeight:1.7, margin:0 }}>Wie hoch ist Ihre Erfolgsquote? Welche Kunden kommen regelmäßig? Sehen Sie Ihren Betrieb schwarz auf weiß.</p>
+                </div>
+              </Reveal>
+            </div>
+
+            {/* CTA below bento */}
+            <Reveal delay={80}>
+              <div style={{ marginTop:16, background:SURF, border:`1px solid ${BORDER}`, borderRadius:16, padding:"20px 28px", display:"flex", alignItems:"center", justifyContent:"space-between", gap:20, flexWrap:"wrap" }}>
+                <div>
+                  <span style={{ color:TXT, fontWeight:700, fontSize:15 }}>Alles in einem Paket. Ab €1,30/Tag.</span>
+                  <span style={{ color:MUTED, fontSize:13, marginLeft:12 }}>Monatlich kündbar · Kein Vertrag</span>
+                </div>
+                <a href="/lead" className="btn-primary" style={{ fontSize:13, padding:"10px 22px", flexShrink:0 }}>Jetzt anfragen →</a>
+              </div>
+            </Reveal>
+          </div>
+        </section>
+
+        {/* ══════════════════════════════════════════════
+            REVIEWS
+        ══════════════════════════════════════════════ */}
+        <section className="sec-pad" style={{ padding:"88px 32px", background:SURF }}>
+          <div style={{ maxWidth:900, margin:"0 auto" }}>
+            <Reveal>
+              <div style={{ textAlign:"center", marginBottom:52 }}>
+                <div className="tag" style={{ marginBottom:20 }}>Echte Ergebnisse</div>
+                <h2 style={{ fontSize:"clamp(28px,3.5vw,44px)", fontWeight:900, letterSpacing:"-1.5px", lineHeight:1.08, margin:0, color:TXT }}>Was Betriebe berichten.</h2>
+              </div>
+            </Reveal>
+            <div style={{ display:"grid", gap:12 }} className="reviews-grid">
+              <style>{`.reviews-grid{grid-template-columns:1fr 1fr} @media(max-width:700px){.reviews-grid{grid-template-columns:1fr!important}}`}</style>
+              {reviews.map((r, i) => (
+                <Reveal key={i} delay={i * 80}>
+                  <div className="card-hover" style={{ background:SURF2, border:`1px solid ${BORDER}`, borderRadius:18, padding:"28px", display:"flex", flexDirection:"column", height:"100%" }}>
+                    <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:18 }}>
+                      <div style={{ background:"rgba(24,166,109,0.1)", border:"1px solid rgba(24,166,109,0.2)", color:"#4AE89B", fontSize:11, fontWeight:700, padding:"5px 12px", borderRadius:980 }}>✓ {r.result}</div>
+                      <div style={{ color:"#FBBF24", fontSize:12, letterSpacing:2 }}>★★★★★</div>
+                    </div>
+                    <p style={{ fontSize:14, color:MUTED, lineHeight:1.75, flex:1, marginBottom:20, fontStyle:"italic" }}>„{r.text}"</p>
+                    <div style={{ display:"flex", alignItems:"center", gap:12, paddingTop:18, borderTop:`1px solid ${BORDER}` }}>
+                      <div style={{ width:36, height:36, background:"linear-gradient(135deg,#18A66D,#0A7A4F)", color:"#fff", borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", fontSize:14, fontWeight:900, flexShrink:0 }}>{r.name.charAt(0)}</div>
                       <div>
-                        <div style={{ fontSize:13, fontWeight:700, color:"#0B0D14" }}>{r.name}</div>
-                        <div style={{ fontSize:12, color:"#9CA3AF" }}>{r.role} · {r.city}</div>
+                        <div style={{ fontSize:13, fontWeight:700, color:TXT }}>{r.name}</div>
+                        <div style={{ fontSize:12, color:MUTED2 }}>{r.role} · {r.city}</div>
                       </div>
                     </div>
                   </div>
@@ -598,69 +551,71 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* ══ PRICING ══ */}
-        <section id="preise" className="sec-pad" style={{ background:"#F9FAFB", padding:"72px 32px" }}>
-          <div style={{ maxWidth:960, margin:"0 auto" }}>
+        {/* ══════════════════════════════════════════════
+            PRICING
+        ══════════════════════════════════════════════ */}
+        <section id="preise" className="sec-pad" style={{ padding:"88px 32px", background:BG }}>
+          <div style={{ maxWidth:1000, margin:"0 auto" }}>
             <Reveal>
-              <div style={{ textAlign:"center", maxWidth:600, margin:"0 auto 16px" }}>
-                <div style={{ fontSize:11, fontWeight:700, letterSpacing:3, textTransform:"uppercase", color:"#18A66D", marginBottom:16 }}>Ihr Paket</div>
-                <h2 style={{ fontSize:"clamp(30px,4vw,52px)", fontWeight:900, letterSpacing:"-1.5px", lineHeight:1.08, margin:"0 0 14px" }}>Individuell angepasst.<br />Passend für Ihren Betrieb.</h2>
-                <p style={{ fontSize:16, color:"#6B7280", margin:0, lineHeight:1.6 }}>
-                  Kein Einheitspaket. Wir schauen gemeinsam, wie viele Termine Sie haben —<br className="hidden md:block" /> und finden das Paket, das sich ab dem ersten Monat rechnet.
+              <div style={{ textAlign:"center", maxWidth:560, margin:"0 auto 16px" }}>
+                <div className="tag" style={{ marginBottom:20 }}>Ihr Paket</div>
+                <h2 style={{ fontSize:"clamp(30px,4vw,50px)", fontWeight:900, letterSpacing:"-1.5px", lineHeight:1.08, margin:"0 0 14px", color:TXT }}>
+                  Individuell angepasst.<br />Passend für Ihren Betrieb.
+                </h2>
+                <p style={{ fontSize:16, color:MUTED, margin:0, lineHeight:1.65 }}>
+                  Kein Einheitspaket. Im Gespräch finden wir gemeinsam das richtige Paket.
                 </p>
               </div>
             </Reveal>
 
-            {/* Anchor: ab €1,30 / Tag */}
             <Reveal delay={60}>
-              <div style={{ display:"flex", justifyContent:"center", margin:"32px 0 48px" }}>
-                <div style={{ background:"#fff", border:"1px solid rgba(24,166,109,.2)", borderRadius:20, padding:"20px 32px", display:"flex", alignItems:"center", gap:20, boxShadow:"0 2px 12px rgba(0,0,0,.05)" }}>
+              <div style={{ display:"flex", justifyContent:"center", margin:"32px 0 44px" }}>
+                <div style={{ background:SURF, border:`1px solid rgba(24,166,109,0.2)`, borderRadius:16, padding:"18px 28px", display:"flex", alignItems:"center", gap:20, boxShadow:`0 0 40px rgba(24,166,109,0.07)` }}>
                   <div style={{ textAlign:"center" }}>
-                    <div style={{ fontSize:11, fontWeight:700, letterSpacing:2, textTransform:"uppercase", color:"#9CA3AF", marginBottom:4 }}>Einstieg bereits</div>
-                    <div style={{ fontSize:36, fontWeight:900, color:"#0B0D14", letterSpacing:"-1px", lineHeight:1 }}>ab €1,30 <span style={{ fontSize:16, fontWeight:600, color:"#9CA3AF" }}>/ Tag</span></div>
-                    <div style={{ fontSize:12, color:"#9CA3AF", marginTop:4 }}>Monatlich kündbar · Kein Vertrag</div>
+                    <div style={{ fontSize:11, fontWeight:700, letterSpacing:2, textTransform:"uppercase", color:MUTED2, marginBottom:4 }}>Einstieg bereits ab</div>
+                    <div style={{ fontSize:34, fontWeight:900, color:TXT, letterSpacing:"-1px", lineHeight:1 }}>€1,30 <span style={{ fontSize:15, fontWeight:500, color:MUTED }}>/ Tag</span></div>
+                    <div style={{ fontSize:11, color:MUTED2, marginTop:4 }}>Monatlich kündbar · Kein Vertrag</div>
                   </div>
-                  <div style={{ width:1, height:52, background:"#E5E7EB" }} />
-                  <div style={{ fontSize:13, color:"#6B7280", maxWidth:220, lineHeight:1.55 }}>
-                    Schon <strong style={{ color:"#0B0D14" }}>2–3 verhinderte Ausfälle</strong> decken das Paket vollständig ab.
+                  <div style={{ width:1, height:48, background:BORDER }} />
+                  <div style={{ fontSize:13, color:MUTED, maxWidth:200, lineHeight:1.6 }}>
+                    Schon <strong style={{ color:TXT }}>2–3 verhinderte Ausfälle</strong> decken das Paket vollständig ab.
                   </div>
                 </div>
               </div>
             </Reveal>
 
-            {/* Tier cards */}
-            <div style={{ display:"grid", gap:16, alignItems:"start" }} className="pricing-grid">
+            <div style={{ display:"grid", gap:3 }} className="pricing-grid">
               <style>{`.pricing-grid{grid-template-columns:repeat(3,1fr)} @media(max-width:800px){.pricing-grid{grid-template-columns:1fr!important}}`}</style>
               {tiers.map((tier, i) => (
                 <Reveal key={i} delay={i * 70}>
                   {tier.dark ? (
-                    <div style={{ background:"#06091A", border:"1.5px solid rgba(24,166,109,.3)", borderRadius:20, padding:"32px 28px", position:"relative", boxShadow:"0 16px 48px rgba(24,166,109,.1)" }}>
-                      <div style={{ position:"absolute", top:-14, left:"50%", transform:"translateX(-50%)", background:"#18A66D", color:"#fff", fontSize:11, fontWeight:700, padding:"5px 16px", borderRadius:980, whiteSpace:"nowrap" }}>{tier.tag}</div>
-                      <div style={{ fontSize:11, fontWeight:700, letterSpacing:2, textTransform:"uppercase", color:"rgba(74,232,155,.8)", marginBottom:8 }}>{tier.name}</div>
-                      <div style={{ fontSize:13, color:"rgba(255,255,255,.4)", marginBottom:24, paddingBottom:20, borderBottom:"1px solid rgba(255,255,255,.08)" }}>{tier.for}</div>
-                      <div style={{ display:"flex", flexDirection:"column", gap:12, marginBottom:32 }}>
+                    <div style={{ background:`linear-gradient(160deg, rgba(24,166,109,0.12) 0%, ${SURF2} 60%)`, border:"1px solid rgba(24,166,109,0.3)", borderRadius:18, padding:"32px 28px", position:"relative", boxShadow:`0 0 60px rgba(24,166,109,0.08)`, height:"100%", boxSizing:"border-box" }}>
+                      <div style={{ position:"absolute", top:-14, left:"50%", transform:"translateX(-50%)", background:"linear-gradient(135deg,#18A66D,#0EA060)", color:"#fff", fontSize:11, fontWeight:700, padding:"5px 18px", borderRadius:980, whiteSpace:"nowrap", boxShadow:"0 4px 16px rgba(24,166,109,0.4)" }}>✓ Meistgewählt</div>
+                      <div style={{ fontSize:11, fontWeight:700, letterSpacing:2, textTransform:"uppercase", color:"#4AE89B", marginBottom:8 }}>{tier.name}</div>
+                      <div style={{ fontSize:13, color:MUTED2, marginBottom:24, paddingBottom:20, borderBottom:`1px solid rgba(255,255,255,0.08)` }}>{tier.for}</div>
+                      <div style={{ display:"flex", flexDirection:"column", gap:11, marginBottom:32 }}>
                         {tier.features.map((f, j) => (
                           <div key={j} style={{ display:"flex", alignItems:"center", gap:10 }}>
-                            <span style={{ color:"#4AE89B", fontSize:13, flexShrink:0 }}>✓</span>
-                            <span style={{ fontSize:14, color:"rgba(255,255,255,.65)" }}>{f}</span>
+                            <span style={{ color:"#4AE89B", fontSize:12, flexShrink:0 }}>✓</span>
+                            <span style={{ fontSize:13, color:"rgba(240,244,255,0.7)" }}>{f}</span>
                           </div>
                         ))}
                       </div>
-                      <a href="/lead" className="btn-primary" style={{ display:"block", textAlign:"center", fontSize:14, padding:"14px 0", borderRadius:12, width:"100%", boxSizing:"border-box" }}>Passendes Paket anfragen →</a>
+                      <a href="/lead" className="btn-primary" style={{ display:"block", textAlign:"center", fontSize:14, padding:"13px 0", borderRadius:10, width:"100%", boxSizing:"border-box" }}>Paket anfragen →</a>
                     </div>
                   ) : (
-                    <div style={{ background:"#fff", border:"1px solid #E5E7EB", borderRadius:20, padding:"32px 28px", boxShadow:"0 1px 4px rgba(0,0,0,.04)" }}>
-                      <div style={{ fontSize:11, fontWeight:700, letterSpacing:2, textTransform:"uppercase", color:"#9CA3AF", marginBottom:8 }}>{tier.name}</div>
-                      <div style={{ fontSize:13, color:"#9CA3AF", marginBottom:24, paddingBottom:20, borderBottom:"1px solid #F3F4F6" }}>{tier.for}</div>
-                      <div style={{ display:"flex", flexDirection:"column", gap:12, marginBottom:32 }}>
+                    <div className="card-hover" style={{ background:SURF, border:`1px solid ${BORDER}`, borderRadius:18, padding:"32px 28px", height:"100%", boxSizing:"border-box" }}>
+                      <div style={{ fontSize:11, fontWeight:700, letterSpacing:2, textTransform:"uppercase", color:MUTED2, marginBottom:8 }}>{tier.name}</div>
+                      <div style={{ fontSize:13, color:MUTED2, marginBottom:24, paddingBottom:20, borderBottom:`1px solid ${BORDER}` }}>{tier.for}</div>
+                      <div style={{ display:"flex", flexDirection:"column", gap:11, marginBottom:32 }}>
                         {tier.features.map((f, j) => (
                           <div key={j} style={{ display:"flex", alignItems:"center", gap:10 }}>
-                            <span style={{ color:"#18A66D", fontSize:13, flexShrink:0 }}>✓</span>
-                            <span style={{ fontSize:14, color:"#6B7280" }}>{f}</span>
+                            <span style={{ color:GREEN, fontSize:12, flexShrink:0 }}>✓</span>
+                            <span style={{ fontSize:13, color:MUTED }}>{f}</span>
                           </div>
                         ))}
                       </div>
-                      <a href="/lead" className="btn-outline" style={{ display:"block", textAlign:"center", fontSize:14, padding:"14px 0", borderRadius:12, width:"100%", boxSizing:"border-box" }}>Passendes Paket anfragen →</a>
+                      <a href="/lead" className="btn-outline" style={{ display:"block", textAlign:"center", fontSize:14, padding:"13px 0", borderRadius:10, width:"100%", boxSizing:"border-box" }}>Paket anfragen →</a>
                     </div>
                   )}
                 </Reveal>
@@ -668,84 +623,73 @@ export default function LandingPage() {
             </div>
 
             <Reveal delay={100}>
-              <p style={{ textAlign:"center", fontSize:13, color:"#9CA3AF", marginTop:28, lineHeight:1.7 }}>
-                Die meisten Betriebe zahlen zwischen <strong style={{ color:"#6B7280" }}>€39 und €109 / Monat</strong> · Monatlich kündbar · Alle Preise sind Endpreise
+              <p style={{ textAlign:"center", fontSize:13, color:MUTED2, marginTop:24 }}>
+                Die meisten Betriebe zahlen zwischen <strong style={{ color:MUTED }}>€39 und €109 / Monat</strong> · Monatlich kündbar · Alle Preise sind Endpreise (§19 UStG)
               </p>
             </Reveal>
 
             {/* Add-on teaser */}
             <Reveal delay={120}>
-              <a href="#online-buchung" style={{ textDecoration:"none", display:"block", marginTop:20 }}>
-                <div style={{
-                  background:"linear-gradient(135deg,rgba(24,166,109,.06) 0%,rgba(24,166,109,.02) 100%)",
-                  border:"1px dashed rgba(24,166,109,.35)", borderRadius:18,
-                  padding:"20px 28px", display:"flex", alignItems:"center",
-                  justifyContent:"space-between", gap:20, flexWrap:"wrap" as any,
-                  cursor:"pointer", transition:"border-color .2s"
-                }}>
+              <a href="#online-buchung" style={{ textDecoration:"none", display:"block", marginTop:16 }}>
+                <div className="card-hover" style={{ background:SURF, border:"1px dashed rgba(24,166,109,0.3)", borderRadius:16, padding:"18px 24px", display:"flex", alignItems:"center", justifyContent:"space-between", gap:16, flexWrap:"wrap", cursor:"pointer" }}>
                   <div style={{ display:"flex", alignItems:"center", gap:14 }}>
-                    <div style={{ width:40, height:40, background:"rgba(24,166,109,.1)", borderRadius:12, display:"flex", alignItems:"center", justifyContent:"center", fontSize:20, flexShrink:0 }}>🔗</div>
+                    <div style={{ width:38, height:38, background:"rgba(24,166,109,0.1)", borderRadius:11, display:"flex", alignItems:"center", justifyContent:"center", fontSize:18, flexShrink:0 }}>🔗</div>
                     <div>
-                      <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:3 }}>
-                        <span style={{ fontSize:14, fontWeight:800, color:"#0B0D14" }}>Add-on: Online-Buchung</span>
-                        <span style={{ background:"#F0FBF5", border:"1px solid rgba(24,166,109,.3)", color:"#18A66D", fontSize:10, fontWeight:700, padding:"2px 8px", borderRadius:980 }}>Optional</span>
+                      <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:2 }}>
+                        <span style={{ fontSize:14, fontWeight:700, color:TXT }}>Add-on: Online-Buchung</span>
+                        <span style={{ background:"rgba(24,166,109,0.1)", border:"1px solid rgba(24,166,109,0.25)", color:"#4AE89B", fontSize:10, fontWeight:700, padding:"2px 8px", borderRadius:980 }}>Optional</span>
                       </div>
-                      <p style={{ fontSize:13, color:"#6B7280", margin:0 }}>QR-Code + eigene Buchungsseite + SMS-Bestätigung — zu jedem Paket zubuchbar.</p>
+                      <p style={{ fontSize:13, color:MUTED, margin:0 }}>QR-Code + eigene Buchungsseite + SMS-Bestätigung — zu jedem Paket zubuchbar.</p>
                     </div>
                   </div>
-                  <span style={{ fontSize:13, color:"#18A66D", fontWeight:600, flexShrink:0 }}>Mehr erfahren →</span>
+                  <span style={{ fontSize:13, color:GREEN, fontWeight:600, flexShrink:0 }}>Mehr erfahren →</span>
                 </div>
               </a>
             </Reveal>
           </div>
         </section>
 
-        {/* ══ ADD-ON: ONLINE BUCHUNG ══ */}
-        <section id="online-buchung" className="sec-pad" style={{ background:"#06091A", padding:"72px 32px", position:"relative", overflow:"hidden" }}>
-          {/* background glows */}
-          <div style={{ position:"absolute", top:"20%", right:"-10%", width:500, height:400, borderRadius:"50%", background:"radial-gradient(ellipse,rgba(24,166,109,.07) 0%,transparent 65%)", pointerEvents:"none" }} />
-          <div style={{ position:"absolute", bottom:"10%", left:"-5%", width:350, height:300, borderRadius:"50%", background:"radial-gradient(ellipse,rgba(79,110,247,.05) 0%,transparent 65%)", pointerEvents:"none" }} />
+        {/* ══════════════════════════════════════════════
+            ADD-ON: ONLINE BUCHUNG
+        ══════════════════════════════════════════════ */}
+        <section id="online-buchung" className="sec-pad" style={{ padding:"88px 32px", background:SURF, position:"relative", overflow:"hidden" }}>
+          <div style={{ position:"absolute", top:"10%", right:"-5%", width:500, height:400, borderRadius:"50%", background:`radial-gradient(ellipse, rgba(24,166,109,0.06) 0%, transparent 65%)`, pointerEvents:"none" }} />
+          <div style={{ position:"absolute", bottom:"5%", left:"-5%", width:400, height:320, borderRadius:"50%", background:`radial-gradient(ellipse, rgba(99,102,241,0.04) 0%, transparent 65%)`, pointerEvents:"none" }} />
 
-          <div style={{ maxWidth:960, margin:"0 auto", position:"relative" }}>
+          <div style={{ maxWidth:1000, margin:"0 auto", position:"relative" }}>
             <Reveal>
-              <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:20 }}>
-                <div style={{ background:"rgba(24,166,109,.12)", border:"1px solid rgba(24,166,109,.25)", color:"#4AE89B", fontSize:11, fontWeight:700, padding:"5px 14px", borderRadius:980, letterSpacing:1.5, textTransform:"uppercase" as any }}>
-                  Optionales Add-on
+              <div style={{ maxWidth:560, marginBottom:52 }}>
+                <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:20 }}>
+                  <div className="tag">Optionales Add-on</div>
+                  <div style={{ height:1, flex:1, background:BORDER }} />
                 </div>
-                <div style={{ height:1, flex:1, background:"rgba(255,255,255,.06)" }} />
-              </div>
-              <div style={{ maxWidth:640, marginBottom:60 }}>
-                <h2 style={{ fontSize:"clamp(32px,4vw,52px)", fontWeight:900, color:"#fff", letterSpacing:"-1.5px", lineHeight:1.08, margin:"0 0 16px" }}>
-                  Online-Buchung.<br /><span style={{ color:"#18A66D" }}>Kunden buchen sich selbst.</span>
+                <h2 style={{ fontSize:"clamp(30px,4vw,50px)", fontWeight:900, color:TXT, letterSpacing:"-1.5px", lineHeight:1.08, margin:"0 0 14px" }}>
+                  Online-Buchung.<br /><span className="gradient-text-green">Kunden buchen sich selbst.</span>
                 </h2>
-                <p style={{ fontSize:17, color:"rgba(255,255,255,.38)", lineHeight:1.65, margin:0 }}>
-                  Ergänzen Sie Ihr TerminStop-Paket um eine eigene Buchungsseite mit QR-Code — so können Kunden rund um die Uhr Termine anfragen, ohne dass Sie ans Telefon müssen.
+                <p style={{ fontSize:16, color:MUTED, lineHeight:1.65, margin:0 }}>
+                  Ergänzen Sie TerminStop um eine eigene Buchungsseite mit QR-Code — so können Kunden rund um die Uhr Termine anfragen, ohne dass Sie ans Telefon müssen.
                 </p>
               </div>
             </Reveal>
 
-            {/* Feature grid */}
-            <div style={{ display:"grid", gap:14 }} className="addon-grid">
+            <div style={{ display:"grid", gap:3 }} className="addon-grid">
               <style>{`.addon-grid{grid-template-columns:repeat(3,1fr)} @media(max-width:900px){.addon-grid{grid-template-columns:repeat(2,1fr)!important}} @media(max-width:560px){.addon-grid{grid-template-columns:1fr!important}}`}</style>
               {addonFeatures.map((f, i) => (
                 <Reveal key={i} delay={i * 50}>
-                  <div style={{
-                    background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.08)",
-                    borderRadius:18, padding:"24px", transition:"border-color .2s",
-                    height:"100%", boxSizing:"border-box" as any
-                  }}>
-                    <div style={{ fontSize:28, marginBottom:14 }}>{f.icon}</div>
-                    <div style={{ fontSize:14, fontWeight:700, color:"#fff", marginBottom:8, letterSpacing:"-0.2px" }}>{f.title}</div>
-                    <div style={{ fontSize:13, color:"rgba(255,255,255,.32)", lineHeight:1.65 }}>{f.desc}</div>
+                  <div className="card-hover" style={{ background:SURF2, border:`1px solid ${BORDER}`, borderRadius:16, padding:"22px", height:"100%", boxSizing:"border-box" }}>
+                    <div style={{ width:36, height:36, background:"rgba(24,166,109,0.08)", border:"1px solid rgba(24,166,109,0.15)", borderRadius:10, display:"flex", alignItems:"center", justifyContent:"center", marginBottom:14 }}>
+                      <span style={{ color:"#4AE89B", fontSize:14, fontWeight:700 }}>✓</span>
+                    </div>
+                    <div style={{ fontSize:14, fontWeight:700, color:TXT, marginBottom:6, letterSpacing:"-0.2px" }}>{f.title}</div>
+                    <div style={{ fontSize:13, color:MUTED, lineHeight:1.65 }}>{f.desc}</div>
                   </div>
                 </Reveal>
               ))}
             </div>
 
-            {/* CTA */}
             <Reveal delay={100}>
-              <div style={{ marginTop:40, display:"flex", flexDirection:"column" as any, alignItems:"center", gap:16, textAlign:"center" as any }}>
-                <p style={{ fontSize:13, color:"rgba(255,255,255,.25)", margin:0 }}>
+              <div style={{ marginTop:32, display:"flex", flexDirection:"column", alignItems:"center", gap:14, textAlign:"center" }}>
+                <p style={{ fontSize:13, color:MUTED2, margin:0 }}>
                   Das Add-on ist für jeden TerminStop-Kunden optional zubuchbar — fragen Sie uns einfach im Gespräch danach.
                 </p>
                 <a href="/lead" className="btn-primary" style={{ fontSize:15, padding:"14px 36px" }}>
@@ -756,74 +700,97 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* ══ FAQ ══ */}
-        <section className="sec-pad" style={{ background:"#fff", padding:"72px 32px" }}>
-          <div style={{ maxWidth:680, margin:"0 auto" }}>
+        {/* ══════════════════════════════════════════════
+            FAQ
+        ══════════════════════════════════════════════ */}
+        <section className="sec-pad" style={{ padding:"88px 32px", background:BG }}>
+          <div style={{ maxWidth:660, margin:"0 auto" }}>
             <Reveal>
-              <div style={{ textAlign:"center", marginBottom:56 }}>
-                <div style={{ fontSize:11, fontWeight:700, letterSpacing:3, textTransform:"uppercase", color:"#18A66D", marginBottom:16 }}>FAQ</div>
-                <h2 style={{ fontSize:"clamp(32px,4vw,52px)", fontWeight:900, letterSpacing:"-1.5px", lineHeight:1.08, margin:"0 0 10px" }}>Häufige Fragen.</h2>
-                <p style={{ fontSize:16, color:"#9CA3AF", margin:0 }}>Alles, was Sie wissen möchten – bevor Sie anfragen.</p>
+              <div style={{ textAlign:"center", marginBottom:52 }}>
+                <div className="tag" style={{ marginBottom:20 }}>FAQ</div>
+                <h2 style={{ fontSize:"clamp(28px,3.5vw,44px)", fontWeight:900, letterSpacing:"-1.5px", lineHeight:1.08, margin:"0 0 10px", color:TXT }}>Häufige Fragen.</h2>
+                <p style={{ fontSize:15, color:MUTED, margin:0 }}>Alles, was Sie wissen möchten — bevor Sie anfragen.</p>
               </div>
             </Reveal>
             <div>
               {faqs.map((faq, i) => (
-                <div key={i} className="faq-item">
-                  <button
-                    onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                    style={{ width:"100%", textAlign:"left", padding:"22px 0", display:"flex", justifyContent:"space-between", alignItems:"center", gap:16, background:"none", border:"none", cursor:"pointer" }}
-                  >
-                    <span style={{ fontSize:15, fontWeight:600, color:"#0B0D14", lineHeight:1.5 }}>{faq.q}</span>
-                    <span style={{ color:"#18A66D", fontSize:22, flexShrink:0, fontWeight:300, lineHeight:1, transform: openFaq === i ? "rotate(45deg)" : "none", transition:"transform .25s" }}>+</span>
-                  </button>
-                  {openFaq === i && (
-                    <div style={{ paddingBottom:22, fontSize:14, color:"#6B7280", lineHeight:1.7, paddingRight:32 }}>{faq.a}</div>
-                  )}
-                </div>
+                <Reveal key={i} delay={i * 40}>
+                  <div className="faq-item">
+                    <button
+                      onClick={() => setOpenFaq(openFaq === i ? null : i)}
+                      style={{ width:"100%", textAlign:"left", padding:"20px 0", display:"flex", justifyContent:"space-between", alignItems:"center", gap:16, background:"none", border:"none", cursor:"pointer" }}
+                    >
+                      <span style={{ fontSize:15, fontWeight:600, color:TXT, lineHeight:1.5 }}>{faq.q}</span>
+                      <span style={{ color:GREEN, fontSize:20, flexShrink:0, fontWeight:300, lineHeight:1, transform: openFaq === i ? "rotate(45deg)" : "none", transition:"transform .25s cubic-bezier(.16,1,.3,1)" }}>+</span>
+                    </button>
+                    {openFaq === i && (
+                      <div style={{ paddingBottom:20, fontSize:14, color:MUTED, lineHeight:1.75, paddingRight:32 }}>{faq.a}</div>
+                    )}
+                  </div>
+                </Reveal>
               ))}
             </div>
           </div>
         </section>
 
-        {/* ══ FINAL CTA ══ */}
-        <section className="sec-pad" style={{ background:"linear-gradient(170deg,#06091A 0%,#080C1E 100%)", padding:"120px 32px", position:"relative", overflow:"hidden" }}>
-          <div style={{ position:"absolute", top:"50%", left:"50%", transform:"translate(-50%,-50%)", width:600, height:400, borderRadius:"50%", background:"radial-gradient(ellipse,rgba(24,166,109,.08) 0%,transparent 65%)", pointerEvents:"none" }} />
-          <div style={{ maxWidth:600, margin:"0 auto", textAlign:"center", position:"relative" }}>
+        {/* ══════════════════════════════════════════════
+            FINAL CTA
+        ══════════════════════════════════════════════ */}
+        <section className="sec-pad" style={{ padding:"100px 32px", background:SURF, position:"relative", overflow:"hidden" }}>
+          <div style={{ position:"absolute", top:"50%", left:"50%", transform:"translate(-50%,-50%)", width:700, height:500, borderRadius:"50%", background:`radial-gradient(ellipse, rgba(24,166,109,0.1) 0%, transparent 65%)`, pointerEvents:"none" }} />
+          <div className="grid-bg" />
+
+          <div style={{ maxWidth:660, margin:"0 auto", textAlign:"center", position:"relative", zIndex:2 }}>
             <Reveal>
-              <div style={{ display:"inline-flex", alignItems:"center", gap:8, background:"rgba(24,166,109,.08)", border:"1px solid rgba(24,166,109,.18)", color:"rgba(74,232,155,.85)", fontSize:12, fontWeight:600, padding:"7px 18px", borderRadius:980, marginBottom:36 }}>
-                ✓ Kostenlos · Unverbindlich · 15 Minuten
-              </div>
-              <h2 style={{ fontSize:"clamp(36px,5vw,64px)", fontWeight:900, color:"#fff", letterSpacing:"-2px", lineHeight:1.04, margin:"0 0 20px" }}>
-                Ihr Betrieb.<br /><span style={{ color:"#18A66D" }}>Endlich digital.</span>
+              <div className="tag" style={{ marginBottom:24 }}>Jetzt starten</div>
+              <h2 style={{ fontSize:"clamp(36px,5vw,64px)", fontWeight:900, letterSpacing:"-2.5px", lineHeight:1.04, margin:"0 0 20px", color:TXT }}>
+                Weniger Ausfälle.<br />
+                <span className="gradient-text-green">Ab morgen.</span>
               </h2>
-              <p style={{ fontSize:18, color:"rgba(255,255,255,.38)", lineHeight:1.65, maxWidth:480, margin:"0 auto 44px" }}>
-                Kalender, Kundenkartei, SMS-Erinnerungen und Auswertungen — in einem System, in 10 Minuten eingerichtet. Sprechen Sie kurz mit uns und starten Sie noch heute.
+              <p style={{ fontSize:17, color:MUTED, lineHeight:1.65, maxWidth:440, margin:"0 auto 44px" }}>
+                Kostenlose Beratung, persönliches Onboarding, monatlich kündbar. Kein Risiko.
               </p>
-              <a href="/lead" className="btn-primary" style={{ fontSize:16, padding:"16px 40px" }}>
-                Kostenloses Gespräch sichern →
-              </a>
-              <div style={{ marginTop:32, display:"flex", justifyContent:"center", gap:28, flexWrap:"wrap" }}>
-                {["Kein Vertrag","Monatlich kündbar","Persönliches Onboarding","In 10 Min. startklar"].map((t, i) => (
-                  <span key={i} style={{ fontSize:13, color:"rgba(255,255,255,.22)" }}>✓ {t}</span>
-                ))}
+              <div style={{ display:"flex", gap:12, justifyContent:"center", flexWrap:"wrap" }}>
+                <a href="/lead" className="btn-primary" style={{ fontSize:16, padding:"16px 40px" }}>
+                  Kostenlos anfragen →
+                </a>
+                <a href="/demo" className="btn-ghost" style={{ fontSize:16, padding:"16px 32px" }}>
+                  Demo ansehen
+                </a>
               </div>
+              <p style={{ marginTop:28, fontSize:12, color:MUTED2 }}>
+                Ab €1,30/Tag · Keine Mindestlaufzeit · In 10 Minuten eingerichtet
+              </p>
             </Reveal>
           </div>
         </section>
 
-        {/* ══ FOOTER ══ */}
-        <footer style={{ background:"#fff", borderTop:"1px solid #F3F4F6", padding:"28px 32px" }}>
-          <div style={{ maxWidth:960, margin:"0 auto", display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:16 }}>
-            <span style={{ fontSize:16, fontWeight:800, letterSpacing:"-0.5px" }}>
-              <span style={{ color:"#18A66D" }}>Termin</span>
-              <span style={{ color:"#0B0D14" }}>Stop</span>
-            </span>
-            <div style={{ display:"flex", gap:24 }}>
-              {[["Impressum","/impressum"],["Datenschutz","/datenschutz"],["AGB","/agb"],["AVV","/avv"],["Login","/login"]].map(([l, h]) => (
-                <a key={h} href={h} style={{ fontSize:13, color:"#9CA3AF", textDecoration:"none" }}>{l}</a>
-              ))}
+        {/* ══════════════════════════════════════════════
+            FOOTER
+        ══════════════════════════════════════════════ */}
+        <footer style={{ background:BG, borderTop:`1px solid ${BORDER}`, padding:"32px", display:"flex", alignItems:"center", justifyContent:"space-between", flexWrap:"wrap", gap:16 }}>
+          <a href="/" style={{ textDecoration:"none", fontSize:15, fontWeight:800, letterSpacing:"-0.5px", display:"flex", alignItems:"center", gap:8 }}>
+            <div style={{ width:24, height:24, background:"linear-gradient(135deg,#18A66D,#0EA060)", borderRadius:7, display:"flex", alignItems:"center", justifyContent:"center" }}>
+              <span style={{ color:"#fff", fontWeight:900, fontSize:11 }}>T</span>
             </div>
+            <span style={{ color:TXT }}>TerminStop</span>
+          </a>
+          <div style={{ display:"flex", gap:20, flexWrap:"wrap" }}>
+            {[
+              { label:"Impressum", href:"/impressum" },
+              { label:"Datenschutz", href:"/datenschutz" },
+              { label:"AGB", href:"/agb" },
+              { label:"AVV", href:"/avv" },
+              { label:"Login", href:"/login" },
+            ].map((l, i) => (
+              <a key={i} href={l.href} style={{ fontSize:12, color:MUTED2, textDecoration:"none", fontWeight:500, transition:"color .2s" }}
+                onMouseEnter={e => (e.currentTarget.style.color = MUTED)}
+                onMouseLeave={e => (e.currentTarget.style.color = MUTED2)}>
+                {l.label}
+              </a>
+            ))}
           </div>
+          <div style={{ fontSize:12, color:MUTED2 }}>© {new Date().getFullYear()} TerminStop · Marvin Passe</div>
         </footer>
 
       </div>
