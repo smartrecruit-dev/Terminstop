@@ -47,15 +47,21 @@ export default function RequestsPage() {
     if (!id) { window.location.href = "/login"; return }
     setCompanyId(id)
     setCompanyName(name || "")
-    // Add-on Status laden
-    supabase.from("companies").select("booking_addon").eq("id", id).single()
-      .then(({ data }) => setBookingAddon(data?.booking_addon ?? false))
   }, [])
 
   useEffect(() => { if (companyId) load() }, [companyId])
 
   async function load() {
     setLoading(true)
+
+    // Add-on Status immer frisch laden
+    const { data: co } = await supabase
+      .from("companies")
+      .select("booking_addon")
+      .eq("id", companyId!)
+      .single()
+    setBookingAddon(co?.booking_addon ?? false)
+
     const { data } = await supabase
       .from("appointments")
       .select("id, name, phone, date, time, note, request_text, created_at, status")
