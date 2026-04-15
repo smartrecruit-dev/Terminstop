@@ -204,7 +204,7 @@ export default function ServicesPage() {
                 </div>
               ))}
             </div>
-            <a href="mailto:info@terminstop.de?subject=Online-Buchung Add-on anfragen"
+            <a href="mailto:terminstop.business@gmail.com?subject=Online-Buchung Add-on anfragen"
               style={{
                 display:"inline-flex", alignItems:"center", gap:8,
                 background:"#18A66D", color:"#fff", textDecoration:"none",

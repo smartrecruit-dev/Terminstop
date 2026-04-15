@@ -33,12 +33,13 @@ function formatDate(d: string | null, t: string | null) {
 }
 
 export default function RequestsPage() {
-  const [companyId,   setCompanyId]   = useState<string | null>(null)
-  const [companyName, setCompanyName] = useState("")
-  const [requests,    setRequests]    = useState<Request[]>([])
-  const [loading,     setLoading]     = useState(true)
-  const [acting,      setActing]      = useState<string | null>(null)
-  const [toast,       setToast]       = useState<{ msg: string; ok: boolean } | null>(null)
+  const [companyId,    setCompanyId]    = useState<string | null>(null)
+  const [companyName,  setCompanyName]  = useState("")
+  const [bookingAddon, setBookingAddon] = useState<boolean | null>(null)
+  const [requests,     setRequests]     = useState<Request[]>([])
+  const [loading,      setLoading]      = useState(true)
+  const [acting,       setActing]       = useState<string | null>(null)
+  const [toast,        setToast]        = useState<{ msg: string; ok: boolean } | null>(null)
 
   useEffect(() => {
     const id   = localStorage.getItem("company_id")
@@ -46,6 +47,9 @@ export default function RequestsPage() {
     if (!id) { window.location.href = "/login"; return }
     setCompanyId(id)
     setCompanyName(name || "")
+    // Add-on Status laden
+    supabase.from("companies").select("booking_addon").eq("id", id).single()
+      .then(({ data }) => setBookingAddon(data?.booking_addon ?? false))
   }, [])
 
   useEffect(() => { if (companyId) load() }, [companyId])
@@ -132,8 +136,48 @@ export default function RequestsPage() {
           </p>
         </div>
 
+        {/* ── ADD-ON GESPERRT ── */}
+        {bookingAddon === false && (
+          <div style={{
+            background:"#fff", border:"2px dashed #E5E7EB", borderRadius:20,
+            padding:"40px 28px", textAlign:"center"
+          }}>
+            <div style={{ fontSize:48, marginBottom:16 }}>🔔</div>
+            <h2 style={{ fontSize:18, fontWeight:800, color:"#1F2A37", marginBottom:8 }}>
+              Online-Buchung ist noch nicht freigeschaltet
+            </h2>
+            <p style={{ fontSize:14, color:"#6B7280", lineHeight:1.65, maxWidth:360, margin:"0 auto 24px" }}>
+              Sobald das Add-on aktiv ist, landen alle Kundenanfragen hier — und Sie bestätigen mit einem Klick.
+            </p>
+            <div style={{ display:"flex", flexDirection:"column", gap:10, maxWidth:300, margin:"0 auto 28px" }}>
+              {[
+                "Anfragen direkt aus Ihrem Buchungslink",
+                "Bestätigen per Klick — Kunde bekommt SMS",
+                "Offene Anfragen mit rotem Badge sichtbar",
+              ].map((f, i) => (
+                <div key={i} style={{ display:"flex", alignItems:"center", gap:10, textAlign:"left" }}>
+                  <span style={{ color:"#18A66D", fontSize:14, flexShrink:0 }}>✓</span>
+                  <span style={{ fontSize:13, color:"#374151" }}>{f}</span>
+                </div>
+              ))}
+            </div>
+            <a href="mailto:terminstop.business@gmail.com?subject=Online-Buchung Add-on anfragen"
+              style={{
+                display:"inline-flex", alignItems:"center", gap:8,
+                background:"#18A66D", color:"#fff", textDecoration:"none",
+                fontSize:14, fontWeight:700, padding:"12px 28px", borderRadius:12,
+                boxShadow:"0 4px 16px rgba(24,166,109,0.25)"
+              }}>
+              Add-on anfragen →
+            </a>
+            <p style={{ fontSize:12, color:"#9CA3AF", marginTop:12 }}>
+              Sprechen Sie uns an — wir schalten es für Sie frei.
+            </p>
+          </div>
+        )}
+
         {/* Stats bar */}
-        {!loading && requests.length > 0 && (
+        {bookingAddon === true && !loading && requests.length > 0 && (
           <div className="grid grid-cols-3 gap-3 mb-6">
             <div className="bg-white rounded-2xl border border-[#E5E7EB] p-4 text-center">
               <div className="text-2xl font-bold text-[#EF4444]">{pending.length}</div>
@@ -150,12 +194,12 @@ export default function RequestsPage() {
           </div>
         )}
 
-        {loading ? (
+        {bookingAddon === true && loading ? (
           <div className="bg-white rounded-2xl border border-[#E5E7EB] p-12 text-center text-[#9CA3AF] text-sm">
             <div className="w-6 h-6 border-2 border-[#E5E7EB] border-t-[#18A66D] rounded-full animate-spin mx-auto mb-3" />
             Wird geladen …
           </div>
-        ) : requests.length === 0 ? (
+        ) : bookingAddon === true && requests.length === 0 ? (
           <div className="bg-white rounded-2xl border border-[#E5E7EB] p-12 text-center">
             <div className="text-5xl mb-4">🔔</div>
             <p className="text-sm font-semibold text-[#374151]">Noch keine Anfragen</p>
@@ -163,7 +207,7 @@ export default function RequestsPage() {
               Sobald Kunden über Ihren Buchungslink buchen,<br />erscheinen sie hier.
             </p>
           </div>
-        ) : (
+        ) : bookingAddon === true ? (
           <div className="space-y-6">
 
             {/* ── Offene Anfragen ── */}
