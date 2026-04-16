@@ -20,32 +20,26 @@ function formatPhone(phone: string) {
   return cleaned
 }
 
-function generatePassword() {
-  const chars = "ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789"
-  const special = "!@#$%"
-  let pw = special[Math.floor(Math.random() * special.length)]
-  for (let i = 0; i < 9; i++) pw += chars[Math.floor(Math.random() * chars.length)]
-  return pw.split("").sort(() => Math.random() - 0.5).join("")
-}
-
 export async function POST(req: NextRequest) {
   if (!checkAdminAuth(req)) {
     return NextResponse.json({ error: "Nicht autorisiert" }, { status: 401 })
   }
 
   try {
-    const { name, email, phone } = await req.json()
+    const { name, email, phone, password } = await req.json()
 
-    if (!name || !email || !phone) {
-      return NextResponse.json({ error: "Name, E-Mail und Telefon sind erforderlich" }, { status: 400 })
+    if (!name || !email || !password) {
+      return NextResponse.json({ error: "Name, E-Mail und Passwort sind erforderlich" }, { status: 400 })
     }
 
-    const password = generatePassword()
+    if (password.length < 6) {
+      return NextResponse.json({ error: "Passwort muss mindestens 6 Zeichen haben" }, { status: 400 })
+    }
 
-    // 1. Auth-User anlegen
+    // 1. Auth-User anlegen mit eigenem Passwort
     const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
       email: email.trim(),
-      password,
+      password: password,
       email_confirm: true,
     })
 
@@ -55,17 +49,23 @@ export async function POST(req: NextRequest) {
 
     const userId = authData.user.id
 
-    // 2. Company-Record anlegen (id = user id, wegen RLS)
+    // 2. Company-Record anlegen
+    const companyData: any = {
+      id: userId,
+      name: name.trim(),
+      paused: false,
+      booking_addon: false,
+      sms_count: 0,
+    }
+
+    // Telefon nur eintragen wenn angegeben
+    if (phone && phone.trim()) {
+      companyData.notification_phone = formatPhone(phone.trim())
+    }
+
     const { error: companyError } = await supabaseAdmin
       .from("companies")
-      .insert({
-        id: userId,
-        name: name.trim(),
-        notification_phone: formatPhone(phone.trim()),
-        paused: false,
-        booking_addon: false,
-        sms_count: 0,
-      })
+      .insert(companyData)
 
     if (companyError) {
       // Rollback: User wieder löschen
@@ -73,35 +73,14 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: companyError.message }, { status: 500 })
     }
 
-    // 3. Willkommens-SMS senden
-    const welcomeMsg = `Hallo ${name.trim()}, willkommen bei TerminStop! 🎉 Ihr Login: terminstop.de/login | E-Mail: ${email.trim()} | Passwort: ${password} | Bei Fragen: terminstop.business@gmail.com`
-
-    let smsSent = false
-    try {
-      const smsRes = await fetch("https://gateway.seven.io/api/sms", {
-        method: "POST",
-        headers: {
-          "X-Api-Key": process.env.SEVEN_API_KEY!,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          to: formatPhone(phone.trim()),
-          text: welcomeMsg,
-          from: "TerminStop",
-        }),
-      })
-      smsSent = smsRes.ok
-    } catch {
-      smsSent = false
-    }
-
+    // Kein SMS-Versand mehr – Marvin schickt manuell eine E-Mail
     return NextResponse.json({
       success: true,
       userId,
       email: email.trim(),
       password,
-      smsSent,
-      message: `Betrieb "${name}" wurde erfolgreich angelegt.`,
+      name: name.trim(),
+      message: `Betrieb "${name.trim()}" wurde erfolgreich angelegt.`,
     })
 
   } catch (e: any) {
