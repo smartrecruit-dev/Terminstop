@@ -28,40 +28,50 @@ export default function SetupChecklist({ companyId, appointmentCount }: Checklis
 
   async function load() {
     const [{ data: company }, { count: serviceCount }] = await Promise.all([
-      supabase.from("companies").select("notification_phone, slug").eq("id", companyId).single(),
+      supabase.from("companies").select("notification_phone, slug, booking_addon").eq("id", companyId).single(),
       supabase.from("services").select("id", { count: "exact", head: true }).eq("company_id", companyId),
     ])
 
-    setItems([
+    const hasBookingAddon = !!company?.booking_addon
+
+    const baseItems: CheckItem[] = [
       {
         id: "termin",
         label: "Ersten Termin eintragen",
-        desc: "Trag Name, Telefon, Datum und Uhrzeit ein – SMS läuft dann automatisch.",
+        desc: "Trag Name, Telefon, Datum und Uhrzeit ein – die SMS läuft dann automatisch.",
         href: "/dashboard",
         done: appointmentCount > 0,
       },
       {
         id: "telefon",
-        label: "Benachrichtigungs-Nummer setzen",
-        desc: "Erhalte eine SMS wenn eine neue Online-Anfrage eingeht.",
+        label: "Telefonnummer hinterlegen",
+        desc: "Stelle sicher, dass deine Nummer in den Einstellungen korrekt hinterlegt ist.",
         href: "/settings",
         done: !!company?.notification_phone,
       },
-      {
-        id: "buchungslink",
-        label: "Buchungslink einrichten",
-        desc: "Richte deinen persönlichen Link ein (terminstop.de/book/dein-betrieb).",
-        href: "/settings",
-        done: !!company?.slug,
-      },
-      {
-        id: "leistungen",
-        label: "Leistungen hinzufügen",
-        desc: "Kunden wählen bei der Online-Buchung aus deinen Leistungen aus.",
-        href: "/services",
-        done: (serviceCount || 0) > 0,
-      },
-    ])
+    ]
+
+    // Only show booking add-on steps if add-on is active
+    if (hasBookingAddon) {
+      baseItems.push(
+        {
+          id: "buchungslink",
+          label: "Buchungslink einrichten",
+          desc: "Richte deinen persönlichen Link ein (terminstop.de/book/dein-betrieb).",
+          href: "/settings",
+          done: !!company?.slug,
+        },
+        {
+          id: "leistungen",
+          label: "Leistungen hinzufügen",
+          desc: "Kunden wählen bei der Online-Buchung aus deinen Leistungen aus.",
+          href: "/services",
+          done: (serviceCount || 0) > 0,
+        }
+      )
+    }
+
+    setItems(baseItems)
     setLoading(false)
   }
 

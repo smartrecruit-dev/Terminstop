@@ -6,27 +6,33 @@ import { supabase } from "../lib/supabaseClient"
 type NavItem = { href: string; label: string; icon: string; active?: boolean }
 
 // Kern-Links — immer sichtbar
-const DESKTOP_LINKS = [
+const DESKTOP_BASE = [
   { href: "/dashboard", label: "Dashboard" },
   { href: "/calendar",  label: "Kalender"  },
   { href: "/customers", label: "Kunden"    },
+]
+
+// Nur mit Booking Add-on
+const DESKTOP_ADDON = [
   { href: "/requests",  label: "Anfragen"  },
 ]
 
 // Mehr-Menü — weniger prominent
-const DESKTOP_MORE = [
+const DESKTOP_MORE_BASE = [
   { href: "/insights",  label: "Einblicke" },
-  { href: "/services",  label: "Buchung"   },
   { href: "/settings",  label: "⚙️ Einstellungen" },
 ]
+const DESKTOP_MORE_ADDON = [
+  { href: "/services",  label: "Buchung"   },
+]
 
-const MOBILE_LINKS: NavItem[] = [
+const MOBILE_BASE: NavItem[] = [
   { href: "/dashboard", label: "Start",    icon: "🏠" },
   { href: "/calendar",  label: "Kalender", icon: "📅" },
   { href: "/customers", label: "Kunden",   icon: "👥" },
-  { href: "/requests",  label: "Anfragen", icon: "🔔" },
   { href: "/settings",  label: "Mehr",     icon: "⚙️" },
 ]
+const MOBILE_ADDON: NavItem = { href: "/requests", label: "Anfragen", icon: "🔔" }
 
 export default function DashNav({
   active,
@@ -38,6 +44,7 @@ export default function DashNav({
   onLogout: () => void
 }) {
   const [pendingCount, setPendingCount] = useState(0)
+  const [bookingAddon, setBookingAddon] = useState(false)
   const [moreOpen, setMoreOpen] = useState(false)
   const moreRef = useRef<HTMLDivElement>(null)
 
@@ -51,6 +58,16 @@ export default function DashNav({
 
   useEffect(() => {
     if (!companyId) return
+
+    // Fetch booking_addon flag
+    supabase
+      .from("companies")
+      .select("booking_addon")
+      .eq("id", companyId)
+      .single()
+      .then(({ data }) => setBookingAddon(!!data?.booking_addon))
+
+    // Fetch pending online bookings
     supabase
       .from("appointments")
       .select("id", { count: "exact", head: true })
@@ -59,6 +76,19 @@ export default function DashNav({
       .eq("status", "pending")
       .then(({ count }) => setPendingCount(count || 0))
   }, [companyId])
+
+  // Build nav arrays based on add-on status
+  const desktopLinks = bookingAddon
+    ? [...DESKTOP_BASE, ...DESKTOP_ADDON]
+    : DESKTOP_BASE
+
+  const desktopMore = bookingAddon
+    ? [...DESKTOP_MORE_ADDON, ...DESKTOP_MORE_BASE]
+    : DESKTOP_MORE_BASE
+
+  const mobileLinks: NavItem[] = bookingAddon
+    ? [...MOBILE_BASE.slice(0, 3), MOBILE_ADDON, MOBILE_BASE[3]]
+    : MOBILE_BASE
 
   return (
     <>
@@ -70,7 +100,7 @@ export default function DashNav({
             <span className="text-[#1F2A37]">Stop</span>
           </span>
           <div className="hidden md:flex gap-1 items-center">
-            {DESKTOP_LINKS.map(item => (
+            {desktopLinks.map(item => (
               <a key={item.href} href={item.href}
                 className={`relative text-sm px-4 py-2 rounded-lg transition ${
                   active === item.href
@@ -89,7 +119,7 @@ export default function DashNav({
             <div ref={moreRef} style={{ position: "relative" }}>
               <button onClick={() => setMoreOpen(v => !v)}
                 className={`relative text-sm px-4 py-2 rounded-lg transition ${
-                  DESKTOP_MORE.some(m => m.href === active)
+                  desktopMore.some(m => m.href === active)
                     ? "font-semibold text-[#1F2A37] bg-[#F7FAFC]"
                     : "text-[#6B7280] hover:text-[#1F2A37] hover:bg-[#F7FAFC]"
                 }`}>
@@ -102,7 +132,7 @@ export default function DashNav({
                   boxShadow: "0 8px 24px rgba(0,0,0,0.10)", zIndex: 100,
                   minWidth: 180, overflow: "hidden",
                 }}>
-                  {DESKTOP_MORE.map(item => (
+                  {desktopMore.map(item => (
                     <a key={item.href} href={item.href}
                       onClick={() => setMoreOpen(false)}
                       style={{
@@ -135,7 +165,7 @@ export default function DashNav({
 
       {/* Mobile bottom nav */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-[#E5E7EB] z-50 flex justify-around items-center px-2 py-2 pb-safe" style={{ paddingBottom:"max(8px, env(safe-area-inset-bottom))" }}>
-        {MOBILE_LINKS.map(item => (
+        {mobileLinks.map(item => (
           <a key={item.href} href={item.href}
             className={`relative flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl transition ${
               active === item.href ? "text-[#18A66D]" : "text-[#9CA3AF]"
