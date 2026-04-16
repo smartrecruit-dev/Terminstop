@@ -1,26 +1,31 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import { supabase } from "../lib/supabaseClient"
 
 type NavItem = { href: string; label: string; icon: string; active?: boolean }
 
+// Kern-Links — immer sichtbar
 const DESKTOP_LINKS = [
   { href: "/dashboard", label: "Dashboard" },
   { href: "/calendar",  label: "Kalender"  },
   { href: "/customers", label: "Kunden"    },
-  { href: "/insights",  label: "Einblicke" },
   { href: "/requests",  label: "Anfragen"  },
+]
+
+// Mehr-Menü — weniger prominent
+const DESKTOP_MORE = [
+  { href: "/insights",  label: "Einblicke" },
   { href: "/services",  label: "Buchung"   },
   { href: "/settings",  label: "⚙️ Einstellungen" },
 ]
 
 const MOBILE_LINKS: NavItem[] = [
-  { href: "/dashboard", label: "Start",     icon: "🏠" },
-  { href: "/calendar",  label: "Kalender",  icon: "📅" },
-  { href: "/customers", label: "Kunden",    icon: "👥" },
-  { href: "/requests",  label: "Anfragen",  icon: "🔔" },
-  { href: "/insights",  label: "Einblicke", icon: "📊" },
+  { href: "/dashboard", label: "Start",    icon: "🏠" },
+  { href: "/calendar",  label: "Kalender", icon: "📅" },
+  { href: "/customers", label: "Kunden",   icon: "👥" },
+  { href: "/requests",  label: "Anfragen", icon: "🔔" },
+  { href: "/settings",  label: "Mehr",     icon: "⚙️" },
 ]
 
 export default function DashNav({
@@ -33,6 +38,16 @@ export default function DashNav({
   onLogout: () => void
 }) {
   const [pendingCount, setPendingCount] = useState(0)
+  const [moreOpen, setMoreOpen] = useState(false)
+  const moreRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (moreRef.current && !moreRef.current.contains(e.target as Node)) setMoreOpen(false)
+    }
+    document.addEventListener("mousedown", handleClick)
+    return () => document.removeEventListener("mousedown", handleClick)
+  }, [])
 
   useEffect(() => {
     if (!companyId) return
@@ -54,7 +69,7 @@ export default function DashNav({
             <span className="text-[#18A66D]">Termin</span>
             <span className="text-[#1F2A37]">Stop</span>
           </span>
-          <div className="hidden md:flex gap-1">
+          <div className="hidden md:flex gap-1 items-center">
             {DESKTOP_LINKS.map(item => (
               <a key={item.href} href={item.href}
                 className={`relative text-sm px-4 py-2 rounded-lg transition ${
@@ -70,6 +85,40 @@ export default function DashNav({
                 )}
               </a>
             ))}
+            {/* Mehr-Dropdown */}
+            <div ref={moreRef} style={{ position: "relative" }}>
+              <button onClick={() => setMoreOpen(v => !v)}
+                className={`relative text-sm px-4 py-2 rounded-lg transition ${
+                  DESKTOP_MORE.some(m => m.href === active)
+                    ? "font-semibold text-[#1F2A37] bg-[#F7FAFC]"
+                    : "text-[#6B7280] hover:text-[#1F2A37] hover:bg-[#F7FAFC]"
+                }`}>
+                Mehr ▾
+              </button>
+              {moreOpen && (
+                <div style={{
+                  position: "absolute", top: "calc(100% + 6px)", left: 0,
+                  background: "#fff", border: "1px solid #E5E7EB", borderRadius: 12,
+                  boxShadow: "0 8px 24px rgba(0,0,0,0.10)", zIndex: 100,
+                  minWidth: 180, overflow: "hidden",
+                }}>
+                  {DESKTOP_MORE.map(item => (
+                    <a key={item.href} href={item.href}
+                      onClick={() => setMoreOpen(false)}
+                      style={{
+                        display: "block", padding: "10px 16px", fontSize: 13, fontWeight: 500,
+                        color: active === item.href ? "#18A66D" : "#374151",
+                        background: active === item.href ? "#F0FBF6" : "transparent",
+                        textDecoration: "none", transition: "background .12s",
+                      }}
+                      onMouseEnter={e => { if (active !== item.href) (e.currentTarget as HTMLElement).style.background = "#F9FAFB" }}
+                      onMouseLeave={e => { if (active !== item.href) (e.currentTarget as HTMLElement).style.background = "transparent" }}>
+                      {item.label}
+                    </a>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
         <div className="flex items-center gap-3">
