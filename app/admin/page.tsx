@@ -29,34 +29,68 @@ type Tab = "zentrale" | "betriebe" | "create" | "coldcall"
 
 const COLD_CALL_SCRIPT = [
   {
-    title: "🟢 Einstieg (5 Sek.)",
+    title: "1️⃣  Einstieg – Name + Begrüßung",
     bg: "#ECFDF5", border: "#6EE7B7",
-    text: '"Guten Tag, mein Name ist Marvin von TerminStop.\nIch störe nur kurz – haben Sie 60 Sekunden?"',
+    tip: "Ruhig, freundlich, klar. Warte bis die Person ihren Namen sagt.",
+    text: '"Schönen guten Tag, mein Name ist Marvin Passe – ich grüße Sie herzlich!"',
+    sub: '→ Person sagt ihren Namen\n→ Du: "Frau / Herr [Name], schön, dass Sie rangehen."',
   },
   {
-    title: "🎯 Problem ansprechen (15 Sek.)",
-    bg: "#EFF6FF", border: "#BFDBFE",
-    text: '"Wir helfen Betrieben wie Ihrem dabei, Terminausfälle zu reduzieren.\nHaben Sie das Problem, dass Kunden Termine vergessen oder kurzfristig absagen?"',
-  },
-  {
-    title: "💡 Lösung (15 Sek.)",
-    bg: GL, border: GB,
-    text: '"TerminStop sendet Ihren Kunden automatisch 24 Stunden vor jedem Termin\neine SMS-Erinnerung. Kein Aufwand für Sie – läuft komplett automatisch.\nAb 1,30 € pro Tag."',
-  },
-  {
-    title: "⚡ Abschluss (10 Sek.)",
+    title: "2️⃣  Transparenz-Opener – Der Vertrauens-Booster",
     bg: "#FFFBEB", border: "#FDE68A",
-    text: '"Ich kann Sie in 2 Minuten einrichten –\nich brauche nur Ihren Namen und Ihre E-Mail.\nDarf ich das kurz machen?"',
+    tip: "Hier lachen die meisten – genau das will man. Kurz Pause lassen nach dem Lachen.",
+    text: '"Ich muss direkt ehrlich zu Ihnen sein – das ist ein Akquiseanruf. 😄\nMöchten Sie jetzt gleich auflegen … oder geben Sie mir 30 Sekunden,\num Ihnen zu erklären worum es geht?"',
+    sub: '→ Fast alle sagen "Na gut, 30 Sekunden" – dann direkt in den Pitch.',
   },
   {
-    title: "🔄 Einwand: Kein Interesse",
-    bg: "#FEF2F2", border: "#FECACA",
-    text: '"Verstehe ich. Darf ich fragen – haben Sie aktuell ein System\nfür SMS-Erinnerungen oder läuft das noch manuell?"',
+    title: "3️⃣  Der 30-Sekunden-Pitch",
+    bg: "#EFF6FF", border: "#BFDBFE",
+    tip: "Konkret bleiben. Kein Fachjargon. Auf die Uhr schauen – wirklich 30 Sek.",
+    text: '"Wir helfen kleinen Betrieben – Friseuren, Kosmetikstudios, Praxen –\ndabei, dass Kunden ihre Termine nicht mehr vergessen.\nTerminStop sendet automatisch eine SMS-Erinnerung, 24 Stunden vorher.\nKein Aufwand, keine App, läuft komplett im Hintergrund.\nAb unter 2 Euro am Tag."',
   },
   {
-    title: "🔄 Einwand: Zu teuer",
+    title: "4️⃣  Qualifizieren – Haben die das Problem?",
+    bg: GL, border: GB,
+    tip: "Fragen stellen statt reden. Wer fragt, führt das Gespräch.",
+    text: '"Kennen Sie das – Kunden die einfach nicht erscheinen oder 10 Minuten vorher absagen?"',
+    sub: '→ JA: "Genau das lösen wir."\n→ NEIN: "Wie machen Sie das aktuell? Rufen Sie vorher manuell an?"',
+  },
+  {
+    title: "5️⃣  Konkret machen – Nutzen zeigen",
+    bg: "#F5F3FF", border: "#DDD6FE",
+    tip: "Zahlen wirken. Lass sie kurz rechnen.",
+    text: '"Stellen Sie sich vor, nur ein Termin pro Woche fällt nicht mehr aus –\nbei einem Durchschnittsumsatz von 40 € wären das über 160 € mehr im Monat.\nDas System kostet einen Bruchteil davon."',
+  },
+  {
+    title: "6️⃣  Abschluss – Nächster Schritt",
+    bg: GL, border: GB,
+    tip: "Nicht fragen OB sie wollen – fragen WIE es weitergeht.",
+    text: '"Ich richte Sie in 2 Minuten ein – ich brauche nur Ihren Namen,\nIhre E-Mail-Adresse und Ihre Handynummer.\nDann können Sie heute noch loslegen. Darf ich das kurz machen?"',
+  },
+  {
+    title: "🔄  Einwand: \"Kein Interesse\"",
     bg: "#FEF2F2", border: "#FECACA",
-    text: '"1,30 € pro Tag – das ist weniger als ein Kaffee.\nUnd wenn nur ein Termin pro Woche nicht ausfällt,\nhat sich\'s schon gerechnet.\nWollen wir\'s einfach mal 2 Wochen kostenlos testen?"',
+    tip: "Nicht aufgeben – noch eine Frage stellen.",
+    text: '"Verstehe ich völlig. Darf ich kurz fragen –\nwie läuft das bei Ihnen aktuell? Rufen Sie Kunden vor dem Termin manuell an,\noder läuft das bei Ihnen problemlos?"',
+    sub: '→ Falls manuell: "Das ist ja ganz schön Aufwand – genau das nehmen wir Ihnen ab."',
+  },
+  {
+    title: "🔄  Einwand: \"Zu teuer\"",
+    bg: "#FEF2F2", border: "#FECACA",
+    tip: "Perspektive verschieben – vom Preis zum Nutzen.",
+    text: '"Das verstehe ich. Wenn ich Ihnen sage: unter 2 Euro am Tag –\ndas ist weniger als eine Tasse Kaffee.\nUnd wenn nur ein Termin pro Woche nicht mehr ausfällt,\nhat sich das schon mehrfach gerechnet.\nWir können auch klein anfangen – einfach testen."',
+  },
+  {
+    title: "🔄  Einwand: \"Ich muss das erst überlegen\"",
+    bg: "#FEF2F2", border: "#FECACA",
+    tip: "Verbindlichen nächsten Schritt vereinbaren, nicht einfach auflegen.",
+    text: '"Klar, das ist absolut verständlich. Was wäre denn das Konkrete,\nüber das Sie noch nachdenken möchten? Vielleicht kann ich das direkt klären.\nOder: Wann passt es Ihnen, dass ich kurz nochmal anrufe?"',
+  },
+  {
+    title: "✅  Ziel des Anrufs",
+    bg: GL, border: GB,
+    tip: "",
+    text: "Name + E-Mail + Handynummer → direkt unten anlegen → Betrieb ist sofort live.\nDer Kunde bekommt von dir eine E-Mail mit den Login-Daten.",
   },
 ]
 
@@ -665,11 +699,28 @@ terminstop.business@gmail.com`
               <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 16 }}>
                 <CopyBtn text={COLD_CALL_SCRIPT.map(s => `${s.title}\n${s.text}`).join("\n\n")} label="📋 Alles kopieren" />
               </div>
-              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                 {COLD_CALL_SCRIPT.map(s => (
-                  <div key={s.title} style={{ background: s.bg, border: `1px solid ${s.border}`, borderRadius: 12, padding: "14px 18px" }}>
-                    <div style={{ fontSize: 12, fontWeight: 800, color: T, marginBottom: 7, letterSpacing: .2 }}>{s.title}</div>
-                    <div style={{ fontSize: 13, color: T, lineHeight: 1.7, whiteSpace: "pre-line", fontStyle: "italic" }}>{s.text}</div>
+                  <div key={s.title} style={{ background: s.bg, border: `1px solid ${s.border}`, borderRadius: 14, padding: "16px 20px" }}>
+                    {/* Title */}
+                    <div style={{ fontSize: 12, fontWeight: 900, color: T, marginBottom: s.tip ? 8 : 10, letterSpacing: .2, textTransform: "uppercase" }}>{s.title}</div>
+
+                    {/* Coaching tip */}
+                    {s.tip && (
+                      <div style={{ fontSize: 11, color: "#6B7280", fontStyle: "italic", background: "rgba(255,255,255,0.6)", borderRadius: 8, padding: "6px 10px", marginBottom: 10, borderLeft: "3px solid rgba(0,0,0,0.08)" }}>
+                        💡 {s.tip}
+                      </div>
+                    )}
+
+                    {/* Script text */}
+                    <div style={{ fontSize: 14, color: T, lineHeight: 1.75, whiteSpace: "pre-line", fontStyle: "italic", fontWeight: 500 }}>{s.text}</div>
+
+                    {/* Follow-up / branching */}
+                    {s.sub && (
+                      <div style={{ marginTop: 10, fontSize: 12, color: "#374151", lineHeight: 1.7, whiteSpace: "pre-line", background: "rgba(255,255,255,0.5)", borderRadius: 8, padding: "8px 12px", borderLeft: `3px solid ${s.border}` }}>
+                        {s.sub}
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
