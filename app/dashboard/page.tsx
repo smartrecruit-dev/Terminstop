@@ -19,6 +19,7 @@ const [name, setName] = useState("")
   const [justAddedId, setJustAddedId] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [formSuccess, setFormSuccess] = useState(false)
+  const [showForm, setShowForm] = useState(false)
 
   const [companyId, setCompanyId] = useState<string | null>(null)
   const [companyName, setCompanyName] = useState("")
@@ -146,347 +147,176 @@ const [name, setName] = useState("")
     return "Guten Abend"
   }
 
-  return (
-    <div
-      className="min-h-screen text-[#1F2A37] overflow-x-hidden"
-      style={{
-        fontFamily: "'Inter', 'Manrope', sans-serif",
-        backgroundColor: "#F7FAFC"
-      }}
-    >
+  const inp = "w-full bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl px-4 py-3 text-sm text-[#111827] placeholder-[#9CA3AF] focus:outline-none focus:border-[#18A66D] focus:ring-2 focus:ring-[#18A66D]/10 transition"
 
+  const AppointmentForm = () => (
+    <form onSubmit={async (e) => { await handleSubmit(e); setShowForm(false) }} className="flex flex-col gap-4">
+      {/* Name */}
+      <div className="relative">
+        <label className="block text-xs font-bold text-[#6B7280] mb-1.5">Name</label>
+        <input className={inp} placeholder="Max Mustermann" value={name}
+          onChange={e => { setName(e.target.value); setCustomerSearch(e.target.value); setShowSuggestions(true) }}
+          onFocus={() => setShowSuggestions(true)}
+          onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
+          autoComplete="off" />
+        {showSuggestions && customerSearch.length > 0 && (
+          <div className="absolute z-20 left-0 right-0 top-full mt-1 bg-white border border-[#E5E7EB] rounded-xl shadow-lg overflow-hidden">
+            {customers.filter(c => c.name.toLowerCase().includes(customerSearch.toLowerCase())).slice(0, 5).map(c => (
+              <button key={c.id} type="button"
+                onMouseDown={() => { setName(c.name); setPhone(c.phone); setCustomerSearch(""); setShowSuggestions(false) }}
+                className="w-full text-left px-4 py-2.5 text-sm hover:bg-[#F0FDF6] transition flex items-center justify-between">
+                <span className="font-semibold text-[#111827]">{c.name}</span>
+                <span className="text-xs text-[#9CA3AF]">{c.phone}</span>
+              </button>
+            ))}
+            {customers.filter(c => c.name.toLowerCase().includes(customerSearch.toLowerCase())).length === 0 && (
+              <div className="px-4 py-3 text-xs text-[#9CA3AF]">Nicht in der Kartei</div>
+            )}
+          </div>
+        )}
+      </div>
+      {/* Telefon */}
+      <div>
+        <label className="block text-xs font-bold text-[#6B7280] mb-1.5">Telefonnummer</label>
+        <input className={inp} placeholder="0151 12345678" value={phone} onChange={e => setPhone(e.target.value)} type="tel" />
+      </div>
+      {/* Datum + Zeit */}
+      <div className="grid grid-cols-2 gap-3">
+        <div>
+          <label className="block text-xs font-bold text-[#6B7280] mb-1.5">Datum</label>
+          <input type="date" className={inp} value={date} onChange={e => setDate(e.target.value)} />
+        </div>
+        <div>
+          <label className="block text-xs font-bold text-[#6B7280] mb-1.5">Uhrzeit</label>
+          <input type="time" className={inp} value={time} onChange={e => setTime(e.target.value)} />
+        </div>
+      </div>
+      {/* Notiz */}
+      <div>
+        <label className="block text-xs font-bold text-[#6B7280] mb-1.5">Notiz <span className="font-normal">(optional)</span></label>
+        <input className={inp} placeholder="z.B. Erstbesuch" value={note} onChange={e => setNote(e.target.value)} />
+      </div>
+      <button type="submit" disabled={isSubmitting}
+        className={`w-full py-3.5 rounded-xl font-bold text-sm transition-all ${
+          formSuccess ? "bg-[#F0FBF6] text-[#18A66D] border border-[#D1F5E3]"
+          : isSubmitting ? "bg-[#E5E7EB] text-[#9CA3AF] cursor-not-allowed"
+          : "bg-[#18A66D] text-white hover:bg-[#15955F]"
+        }`}>
+        {formSuccess ? "✓ Gespeichert!" : isSubmitting ? "Speichert …" : "Termin speichern →"}
+      </button>
+    </form>
+  )
+
+  return (
+    <div className="min-h-screen" style={{ fontFamily: "'Inter','Manrope',sans-serif", backgroundColor: "#F9FAFB" }}>
       <DashNav active="/dashboard" companyId={companyId} onLogout={handleLogout} />
 
-      <div className="max-w-6xl mx-auto px-4 md:px-10 py-8 pb-24 md:pb-10">
+      {/* ── Mobiles Formular-Modal ── */}
+      {showForm && (
+        <div className="fixed inset-0 z-50 flex items-end md:hidden" style={{ background: "rgba(0,0,0,0.4)" }}
+          onClick={e => { if (e.target === e.currentTarget) setShowForm(false) }}>
+          <div className="w-full bg-white rounded-t-2xl p-6 pb-8 max-h-[92dvh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-5">
+              <h2 className="text-base font-bold text-[#111827]">Neuer Termin</h2>
+              <button onClick={() => setShowForm(false)} className="text-[#9CA3AF] text-xl font-light">✕</button>
+            </div>
+            <AppointmentForm />
+          </div>
+        </div>
+      )}
 
-        {/* ─── HEADER ─── */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10">
+      <div className="max-w-4xl mx-auto px-4 py-6 pb-28 md:pb-10">
+
+        {/* Onboarding */}
+        {companyId && <SetupChecklist companyId={companyId} appointmentCount={appointments.length} />}
+
+        {/* ── Header ── */}
+        <div className="flex items-center justify-between mb-6">
           <div>
-            <div className="text-xs text-[#6B7280] font-medium mb-1 uppercase tracking-wider">
-              {now.toLocaleDateString("de-DE", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}
-            </div>
-            <h1 className="text-3xl md:text-4xl font-bold text-[#1F2A37]">
-              {greeting()}, <span className="text-[#18A66D]">{companyName || "Ihr Unternehmen"}</span>
+            <p className="text-xs text-[#9CA3AF] font-medium">
+              {now.toLocaleDateString("de-DE", { weekday: "long", day: "numeric", month: "long" })}
+            </p>
+            <h1 className="text-xl font-bold text-[#111827]">
+              {filteredAppointments.length === 0
+                ? "Heute keine Termine"
+                : `${filteredAppointments.length} ${filteredAppointments.length === 1 ? "Termin" : "Termine"} heute`}
             </h1>
-            <p className="text-[#6B7280] mt-1 text-sm">Hier ist Ihre Übersicht für heute.</p>
           </div>
-          <div className="flex items-center gap-2 bg-[#E8FBF3] border border-[#6EE7B7] text-[#18A66D] text-xs font-semibold px-4 py-2 rounded-full">
-            <span className="w-1.5 h-1.5 bg-[#18A66D] rounded-full animate-pulse" />
-            SMS-Erinnerungen aktiv
-          </div>
+          {/* + Button Desktop */}
+          <button onClick={() => setShowForm(true)}
+            className="hidden md:flex items-center gap-2 bg-[#18A66D] text-white text-sm font-bold px-5 py-2.5 rounded-xl hover:bg-[#15955F] transition">
+            + Termin
+          </button>
         </div>
 
-        {/* ─── ONBOARDING CHECKLISTE ─── */}
-        {companyId && (
-          <SetupChecklist companyId={companyId} appointmentCount={appointments.length} />
-        )}
+        <div className="flex gap-6 items-start">
 
-        {/* ─── KPI CARDS ─── */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
-
-          {/* Heute gesamt */}
-          <div className="bg-white border border-[#E5E7EB] rounded-2xl p-5 shadow-sm">
-            <div className="text-xs text-[#6B7280] font-medium mb-3 uppercase tracking-wide">Heute</div>
-            <div className="text-3xl font-black text-[#1F2A37]">{filteredAppointments.length}</div>
-            <div className="text-xs text-[#6B7280] mt-1">Termine gesamt</div>
-          </div>
-
-          {/* Offen */}
-          <div className="bg-white border border-[#E5E7EB] rounded-2xl p-5 shadow-sm">
-            <div className="text-xs text-[#6B7280] font-medium mb-3 uppercase tracking-wide">Offen</div>
-            <div className="text-3xl font-black text-[#1F2A37]">{openCount}</div>
-            <div className="text-xs text-[#6B7280] mt-1">Noch ausstehend</div>
-          </div>
-
-          {/* Erledigt */}
-          <div className="bg-white border border-[#E5E7EB] rounded-2xl p-5 shadow-sm">
-            <div className="text-xs text-[#6B7280] font-medium mb-3 uppercase tracking-wide">Erledigt</div>
-            <div className="text-3xl font-black text-[#18A66D]">{doneCount}</div>
-            <div className="text-xs text-[#6B7280] mt-1">Abgeschlossen</div>
-          </div>
-
-          {/* Fortschritt */}
-          <div className="bg-white border border-[#E5E7EB] rounded-2xl p-5 shadow-sm">
-            <div className="text-xs text-[#6B7280] font-medium mb-3 uppercase tracking-wide">Fortschritt</div>
-            <div className="text-3xl font-black text-[#1F2A37]">{completionPct}%</div>
-            <div className="w-full bg-[#E5E7EB] rounded-full h-1.5 mt-2">
-              <div
-                className="bg-[#18A66D] h-1.5 rounded-full transition-all duration-700"
-                style={{ width: `${completionPct}%` }}
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* ─── NEXT APPOINTMENT BANNER ─── */}
-        {nextOpen && (
-          <div className="bg-[#1F2A37] text-white rounded-2xl p-5 mb-8 flex items-center justify-between gap-4 shadow-lg">
-            <div className="flex items-center gap-4">
-              <div className="w-10 h-10 bg-[#18A66D] rounded-xl flex items-center justify-center shrink-0">
-                <span className="text-white text-lg">📍</span>
-              </div>
-              <div>
-                <div className="text-xs text-white/50 font-medium uppercase tracking-wider mb-0.5">Nächster Termin</div>
-                <div className="text-base font-bold">{nextOpen.name}</div>
-                <div className="text-sm text-white/60">{nextOpen.time} Uhr{nextOpen.note ? ` · ${nextOpen.note}` : ""}</div>
-              </div>
-            </div>
-            <div className="flex items-center gap-2 bg-[#18A66D]/20 border border-[#18A66D]/30 text-[#18A66D] text-xs font-semibold px-4 py-2 rounded-xl">
-              <span className="w-1.5 h-1.5 bg-[#18A66D] rounded-full animate-pulse" />
-              Erinnerung gesendet
-            </div>
-          </div>
-        )}
-
-        {/* ─── MAIN GRID: Liste + Formular ─── */}
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-
-          {/* ── TERMINLISTE (3/5) ── */}
-          <div className="lg:col-span-3 bg-white border border-[#E5E7EB] rounded-2xl shadow-sm overflow-hidden">
-            <div className="px-6 py-4 border-b border-[#E5E7EB] flex items-center justify-between">
-              <div>
-                <h2 className="text-sm font-bold text-[#1F2A37]">Heutige Termine</h2>
-                <p className="text-xs text-[#6B7280] mt-0.5">
-                  {now.toLocaleDateString("de-DE", { day: "numeric", month: "long" })}
-                </p>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-[#6B7280]">{doneCount}/{filteredAppointments.length}</span>
-                <div className="w-16 bg-[#E5E7EB] rounded-full h-1.5">
-                  <div
-                    className="bg-[#18A66D] h-1.5 rounded-full transition-all duration-700"
-                    style={{ width: `${completionPct}%` }}
-                  />
-                </div>
-              </div>
-            </div>
-
-          <div className="divide-y divide-[#F3F4F6] overflow-y-auto max-h-[500px]">
+          {/* ── Terminliste ── */}
+          <div className="flex-1 min-w-0">
+            <div className="bg-white border border-[#E5E7EB] rounded-2xl overflow-hidden">
               {filteredAppointments.length === 0 ? (
-                <div className="px-6 py-16 text-center">
-                  <div className="text-4xl mb-3">📅</div>
-                  <div className="text-sm font-semibold text-[#1F2A37] mb-1">Keine Termine heute</div>
-                  <div className="text-xs text-[#6B7280]">Fügen Sie rechts einen neuen Termin hinzu.</div>
+                <div className="py-16 text-center">
+                  <div className="text-5xl mb-3">📅</div>
+                  <div className="text-sm font-semibold text-[#374151] mb-1">Noch keine Termine für heute</div>
+                  <div className="text-xs text-[#9CA3AF]">Tippe auf + um einen Termin hinzuzufügen</div>
                 </div>
               ) : (
-                filteredAppointments.map((a: any) => {
-                  const isDone = a.status === "done"
-                  const isNew = a.id === justAddedId
-                  const isNext = a.id === nextOpen?.id
-                  const isPast = new Date(`${a.date}T${a.time}`).getTime() < now.getTime() - 30 * 60 * 1000
-
-                  return (
-                    <div
-                      key={a.id}
-                      className={`
-                        flex items-center justify-between px-6 py-4 transition-all duration-300
-                        ${isDone ? "opacity-35" : isPast ? "opacity-50 hover:opacity-70" : isNext ? "bg-[#F0FDF6]" : "hover:bg-[#FAFAFA]"}
-                        ${isNew ? "animate-[fadeIn_0.4s_ease]" : ""}
-                      `}
-                    >
-                      <div className="flex items-center gap-4">
-                        {/* Time badge */}
-                        <div className={`
-                          text-xs font-bold w-14 text-center py-1.5 rounded-lg shrink-0
-                          ${isNext ? "bg-[#18A66D] text-white" : "bg-[#F7FAFC] text-[#6B7280]"}
-                        `}>
+                <div className="divide-y divide-[#F3F4F6]">
+                  {filteredAppointments.map((a: any) => {
+                    const isDone = a.status === "done"
+                    const isNext = a.id === nextOpen?.id
+                    const isNew = a.id === justAddedId
+                    return (
+                      <div key={a.id}
+                        className={`flex items-center gap-4 px-5 py-4 transition-all ${
+                          isDone ? "opacity-40" : isNext ? "bg-[#F0FBF6]" : "hover:bg-[#FAFAFA]"
+                        } ${isNew ? "animate-pulse" : ""}`}>
+                        {/* Zeit */}
+                        <div className={`text-xs font-bold px-2.5 py-1.5 rounded-lg shrink-0 ${
+                          isNext ? "bg-[#18A66D] text-white" : "bg-[#F3F4F6] text-[#6B7280]"
+                        }`}>
                           {a.time}
                         </div>
-
-                        <div>
-                          <div className={`text-sm font-semibold ${isDone ? "line-through text-[#9CA3AF]" : "text-[#1F2A37]"}`}>
+                        {/* Name + Notiz */}
+                        <div className="flex-1 min-w-0">
+                          <div className={`text-sm font-semibold truncate ${isDone ? "line-through text-[#9CA3AF]" : "text-[#111827]"}`}>
                             {a.name}
                           </div>
-                          {a.note && (
-                            <div className="text-xs text-[#9CA3AF] mt-0.5">{a.note}</div>
-                          )}
-                          {isNext && !isDone && (
-                            <div className="text-xs text-[#18A66D] font-medium mt-0.5">Nächster Termin</div>
-                          )}
+                          {a.note && <div className="text-xs text-[#9CA3AF] truncate">{a.note}</div>}
                         </div>
-                      </div>
-
-                      {/* SMS badge + toggle */}
-                      <div className="flex items-center gap-3">
-                        <div className="hidden sm:flex items-center gap-1.5 text-xs text-[#18A66D] bg-[#E8FBF3] px-2.5 py-1 rounded-full font-medium">
-                          <span className="w-1 h-1 bg-[#18A66D] rounded-full" />
-                          SMS ✓
-                        </div>
-                        <button
-                          onClick={() => toggleDone(a)}
-                          className={`w-6 h-6 rounded-full border-2 transition-all flex items-center justify-center shrink-0 ${
-                            isDone
-                              ? "bg-[#18A66D] border-[#18A66D]"
-                              : "border-[#D1D5DB] hover:border-[#18A66D]"
-                          }`}
-                        >
-                          {isDone && <span className="text-white text-xs">✓</span>}
+                        {/* Erledigt-Button */}
+                        <button onClick={() => toggleDone(a)}
+                          className={`w-7 h-7 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ${
+                            isDone ? "bg-[#18A66D] border-[#18A66D]" : "border-[#D1D5DB] hover:border-[#18A66D]"
+                          }`}>
+                          {isDone && <span className="text-white text-xs font-bold">✓</span>}
                         </button>
                       </div>
-                    </div>
-                  )
-                })
+                    )
+                  })}
+                </div>
               )}
             </div>
           </div>
 
-          {/* ── FORMULAR (2/5) ── */}
-          <div className="lg:col-span-2 bg-white border border-[#E5E7EB] rounded-2xl shadow-sm overflow-hidden">
-            <div className="px-6 py-4 border-b border-[#E5E7EB]">
-              <h2 className="text-sm font-bold text-[#1F2A37]">Neuer Termin</h2>
-              <p className="text-xs text-[#6B7280] mt-0.5">Termin eintragen & SMS-Erinnerung wird automatisch geplant</p>
+          {/* ── Desktop Formular (seitlich) ── */}
+          <div className="hidden md:block w-72 flex-shrink-0">
+            <div className="bg-white border border-[#E5E7EB] rounded-2xl p-5">
+              <h2 className="text-sm font-bold text-[#111827] mb-4">Neuer Termin</h2>
+              <AppointmentForm />
             </div>
-
-            <form onSubmit={handleSubmit} className="px-6 py-6 flex flex-col gap-4">
-
-              {/* Name mit Kunden-Auswahl */}
-              <div className="relative">
-                <label className="text-xs font-semibold text-[#6B7280] uppercase tracking-wide mb-1.5 block">
-                  Name
-                </label>
-                <input
-                  className="w-full bg-[#F7FAFC] border border-[#E5E7EB] rounded-xl px-4 py-3 text-sm text-[#1F2A37] placeholder-[#9CA3AF] focus:outline-none focus:border-[#18A66D] focus:ring-2 focus:ring-[#18A66D]/10 transition"
-                  placeholder="Max Mustermann"
-                  value={name}
-                  onChange={(e) => {
-                    setName(e.target.value)
-                    setCustomerSearch(e.target.value)
-                    setShowSuggestions(true)
-                  }}
-                  onFocus={() => setShowSuggestions(true)}
-                  onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
-                  autoComplete="off"
-                />
-                {showSuggestions && customerSearch.length > 0 && (
-                  <div className="absolute z-10 left-0 right-0 top-full mt-1 bg-white border border-[#E5E7EB] rounded-xl shadow-lg overflow-hidden">
-                    {customers
-                      .filter(c => c.name.toLowerCase().includes(customerSearch.toLowerCase()))
-                      .slice(0, 5)
-                      .map(c => (
-                        <button
-                          key={c.id}
-                          type="button"
-                          onMouseDown={() => {
-                            setName(c.name)
-                            setPhone(c.phone)
-                            setCustomerSearch("")
-                            setShowSuggestions(false)
-                          }}
-                          className="w-full text-left px-4 py-2.5 text-sm hover:bg-[#F0FDF6] transition flex items-center justify-between"
-                        >
-                          <span className="font-medium text-[#1F2A37]">{c.name}</span>
-                          <span className="text-xs text-[#9CA3AF]">{c.phone}</span>
-                        </button>
-                      ))
-                    }
-                    {customers.filter(c => c.name.toLowerCase().includes(customerSearch.toLowerCase())).length === 0 && (
-                      <div className="px-4 py-3 text-xs text-[#9CA3AF]">Kein Treffer in der Kartei</div>
-                    )}
-                  </div>
-                )}
-              </div>
-
-              {/* Telefon */}
-              <div>
-                <label className="text-xs font-semibold text-[#6B7280] uppercase tracking-wide mb-1.5 block">
-                  Telefonnummer
-                </label>
-                <input
-                  className="w-full bg-[#F7FAFC] border border-[#E5E7EB] rounded-xl px-4 py-3 text-sm text-[#1F2A37] placeholder-[#9CA3AF] focus:outline-none focus:border-[#18A66D] focus:ring-2 focus:ring-[#18A66D]/10 transition"
-                  placeholder="+49 170 1234567"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                />
-              </div>
-
-              {/* Datum + Uhrzeit */}
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="text-xs font-semibold text-[#6B7280] uppercase tracking-wide mb-1.5 block">
-                    Datum
-                  </label>
-                  <input
-                    type="date"
-                    className="w-full bg-[#F7FAFC] border border-[#E5E7EB] rounded-xl px-3 py-3 text-sm text-[#1F2A37] focus:outline-none focus:border-[#18A66D] focus:ring-2 focus:ring-[#18A66D]/10 transition"
-                    value={date}
-                    onChange={(e) => setDate(e.target.value)}
-                  />
-                </div>
-                <div>
-                  <label className="text-xs font-semibold text-[#6B7280] uppercase tracking-wide mb-1.5 block">
-                    Uhrzeit
-                  </label>
-                  <input
-                    type="time"
-                    className="w-full bg-[#F7FAFC] border border-[#E5E7EB] rounded-xl px-3 py-3 text-sm text-[#1F2A37] focus:outline-none focus:border-[#18A66D] focus:ring-2 focus:ring-[#18A66D]/10 transition"
-                    value={time}
-                    onChange={(e) => setTime(e.target.value)}
-                  />
-                </div>
-              </div>
-
-              {/* Notiz */}
-              <div>
-                <label className="text-xs font-semibold text-[#6B7280] uppercase tracking-wide mb-1.5 block">
-                  Notiz <span className="text-[#9CA3AF] normal-case font-normal">(optional)</span>
-                </label>
-                <input
-                  className="w-full bg-[#F7FAFC] border border-[#E5E7EB] rounded-xl px-4 py-3 text-sm text-[#1F2A37] placeholder-[#9CA3AF] focus:outline-none focus:border-[#18A66D] focus:ring-2 focus:ring-[#18A66D]/10 transition"
-                  placeholder="z. B. Erstbesuch, Sonderwunsch..."
-                  value={note}
-                  onChange={(e) => setNote(e.target.value)}
-                />
-              </div>
-
-              {/* SMS Hinweis */}
-              <div className="flex items-center gap-2.5 bg-[#E8FBF3] border border-[#6EE7B7]/50 rounded-xl px-4 py-3">
-                <span className="text-base">📱</span>
-                <div>
-                  <div className="text-xs font-semibold text-[#18A66D]">SMS-Erinnerung wird automatisch geplant</div>
-                  <div className="text-xs text-[#18A66D]/70">24 Stunden vor dem Termin</div>
-                </div>
-              </div>
-
-              {/* Submit */}
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className={`
-                  mt-1 w-full py-3.5 rounded-xl font-bold text-sm transition-all shadow-md
-                  ${formSuccess
-                    ? "bg-[#E8FBF3] text-[#18A66D] border border-[#6EE7B7]"
-                    : isSubmitting
-                    ? "bg-[#6B7280] text-white cursor-not-allowed"
-                    : "bg-[#18A66D] text-white hover:bg-[#0F8F63] shadow-[#18A66D]/20"
-                  }
-                `}
-              >
-                {formSuccess ? "✓ Termin gespeichert!" : isSubmitting ? "Speichern..." : "Termin speichern →"}
-              </button>
-
-            </form>
           </div>
 
         </div>
-
-        {/* ─── BOTTOM INFO BAR ─── */}
-        <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-3 bg-white border border-[#E5E7EB] rounded-2xl px-6 py-4 shadow-sm">
-          <div className="flex items-center gap-6 text-xs text-[#6B7280]">
-            <div className="flex items-center gap-2">
-              <span className="w-1.5 h-1.5 bg-[#18A66D] rounded-full animate-pulse" />
-              <span>SMS-System aktiv</span>
-            </div>
-            <div className="hidden sm:block h-3 w-px bg-[#E5E7EB]" />
-            <span>{appointments.length} Termine insgesamt</span>
-            <div className="hidden sm:block h-3 w-px bg-[#E5E7EB]" />
-            <span>Erfolgsquote 95%</span>
-          </div>
-          <div className="text-xs text-[#9CA3AF]">
-            Zuletzt aktualisiert: {now.toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" })} Uhr
-          </div>
-        </div>
-
       </div>
+
+      {/* ── Mobiler FAB ── */}
+      <button onClick={() => setShowForm(true)}
+        className="md:hidden fixed bottom-20 right-5 z-40 w-14 h-14 bg-[#18A66D] text-white text-2xl font-bold rounded-full shadow-xl flex items-center justify-center hover:bg-[#15955F] transition">
+        +
+      </button>
+
+      <style>{`@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}`}</style>
     </div>
   )
 }
