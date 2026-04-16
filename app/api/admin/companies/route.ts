@@ -7,8 +7,10 @@ const supabaseAdmin = createClient(
 )
 
 function checkAdminAuth(req: NextRequest) {
-  const secret = req.headers.get("x-admin-secret")
-  return secret === process.env.ADMIN_SECRET
+  const secret = (req.headers.get("x-admin-secret") || "").trim()
+  const expected = (process.env.ADMIN_SECRET || "").trim()
+  if (!expected) return false
+  return secret === expected
 }
 
 export async function GET(req: NextRequest) {
