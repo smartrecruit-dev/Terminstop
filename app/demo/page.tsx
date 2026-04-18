@@ -3,372 +3,302 @@
 import { useState, useEffect } from "react"
 import { DEMO_COMPANY, generateDemoAppointments } from "./demoData"
 
-/* ─── Demo-Banner ──────────────────────────────────────────── */
+// ── SVG Icons (gleiche wie DashNav) ──────────────────────────────────────────
+const IconHome = () => (
+  <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+    <path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5Z"/><path d="M9 21V12h6v9"/>
+  </svg>
+)
+const IconCalendar = () => (
+  <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+    <rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>
+  </svg>
+)
+const IconUsers = () => (
+  <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
+  </svg>
+)
+
 function DemoBanner() {
   return (
-    <div style={{
-      background: "linear-gradient(90deg, #7C3AED, #9333EA)",
-      color: "white",
-      padding: "10px 24px",
-      display: "flex", alignItems: "center", justifyContent: "space-between",
-      fontSize: "13px", fontWeight: 600, gap: 12, flexWrap: "wrap",
-    }}>
+    <div style={{ background: "linear-gradient(90deg,#7C3AED,#9333EA)", color: "#fff", padding: "10px 24px", display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: 13, fontWeight: 600, gap: 12, flexWrap: "wrap" }}>
       <span>🎭 Demo-Modus – Alle Daten sind fiktiv · Keine SMS werden versendet</span>
-      <a
-        href="/lead"
-        style={{
-          background: "white", color: "#7C3AED",
-          padding: "6px 16px", borderRadius: 8, fontWeight: 700,
-          textDecoration: "none", fontSize: "12px", whiteSpace: "nowrap",
-        }}
-      >
+      <a href="/lead" style={{ background: "#fff", color: "#7C3AED", padding: "6px 16px", borderRadius: 8, fontWeight: 700, textDecoration: "none", fontSize: 12, whiteSpace: "nowrap" }}>
         Jetzt kostenlos testen →
       </a>
     </div>
   )
 }
 
-/* ─── Dashboard ────────────────────────────────────────────── */
+// Demo-Formular als eigene Komponente (außerhalb von DemoDashboard!) → kein Fokus-Verlust
+interface DemoFormProps {
+  name: string; setName: (v: string) => void
+  phone: string; setPhone: (v: string) => void
+  date: string; setDate: (v: string) => void
+  time: string; setTime: (v: string) => void
+  note: string; setNote: (v: string) => void
+  isSubmitting: boolean; formSuccess: boolean
+  onSubmit: (e: React.FormEvent) => void
+}
+function DemoForm({ name, setName, phone, setPhone, date, setDate, time, setTime, note, setNote, isSubmitting, formSuccess, onSubmit }: DemoFormProps) {
+  const inp = "w-full bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl px-4 py-3 text-sm text-[#111827] placeholder-[#9CA3AF] focus:outline-none focus:border-[#18A66D] focus:ring-2 focus:ring-[#18A66D]/10 transition"
+  return (
+    <form onSubmit={onSubmit} className="flex flex-col gap-4">
+      <div>
+        <label className="block text-xs font-bold text-[#6B7280] uppercase tracking-wide mb-1.5">Name</label>
+        <input className={inp} placeholder="Max Mustermann" value={name} onChange={e => setName(e.target.value)} required />
+      </div>
+      <div>
+        <label className="block text-xs font-bold text-[#6B7280] uppercase tracking-wide mb-1.5">Telefonnummer</label>
+        <input className={inp} placeholder="0151 12345678" value={phone} onChange={e => setPhone(e.target.value)} type="tel" required />
+      </div>
+      <div className="grid grid-cols-2 gap-3">
+        <div>
+          <label className="block text-xs font-bold text-[#6B7280] uppercase tracking-wide mb-1.5">Datum</label>
+          <input type="date" className={inp} value={date} onChange={e => setDate(e.target.value)} required />
+        </div>
+        <div>
+          <label className="block text-xs font-bold text-[#6B7280] uppercase tracking-wide mb-1.5">Uhrzeit</label>
+          <input type="time" className={inp} value={time} onChange={e => setTime(e.target.value)} required />
+        </div>
+      </div>
+      <div>
+        <label className="block text-xs font-bold text-[#6B7280] uppercase tracking-wide mb-1.5">
+          Notiz <span className="font-normal normal-case text-[#9CA3AF]">(optional)</span>
+        </label>
+        <input className={inp} placeholder="z.B. Erstbesuch" value={note} onChange={e => setNote(e.target.value)} />
+      </div>
+      {/* SMS Hinweis */}
+      <div className="flex items-center gap-2.5 bg-[#F0FBF6] border border-[#D1F5E3] rounded-xl px-4 py-3">
+        <span className="text-base">📱</span>
+        <div>
+          <div className="text-xs font-semibold text-[#18A66D]">SMS-Erinnerung automatisch geplant</div>
+          <div className="text-xs text-[#18A66D]/70">24 Stunden vor dem Termin</div>
+        </div>
+      </div>
+      <button type="submit" disabled={isSubmitting}
+        className={`w-full py-3.5 rounded-xl font-bold text-sm transition-all ${
+          formSuccess ? "bg-[#F0FBF6] text-[#18A66D] border border-[#D1F5E3]"
+          : isSubmitting ? "bg-[#E5E7EB] text-[#9CA3AF] cursor-not-allowed"
+          : "bg-[#18A66D] text-white hover:bg-[#15955F] active:scale-[.98]"
+        }`}>
+        {formSuccess ? "✓ Termin gespeichert!" : isSubmitting ? "Speichert …" : "Termin speichern →"}
+      </button>
+    </form>
+  )
+}
+
+// ── Main ──────────────────────────────────────────────────────────────────────
 export default function DemoDashboard() {
   const [appointments, setAppointments] = useState<any[]>([])
-  const [justAddedId, setJustAddedId] = useState<string | null>(null)
-  const [formSuccess, setFormSuccess] = useState(false)
+  const [justAddedId, setJustAddedId]   = useState<string | null>(null)
+  const [formSuccess, setFormSuccess]   = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [showForm, setShowForm]         = useState(false)
 
-  // Form state
-  const [name, setName] = useState("")
+  const [name, setName]   = useState("")
   const [phone, setPhone] = useState("")
-  const [date, setDate] = useState("")
-  const [time, setTime] = useState("")
-  const [note, setNote] = useState("")
+  const [date, setDate]   = useState("")
+  const [time, setTime]   = useState("")
+  const [note, setNote]   = useState("")
 
-  useEffect(() => {
-    setAppointments(generateDemoAppointments())
-  }, [])
+  useEffect(() => { setAppointments(generateDemoAppointments()) }, [])
 
   function toggleDone(a: any) {
-    setAppointments(prev =>
-      prev.map(x => x.id === a.id ? { ...x, status: x.status === "done" ? "pending" : "done" } : x)
-    )
+    setAppointments(prev => prev.map(x => x.id === a.id ? { ...x, status: x.status === "done" ? "pending" : "done" } : x))
   }
 
-  function handleSubmit(e: any) {
+  function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!name || !phone || !date || !time) return
     setIsSubmitting(true)
-
-    const newId = `demo-new-${Date.now()}`
-    const newAppt = { id: newId, name, phone, date, time, note, status: "pending", company_id: "demo" }
-
     setTimeout(() => {
-      setAppointments(prev => [...prev, newAppt])
-      setJustAddedId(newId)
-      setTimeout(() => setJustAddedId(null), 1200)
+      const newId = `demo-${Date.now()}`
+      setAppointments(prev => [...prev, { id: newId, name, phone, date, time, note, status: "pending" }])
+      setJustAddedId(newId); setTimeout(() => setJustAddedId(null), 1200)
       setName(""); setPhone(""); setDate(""); setTime(""); setNote("")
-      setIsSubmitting(false)
-      setFormSuccess(true)
-      setTimeout(() => setFormSuccess(false), 2500)
-    }, 600)
+      setIsSubmitting(false); setFormSuccess(true)
+      setTimeout(() => { setFormSuccess(false); setShowForm(false) }, 1800)
+    }, 500)
   }
 
-  const now = new Date()
+  const now      = new Date()
   const todayStr = now.toISOString().split("T")[0]
-  const filteredAppointments = appointments
-    .filter(a => a.date === todayStr)
-    .sort((a, b) => a.time.localeCompare(b.time))
-
-  const doneCount = filteredAppointments.filter(a => a.status === "done").length
-  const openCount = filteredAppointments.filter(a => a.status !== "done").length
-  const completionPct = filteredAppointments.length > 0
-    ? Math.round((doneCount / filteredAppointments.length) * 100) : 0
-
-  const nextOpen = filteredAppointments.find(a => {
+  const allToday = appointments.filter(a => a.date === todayStr).sort((a, b) => a.time.localeCompare(b.time))
+  const doneCount = allToday.filter(a => a.status === "done").length
+  const openCount = allToday.filter(a => a.status !== "done").length
+  const pct       = allToday.length > 0 ? Math.round((doneCount / allToday.length) * 100) : 0
+  const nextOpen  = allToday.find(a => {
     if (a.status === "done") return false
     const [h, m] = a.time.split(":").map(Number)
-    const slotMs = new Date(a.date).setHours(h, m, 0, 0)
-    return slotMs >= now.getTime() - 30 * 60 * 1000
+    return new Date(a.date).setHours(h, m) >= now.getTime() - 30 * 60 * 1000
   })
 
-  const greeting = () => {
-    const h = now.getHours()
-    if (h < 12) return "Guten Morgen"
-    if (h < 18) return "Guten Tag"
-    return "Guten Abend"
-  }
+  const formProps: DemoFormProps = { name, setName, phone, setPhone, date, setDate, time, setTime, note, setNote, isSubmitting, formSuccess, onSubmit: handleSubmit }
+
+  const mobileNav = [
+    { href: "/demo", label: "Start", icon: <IconHome />, active: true },
+    { href: "/demo/calendar", label: "Kalender", icon: <IconCalendar /> },
+    { href: "/demo/customers", label: "Kunden", icon: <IconUsers /> },
+  ]
 
   return (
-    <div className="min-h-screen text-[#1F2A37] overflow-x-hidden" style={{ fontFamily: "'Inter','Manrope',sans-serif", backgroundColor: "#F7FAFC" }}>
-
+    <div className="min-h-screen" style={{ fontFamily: "'Inter','Manrope',sans-serif", backgroundColor: "#F9FAFB" }}>
       <DemoBanner />
 
-      {/* ─── NAV ─── */}
-      <nav className="flex justify-between items-center px-4 md:px-12 py-4 border-b border-[#E5E7EB] bg-white sticky top-0 z-50">
-        <div className="flex items-center gap-4 md:gap-8">
-          <span className="text-base font-bold">
-            <span className="text-[#18A66D]">Termin</span>
-            <span className="text-[#1F2A37]">Stop</span>
+      {/* ── Nav ── */}
+      <nav style={{ background: "#fff", borderBottom: "1px solid #E5E7EB", boxShadow: "0 1px 3px rgba(0,0,0,0.04)", position: "sticky", top: 0, zIndex: 50, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 24px", height: 58 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 32 }}>
+          <span style={{ fontSize: 17, fontWeight: 900, letterSpacing: "-.3px" }}>
+            <span style={{ color: "#18A66D" }}>Termin</span><span style={{ color: "#111827" }}>Stop</span>
           </span>
-          <div className="hidden md:flex gap-1">
-            <a href="/demo" className="text-sm font-semibold text-[#1F2A37] bg-[#F7FAFC] px-4 py-2 rounded-lg">Dashboard</a>
-            <a href="/demo/calendar" className="text-sm text-[#6B7280] hover:text-[#1F2A37] hover:bg-[#F7FAFC] px-4 py-2 rounded-lg transition">Kalender</a>
-            <a href="/demo/customers" className="text-sm text-[#6B7280] hover:text-[#1F2A37] hover:bg-[#F7FAFC] px-4 py-2 rounded-lg transition">Kunden</a>
+          <div className="hidden md:flex" style={{ gap: 2 }}>
+            {[{ href: "/demo", label: "Dashboard", active: true }, { href: "/demo/calendar", label: "Kalender" }, { href: "/demo/customers", label: "Kunden" }].map(item => (
+              <a key={item.href} href={item.href} style={{ position: "relative", textDecoration: "none", padding: "6px 14px", borderRadius: 9, fontSize: 13.5, fontWeight: item.active ? 700 : 500, color: item.active ? "#111827" : "#6B7280", background: item.active ? "#F0FBF6" : "transparent", transition: "all .12s" }}>
+                {item.label}
+                {item.active && <span style={{ position: "absolute", bottom: -1, left: "50%", transform: "translateX(-50%)", width: 20, height: 2.5, borderRadius: 99, background: "#18A66D" }} />}
+              </a>
+            ))}
           </div>
         </div>
-        <div className="flex items-center gap-3">
-          <div className="hidden md:flex items-center gap-2 text-xs text-[#18A66D] font-medium">
-            <span className="w-1.5 h-1.5 bg-[#18A66D] rounded-full animate-pulse" />
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <div className="hidden md:flex" style={{ alignItems: "center", gap: 6, fontSize: 12, color: "#18A66D", fontWeight: 600 }}>
+            <span style={{ width: 7, height: 7, background: "#18A66D", borderRadius: "50%", display: "inline-block" }} />
             Demo aktiv
           </div>
-          <a href="/" className="text-sm text-[#6B7280] hover:text-[#1F2A37] transition px-3 py-1.5 rounded-lg hover:bg-[#F7FAFC]">
-            ← Startseite
+          <a href="/lead" style={{ fontSize: 13, color: "#fff", background: "#18A66D", border: "none", cursor: "pointer", padding: "7px 16px", borderRadius: 9, fontWeight: 700, textDecoration: "none" }}>
+            Jetzt testen →
           </a>
         </div>
       </nav>
 
-      {/* ─── MOBILE BOTTOM NAV ─── */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-[#E5E7EB] z-50 flex justify-around items-center px-2 py-2">
-        {[
-          { href: "/demo", label: "Dashboard", icon: "🏠", active: true },
-          { href: "/demo/calendar", label: "Kalender", icon: "📅" },
-          { href: "/demo/customers", label: "Kunden", icon: "👥" },
-        ].map((item) => (
-          <a key={item.href} href={item.href} className={`flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl transition ${item.active ? "text-[#18A66D]" : "text-[#9CA3AF]"}`}>
-            <span className="text-lg">{item.icon}</span>
-            <span className="text-[10px] font-medium">{item.label}</span>
-          </a>
-        ))}
-        <a href="/lead" className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl bg-[#18A66D] text-white">
-          <span className="text-lg">✨</span>
-          <span className="text-[10px] font-medium">Testen</span>
-        </a>
-      </div>
+      {/* ── Mobiles Modal ── */}
+      {showForm && (
+        <div className="fixed inset-0 z-50 flex items-end md:hidden"
+          style={{ background: "rgba(0,0,0,0.45)", backdropFilter: "blur(4px)" }}
+          onClick={e => { if (e.target === e.currentTarget) setShowForm(false) }}>
+          <div className="w-full bg-white rounded-t-3xl p-6 pb-10 max-h-[92dvh] overflow-y-auto shadow-2xl">
+            <div className="w-10 h-1 bg-[#E5E7EB] rounded-full mx-auto mb-5" />
+            <div className="flex items-center justify-between mb-5">
+              <h2 className="text-base font-bold text-[#111827]">Neuer Termin</h2>
+              <button onClick={() => setShowForm(false)} className="w-8 h-8 rounded-full bg-[#F3F4F6] flex items-center justify-center text-[#6B7280] text-sm">✕</button>
+            </div>
+            <DemoForm {...formProps} />
+          </div>
+        </div>
+      )}
 
-      <div className="max-w-6xl mx-auto px-4 md:px-10 py-8 pb-24 md:pb-10">
+      <div className="max-w-4xl mx-auto px-4 py-6 pb-28 md:pb-10">
 
-        {/* ─── HEADER ─── */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10">
+        {/* ── Header ── */}
+        <div className="flex items-center justify-between mb-5">
           <div>
-            <div className="text-xs text-[#6B7280] font-medium mb-1 uppercase tracking-wider">
-              {now.toLocaleDateString("de-DE", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}
-            </div>
-            <h1 className="text-3xl md:text-4xl font-bold text-[#1F2A37]">
-              {greeting()}, <span className="text-[#18A66D]">{DEMO_COMPANY}</span>
+            <p className="text-xs text-[#9CA3AF] font-medium mb-0.5">
+              {now.toLocaleDateString("de-DE", { weekday: "long", day: "numeric", month: "long" })}
+            </p>
+            <h1 className="text-xl font-bold text-[#111827]">
+              {allToday.length === 0 ? "Heute keine Termine" : `${allToday.length} Termin${allToday.length !== 1 ? "e" : ""} heute`}
             </h1>
-            <p className="text-[#6B7280] mt-1 text-sm">Hier ist Ihre Übersicht für heute.</p>
           </div>
-          <div className="flex items-center gap-2 bg-[#E8FBF3] border border-[#6EE7B7] text-[#18A66D] text-xs font-semibold px-4 py-2 rounded-full">
-            <span className="w-1.5 h-1.5 bg-[#18A66D] rounded-full animate-pulse" />
-            SMS-Erinnerungen aktiv
-          </div>
+          <button onClick={() => setShowForm(true)}
+            className="hidden md:flex items-center gap-2 bg-[#18A66D] text-white text-sm font-bold px-5 py-2.5 rounded-xl hover:bg-[#15955F] transition active:scale-[.97]">
+            + Termin
+          </button>
         </div>
 
-        {/* ─── KPI CARDS ─── */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
-          <div className="bg-white border border-[#E5E7EB] rounded-2xl p-5 shadow-sm">
-            <div className="text-xs text-[#6B7280] font-medium mb-3 uppercase tracking-wide">Heute</div>
-            <div className="text-3xl font-black text-[#1F2A37]">{filteredAppointments.length}</div>
-            <div className="text-xs text-[#6B7280] mt-1">Termine gesamt</div>
-          </div>
-          <div className="bg-white border border-[#E5E7EB] rounded-2xl p-5 shadow-sm">
-            <div className="text-xs text-[#6B7280] font-medium mb-3 uppercase tracking-wide">Offen</div>
-            <div className="text-3xl font-black text-[#1F2A37]">{openCount}</div>
-            <div className="text-xs text-[#6B7280] mt-1">Noch ausstehend</div>
-          </div>
-          <div className="bg-white border border-[#E5E7EB] rounded-2xl p-5 shadow-sm">
-            <div className="text-xs text-[#6B7280] font-medium mb-3 uppercase tracking-wide">Erledigt</div>
-            <div className="text-3xl font-black text-[#18A66D]">{doneCount}</div>
-            <div className="text-xs text-[#6B7280] mt-1">Abgeschlossen</div>
-          </div>
-          <div className="bg-white border border-[#E5E7EB] rounded-2xl p-5 shadow-sm">
-            <div className="text-xs text-[#6B7280] font-medium mb-3 uppercase tracking-wide">Fortschritt</div>
-            <div className="text-3xl font-black text-[#1F2A37]">{completionPct}%</div>
-            <div className="w-full bg-[#E5E7EB] rounded-full h-1.5 mt-2">
-              <div className="bg-[#18A66D] h-1.5 rounded-full transition-all duration-700" style={{ width: `${completionPct}%` }} />
-            </div>
-          </div>
-        </div>
-
-        {/* ─── NEXT APPOINTMENT BANNER ─── */}
-        {nextOpen && (
-          <div className="bg-[#1F2A37] text-white rounded-2xl p-5 mb-8 flex items-center justify-between gap-4 shadow-lg">
-            <div className="flex items-center gap-4">
-              <div className="w-10 h-10 bg-[#18A66D] rounded-xl flex items-center justify-center shrink-0">
-                <span className="text-white text-lg">📍</span>
+        {/* ── Fortschrittsbalken ── */}
+        {allToday.length > 0 && (
+          <div className="bg-white border border-[#E5E7EB] rounded-2xl px-5 py-4 mb-4 flex items-center gap-4">
+            <div className="flex-1">
+              <div className="flex items-center justify-between mb-1.5">
+                <span className="text-xs font-bold text-[#6B7280]">{doneCount} von {allToday.length} erledigt</span>
+                <span className="text-xs font-bold text-[#18A66D]">{pct} %</span>
               </div>
-              <div>
-                <div className="text-xs text-white/50 font-medium uppercase tracking-wider mb-0.5">Nächster Termin</div>
-                <div className="text-base font-bold">{nextOpen.name}</div>
-                <div className="text-sm text-white/60">{nextOpen.time} Uhr{nextOpen.note ? ` · ${nextOpen.note}` : ""}</div>
+              <div className="h-2 bg-[#F3F4F6] rounded-full overflow-hidden">
+                <div className="h-full bg-[#18A66D] rounded-full transition-all duration-500" style={{ width: `${pct}%` }} />
               </div>
             </div>
-            <div className="flex items-center gap-2 bg-[#18A66D]/20 border border-[#18A66D]/30 text-[#18A66D] text-xs font-semibold px-4 py-2 rounded-xl">
-              <span className="w-1.5 h-1.5 bg-[#18A66D] rounded-full animate-pulse" />
-              Erinnerung gesendet
-            </div>
+            {openCount > 0 && (
+              <div className="text-right shrink-0">
+                <div className="text-lg font-black text-[#111827]">{openCount}</div>
+                <div className="text-xs text-[#9CA3AF] font-medium">offen</div>
+              </div>
+            )}
           </div>
         )}
 
-        {/* ─── MAIN GRID ─── */}
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+        <div className="flex gap-5 items-start">
 
-          {/* ── TERMINLISTE ── */}
-          <div className="lg:col-span-3 bg-white border border-[#E5E7EB] rounded-2xl shadow-sm overflow-hidden">
-            <div className="px-6 py-4 border-b border-[#E5E7EB] flex items-center justify-between">
-              <div>
-                <h2 className="text-sm font-bold text-[#1F2A37]">Heutige Termine</h2>
-                <p className="text-xs text-[#6B7280] mt-0.5">
-                  {now.toLocaleDateString("de-DE", { day: "numeric", month: "long" })}
-                </p>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-[#6B7280]">{doneCount}/{filteredAppointments.length}</span>
-                <div className="w-16 bg-[#E5E7EB] rounded-full h-1.5">
-                  <div className="bg-[#18A66D] h-1.5 rounded-full transition-all duration-700" style={{ width: `${completionPct}%` }} />
-                </div>
-              </div>
-            </div>
-
-            <div className="divide-y divide-[#F3F4F6] overflow-y-auto max-h-[500px]">
-              {filteredAppointments.length === 0 ? (
-                <div className="px-6 py-16 text-center">
-                  <div className="text-4xl mb-3">📅</div>
-                  <div className="text-sm font-semibold text-[#1F2A37] mb-1">Keine Termine heute</div>
-                  <div className="text-xs text-[#6B7280]">Fügen Sie rechts einen Termin hinzu.</div>
+          {/* ── Terminliste ── */}
+          <div className="flex-1 min-w-0">
+            <div className="bg-white border border-[#E5E7EB] rounded-2xl overflow-hidden">
+              {allToday.length === 0 ? (
+                <div className="py-16 text-center">
+                  <div className="text-5xl mb-3">📅</div>
+                  <div className="text-sm font-semibold text-[#374151] mb-1">Noch keine Termine für heute</div>
+                  <div className="text-xs text-[#9CA3AF]">Tippe auf + um einen Termin hinzuzufügen</div>
                 </div>
               ) : (
-                filteredAppointments.map((a: any) => {
-                  const isDone = a.status === "done"
-                  const isNew = a.id === justAddedId
-                  const isNext = a.id === nextOpen?.id
-                  const [h, m] = a.time.split(":").map(Number)
-                  const slotMs = new Date(a.date).setHours(h, m, 0, 0)
-                  const isPast = slotMs < now.getTime() - 30 * 60 * 1000
-
-                  return (
-                    <div
-                      key={a.id}
-                      className={`flex items-center justify-between px-6 py-4 transition-all duration-300 ${
-                        isDone ? "opacity-35" : isPast ? "opacity-50 hover:opacity-70" : isNext ? "bg-[#F0FDF6]" : "hover:bg-[#FAFAFA]"
-                      } ${isNew ? "animate-pulse" : ""}`}
-                    >
-                      <div className="flex items-center gap-4">
-                        <div className={`text-xs font-bold w-14 text-center py-1.5 rounded-lg shrink-0 ${
-                          isNext ? "bg-[#18A66D] text-white" : "bg-[#F7FAFC] text-[#6B7280]"
-                        }`}>
+                <div className="divide-y divide-[#F3F4F6]">
+                  {allToday.map((a: any) => {
+                    const isDone = a.status === "done"
+                    const isNext = a.id === nextOpen?.id
+                    const isNew  = a.id === justAddedId
+                    return (
+                      <div key={a.id} className={`flex items-center gap-4 px-5 py-4 transition-all ${isDone ? "opacity-40" : isNext ? "bg-[#F0FBF6]" : "hover:bg-[#FAFAFA]"} ${isNew ? "animate-pulse" : ""}`}>
+                        <div className={`text-xs font-bold px-2.5 py-1.5 rounded-lg shrink-0 min-w-[46px] text-center ${isNext ? "bg-[#18A66D] text-white" : "bg-[#F3F4F6] text-[#6B7280]"}`}>
                           {a.time}
                         </div>
-                        <div>
-                          <div className={`text-sm font-semibold ${isDone ? "line-through text-[#9CA3AF]" : "text-[#1F2A37]"}`}>
-                            {a.name}
-                          </div>
-                          {a.note && <div className="text-xs text-[#9CA3AF] mt-0.5">{a.note}</div>}
-                          {isNext && !isDone && <div className="text-xs text-[#18A66D] font-medium mt-0.5">Nächster Termin</div>}
+                        <div className="flex-1 min-w-0">
+                          <div className={`text-sm font-semibold truncate ${isDone ? "line-through text-[#9CA3AF]" : "text-[#111827]"}`}>{a.name}</div>
+                          {a.note && <div className="text-xs text-[#9CA3AF] truncate mt-0.5">{a.note}</div>}
                         </div>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <div className="hidden sm:flex items-center gap-1.5 text-xs text-[#18A66D] bg-[#E8FBF3] px-2.5 py-1 rounded-full font-medium">
-                          <span className="w-1 h-1 bg-[#18A66D] rounded-full" />
-                          SMS ✓
+                        <div className="hidden sm:flex items-center gap-1.5 text-xs text-[#18A66D] bg-[#F0FBF6] px-2.5 py-1 rounded-full font-medium shrink-0">
+                          <span className="w-1 h-1 bg-[#18A66D] rounded-full" />SMS ✓
                         </div>
-                        <button
-                          onClick={() => toggleDone(a)}
-                          className={`w-6 h-6 rounded-full border-2 transition-all flex items-center justify-center shrink-0 ${
-                            isDone ? "bg-[#18A66D] border-[#18A66D]" : "border-[#D1D5DB] hover:border-[#18A66D]"
-                          }`}
-                        >
-                          {isDone && <span className="text-white text-xs">✓</span>}
+                        <button onClick={() => toggleDone(a)}
+                          className={`w-7 h-7 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ${isDone ? "bg-[#18A66D] border-[#18A66D]" : "border-[#D1D5DB] hover:border-[#18A66D]"}`}>
+                          {isDone && <span className="text-white text-xs font-bold">✓</span>}
                         </button>
                       </div>
-                    </div>
-                  )
-                })
+                    )
+                  })}
+                </div>
               )}
             </div>
           </div>
 
-          {/* ── FORMULAR ── */}
-          <div className="lg:col-span-2 bg-white border border-[#E5E7EB] rounded-2xl shadow-sm overflow-hidden">
-            <div className="px-6 py-4 border-b border-[#E5E7EB]">
-              <h2 className="text-sm font-bold text-[#1F2A37]">Neuer Termin</h2>
-              <p className="text-xs text-[#6B7280] mt-0.5">SMS-Erinnerung wird automatisch geplant</p>
+          {/* ── Desktop Formular ── */}
+          <div className="hidden md:block w-72 flex-shrink-0">
+            <div className="bg-white border border-[#E5E7EB] rounded-2xl p-5 sticky top-20">
+              <h2 className="text-sm font-bold text-[#111827] mb-4">Neuer Termin</h2>
+              <DemoForm {...formProps} />
             </div>
+          </div>
 
-            <form onSubmit={handleSubmit} className="px-6 py-6 flex flex-col gap-4">
-              <div>
-                <label className="text-xs font-semibold text-[#6B7280] uppercase tracking-wide mb-1.5 block">Name</label>
-                <input
-                  className="w-full bg-[#F7FAFC] border border-[#E5E7EB] rounded-xl px-4 py-3 text-sm text-[#1F2A37] placeholder-[#9CA3AF] focus:outline-none focus:border-[#18A66D] focus:ring-2 focus:ring-[#18A66D]/10 transition"
-                  placeholder="Max Mustermann"
-                  value={name} onChange={(e) => setName(e.target.value)} required
-                />
-              </div>
-              <div>
-                <label className="text-xs font-semibold text-[#6B7280] uppercase tracking-wide mb-1.5 block">Telefonnummer</label>
-                <input
-                  className="w-full bg-[#F7FAFC] border border-[#E5E7EB] rounded-xl px-4 py-3 text-sm text-[#1F2A37] placeholder-[#9CA3AF] focus:outline-none focus:border-[#18A66D] focus:ring-2 focus:ring-[#18A66D]/10 transition"
-                  placeholder="+49 170 1234567"
-                  value={phone} onChange={(e) => setPhone(e.target.value)} required
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="text-xs font-semibold text-[#6B7280] uppercase tracking-wide mb-1.5 block">Datum</label>
-                  <input type="date" className="w-full bg-[#F7FAFC] border border-[#E5E7EB] rounded-xl px-3 py-3 text-sm text-[#1F2A37] focus:outline-none focus:border-[#18A66D] focus:ring-2 focus:ring-[#18A66D]/10 transition"
-                    value={date} onChange={(e) => setDate(e.target.value)} required />
-                </div>
-                <div>
-                  <label className="text-xs font-semibold text-[#6B7280] uppercase tracking-wide mb-1.5 block">Uhrzeit</label>
-                  <input type="time" className="w-full bg-[#F7FAFC] border border-[#E5E7EB] rounded-xl px-3 py-3 text-sm text-[#1F2A37] focus:outline-none focus:border-[#18A66D] focus:ring-2 focus:ring-[#18A66D]/10 transition"
-                    value={time} onChange={(e) => setTime(e.target.value)} required />
-                </div>
-              </div>
-              <div>
-                <label className="text-xs font-semibold text-[#6B7280] uppercase tracking-wide mb-1.5 block">
-                  Notiz <span className="text-[#9CA3AF] normal-case font-normal">(optional)</span>
-                </label>
-                <input
-                  className="w-full bg-[#F7FAFC] border border-[#E5E7EB] rounded-xl px-4 py-3 text-sm text-[#1F2A37] placeholder-[#9CA3AF] focus:outline-none focus:border-[#18A66D] focus:ring-2 focus:ring-[#18A66D]/10 transition"
-                  placeholder="z. B. Erstbesuch, Sonderwunsch..."
-                  value={note} onChange={(e) => setNote(e.target.value)}
-                />
-              </div>
-              <div className="flex items-center gap-2.5 bg-[#E8FBF3] border border-[#6EE7B7]/50 rounded-xl px-4 py-3">
-                <span className="text-base">📱</span>
-                <div>
-                  <div className="text-xs font-semibold text-[#18A66D]">SMS-Erinnerung wird automatisch geplant</div>
-                  <div className="text-xs text-[#18A66D]/70">24 Stunden vor dem Termin</div>
-                </div>
-              </div>
-              <button
-                type="submit" disabled={isSubmitting}
-                className={`mt-1 w-full py-3.5 rounded-xl font-bold text-sm transition-all shadow-md ${
-                  formSuccess ? "bg-[#E8FBF3] text-[#18A66D] border border-[#6EE7B7]"
-                  : isSubmitting ? "bg-[#6B7280] text-white cursor-not-allowed"
-                  : "bg-[#18A66D] text-white hover:bg-[#0F8F63] shadow-[#18A66D]/20"
-                }`}
-              >
-                {formSuccess ? "✓ Termin gespeichert!" : isSubmitting ? "Speichern..." : "Termin speichern →"}
-              </button>
-            </form>
-          </div>
         </div>
+      </div>
 
-        {/* ─── BOTTOM BAR ─── */}
-        <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-3 bg-white border border-[#E5E7EB] rounded-2xl px-6 py-4 shadow-sm">
-          <div className="flex items-center gap-6 text-xs text-[#6B7280]">
-            <div className="flex items-center gap-2">
-              <span className="w-1.5 h-1.5 bg-[#18A66D] rounded-full animate-pulse" />
-              SMS-System aktiv
-            </div>
-            <div className="hidden sm:block h-3 w-px bg-[#E5E7EB]" />
-            <span>{appointments.length} Termine insgesamt</span>
-            <div className="hidden sm:block h-3 w-px bg-[#E5E7EB]" />
-            <span>Erfolgsquote 95%</span>
-          </div>
-          <div className="text-xs text-[#9CA3AF]">
-            Zuletzt aktualisiert: {now.toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" })} Uhr
-          </div>
-        </div>
+      {/* ── Mobiler FAB ── */}
+      <button onClick={() => setShowForm(true)}
+        className="md:hidden fixed bottom-20 right-5 z-40 w-14 h-14 bg-[#18A66D] text-white text-3xl font-light rounded-full shadow-xl flex items-center justify-center hover:bg-[#15955F] transition active:scale-95">
+        +
+      </button>
+
+      {/* ── Mobile Bottom Nav ── */}
+      <div style={{ display: "flex", position: "fixed", bottom: 0, left: 0, right: 0, background: "#fff", borderTop: "1px solid #E5E7EB", boxShadow: "0 -2px 12px rgba(0,0,0,0.06)", zIndex: 50, paddingBottom: "max(10px,env(safe-area-inset-bottom))", justifyContent: "space-around", alignItems: "center", paddingTop: 8 }} className="md:hidden">
+        {mobileNav.map(item => (
+          <a key={item.href} href={item.href} style={{ position: "relative", display: "flex", flexDirection: "column", alignItems: "center", gap: 3, padding: "4px 12px", textDecoration: "none", color: item.active ? "#18A66D" : "#9CA3AF", minWidth: 52 }}>
+            {item.active && <span style={{ position: "absolute", top: -8, left: "50%", transform: "translateX(-50%)", width: 28, height: 3, borderRadius: 99, background: "#18A66D" }} />}
+            {item.icon}
+            <span style={{ fontSize: 10, fontWeight: item.active ? 700 : 500, letterSpacing: .2 }}>{item.label}</span>
+          </a>
+        ))}
+        <a href="/lead" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3, padding: "4px 12px", textDecoration: "none", color: "#18A66D", minWidth: 52 }}>
+          <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+          <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: .2 }}>Testen</span>
+        </a>
       </div>
     </div>
   )
