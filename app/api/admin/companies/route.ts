@@ -7,7 +7,7 @@ const supabaseAdmin = createClient(
 )
 
 function checkAdminAuth(req: NextRequest) {
-  const secret = (req.headers.get("x-admin-secret") || "").trim()
+  const secret   = (req.headers.get("x-admin-secret") || "").trim()
   const expected = (process.env.ADMIN_SECRET || "").trim()
   if (!expected) return false
   return secret === expected
@@ -19,31 +19,25 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    // Alle Companies laden
+    // Companies ohne created_at (Spalte existiert nicht in der Tabelle)
     const { data: companies, error } = await supabaseAdmin
       .from("companies")
-      .select("id, name, paused, slug, booking_addon, notification_phone, booking_note, sms_count, created_at")
-      .order("created_at", { ascending: false })
+      .select("id, name, paused, slug, booking_addon, notification_phone, booking_note, sms_count")
 
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-    // Auth-User-Emails laden
+    // Auth-User laden → Email + created_at kommen von hier
     const { data: { users } } = await supabaseAdmin.auth.admin.listUsers()
-    const emailMap: Record<string, string> = {}
-    users.forEach(u => { if (u.email) emailMap[u.id] = u.email })
+    const userMap: Record<string, { email: string; created_at: string }> = {}
+    users.forEach(u => {
+      userMap[u.id] = { email: u.email || "—", created_at: u.created_at || "" }
+    })
 
-    // Termine & Kunden-Anzahl pro Company laden
+    // Termine & Kunden-Anzahl
     const ids = (companies || []).map(c => c.id)
-
     const [{ data: apptCounts }, { data: custCounts }] = await Promise.all([
-      supabaseAdmin
-        .from("appointments")
-        .select("company_id")
-        .in("company_id", ids),
-      supabaseAdmin
-        .from("customers")
-        .select("company_id")
-        .in("company_id", ids),
+      supabaseAdmin.from("appointments").select("company_id").in("company_id", ids),
+      supabaseAdmin.from("customers").select("company_id").in("company_id", ids),
     ])
 
     const apptMap: Record<string, number> = {}
@@ -51,14 +45,15 @@ export async function GET(req: NextRequest) {
     ;(apptCounts || []).forEach(a => { apptMap[a.company_id] = (apptMap[a.company_id] || 0) + 1 })
     ;(custCounts || []).forEach(c => { custMap[c.company_id] = (custMap[c.company_id] || 0) + 1 })
 
-    // User-IDs zu Companies matchen über auth.users
-    // companies haben keine user_id direkt — stattdessen per RLS (auth.uid() = company.id)
-    const enriched = (companies || []).map(c => ({
-      ...c,
-      email: emailMap[c.id] || "—",
-      appointments: apptMap[c.id] || 0,
-      customers: custMap[c.id] || 0,
-    }))
+    const enriched = (companies || [])
+      .map(c => ({
+        ...c,
+        email:        userMap[c.id]?.email      || "—",
+        created_at:   userMap[c.id]?.created_at || "",
+        appointments: apptMap[c.id] || 0,
+        customers:    custMap[c.id] || 0,
+      }))
+      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
 
     return NextResponse.json({ companies: enriched })
   } catch (e: any) {

@@ -105,6 +105,34 @@ export default function AdminPage() {
 
   const [toast, setToast] = useState<{ msg: string; ok: boolean } | null>(null)
 
+  // Sales Tracker
+  type SalesEntry = { anrufe: number; gespraeche: number; termine: number; closes: number }
+  const todayKey = new Date().toISOString().split("T")[0]
+  const [salesLog, setSalesLog] = useState<Record<string, SalesEntry>>({})
+  const [salesDate, setSalesDate] = useState(todayKey)
+
+  useEffect(() => {
+    try {
+      const s = localStorage.getItem("admin_sales")
+      if (s) setSalesLog(JSON.parse(s))
+    } catch {}
+  }, [])
+
+  function getSalesEntry(date: string): SalesEntry {
+    return salesLog[date] || { anrufe: 0, gespraeche: 0, termine: 0, closes: 0 }
+  }
+
+  function updateSales(date: string, field: keyof SalesEntry, val: number) {
+    const updated = { ...salesLog, [date]: { ...getSalesEntry(date), [field]: Math.max(0, val) } }
+    setSalesLog(updated)
+    localStorage.setItem("admin_sales", JSON.stringify(updated))
+  }
+
+  function pct(a: number, b: number) {
+    if (!b) return "—"
+    return Math.round((a / b) * 100) + " %"
+  }
+
   // Notizen
   const [notes, setNotes]           = useState("")
   const [prices, setPrices]         = useState<PriceRow[]>([])
@@ -317,6 +345,130 @@ export default function AdminPage() {
                 </div>
               ))}
             </div>
+
+            {/* ── Sales Tracker ── */}
+            {(() => {
+              const entry = getSalesEntry(salesDate)
+              const allDates = Object.keys(salesLog).sort((a, b) => b.localeCompare(a))
+              const totalAnrufe     = allDates.reduce((s, d) => s + salesLog[d].anrufe, 0)
+              const totalGespraeche = allDates.reduce((s, d) => s + salesLog[d].gespraeche, 0)
+              const totalTermine    = allDates.reduce((s, d) => s + salesLog[d].termine, 0)
+              const totalCloses     = allDates.reduce((s, d) => s + salesLog[d].closes, 0)
+
+              const metrics = [
+                { key: "anrufe"     as keyof SalesEntry, label: "📞 Anrufe",       color: "#6B7280", bg: "#F9FAFB" },
+                { key: "gespraeche" as keyof SalesEntry, label: "💬 Gespräche",    color: "#3B82F6", bg: "#EFF6FF" },
+                { key: "termine"    as keyof SalesEntry, label: "📅 Termine",      color: "#D97706", bg: "#FFFBEB" },
+                { key: "closes"     as keyof SalesEntry, label: "✅ Closes",       color: G,         bg: GL },
+              ]
+
+              return (
+                <div style={{ background: "#fff", border: `1px solid ${BD}`, borderRadius: 20, overflow: "hidden", boxShadow: "0 1px 4px rgba(0,0,0,0.04)", marginBottom: 20 }}>
+                  <div style={{ padding: "16px 22px", borderBottom: `1px solid ${BD}`, display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
+                    <span style={{ fontSize: 14, fontWeight: 800, color: T }}>📊 Sales-Auswertung</span>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                      <span style={{ fontSize: 12, color: M }}>Datum:</span>
+                      <input type="date" value={salesDate} onChange={e => setSalesDate(e.target.value)}
+                        style={{ ...inp, width: "auto", padding: "6px 10px", fontSize: 12 }} />
+                    </div>
+                  </div>
+
+                  <div style={{ padding: "20px 22px" }}>
+                    {/* Eingabe-Zeile */}
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12, marginBottom: 20 }}>
+                      {metrics.map(m => (
+                        <div key={m.key} style={{ background: m.bg, border: `1px solid ${BD}`, borderRadius: 14, padding: "14px 16px" }}>
+                          <div style={{ fontSize: 11, fontWeight: 700, color: m.color, textTransform: "uppercase", letterSpacing: .4, marginBottom: 8 }}>{m.label}</div>
+                          <input
+                            type="number" min={0} value={entry[m.key] || ""}
+                            onChange={e => updateSales(salesDate, m.key, parseInt(e.target.value) || 0)}
+                            placeholder="0"
+                            style={{ width: "100%", border: `1.5px solid ${BD}`, borderRadius: 9, padding: "8px 10px", fontSize: 22, fontWeight: 900, color: m.color, background: "#fff", outline: "none", fontFamily: "inherit", boxSizing: "border-box" as const, textAlign: "center" as const }}
+                          />
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Conversion-Funnel */}
+                    <div style={{ background: BG, borderRadius: 14, padding: "16px 20px", marginBottom: 20 }}>
+                      <div style={{ fontSize: 12, fontWeight: 800, color: T, textTransform: "uppercase", letterSpacing: .4, marginBottom: 14 }}>Conversion-Funnel — {salesDate}</div>
+                      <div style={{ display: "flex", alignItems: "center", gap: 0, flexWrap: "wrap" }}>
+                        {[
+                          { label: "Anrufe",     value: entry.anrufe,     color: "#6B7280", bg: "#F3F4F6" },
+                          { label: "Gespräche",  value: entry.gespraeche, color: "#3B82F6", bg: "#DBEAFE", rate: pct(entry.gespraeche, entry.anrufe) },
+                          { label: "Termine",    value: entry.termine,    color: "#D97706", bg: "#FDE68A", rate: pct(entry.termine, entry.gespraeche) },
+                          { label: "Closes",     value: entry.closes,     color: G,         bg: GB,        rate: pct(entry.closes, entry.termine) },
+                        ].map((step, i) => (
+                          <div key={step.label} style={{ display: "flex", alignItems: "center", flex: 1, minWidth: 0 }}>
+                            <div style={{ flex: 1, textAlign: "center", background: step.bg, borderRadius: 12, padding: "12px 8px" }}>
+                              <div style={{ fontSize: 28, fontWeight: 900, color: step.color, lineHeight: 1 }}>{step.value}</div>
+                              <div style={{ fontSize: 11, fontWeight: 700, color: step.color, marginTop: 4 }}>{step.label}</div>
+                            </div>
+                            {i < 3 && (
+                              <div style={{ textAlign: "center", padding: "0 6px", flexShrink: 0 }}>
+                                <div style={{ fontSize: 11, fontWeight: 800, color: step.rate === "—" ? M : G }}>{step.rate}</div>
+                                <div style={{ fontSize: 16, color: BD }}>→</div>
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                      {/* Gesamtquote */}
+                      <div style={{ marginTop: 14, paddingTop: 14, borderTop: `1px solid ${BD}`, display: "flex", gap: 24, flexWrap: "wrap" }}>
+                        {[
+                          { label: "Gesamt-Closequote", value: pct(entry.closes, entry.anrufe) },
+                          { label: "Gespräche / Anruf", value: pct(entry.gespraeche, entry.anrufe) },
+                          { label: "Termin / Gespräch", value: pct(entry.termine, entry.gespraeche) },
+                          { label: "Close / Termin",    value: pct(entry.closes, entry.termine) },
+                        ].map(s => (
+                          <div key={s.label}>
+                            <div style={{ fontSize: 10, color: M, fontWeight: 700, textTransform: "uppercase", letterSpacing: .3 }}>{s.label}</div>
+                            <div style={{ fontSize: 18, fontWeight: 900, color: s.value === "—" ? M : G }}>{s.value}</div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Gesamtübersicht aller Tage */}
+                    {allDates.length > 0 && (
+                      <div>
+                        <div style={{ fontSize: 12, fontWeight: 800, color: T, textTransform: "uppercase", letterSpacing: .4, marginBottom: 10 }}>Gesamt-Auswertung ({allDates.length} Tage)</div>
+                        <div style={{ display: "flex", gap: 20, flexWrap: "wrap", background: `linear-gradient(135deg, ${G}, #15955F)`, borderRadius: 14, padding: "16px 20px" }}>
+                          {[
+                            { label: "Anrufe",    value: totalAnrufe },
+                            { label: "Gespräche", value: totalGespraeche },
+                            { label: "Termine",   value: totalTermine },
+                            { label: "Closes",    value: totalCloses },
+                            { label: "Ø Closequote", value: pct(totalCloses, totalAnrufe) },
+                          ].map(s => (
+                            <div key={s.label} style={{ textAlign: "center" }}>
+                              <div style={{ fontSize: 24, fontWeight: 900, color: "#fff" }}>{s.value}</div>
+                              <div style={{ fontSize: 10, color: "rgba(255,255,255,0.75)", fontWeight: 700, textTransform: "uppercase", letterSpacing: .3, marginTop: 3 }}>{s.label}</div>
+                            </div>
+                          ))}
+                        </div>
+                        {/* Letzte 5 Tage */}
+                        <div style={{ marginTop: 10, display: "flex", flexDirection: "column", gap: 4 }}>
+                          {allDates.slice(0, 5).map(d => {
+                            const e = salesLog[d]
+                            return (
+                              <div key={d} onClick={() => setSalesDate(d)}
+                                style={{ display: "flex", alignItems: "center", gap: 14, padding: "8px 14px", borderRadius: 10, background: d === salesDate ? GL : "transparent", cursor: "pointer", border: `1px solid ${d === salesDate ? GB : "transparent"}` }}>
+                                <span style={{ fontSize: 12, color: M, fontWeight: 600, minWidth: 90 }}>{new Date(d).toLocaleDateString("de-DE", { weekday: "short", day: "numeric", month: "short" })}</span>
+                                {[{ l: "📞", v: e.anrufe }, { l: "💬", v: e.gespraeche }, { l: "📅", v: e.termine }, { l: "✅", v: e.closes }].map(x => (
+                                  <span key={x.l} style={{ fontSize: 12, color: T, fontWeight: 700 }}>{x.l} {x.v}</span>
+                                ))}
+                                <span style={{ marginLeft: "auto", fontSize: 12, fontWeight: 800, color: G }}>{pct(e.closes, e.anrufe)}</span>
+                              </div>
+                            )
+                          })}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )
+            })()}
 
             {/* Neueste Betriebe */}
             <div style={{ background: "#fff", border: `1px solid ${BD}`, borderRadius: 20, overflow: "hidden", boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}>
