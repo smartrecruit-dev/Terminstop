@@ -18,45 +18,78 @@ type Company = {
   appointments: number; customers: number; created_at: string
 }
 
-type Tab = "zentrale" | "betriebe" | "coldcall" | "notizen"
+type Tab = "zentrale" | "betriebe" | "coldcall" | "notizen" | "rueckrufe"
 
 type PriceRow = { id: string; name: string; price: string; desc: string }
 
-const COLD_CALL_SCRIPT = [
-  { title: "1️⃣  Einstieg – Name + Begrüßung", bg: "#ECFDF5", border: "#6EE7B7",
+type Rückruf = {
+  id: string
+  name: string
+  phone: string
+  datum: string
+  notiz: string
+  status: "offen" | "versucht" | "erledigt" | "kein_interesse"
+}
+
+type ScriptBlock = {
+  id: string
+  title: string
+  bg: string
+  border: string
+  tip: string
+  text: string
+  sub: string
+}
+
+const DEFAULT_SCRIPT: ScriptBlock[] = [
+  { id: "1", title: "1️⃣  Einstieg – Name + Begrüßung", bg: "#ECFDF5", border: "#6EE7B7",
     tip: "Ruhig, freundlich, klar. Warte bis die Person ihren Namen sagt.",
     text: '"Schönen guten Tag, mein Name ist Marvin Passe – ich grüße Sie herzlich!"',
     sub: '→ Person sagt ihren Namen\n→ Du: "Frau / Herr [Name], schön, dass Sie rangehen."' },
-  { title: "2️⃣  Transparenz-Opener – Der Vertrauens-Booster", bg: "#FFFBEB", border: "#FDE68A",
+  { id: "2", title: "2️⃣  Transparenz-Opener – Der Vertrauens-Booster", bg: "#FFFBEB", border: "#FDE68A",
     tip: "Hier lachen die meisten – genau das will man. Kurz Pause lassen nach dem Lachen.",
     text: '"Ich muss direkt ehrlich zu Ihnen sein – das ist ein Akquiseanruf. 😄\nMöchten Sie jetzt gleich auflegen … oder geben Sie mir 30 Sekunden,\num Ihnen zu erklären worum es geht?"',
     sub: '→ Fast alle sagen "Na gut, 30 Sekunden" – dann direkt in den Pitch.' },
-  { title: "3️⃣  Der 30-Sekunden-Pitch", bg: "#EFF6FF", border: "#BFDBFE",
+  { id: "3", title: "3️⃣  Der 30-Sekunden-Pitch", bg: "#EFF6FF", border: "#BFDBFE",
     tip: "Konkret bleiben. Kein Fachjargon. Auf die Uhr schauen – wirklich 30 Sek.",
-    text: '"Wir helfen kleinen Betrieben – Friseuren, Kosmetikstudios, Praxen –\ndabei, dass Kunden ihre Termine nicht mehr vergessen.\nTerminStop sendet automatisch eine SMS-Erinnerung, 24 Stunden vorher.\nKein Aufwand, keine App, läuft komplett im Hintergrund.\nAb unter 2 Euro am Tag."' },
-  { title: "4️⃣  Qualifizieren – Haben die das Problem?", bg: GL, border: GB,
+    text: '"Wir helfen kleinen Betrieben – Friseuren, Kosmetikstudios, Praxen –\ndabei, dass Kunden ihre Termine nicht mehr vergessen.\nTerminStop sendet automatisch eine SMS-Erinnerung, 24 Stunden vorher.\nKein Aufwand, keine App, läuft komplett im Hintergrund.\nAb unter 2 Euro am Tag."',
+    sub: "" },
+  { id: "4", title: "4️⃣  Qualifizieren – Haben die das Problem?", bg: GL, border: GB,
     tip: "Fragen stellen statt reden. Wer fragt, führt das Gespräch.",
     text: '"Kennen Sie das – Kunden die einfach nicht erscheinen oder 10 Minuten vorher absagen?"',
     sub: '→ JA: "Genau das lösen wir."\n→ NEIN: "Wie machen Sie das aktuell? Rufen Sie vorher manuell an?"' },
-  { title: "5️⃣  Konkret machen – Nutzen zeigen", bg: "#F5F3FF", border: "#DDD6FE",
+  { id: "5", title: "5️⃣  Konkret machen – Nutzen zeigen", bg: "#F5F3FF", border: "#DDD6FE",
     tip: "Zahlen wirken. Lass sie kurz rechnen.",
-    text: '"Stellen Sie sich vor, nur ein Termin pro Woche fällt nicht mehr aus –\nbei einem Durchschnittsumsatz von 40 € wären das über 160 € mehr im Monat.\nDas System kostet einen Bruchteil davon."' },
-  { title: "6️⃣  Abschluss – Nächster Schritt", bg: GL, border: GB,
+    text: '"Stellen Sie sich vor, nur ein Termin pro Woche fällt nicht mehr aus –\nbei einem Durchschnittsumsatz von 40 € wären das über 160 € mehr im Monat.\nDas System kostet einen Bruchteil davon."',
+    sub: "" },
+  { id: "6", title: "6️⃣  Abschluss – Nächster Schritt", bg: GL, border: GB,
     tip: "Nicht fragen OB sie wollen – fragen WIE es weitergeht.",
-    text: '"Ich richte Sie in 2 Minuten ein – ich brauche nur Ihren Namen,\nIhre E-Mail-Adresse und Ihre Handynummer.\nDann können Sie heute noch loslegen. Darf ich das kurz machen?"' },
-  { title: '🔄  Einwand: "Kein Interesse"', bg: "#FEF2F2", border: "#FECACA",
+    text: '"Ich richte Sie in 2 Minuten ein – ich brauche nur Ihren Namen,\nIhre E-Mail-Adresse und Ihre Handynummer.\nDann können Sie heute noch loslegen. Darf ich das kurz machen?"',
+    sub: "" },
+  { id: "7", title: '🔄  Einwand: "Kein Interesse"', bg: "#FEF2F2", border: "#FECACA",
     tip: "Nicht aufgeben – noch eine Frage stellen.",
     text: '"Verstehe ich völlig. Darf ich kurz fragen –\nwie läuft das bei Ihnen aktuell? Rufen Sie Kunden vor dem Termin manuell an,\noder läuft das bei Ihnen problemlos?"',
     sub: '→ Falls manuell: "Das ist ja ganz schön Aufwand – genau das nehmen wir Ihnen ab."' },
-  { title: '🔄  Einwand: "Zu teuer"', bg: "#FEF2F2", border: "#FECACA",
+  { id: "8", title: '🔄  Einwand: "Zu teuer"', bg: "#FEF2F2", border: "#FECACA",
     tip: "Perspektive verschieben – vom Preis zum Nutzen.",
-    text: '"Das verstehe ich. Wenn ich Ihnen sage: unter 2 Euro am Tag –\ndas ist weniger als eine Tasse Kaffee.\nUnd wenn nur ein Termin pro Woche nicht mehr ausfällt,\nhat sich das schon mehrfach gerechnet.\nWir können auch klein anfangen – einfach testen."' },
-  { title: '🔄  Einwand: "Ich muss das erst überlegen"', bg: "#FEF2F2", border: "#FECACA",
+    text: '"Das verstehe ich. Wenn ich Ihnen sage: unter 2 Euro am Tag –\ndas ist weniger als eine Tasse Kaffee.\nUnd wenn nur ein Termin pro Woche nicht mehr ausfällt,\nhat sich das schon mehrfach gerechnet.\nWir können auch klein anfangen – einfach testen."',
+    sub: "" },
+  { id: "9", title: '🔄  Einwand: "Ich muss das erst überlegen"', bg: "#FEF2F2", border: "#FECACA",
     tip: "Verbindlichen nächsten Schritt vereinbaren, nicht einfach auflegen.",
-    text: '"Klar, das ist absolut verständlich. Was wäre denn das Konkrete,\nüber das Sie noch nachdenken möchten? Vielleicht kann ich das direkt klären.\nOder: Wann passt es Ihnen, dass ich kurz nochmal anrufe?"' },
-  { title: "✅  Ziel des Anrufs", bg: GL, border: GB, tip: "",
-    text: "Name + E-Mail + Handynummer → direkt in Supabase anlegen → Betrieb ist sofort live.\nDer Kunde bekommt von dir eine E-Mail mit den Login-Daten." },
+    text: '"Klar, das ist absolut verständlich. Was wäre denn das Konkrete,\nüber das Sie noch nachdenken möchten? Vielleicht kann ich das direkt klären.\nOder: Wann passt es Ihnen, dass ich kurz nochmal anrufe?"',
+    sub: "" },
+  { id: "10", title: "✅  Ziel des Anrufs", bg: GL, border: GB,
+    tip: "",
+    text: "Name + E-Mail + Handynummer → direkt in Supabase anlegen → Betrieb ist sofort live.\nDer Kunde bekommt von dir eine E-Mail mit den Login-Daten.",
+    sub: "" },
 ]
+
+const STATUS_META: Record<Rückruf["status"], { label: string; color: string; bg: string; border: string }> = {
+  offen:          { label: "Offen",          color: "#D97706", bg: "#FFFBEB", border: "#FDE68A" },
+  versucht:       { label: "Versucht",        color: "#3B82F6", bg: "#EFF6FF", border: "#BFDBFE" },
+  erledigt:       { label: "Erledigt ✓",      color: G,         bg: GL,        border: GB       },
+  kein_interesse: { label: "Kein Interesse",  color: M,         bg: "#F3F4F6", border: BD       },
+}
 
 const inp: React.CSSProperties = {
   width: "100%", padding: "10px 13px", border: `1.5px solid ${BD}`,
@@ -64,15 +97,22 @@ const inp: React.CSSProperties = {
   outline: "none", fontFamily: "inherit", boxSizing: "border-box",
 }
 
-const btnStyle = (v: "green" | "gray" | "red" | "blue" | "yellow"): React.CSSProperties => ({
+const btnStyle = (v: "green" | "gray" | "red" | "blue" | "yellow" | "purple"): React.CSSProperties => ({
   padding: "8px 14px", borderRadius: 9, border: "none", cursor: "pointer",
   fontSize: 12, fontWeight: 700, transition: "all .12s", whiteSpace: "nowrap",
-  background: v === "green" ? G : v === "red" ? "#FEE2E2" : v === "blue" ? "#EFF6FF" : v === "yellow" ? "#FFFBEB" : "#F3F4F6",
-  color: v === "green" ? "#fff" : v === "red" ? RED : v === "blue" ? "#3B82F6" : v === "yellow" ? "#D97706" : T,
+  background: v === "green" ? G : v === "red" ? "#FEE2E2" : v === "blue" ? "#EFF6FF" : v === "yellow" ? "#FFFBEB" : v === "purple" ? "#F5F3FF" : "#F3F4F6",
+  color: v === "green" ? "#fff" : v === "red" ? RED : v === "blue" ? "#3B82F6" : v === "yellow" ? "#D97706" : v === "purple" ? "#7C3AED" : T,
 })
 
-function Badge({ label, color }: { label: string; color: "green" | "gray" | "blue" | "red" | "yellow" }) {
-  const map = { green: { bg: GL, fg: G, border: GB }, gray: { bg: "#F3F4F6", fg: M, border: BD }, blue: { bg: "#EFF6FF", fg: "#3B82F6", border: "#BFDBFE" }, red: { bg: "#FEF2F2", fg: RED, border: "#FECACA" }, yellow: { bg: "#FFFBEB", fg: "#D97706", border: "#FDE68A" } }
+function Badge({ label, color }: { label: string; color: "green" | "gray" | "blue" | "red" | "yellow" | "purple" }) {
+  const map = {
+    green:  { bg: GL,        fg: G,        border: GB       },
+    gray:   { bg: "#F3F4F6", fg: M,        border: BD       },
+    blue:   { bg: "#EFF6FF", fg: "#3B82F6",border: "#BFDBFE"},
+    red:    { bg: "#FEF2F2", fg: RED,       border: "#FECACA"},
+    yellow: { bg: "#FFFBEB", fg: "#D97706", border: "#FDE68A"},
+    purple: { bg: "#F5F3FF", fg: "#7C3AED", border: "#DDD6FE"},
+  }
   const c = map[color]
   return <span style={{ fontSize: 10, fontWeight: 700, padding: "3px 9px", borderRadius: 20, background: c.bg, color: c.fg, border: `1px solid ${c.border}`, letterSpacing: .3 }}>{label}</span>
 }
@@ -105,41 +145,31 @@ export default function AdminPage() {
 
   const [toast, setToast] = useState<{ msg: string; ok: boolean } | null>(null)
 
-  // Sales Tracker
+  // ── Sales Tracker ────────────────────────────────────────────────────────
   type SalesEntry = { anrufe: number; gespraeche: number; termine: number; closes: number }
   const todayKey = new Date().toISOString().split("T")[0]
   const [salesLog, setSalesLog] = useState<Record<string, SalesEntry>>({})
   const [salesDate, setSalesDate] = useState(todayKey)
 
-  useEffect(() => {
-    try {
-      const s = localStorage.getItem("admin_sales")
-      if (s) setSalesLog(JSON.parse(s))
-    } catch {}
-  }, [])
+  // ── Cold-Call Skript (editierbar) ────────────────────────────────────────
+  const [script, setScript]           = useState<ScriptBlock[]>(DEFAULT_SCRIPT)
+  const [scriptEditing, setScriptEditing] = useState(false)
+  const [editScript, setEditScript]   = useState<ScriptBlock[]>(DEFAULT_SCRIPT)
+  const [newBlock, setNewBlock]       = useState<Partial<ScriptBlock>>({ bg: GL, border: GB })
 
-  function getSalesEntry(date: string): SalesEntry {
-    return salesLog[date] || { anrufe: 0, gespraeche: 0, termine: 0, closes: 0 }
-  }
+  // ── Rückruf-Liste ────────────────────────────────────────────────────────
+  const [rueckrufe, setRueckrufe]     = useState<Rückruf[]>([])
+  const [rfFilter, setRfFilter]       = useState<"alle" | Rückruf["status"]>("alle")
+  const [rfOpen, setRfOpen]           = useState<string | null>(null)
+  const [newRF, setNewRF]             = useState<Partial<Rückruf>>({ status: "offen", datum: todayKey })
 
-  function updateSales(date: string, field: keyof SalesEntry, val: number) {
-    const updated = { ...salesLog, [date]: { ...getSalesEntry(date), [field]: Math.max(0, val) } }
-    setSalesLog(updated)
-    localStorage.setItem("admin_sales", JSON.stringify(updated))
-  }
-
-  function pct(a: number, b: number) {
-    if (!b) return "—"
-    return Math.round((a / b) * 100) + " %"
-  }
-
-  // Notizen
-  const [notes, setNotes]           = useState("")
-  const [prices, setPrices]         = useState<PriceRow[]>([])
+  // ── Notizen ──────────────────────────────────────────────────────────────
+  const [notes, setNotes]             = useState("")
+  const [prices, setPrices]           = useState<PriceRow[]>([])
   const [newPriceName, setNewPriceName]   = useState("")
   const [newPricePrice, setNewPricePrice] = useState("")
   const [newPriceDesc, setNewPriceDesc]   = useState("")
-  const [notesSaved, setNotesSaved] = useState(false)
+  const [notesSaved, setNotesSaved]   = useState(false)
 
   useEffect(() => {
     const saved = sessionStorage.getItem("admin_secret")
@@ -148,28 +178,106 @@ export default function AdminPage() {
 
   useEffect(() => { if (authed) loadCompanies() }, [authed])
 
-  // Notizen aus localStorage laden
   useEffect(() => {
     try {
-      const n = localStorage.getItem("admin_notes")
-      const p = localStorage.getItem("admin_prices")
-      if (n) setNotes(n)
-      if (p) setPrices(JSON.parse(p))
+      const s  = localStorage.getItem("admin_sales")
+      const n  = localStorage.getItem("admin_notes")
+      const p  = localStorage.getItem("admin_prices")
+      const sc = localStorage.getItem("admin_script")
+      const rf = localStorage.getItem("admin_rueckrufe")
+      if (s)  setSalesLog(JSON.parse(s))
+      if (n)  setNotes(n)
+      if (p)  setPrices(JSON.parse(p))
+      if (sc) { const parsed = JSON.parse(sc); setScript(parsed); setEditScript(parsed) }
+      if (rf) setRueckrufe(JSON.parse(rf))
     } catch {}
   }, [])
 
+  // ── Sales helpers ─────────────────────────────────────────────────────────
+  function getSalesEntry(date: string): SalesEntry {
+    return salesLog[date] || { anrufe: 0, gespraeche: 0, termine: 0, closes: 0 }
+  }
+  function updateSales(date: string, field: keyof SalesEntry, val: number) {
+    const updated = { ...salesLog, [date]: { ...getSalesEntry(date), [field]: Math.max(0, val) } }
+    setSalesLog(updated)
+    localStorage.setItem("admin_sales", JSON.stringify(updated))
+  }
+  function pct(a: number, b: number) {
+    if (!b) return "—"
+    return Math.round((a / b) * 100) + " %"
+  }
+
+  // ── Skript helpers ────────────────────────────────────────────────────────
+  function saveScript() {
+    setScript(editScript)
+    localStorage.setItem("admin_script", JSON.stringify(editScript))
+    setScriptEditing(false)
+    showToast("Skript gespeichert ✓")
+  }
+  function resetScript() {
+    setEditScript(DEFAULT_SCRIPT)
+    setScript(DEFAULT_SCRIPT)
+    localStorage.removeItem("admin_script")
+    showToast("Skript zurückgesetzt")
+  }
+  function updateBlock(id: string, field: keyof ScriptBlock, val: string) {
+    setEditScript(prev => prev.map(b => b.id === id ? { ...b, [field]: val } : b))
+  }
+  function addBlock() {
+    if (!newBlock.title?.trim() || !newBlock.text?.trim()) return
+    const block: ScriptBlock = {
+      id: Date.now().toString(),
+      title: newBlock.title || "",
+      bg: newBlock.bg || GL,
+      border: newBlock.border || GB,
+      tip: newBlock.tip || "",
+      text: newBlock.text || "",
+      sub: newBlock.sub || "",
+    }
+    setEditScript(prev => [...prev, block])
+    setNewBlock({ bg: GL, border: GB })
+  }
+  function removeBlock(id: string) {
+    setEditScript(prev => prev.filter(b => b.id !== id))
+  }
+
+  // ── Rückruf helpers ───────────────────────────────────────────────────────
+  function saveRueckrufe(list: Rückruf[]) {
+    setRueckrufe(list)
+    localStorage.setItem("admin_rueckrufe", JSON.stringify(list))
+  }
+  function addRueckruf() {
+    if (!newRF.name?.trim() || !newRF.phone?.trim()) return
+    const rf: Rückruf = {
+      id: Date.now().toString(),
+      name: newRF.name.trim(),
+      phone: newRF.phone.trim(),
+      datum: newRF.datum || todayKey,
+      notiz: newRF.notiz || "",
+      status: newRF.status || "offen",
+    }
+    saveRueckrufe([rf, ...rueckrufe])
+    setNewRF({ status: "offen", datum: todayKey })
+    showToast("Rückruf hinzugefügt ✓")
+  }
+  function updateRueckruf(id: string, updates: Partial<Rückruf>) {
+    saveRueckrufe(rueckrufe.map(r => r.id === id ? { ...r, ...updates } : r))
+  }
+  function deleteRueckruf(id: string) {
+    saveRueckrufe(rueckrufe.filter(r => r.id !== id))
+  }
+
+  // ── Notizen helpers ───────────────────────────────────────────────────────
   function saveNotes(n: string) {
     setNotes(n)
     localStorage.setItem("admin_notes", n)
     setNotesSaved(true)
     setTimeout(() => setNotesSaved(false), 1500)
   }
-
   function savePrices(p: PriceRow[]) {
     setPrices(p)
     localStorage.setItem("admin_prices", JSON.stringify(p))
   }
-
   function addPrice() {
     if (!newPriceName.trim()) return
     const row: PriceRow = { id: Date.now().toString(), name: newPriceName.trim(), price: newPricePrice.trim(), desc: newPriceDesc.trim() }
@@ -177,24 +285,22 @@ export default function AdminPage() {
     setNewPriceName(""); setNewPricePrice(""); setNewPriceDesc("")
   }
 
+  // ── General helpers ───────────────────────────────────────────────────────
   function showToast(msg: string, ok = true) {
     setToast({ msg, ok })
     setTimeout(() => setToast(null), 3000)
   }
-
   function handleAuth(e: React.FormEvent) {
     e.preventDefault()
     if (!secret.trim()) return
     setAuthed(true)
     sessionStorage.setItem("admin_secret", secret.trim())
   }
-
   async function loadCompanies() {
     setLoading(true); setLoadError("")
     const res = await fetch("/api/admin/companies", { headers: { "x-admin-secret": secret } })
     if (res.status === 401) {
-      setAuthed(false)
-      sessionStorage.removeItem("admin_secret")
+      setAuthed(false); sessionStorage.removeItem("admin_secret")
       setAuthError("Falsches Passwort.")
       setLoading(false); return
     }
@@ -203,7 +309,6 @@ export default function AdminPage() {
     setCompanies(json.companies || [])
     setLoading(false)
   }
-
   async function quickUpdate(companyId: string, updates: Partial<Company>) {
     const res = await fetch("/api/admin/update-company", {
       method: "POST",
@@ -214,7 +319,6 @@ export default function AdminPage() {
     if (json.success) { showToast("Gespeichert ✓"); loadCompanies() }
     else showToast(json.error || "Fehler beim Speichern", false)
   }
-
   async function saveEdits(companyId: string) {
     const e = edits[companyId]
     if (!e || Object.keys(e).length === 0) return
@@ -225,20 +329,28 @@ export default function AdminPage() {
   }
 
   // ── Stats ──────────────────────────────────────────────────────────────────
-  const activeCount = companies.filter(c => !c.paused).length
-  const addonCount  = companies.filter(c => c.booking_addon).length
-  const totalSMS    = companies.reduce((s, c) => s + (c.sms_count || 0), 0)
-  const totalAppts  = companies.reduce((s, c) => s + (c.appointments || 0), 0)
-  const totalCusts  = companies.reduce((s, c) => s + (c.customers || 0), 0)
-  const thisMonth   = companies.filter(c => {
+  const activeCount  = companies.filter(c => !c.paused).length
+  const addonCount   = companies.filter(c => c.booking_addon).length
+  const totalSMS     = companies.reduce((s, c) => s + (c.sms_count || 0), 0)
+  const totalAppts   = companies.reduce((s, c) => s + (c.appointments || 0), 0)
+  const totalCusts   = companies.reduce((s, c) => s + (c.customers || 0), 0)
+  const thisMonth    = companies.filter(c => {
     const d = new Date(c.created_at), now = new Date()
     return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()
   }).length
+  const risikoList   = companies.filter(c => !c.paused && c.appointments === 0)
+  const topList      = [...companies].sort((a, b) => b.appointments - a.appointments).slice(0, 5)
 
   const filtered = companies
     .filter(c => filter === "all" ? true : filter === "active" ? !c.paused : filter === "paused" ? c.paused : c.booking_addon)
     .filter(c => !search || c.name.toLowerCase().includes(search.toLowerCase()) || (c.email || "").toLowerCase().includes(search.toLowerCase()))
     .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+
+  const rfFiltered = rueckrufe
+    .filter(r => rfFilter === "alle" ? true : r.status === rfFilter)
+    .sort((a, b) => a.datum.localeCompare(b.datum))
+
+  const offeneRueckrufe = rueckrufe.filter(r => r.status === "offen" || r.status === "versucht").length
 
   // ── Login ──────────────────────────────────────────────────────────────────
   if (!authed) return (
@@ -271,27 +383,31 @@ export default function AdminPage() {
 
       {/* Nav */}
       <div style={{ background: "#fff", borderBottom: `1px solid ${BD}`, padding: "0 24px", display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 50, height: 56 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
           <span style={{ fontSize: 16, fontWeight: 900, flexShrink: 0 }}>
             <span style={{ color: G }}>Termin</span><span style={{ color: T }}>Stop</span>
             <span style={{ fontSize: 10, color: "#fff", fontWeight: 700, background: RED, padding: "2px 7px", borderRadius: 20, marginLeft: 8 }}>ADMIN</span>
           </span>
           <div style={{ display: "flex", gap: 2 }}>
             {([
-              ["zentrale", "📊 Zentrale"],
-              ["betriebe", "🏢 Betriebe"],
-              ["coldcall", "📞 Cold-Call"],
-              ["notizen",  "📝 Notizen"],
+              ["zentrale",   "📊 Zentrale"],
+              ["betriebe",   "🏢 Betriebe"],
+              ["coldcall",   "📞 Skript"],
+              ["rueckrufe",  "📋 Rückrufe"],
+              ["notizen",    "📝 Notizen"],
             ] as [Tab, string][]).map(([t, label]) => (
               <button key={t} onClick={() => setTab(t)} style={{
-                padding: "6px 14px", borderRadius: 8, border: "none", cursor: "pointer",
-                fontSize: 13, fontWeight: tab === t ? 700 : 500,
+                padding: "6px 12px", borderRadius: 8, border: "none", cursor: "pointer",
+                fontSize: 12, fontWeight: tab === t ? 700 : 500,
                 background: tab === t ? GL : "transparent",
-                color: tab === t ? G : M,
+                color: tab === t ? G : M, position: "relative",
               }}>
                 {label}
                 {t === "betriebe" && companies.length > 0 && (
                   <span style={{ marginLeft: 5, fontSize: 10, background: BD, color: M, padding: "1px 6px", borderRadius: 10 }}>{companies.length}</span>
+                )}
+                {t === "rueckrufe" && offeneRueckrufe > 0 && (
+                  <span style={{ marginLeft: 5, fontSize: 10, background: RED, color: "#fff", padding: "1px 6px", borderRadius: 10 }}>{offeneRueckrufe}</span>
                 )}
               </button>
             ))}
@@ -346,6 +462,84 @@ export default function AdminPage() {
               ))}
             </div>
 
+            {/* Risiko + Top-Performer nebeneinander */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 20 }}>
+
+              {/* Risiko-Betriebe */}
+              <div style={{ background: "#fff", border: `1px solid ${BD}`, borderRadius: 20, overflow: "hidden", boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}>
+                <div style={{ padding: "14px 20px", borderBottom: `1px solid ${BD}`, display: "flex", alignItems: "center", gap: 10 }}>
+                  <span style={{ fontSize: 18 }}>⚠️</span>
+                  <div>
+                    <div style={{ fontSize: 13, fontWeight: 800, color: T }}>Risiko-Betriebe</div>
+                    <div style={{ fontSize: 11, color: M }}>Aktiv aber noch 0 Termine eingetragen</div>
+                  </div>
+                  {risikoList.length > 0 && <span style={{ marginLeft: "auto", background: "#FEF2F2", color: RED, fontSize: 11, fontWeight: 800, padding: "3px 9px", borderRadius: 20 }}>{risikoList.length}</span>}
+                </div>
+                {risikoList.length === 0 ? (
+                  <div style={{ padding: "28px 20px", textAlign: "center", color: M, fontSize: 13 }}>
+                    {companies.length === 0 ? "Keine Daten geladen" : "✅ Alle aktiven Betriebe haben Termine"}
+                  </div>
+                ) : (
+                  <div style={{ maxHeight: 240, overflowY: "auto" }}>
+                    {risikoList.map((c, i) => (
+                      <div key={c.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "11px 20px", borderBottom: i < risikoList.length - 1 ? `1px solid ${BD}` : "none" }}>
+                        <div style={{ width: 7, height: 7, borderRadius: "50%", background: "#FCD34D", flexShrink: 0 }} />
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ fontSize: 13, fontWeight: 700, color: T, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.name}</div>
+                          <div style={{ fontSize: 11, color: M }}>{c.email}</div>
+                        </div>
+                        <div style={{ fontSize: 11, color: M, flexShrink: 0 }}>
+                          {new Date(c.created_at).toLocaleDateString("de-DE", { day: "numeric", month: "short" })}
+                        </div>
+                        <button onClick={() => {
+                          setNewRF({ name: c.name, phone: c.notification_phone || "", datum: todayKey, status: "offen", notiz: `Onboarding-Follow-up: ${c.name}` })
+                          setTab("rueckrufe")
+                        }} style={{ ...btnStyle("yellow"), padding: "4px 10px", fontSize: 10 }}>
+                          + Rückruf
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Top-Performer */}
+              <div style={{ background: "#fff", border: `1px solid ${BD}`, borderRadius: 20, overflow: "hidden", boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}>
+                <div style={{ padding: "14px 20px", borderBottom: `1px solid ${BD}`, display: "flex", alignItems: "center", gap: 10 }}>
+                  <span style={{ fontSize: 18 }}>🏆</span>
+                  <div>
+                    <div style={{ fontSize: 13, fontWeight: 800, color: T }}>Top-Performer</div>
+                    <div style={{ fontSize: 11, color: M }}>Die 5 aktivsten Betriebe nach Terminen</div>
+                  </div>
+                </div>
+                {topList.length === 0 ? (
+                  <div style={{ padding: "28px 20px", textAlign: "center", color: M, fontSize: 13 }}>Keine Daten geladen</div>
+                ) : (
+                  topList.map((c, i) => {
+                    const maxAppts = topList[0].appointments || 1
+                    const barPct   = Math.max(6, Math.round((c.appointments / maxAppts) * 100))
+                    return (
+                      <div key={c.id} style={{ display: "flex", alignItems: "center", gap: 12, padding: "11px 20px", borderBottom: i < topList.length - 1 ? `1px solid ${BD}` : "none" }}>
+                        <div style={{ fontSize: 13, fontWeight: 900, color: i === 0 ? "#D97706" : M, minWidth: 18, textAlign: "center" }}>
+                          {i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : `${i + 1}.`}
+                        </div>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ fontSize: 12, fontWeight: 700, color: T, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.name}</div>
+                          <div style={{ height: 5, background: BD, borderRadius: 3, marginTop: 4, overflow: "hidden" }}>
+                            <div style={{ height: "100%", width: `${barPct}%`, background: G, borderRadius: 3, transition: "width .4s" }} />
+                          </div>
+                        </div>
+                        <div style={{ textAlign: "right", flexShrink: 0 }}>
+                          <div style={{ fontSize: 14, fontWeight: 900, color: T }}>{c.appointments}</div>
+                          <div style={{ fontSize: 9, color: M, fontWeight: 700, textTransform: "uppercase" }}>Termine</div>
+                        </div>
+                      </div>
+                    )
+                  })
+                )}
+              </div>
+            </div>
+
             {/* ── Sales Tracker ── */}
             {(() => {
               const entry = getSalesEntry(salesDate)
@@ -356,10 +550,10 @@ export default function AdminPage() {
               const totalCloses     = allDates.reduce((s, d) => s + salesLog[d].closes, 0)
 
               const metrics = [
-                { key: "anrufe"     as keyof SalesEntry, label: "📞 Anrufe",       color: "#6B7280", bg: "#F9FAFB" },
-                { key: "gespraeche" as keyof SalesEntry, label: "💬 Gespräche",    color: "#3B82F6", bg: "#EFF6FF" },
-                { key: "termine"    as keyof SalesEntry, label: "📅 Termine",      color: "#D97706", bg: "#FFFBEB" },
-                { key: "closes"     as keyof SalesEntry, label: "✅ Closes",       color: G,         bg: GL },
+                { key: "anrufe"     as keyof SalesEntry, label: "📞 Anrufe",    color: "#6B7280", bg: "#F9FAFB" },
+                { key: "gespraeche" as keyof SalesEntry, label: "💬 Gespräche", color: "#3B82F6", bg: "#EFF6FF" },
+                { key: "termine"    as keyof SalesEntry, label: "📅 Termine",   color: "#D97706", bg: "#FFFBEB" },
+                { key: "closes"     as keyof SalesEntry, label: "✅ Closes",    color: G,         bg: GL },
               ]
 
               return (
@@ -374,7 +568,6 @@ export default function AdminPage() {
                   </div>
 
                   <div style={{ padding: "20px 22px" }}>
-                    {/* Eingabe-Zeile */}
                     <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12, marginBottom: 20 }}>
                       {metrics.map(m => (
                         <div key={m.key} style={{ background: m.bg, border: `1px solid ${BD}`, borderRadius: 14, padding: "14px 16px" }}>
@@ -394,10 +587,10 @@ export default function AdminPage() {
                       <div style={{ fontSize: 12, fontWeight: 800, color: T, textTransform: "uppercase", letterSpacing: .4, marginBottom: 14 }}>Conversion-Funnel — {salesDate}</div>
                       <div style={{ display: "flex", alignItems: "center", gap: 0, flexWrap: "wrap" }}>
                         {[
-                          { label: "Anrufe",     value: entry.anrufe,     color: "#6B7280", bg: "#F3F4F6" },
-                          { label: "Gespräche",  value: entry.gespraeche, color: "#3B82F6", bg: "#DBEAFE", rate: pct(entry.gespraeche, entry.anrufe) },
-                          { label: "Termine",    value: entry.termine,    color: "#D97706", bg: "#FDE68A", rate: pct(entry.termine, entry.gespraeche) },
-                          { label: "Closes",     value: entry.closes,     color: G,         bg: GB,        rate: pct(entry.closes, entry.termine) },
+                          { label: "Anrufe",    value: entry.anrufe,     color: "#6B7280", bg: "#F3F4F6" },
+                          { label: "Gespräche", value: entry.gespraeche, color: "#3B82F6", bg: "#DBEAFE", rate: pct(entry.gespraeche, entry.anrufe) },
+                          { label: "Termine",   value: entry.termine,    color: "#D97706", bg: "#FDE68A", rate: pct(entry.termine, entry.gespraeche) },
+                          { label: "Closes",    value: entry.closes,     color: G,         bg: GB,        rate: pct(entry.closes, entry.termine) },
                         ].map((step, i) => (
                           <div key={step.label} style={{ display: "flex", alignItems: "center", flex: 1, minWidth: 0 }}>
                             <div style={{ flex: 1, textAlign: "center", background: step.bg, borderRadius: 12, padding: "12px 8px" }}>
@@ -406,14 +599,13 @@ export default function AdminPage() {
                             </div>
                             {i < 3 && (
                               <div style={{ textAlign: "center", padding: "0 6px", flexShrink: 0 }}>
-                                <div style={{ fontSize: 11, fontWeight: 800, color: step.rate === "—" ? M : G }}>{step.rate}</div>
+                                <div style={{ fontSize: 11, fontWeight: 800, color: (step as any).rate === "—" ? M : G }}>{(step as any).rate}</div>
                                 <div style={{ fontSize: 16, color: BD }}>→</div>
                               </div>
                             )}
                           </div>
                         ))}
                       </div>
-                      {/* Gesamtquote */}
                       <div style={{ marginTop: 14, paddingTop: 14, borderTop: `1px solid ${BD}`, display: "flex", gap: 24, flexWrap: "wrap" }}>
                         {[
                           { label: "Gesamt-Closequote", value: pct(entry.closes, entry.anrufe) },
@@ -429,16 +621,16 @@ export default function AdminPage() {
                       </div>
                     </div>
 
-                    {/* Gesamtübersicht aller Tage */}
+                    {/* Gesamt-Auswertung aller Tage */}
                     {allDates.length > 0 && (
                       <div>
                         <div style={{ fontSize: 12, fontWeight: 800, color: T, textTransform: "uppercase", letterSpacing: .4, marginBottom: 10 }}>Gesamt-Auswertung ({allDates.length} Tage)</div>
                         <div style={{ display: "flex", gap: 20, flexWrap: "wrap", background: `linear-gradient(135deg, ${G}, #15955F)`, borderRadius: 14, padding: "16px 20px" }}>
                           {[
-                            { label: "Anrufe",    value: totalAnrufe },
-                            { label: "Gespräche", value: totalGespraeche },
-                            { label: "Termine",   value: totalTermine },
-                            { label: "Closes",    value: totalCloses },
+                            { label: "Anrufe",       value: totalAnrufe },
+                            { label: "Gespräche",    value: totalGespraeche },
+                            { label: "Termine",      value: totalTermine },
+                            { label: "Closes",       value: totalCloses },
                             { label: "Ø Closequote", value: pct(totalCloses, totalAnrufe) },
                           ].map(s => (
                             <div key={s.label} style={{ textAlign: "center" }}>
@@ -447,7 +639,6 @@ export default function AdminPage() {
                             </div>
                           ))}
                         </div>
-                        {/* Letzte 5 Tage */}
                         <div style={{ marginTop: 10, display: "flex", flexDirection: "column", gap: 4 }}>
                           {allDates.slice(0, 5).map(d => {
                             const e = salesLog[d]
@@ -481,7 +672,7 @@ export default function AdminPage() {
               ) : loadError ? (
                 <div style={{ padding: 24, color: RED, fontSize: 13 }}>⚠️ Fehler: {loadError}</div>
               ) : companies.length === 0 ? (
-                <div style={{ padding: 40, textAlign: "center", color: M, fontSize: 13 }}>Keine Betriebe gefunden. Passwort korrekt?</div>
+                <div style={{ padding: 40, textAlign: "center", color: M, fontSize: 13 }}>Keine Betriebe gefunden.</div>
               ) : companies.slice(0, 8).map((c, i) => (
                 <div key={c.id} style={{ display: "flex", alignItems: "center", gap: 14, padding: "13px 22px", borderBottom: i < Math.min(7, companies.length - 1) ? `1px solid ${BD}` : "none" }}>
                   <div style={{ width: 8, height: 8, borderRadius: "50%", background: c.paused ? "#FCD34D" : G, flexShrink: 0 }} />
@@ -553,6 +744,7 @@ export default function AdminPage() {
                         <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
                           {c.paused && <Badge label="PAUSIERT" color="yellow" />}
                           {c.booking_addon && <Badge label="BUCHUNG" color="blue" />}
+                          {!c.paused && c.appointments === 0 && <Badge label="KEIN TERMIN" color="red" />}
                         </div>
                         <div style={{ display: "flex", gap: 5, flexShrink: 0 }}>
                           <button onClick={() => quickUpdate(c.id, { booking_addon: !c.booking_addon })} style={{ ...btnStyle(c.booking_addon ? "blue" : "gray"), padding: "6px 10px", fontSize: 11 }}>
@@ -631,33 +823,226 @@ export default function AdminPage() {
           </>
         )}
 
-        {/* ════ COLD-CALL ════ */}
+        {/* ════ COLD-CALL / SKRIPT ════ */}
         {tab === "coldcall" && (
-          <div style={{ maxWidth: 680 }}>
-            <h1 style={{ fontSize: 20, fontWeight: 900, color: T, margin: "0 0 20px", letterSpacing: "-.4px" }}>📞 Cold-Call Leitfaden</h1>
-            <div style={{ background: "#fff", border: `1px solid ${BD}`, borderRadius: 20, padding: "28px 32px", boxShadow: "0 1px 4px rgba(0,0,0,0.04)", marginBottom: 16 }}>
-              <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 16 }}>
-                <CopyBtn text={COLD_CALL_SCRIPT.map(s => `${s.title}\n${s.text}`).join("\n\n")} label="📋 Alles kopieren" />
-              </div>
-              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                {COLD_CALL_SCRIPT.map(s => (
-                  <div key={s.title} style={{ background: s.bg, border: `1px solid ${s.border}`, borderRadius: 14, padding: "16px 20px" }}>
-                    <div style={{ fontSize: 12, fontWeight: 900, color: T, marginBottom: s.tip ? 8 : 10, letterSpacing: .2, textTransform: "uppercase" }}>{s.title}</div>
-                    {s.tip && (
-                      <div style={{ fontSize: 11, color: M, fontStyle: "italic", background: "rgba(255,255,255,0.6)", borderRadius: 8, padding: "6px 10px", marginBottom: 10, borderLeft: "3px solid rgba(0,0,0,0.08)" }}>
-                        💡 {s.tip}
-                      </div>
-                    )}
-                    <div style={{ fontSize: 14, color: T, lineHeight: 1.75, whiteSpace: "pre-line", fontStyle: "italic", fontWeight: 500 }}>{s.text}</div>
-                    {s.sub && (
-                      <div style={{ marginTop: 10, fontSize: 12, color: "#374151", lineHeight: 1.7, whiteSpace: "pre-line", background: "rgba(255,255,255,0.5)", borderRadius: 8, padding: "8px 12px", borderLeft: `3px solid ${s.border}` }}>
-                        {s.sub}
-                      </div>
-                    )}
-                  </div>
-                ))}
+          <div style={{ maxWidth: 720 }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20, flexWrap: "wrap", gap: 10 }}>
+              <h1 style={{ fontSize: 20, fontWeight: 900, color: T, margin: 0, letterSpacing: "-.4px" }}>📞 Cold-Call Skript</h1>
+              <div style={{ display: "flex", gap: 8 }}>
+                {scriptEditing ? (
+                  <>
+                    <button onClick={() => { setEditScript(script); setScriptEditing(false) }} style={btnStyle("gray")}>Abbrechen</button>
+                    <button onClick={resetScript} style={{ ...btnStyle("red"), fontSize: 11 }}>↩ Standard</button>
+                    <button onClick={saveScript} style={btnStyle("green")}>💾 Skript speichern</button>
+                  </>
+                ) : (
+                  <>
+                    <CopyBtn text={script.map(s => `${s.title}\n${s.text}`).join("\n\n")} label="📋 Alles kopieren" />
+                    <button onClick={() => { setEditScript(script); setScriptEditing(true) }} style={btnStyle("purple")}>✏️ Bearbeiten</button>
+                  </>
+                )}
               </div>
             </div>
+
+            {scriptEditing ? (
+              /* ── EDIT MODE ── */
+              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                {editScript.map((block, idx) => (
+                  <div key={block.id} style={{ background: block.bg, border: `2px solid ${block.border}`, borderRadius: 16, padding: "16px 20px" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
+                      <span style={{ fontSize: 11, color: M, fontWeight: 700 }}>#{idx + 1}</span>
+                      <input
+                        value={block.title}
+                        onChange={e => updateBlock(block.id, "title", e.target.value)}
+                        placeholder="Titel des Schritts"
+                        style={{ ...inp, fontSize: 13, fontWeight: 800, flex: 1, background: "rgba(255,255,255,0.7)" }}
+                      />
+                      <button onClick={() => removeBlock(block.id)} style={{ background: "#FEF2F2", color: RED, border: "none", borderRadius: 8, padding: "6px 10px", cursor: "pointer", fontSize: 12, fontWeight: 700, flexShrink: 0 }}>✕ Löschen</button>
+                    </div>
+                    <div style={{ marginBottom: 8 }}>
+                      <label style={{ display: "block", fontSize: 10, fontWeight: 700, color: M, textTransform: "uppercase", letterSpacing: .4, marginBottom: 4 }}>💡 Coaching-Hinweis (optional)</label>
+                      <input value={block.tip} onChange={e => updateBlock(block.id, "tip", e.target.value)} placeholder="Interner Hinweis für dich…" style={{ ...inp, fontSize: 12, background: "rgba(255,255,255,0.7)" }} />
+                    </div>
+                    <div style={{ marginBottom: 8 }}>
+                      <label style={{ display: "block", fontSize: 10, fontWeight: 700, color: M, textTransform: "uppercase", letterSpacing: .4, marginBottom: 4 }}>Skript-Text (Sprichst du so aus)</label>
+                      <textarea value={block.text} onChange={e => updateBlock(block.id, "text", e.target.value)} rows={4}
+                        style={{ ...inp, resize: "vertical", fontSize: 13, lineHeight: 1.7, background: "rgba(255,255,255,0.7)", fontStyle: "italic" }} />
+                    </div>
+                    <div>
+                      <label style={{ display: "block", fontSize: 10, fontWeight: 700, color: M, textTransform: "uppercase", letterSpacing: .4, marginBottom: 4 }}>Verzweigung / Reaktion (optional)</label>
+                      <textarea value={block.sub} onChange={e => updateBlock(block.id, "sub", e.target.value)} rows={2}
+                        style={{ ...inp, resize: "vertical", fontSize: 12, lineHeight: 1.6, background: "rgba(255,255,255,0.7)" }} />
+                    </div>
+                    <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
+                      <div>
+                        <label style={{ display: "block", fontSize: 10, color: M, fontWeight: 700, marginBottom: 3 }}>Hintergrund</label>
+                        <input type="color" value={block.bg} onChange={e => updateBlock(block.id, "bg", e.target.value)} style={{ height: 32, width: 48, border: "none", borderRadius: 8, cursor: "pointer" }} />
+                      </div>
+                      <div>
+                        <label style={{ display: "block", fontSize: 10, color: M, fontWeight: 700, marginBottom: 3 }}>Randfarbe</label>
+                        <input type="color" value={block.border} onChange={e => updateBlock(block.id, "border", e.target.value)} style={{ height: 32, width: 48, border: "none", borderRadius: 8, cursor: "pointer" }} />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+
+                {/* Neuer Block */}
+                <div style={{ background: "#fff", border: `2px dashed ${BD}`, borderRadius: 16, padding: "20px" }}>
+                  <div style={{ fontSize: 13, fontWeight: 800, color: M, marginBottom: 12 }}>+ Neuen Schritt hinzufügen</div>
+                  <input value={newBlock.title || ""} onChange={e => setNewBlock(p => ({ ...p, title: e.target.value }))} placeholder="Titel" style={{ ...inp, marginBottom: 8 }} />
+                  <textarea value={newBlock.text || ""} onChange={e => setNewBlock(p => ({ ...p, text: e.target.value }))} placeholder="Skript-Text …" rows={3}
+                    style={{ ...inp, resize: "vertical", marginBottom: 8 }} />
+                  <input value={newBlock.tip || ""} onChange={e => setNewBlock(p => ({ ...p, tip: e.target.value }))} placeholder="Coaching-Hinweis (optional)" style={{ ...inp, marginBottom: 8 }} />
+                  <input value={newBlock.sub || ""} onChange={e => setNewBlock(p => ({ ...p, sub: e.target.value }))} placeholder="Verzweigung (optional)" style={{ ...inp, marginBottom: 12 }} />
+                  <button onClick={addBlock} style={{ ...btnStyle("green") }}>+ Block hinzufügen</button>
+                </div>
+              </div>
+            ) : (
+              /* ── VIEW MODE ── */
+              <div style={{ background: "#fff", border: `1px solid ${BD}`, borderRadius: 20, padding: "28px 32px", boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                  {script.map(s => (
+                    <div key={s.id} style={{ background: s.bg, border: `1px solid ${s.border}`, borderRadius: 14, padding: "16px 20px" }}>
+                      <div style={{ fontSize: 12, fontWeight: 900, color: T, marginBottom: s.tip ? 8 : 10, letterSpacing: .2, textTransform: "uppercase" }}>{s.title}</div>
+                      {s.tip && (
+                        <div style={{ fontSize: 11, color: M, fontStyle: "italic", background: "rgba(255,255,255,0.6)", borderRadius: 8, padding: "6px 10px", marginBottom: 10, borderLeft: "3px solid rgba(0,0,0,0.08)" }}>
+                          💡 {s.tip}
+                        </div>
+                      )}
+                      <div style={{ fontSize: 14, color: T, lineHeight: 1.75, whiteSpace: "pre-line", fontStyle: "italic", fontWeight: 500 }}>{s.text}</div>
+                      {s.sub && (
+                        <div style={{ marginTop: 10, fontSize: 12, color: "#374151", lineHeight: 1.7, whiteSpace: "pre-line", background: "rgba(255,255,255,0.5)", borderRadius: 8, padding: "8px 12px", borderLeft: `3px solid ${s.border}` }}>
+                          {s.sub}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ════ RÜCKRUFE ════ */}
+        {tab === "rueckrufe" && (
+          <div style={{ maxWidth: 800 }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6, flexWrap: "wrap", gap: 10 }}>
+              <h1 style={{ fontSize: 20, fontWeight: 900, color: T, margin: 0, letterSpacing: "-.4px" }}>📋 Rückruf-Liste</h1>
+              <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                {offeneRueckrufe > 0 && <span style={{ fontSize: 13, fontWeight: 800, color: RED }}>{offeneRueckrufe} offen</span>}
+              </div>
+            </div>
+            <p style={{ fontSize: 13, color: M, margin: "0 0 20px" }}>Kontakte die zurückgerufen werden sollen – lokal gespeichert.</p>
+
+            {/* Neuer Rückruf */}
+            <div style={{ background: "#fff", border: `1px solid ${BD}`, borderRadius: 20, padding: "20px", marginBottom: 16, boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}>
+              <div style={{ fontSize: 13, fontWeight: 800, color: T, marginBottom: 14 }}>+ Neuen Rückruf eintragen</div>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 10 }}>
+                <input value={newRF.name || ""} onChange={e => setNewRF(p => ({ ...p, name: e.target.value }))} placeholder="Name / Firma" style={{ ...inp, fontSize: 12 }} />
+                <input value={newRF.phone || ""} onChange={e => setNewRF(p => ({ ...p, phone: e.target.value }))} placeholder="Telefonnummer" style={{ ...inp, fontSize: 12 }} type="tel" />
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 2fr", gap: 10, marginBottom: 10 }}>
+                <input type="date" value={newRF.datum || todayKey} onChange={e => setNewRF(p => ({ ...p, datum: e.target.value }))} style={{ ...inp, fontSize: 12 }} />
+                <select value={newRF.status || "offen"} onChange={e => setNewRF(p => ({ ...p, status: e.target.value as Rückruf["status"] }))}
+                  style={{ ...inp, fontSize: 12, cursor: "pointer" }}>
+                  {(Object.keys(STATUS_META) as Rückruf["status"][]).map(s => (
+                    <option key={s} value={s}>{STATUS_META[s].label}</option>
+                  ))}
+                </select>
+                <input value={newRF.notiz || ""} onChange={e => setNewRF(p => ({ ...p, notiz: e.target.value }))} placeholder="Notiz (optional)"
+                  style={{ ...inp, fontSize: 12 }} onKeyDown={e => e.key === "Enter" && addRueckruf()} />
+              </div>
+              <button onClick={addRueckruf} style={{ ...btnStyle("green") }}>+ Hinzufügen</button>
+            </div>
+
+            {/* Filter */}
+            <div style={{ display: "flex", gap: 6, marginBottom: 14, flexWrap: "wrap" }}>
+              {([["alle", "Alle"], ...Object.entries(STATUS_META).map(([k, v]) => [k, v.label])] as [string, string][]).map(([k, label]) => (
+                <button key={k} onClick={() => setRfFilter(k as any)} style={{
+                  ...btnStyle("gray"), fontSize: 11,
+                  background: rfFilter === k ? T : "#F3F4F6",
+                  color: rfFilter === k ? "#fff" : T,
+                }}>
+                  {label}
+                  {k !== "alle" && rueckrufe.filter(r => r.status === k).length > 0 && (
+                    <span style={{ marginLeft: 5, opacity: .7 }}>{rueckrufe.filter(r => r.status === k).length}</span>
+                  )}
+                </button>
+              ))}
+            </div>
+
+            {/* Liste */}
+            {rfFiltered.length === 0 ? (
+              <div style={{ background: "#fff", border: `1px solid ${BD}`, borderRadius: 16, padding: "40px 20px", textAlign: "center", color: M, fontSize: 13 }}>
+                {rueckrufe.length === 0 ? "Noch keine Rückrufe eingetragen. Fang oben an!" : "Keine Einträge für diesen Filter."}
+              </div>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                {rfFiltered.map(r => {
+                  const meta    = STATUS_META[r.status]
+                  const isOpen  = rfOpen === r.id
+                  const isPast  = r.datum < todayKey
+                  const isToday = r.datum === todayKey
+
+                  return (
+                    <div key={r.id} style={{ background: "#fff", border: `1px solid ${isToday ? GB : isPast && r.status === "offen" ? "#FECACA" : BD}`, borderRadius: 16, overflow: "hidden", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "14px 18px", flexWrap: "wrap" }}>
+                        {/* Datum-Indikator */}
+                        <div style={{ textAlign: "center", background: isToday ? GL : isPast && r.status === "offen" ? "#FEF2F2" : BG, borderRadius: 10, padding: "6px 10px", flexShrink: 0, minWidth: 56 }}>
+                          <div style={{ fontSize: 16, fontWeight: 900, color: isToday ? G : isPast && r.status === "offen" ? RED : T, lineHeight: 1 }}>
+                            {new Date(r.datum + "T12:00:00").toLocaleDateString("de-DE", { day: "numeric" })}
+                          </div>
+                          <div style={{ fontSize: 9, fontWeight: 700, color: M, textTransform: "uppercase" }}>
+                            {new Date(r.datum + "T12:00:00").toLocaleDateString("de-DE", { month: "short" })}
+                          </div>
+                        </div>
+
+                        <div style={{ flex: 1, minWidth: 120 }}>
+                          <div style={{ fontSize: 14, fontWeight: 800, color: T }}>{r.name}</div>
+                          <div style={{ fontSize: 12, color: M }}>{r.phone}</div>
+                          {r.notiz && <div style={{ fontSize: 11, color: M, marginTop: 2, fontStyle: "italic" }}>{r.notiz}</div>}
+                        </div>
+
+                        <span style={{ fontSize: 10, fontWeight: 700, padding: "4px 10px", borderRadius: 20, background: meta.bg, color: meta.color, border: `1px solid ${meta.border}`, flexShrink: 0 }}>
+                          {meta.label}
+                        </span>
+
+                        <div style={{ display: "flex", gap: 5, flexShrink: 0 }}>
+                          <a href={`tel:${r.phone}`} style={{ ...btnStyle("green"), textDecoration: "none", padding: "6px 12px", fontSize: 12 }}>📞 Anrufen</a>
+                          <button onClick={() => setRfOpen(isOpen ? null : r.id)} style={{ ...btnStyle("gray"), padding: "6px 10px", fontSize: 11 }}>
+                            {isOpen ? "▲" : "✏️"}
+                          </button>
+                          <button onClick={() => deleteRueckruf(r.id)} style={{ ...btnStyle("red"), padding: "6px 10px", fontSize: 11 }}>✕</button>
+                        </div>
+                      </div>
+
+                      {isOpen && (
+                        <div style={{ borderTop: `1px solid ${BD}`, background: BG, padding: "16px 18px", display: "flex", gap: 10, flexWrap: "wrap", alignItems: "flex-end" }}>
+                          <div style={{ flex: 1, minWidth: 140 }}>
+                            <label style={{ display: "block", fontSize: 10, fontWeight: 700, color: M, textTransform: "uppercase", letterSpacing: .4, marginBottom: 4 }}>Status</label>
+                            <select value={r.status} onChange={e => updateRueckruf(r.id, { status: e.target.value as Rückruf["status"] })}
+                              style={{ ...inp, fontSize: 12, cursor: "pointer" }}>
+                              {(Object.keys(STATUS_META) as Rückruf["status"][]).map(s => (
+                                <option key={s} value={s}>{STATUS_META[s].label}</option>
+                              ))}
+                            </select>
+                          </div>
+                          <div style={{ flex: 1, minWidth: 140 }}>
+                            <label style={{ display: "block", fontSize: 10, fontWeight: 700, color: M, textTransform: "uppercase", letterSpacing: .4, marginBottom: 4 }}>Neues Datum</label>
+                            <input type="date" value={r.datum} onChange={e => updateRueckruf(r.id, { datum: e.target.value })} style={{ ...inp, fontSize: 12 }} />
+                          </div>
+                          <div style={{ flex: 2, minWidth: 200 }}>
+                            <label style={{ display: "block", fontSize: 10, fontWeight: 700, color: M, textTransform: "uppercase", letterSpacing: .4, marginBottom: 4 }}>Notiz</label>
+                            <input value={r.notiz} onChange={e => updateRueckruf(r.id, { notiz: e.target.value })} placeholder="Gesprächsnotiz …" style={{ ...inp, fontSize: 12 }} />
+                          </div>
+                          <button onClick={() => setRfOpen(null)} style={{ ...btnStyle("green"), alignSelf: "flex-end" }}>✓ OK</button>
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+            )}
           </div>
         )}
 
@@ -695,7 +1080,6 @@ export default function AdminPage() {
                   <p style={{ fontSize: 12, color: M, margin: "2px 0 0" }}>Pakete & Preise für den Call</p>
                 </div>
 
-                {/* Neue Zeile */}
                 <div style={{ padding: "16px 20px", background: GL, borderBottom: `1px solid ${GB}`, display: "flex", flexDirection: "column", gap: 8 }}>
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 100px", gap: 8 }}>
                     <input value={newPriceName} onChange={e => setNewPriceName(e.target.value)} placeholder="Paketname (z.B. Basis)" style={{ ...inp, fontSize: 12 }} />
@@ -708,7 +1092,6 @@ export default function AdminPage() {
                   </div>
                 </div>
 
-                {/* Zeilen */}
                 <div style={{ minHeight: 200 }}>
                   {prices.length === 0 ? (
                     <div style={{ padding: "40px 20px", textAlign: "center", color: M, fontSize: 13 }}>
@@ -716,7 +1099,7 @@ export default function AdminPage() {
                     </div>
                   ) : (
                     prices.map((row, i) => (
-                      <div key={row.id} style={{ display: "flex", alignItems: "flex-start", gap: 12, padding: "14px 20px", borderBottom: i < prices.length - 1 ? `1px solid ${BD}` : "none", transition: "background .12s" }}>
+                      <div key={row.id} style={{ display: "flex", alignItems: "flex-start", gap: 12, padding: "14px 20px", borderBottom: i < prices.length - 1 ? `1px solid ${BD}` : "none" }}>
                         <div style={{ flex: 1 }}>
                           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 2 }}>
                             <span style={{ fontSize: 13, fontWeight: 800, color: T }}>{row.name}</span>
@@ -746,7 +1129,7 @@ export default function AdminPage() {
         )}
 
       </div>
-      <style>{`* { box-sizing: border-box; } input:focus, textarea:focus { border-color: ${G} !important; }`}</style>
+      <style>{`* { box-sizing: border-box; } input:focus, textarea:focus, select:focus { border-color: ${G} !important; outline: none; }`}</style>
     </div>
   )
 }
