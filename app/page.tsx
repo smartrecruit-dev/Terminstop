@@ -685,6 +685,10 @@ export default function LandingPage() {
             <a href="#online-buchung" className="nav-link" style={{ display: "inline-flex", alignItems: "center" }}>
               <span className="new-pill">Neu</span> Online-Buchung
             </a>
+            <a href="/demo" className="nav-link" style={{ display: "inline-flex", alignItems: "center", gap: 5 }}>
+              <span style={{ width: 6, height: 6, background: "#18A66D", borderRadius: "50%", display: "inline-block" }} />
+              Live-Demo
+            </a>
             <a href="#faq" className="nav-link">FAQ</a>
             <a href="/login" className="nav-link">Login</a>
           </div>
@@ -729,9 +733,16 @@ export default function LandingPage() {
           <a href="#wie-es-funktioniert" onClick={() => setNavOpen(false)}>So funktioniert's</a>
           <a href="#features" onClick={() => setNavOpen(false)}>Features</a>
           <a href="#online-buchung" onClick={() => setNavOpen(false)}>Online-Buchung</a>
+          <a href="/demo" onClick={() => setNavOpen(false)} style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <span style={{ width: 7, height: 7, background: "#18A66D", borderRadius: "50%", display: "inline-block" }} />
+            Live-Demo ansehen
+          </a>
           <a href="#faq" onClick={() => setNavOpen(false)}>FAQ</a>
           <a href="/login" onClick={() => setNavOpen(false)}>Login</a>
           <div style={{ height: 12 }} />
+          <a href="/demo" className="btn btn-outline" onClick={() => setNavOpen(false)} style={{ fontSize: 15, padding: "13px 20px", justifyContent: "center", marginBottom: 8 }}>
+            Live-Demo ansehen →
+          </a>
           <a href="/lead" className="btn btn-primary" onClick={() => setNavOpen(false)} style={{ fontSize: 15, padding: "14px 20px", justifyContent: "center" }}>
             Kostenlos testen →
           </a>
@@ -814,8 +825,9 @@ export default function LandingPage() {
                   <a href="/lead" className="btn btn-primary" style={{ fontSize: 16, padding: "16px 30px" }}>
                     Jetzt kostenlos testen <span>→</span>
                   </a>
-                  <a href="#wie-es-funktioniert" className="btn btn-outline" style={{ fontSize: 16, padding: "16px 26px" }}>
-                    So funktioniert's
+                  <a href="/demo" className="btn btn-outline" style={{ fontSize: 16, padding: "16px 26px", display: "inline-flex", alignItems: "center", gap: 8 }}>
+                    <span style={{ width: 8, height: 8, background: "#18A66D", borderRadius: "50%", display: "inline-block", animation: "pulse 2s infinite" }} />
+                    Live-Demo ansehen
                   </a>
                 </div>
               </Reveal>
