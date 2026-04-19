@@ -209,9 +209,8 @@ export default function DashNav({
         </div>
       </nav>
 
-      {/* ── Mobile Bottom Nav ── */}
-      <div style={{
-        display: "flex",
+      {/* ── Mobile Bottom Nav (nur auf Mobilgeräten) ── */}
+      <div className="ts-mobile-nav" style={{
         position: "fixed", bottom: 0, left: 0, right: 0,
         background: "#fff",
         borderTop: "1px solid #E5E7EB",
@@ -221,7 +220,8 @@ export default function DashNav({
         justifyContent: "space-around",
         alignItems: "center",
         paddingTop: 8,
-      }} className="md:hidden">
+        display: "flex",
+      }}>
         {mobileLinks.map(item => {
           const isActive = active === item.href
           return (
@@ -259,6 +259,10 @@ export default function DashNav({
           )
         })}
       </div>
+      <style>{`
+        @media (min-width: 768px) { .ts-mobile-nav { display: none !important; } }
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+      `}</style>
     </>
   )
 }
