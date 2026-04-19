@@ -1,471 +1,501 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useMemo } from "react"
 import { supabase } from "../lib/supabaseClient"
 import DashNav from "../components/DashNav"
 
+type View = "day" | "week" | "month"
+
+function toStr(d: Date) {
+  return d.toISOString().split("T")[0]
+}
+function parseStr(s: string) {
+  const [y, m, day] = s.split("-").map(Number)
+  return new Date(y, m - 1, day)
+}
+function addDays(d: Date, n: number) {
+  const r = new Date(d); r.setDate(r.getDate() + n); return r
+}
+function startOfWeek(d: Date) {
+  const r = new Date(d)
+  const dow = r.getDay() === 0 ? 6 : r.getDay() - 1 // Mon=0
+  r.setDate(r.getDate() - dow)
+  return r
+}
+function startOfMonth(d: Date) {
+  return new Date(d.getFullYear(), d.getMonth(), 1)
+}
+function isSameDay(a: Date, b: Date) {
+  return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate()
+}
+
+const WEEKDAYS_SHORT = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"]
+const MONTHS_DE = ["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"]
+
 export default function CalendarPage() {
+  useEffect(() => { document.title = "Kalender | TerminStop" }, [])
 
-    useEffect(() => { document.title = "Kalender | TerminStop" }, [])
-
-const [appointments, setAppointments] = useState<any[]>([])
-  const [companyId, setCompanyId] = useState<string | null>(null)
-  const [companyName, setCompanyName] = useState("")
-  const [view, setView] = useState<"day" | "week">("day")
-  const [selected, setSelected] = useState<any>(null)
+  const [appointments, setAppointments] = useState<any[]>([])
+  const [companyId, setCompanyId]       = useState<string | null>(null)
+  const [view, setView]                 = useState<View>("week")
+  const [cursor, setCursor]             = useState(new Date())   // "where are we navigating"
+  const [selected, setSelected]         = useState<any>(null)
   const [confirmDelete, setConfirmDelete] = useState(false)
 
+  const today    = useMemo(() => new Date(), [])
+  const todayStr = useMemo(() => toStr(today), [today])
+
+  /* ── Auth ── */
   useEffect(() => {
-    const storedId = localStorage.getItem("company_id")
-    const storedName = localStorage.getItem("company_name")
-    if (!storedId) window.location.href = "/login"
-    else {
-      setCompanyId(storedId)
-      setCompanyName(storedName || "")
-    }
+    const id   = localStorage.getItem("company_id")
+    const name = localStorage.getItem("company_name")
+    if (!id) { window.location.href = "/login"; return }
+    setCompanyId(id)
   }, [])
 
+  /* ── Load ── */
   async function loadAppointments() {
     if (!companyId) return
     const { data } = await supabase
-      .from("appointments")
-      .select("*")
+      .from("appointments").select("*")
       .eq("company_id", companyId)
       .not("status", "eq", "cancelled")
-      // Online-Anfragen erst nach Bestätigung anzeigen
       .or("online_booking.is.null,online_booking.eq.false,status.eq.confirmed")
       .order("date", { ascending: true })
       .order("time", { ascending: true })
     if (data) setAppointments(data)
   }
+  useEffect(() => { loadAppointments() }, [companyId])
 
-  useEffect(() => {
-    loadAppointments()
-  }, [companyId])
-
+  /* ── Actions ── */
   async function toggleDone(a: any) {
-    const newStatus = a.status === "done" ? "pending" : "done"
-    await supabase.from("appointments").update({ status: newStatus }).eq("id", a.id)
-    if (selected) setSelected({ ...selected, status: newStatus })
+    const ns = a.status === "done" ? "pending" : "done"
+    await supabase.from("appointments").update({ status: ns }).eq("id", a.id)
+    if (selected) setSelected({ ...selected, status: ns })
     loadAppointments()
   }
-
   async function deleteAppointment(id: string) {
     await supabase.from("appointments").delete().eq("id", id)
-    setSelected(null)
-    setConfirmDelete(false)
-    loadAppointments()
+    setSelected(null); setConfirmDelete(false); loadAppointments()
   }
-
   async function handleLogout() {
     await supabase.auth.signOut()
-    localStorage.removeItem("company_id")
-    localStorage.removeItem("company_name")
+    localStorage.removeItem("company_id"); localStorage.removeItem("company_name")
     window.location.href = "/login"
   }
 
-  const today = new Date()
-  const todayStr = today.toISOString().split("T")[0]
+  /* ── Navigation ── */
+  function prev() {
+    setCursor(c => {
+      if (view === "day")   return addDays(c, -1)
+      if (view === "week")  return addDays(c, -7)
+      return new Date(c.getFullYear(), c.getMonth() - 1, 1)
+    })
+  }
+  function next() {
+    setCursor(c => {
+      if (view === "day")   return addDays(c, 1)
+      if (view === "week")  return addDays(c, 7)
+      return new Date(c.getFullYear(), c.getMonth() + 1, 1)
+    })
+  }
+  function goToday() { setCursor(new Date()) }
+
+  /* ── Derived ── */
+  const cursorStr   = toStr(cursor)
+  const isToday     = cursorStr === todayStr
+
+  // Week: 7 days starting from Mon of cursor's week
+  const weekStart = useMemo(() => startOfWeek(cursor), [cursor])
+  const weekDays  = useMemo(() => Array.from({ length: 7 }, (_, i) => addDays(weekStart, i)), [weekStart])
+
+  // Month grid: fill full weeks
+  const monthDays = useMemo(() => {
+    const ms   = startOfMonth(cursor)
+    const dow  = ms.getDay() === 0 ? 6 : ms.getDay() - 1  // Mon=0
+    const days: (Date | null)[] = Array(dow).fill(null)
+    const total = new Date(cursor.getFullYear(), cursor.getMonth() + 1, 0).getDate()
+    for (let d = 1; d <= total; d++) days.push(new Date(cursor.getFullYear(), cursor.getMonth(), d))
+    while (days.length % 7 !== 0) days.push(null)
+    return days
+  }, [cursor])
+
+  // Day stats
+  const dayAppts  = appointments.filter(a => a.date === cursorStr)
+  const doneToday = dayAppts.filter(a => a.status === "done").length
+
+  // Period label
+  function periodLabel() {
+    if (view === "day") {
+      return cursor.toLocaleDateString("de-DE", { weekday: "long", day: "numeric", month: "long", year: "numeric" })
+    }
+    if (view === "week") {
+      const end = addDays(weekStart, 6)
+      const sameMonth = weekStart.getMonth() === end.getMonth()
+      if (sameMonth) return `${weekStart.getDate()}. – ${end.getDate()}. ${MONTHS_DE[end.getMonth()]} ${end.getFullYear()}`
+      return `${weekStart.getDate()}. ${MONTHS_DE[weekStart.getMonth()]} – ${end.getDate()}. ${MONTHS_DE[end.getMonth()]} ${end.getFullYear()}`
+    }
+    return `${MONTHS_DE[cursor.getMonth()]} ${cursor.getFullYear()}`
+  }
+
   const hours = Array.from({ length: 15 }, (_, i) => i + 6)
-  const dayAppointments = appointments.filter(a => a.date === todayStr)
-  const doneToday = dayAppointments.filter(a => a.status === "done").length
-  const openToday = dayAppointments.filter(a => a.status !== "done").length
-
-  const weekDays = Array.from({ length: 7 }, (_, i) => {
-    const d = new Date()
-    d.setDate(today.getDate() + i)
-    return d
-  })
-
-  const now = new Date()
-  const currentHour = now.getHours()
 
   return (
-    <div
-      className="min-h-screen text-[#1F2A37] overflow-x-hidden"
-      style={{ fontFamily: "'Inter', 'Manrope', sans-serif", backgroundColor: "#F7FAFC" }}
-    >
-
+    <div style={{ minHeight: "100vh", backgroundColor: "#F7FAFC", fontFamily: "'Inter','Manrope',sans-serif", color: "#1F2A37" }}>
       <DashNav active="/calendar" companyId={companyId} onLogout={handleLogout} />
 
-      <div className="max-w-6xl mx-auto px-4 md:px-10 py-8 pb-24 md:pb-10">
+      <div style={{ maxWidth: 1200, margin: "0 auto", padding: "28px 16px 100px" }}>
 
-        {/* ─── HEADER ─── */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
+        {/* ── HEADER ── */}
+        <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: 16, marginBottom: 24 }}>
+
+          {/* Left: title + label */}
           <div>
-            <div className="text-xs text-[#6B7280] font-medium mb-1 uppercase tracking-wider">
-              {today.toLocaleDateString("de-DE", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}
+            <div style={{ fontSize: 12, color: "#9CA3AF", fontWeight: 600, textTransform: "uppercase", letterSpacing: .8, marginBottom: 4 }}>
+              {view === "day" ? "Tagesansicht" : view === "week" ? "Wochenansicht" : "Monatsansicht"}
             </div>
-            <h1 className="text-3xl md:text-4xl font-bold text-[#1F2A37]">
-              {view === "day" ? "Tagesansicht" : "Wochenansicht"}
-            </h1>
-            <p className="text-[#6B7280] mt-1 text-sm">
-              {view === "day"
-                ? `${dayAppointments.length} Termine heute · ${doneToday} erledigt · ${openToday} offen`
-                : `Übersicht der nächsten 7 Tage`}
-            </p>
+            <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+              {/* Nav arrows */}
+              <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                <button onClick={prev} style={navBtn}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+                </button>
+                <button onClick={next} style={navBtn}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M9 18l6-6-6-6"/></svg>
+                </button>
+              </div>
+              <h1 style={{ fontSize: 20, fontWeight: 800, color: "#111827", margin: 0, letterSpacing: "-.4px" }}>
+                {periodLabel()}
+              </h1>
+              {!isToday && view === "day" && (
+                <button onClick={goToday} style={{ fontSize: 12, color: "#18A66D", background: "#F0FBF6", border: "1.5px solid #D1F5E3", borderRadius: 8, padding: "4px 12px", cursor: "pointer", fontWeight: 700 }}>
+                  Heute
+                </button>
+              )}
+              {view !== "day" && (
+                <button onClick={goToday} style={{ fontSize: 12, color: "#18A66D", background: "#F0FBF6", border: "1.5px solid #D1F5E3", borderRadius: 8, padding: "4px 12px", cursor: "pointer", fontWeight: 700 }}>
+                  Heute
+                </button>
+              )}
+            </div>
           </div>
 
-          <div className="flex items-center gap-1 bg-white border border-[#E5E7EB] rounded-xl p-1 shadow-sm self-start">
-            <button
-              onClick={() => setView("day")}
-              className={`px-5 py-2 rounded-lg text-sm font-semibold transition ${
-                view === "day" ? "bg-[#18A66D] text-white shadow-sm" : "text-[#6B7280] hover:text-[#1F2A37]"
-              }`}
-            >
-              Tag
-            </button>
-            <button
-              onClick={() => setView("week")}
-              className={`px-5 py-2 rounded-lg text-sm font-semibold transition ${
-                view === "week" ? "bg-[#18A66D] text-white shadow-sm" : "text-[#6B7280] hover:text-[#1F2A37]"
-              }`}
-            >
-              Woche
-            </button>
+          {/* Right: view switcher */}
+          <div style={{ display: "flex", alignItems: "center", gap: 4, background: "#fff", border: "1.5px solid #E5E7EB", borderRadius: 12, padding: 4 }}>
+            {(["day", "week", "month"] as View[]).map(v => (
+              <button key={v} onClick={() => setView(v)} style={{
+                padding: "8px 16px", borderRadius: 9, border: "none", cursor: "pointer",
+                fontSize: 13, fontWeight: 700, transition: "all .15s",
+                background: view === v ? "#18A66D" : "transparent",
+                color: view === v ? "#fff" : "#6B7280",
+              }}>
+                {v === "day" ? "Tag" : v === "week" ? "Woche" : "Monat"}
+              </button>
+            ))}
           </div>
         </div>
 
-        {/* ─── DAY VIEW KPI Strip ─── */}
+        {/* ── DAY STATS ── */}
         {view === "day" && (
-          <div className="grid grid-cols-3 gap-4 mb-8">
-            <div className="bg-white border border-[#E5E7EB] rounded-2xl px-5 py-4 shadow-sm">
-              <div className="text-xs text-[#6B7280] uppercase tracking-wide font-medium mb-2">Gesamt</div>
-              <div className="text-2xl font-black text-[#1F2A37]">{dayAppointments.length}</div>
-              <div className="text-xs text-[#6B7280] mt-0.5">Termine heute</div>
-            </div>
-            <div className="bg-white border border-[#E5E7EB] rounded-2xl px-5 py-4 shadow-sm">
-              <div className="text-xs text-[#6B7280] uppercase tracking-wide font-medium mb-2">Erledigt</div>
-              <div className="text-2xl font-black text-[#18A66D]">{doneToday}</div>
-              <div className="w-full bg-[#E5E7EB] rounded-full h-1.5 mt-2">
-                <div
-                  className="bg-[#18A66D] h-1.5 rounded-full transition-all duration-700"
-                  style={{ width: dayAppointments.length > 0 ? `${Math.round((doneToday / dayAppointments.length) * 100)}%` : "0%" }}
-                />
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12, marginBottom: 20 }}>
+            {[
+              { label: "Gesamt", value: dayAppts.length, sub: "Termine" },
+              { label: "Erledigt", value: doneToday, sub: "abgehakt", green: true },
+              { label: "Offen", value: dayAppts.length - doneToday, sub: "ausstehend" },
+            ].map(s => (
+              <div key={s.label} style={{ background: "#fff", border: "1px solid #E5E7EB", borderRadius: 16, padding: "16px 20px" }}>
+                <div style={{ fontSize: 11, color: "#9CA3AF", fontWeight: 700, textTransform: "uppercase", letterSpacing: .8, marginBottom: 8 }}>{s.label}</div>
+                <div style={{ fontSize: 28, fontWeight: 900, color: s.green ? "#18A66D" : "#111827" }}>{s.value}</div>
+                <div style={{ fontSize: 12, color: "#9CA3AF", marginTop: 2 }}>{s.sub}</div>
               </div>
-            </div>
-            <div className="bg-white border border-[#E5E7EB] rounded-2xl px-5 py-4 shadow-sm">
-              <div className="text-xs text-[#6B7280] uppercase tracking-wide font-medium mb-2">Offen</div>
-              <div className="text-2xl font-black text-[#1F2A37]">{openToday}</div>
-              <div className="text-xs text-[#6B7280] mt-0.5">Noch ausstehend</div>
-            </div>
+            ))}
           </div>
         )}
 
-        {/* ─── DAY VIEW ─── */}
+        {/* ════ DAY VIEW ════ */}
         {view === "day" && (
-          <div className="bg-white border border-[#E5E7EB] rounded-2xl shadow-sm overflow-hidden">
-            <div className="px-6 py-4 border-b border-[#E5E7EB] flex items-center justify-between">
-              <h2 className="text-sm font-bold text-[#1F2A37]">Stundenplan</h2>
-              <span className="text-xs text-[#6B7280]">06:00 – 20:59 Uhr</span>
+          <div style={{ background: "#fff", border: "1px solid #E5E7EB", borderRadius: 18, overflow: "hidden" }}>
+            <div style={{ padding: "14px 24px", borderBottom: "1px solid #F3F4F6", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <span style={{ fontSize: 13, fontWeight: 700, color: "#111827" }}>Stundenplan</span>
+              <span style={{ fontSize: 12, color: "#9CA3AF" }}>06:00 – 20:59 Uhr</span>
             </div>
-            <div className="divide-y divide-[#F3F4F6]">
-              {hours.map((hour) => {
-                const slot = dayAppointments.filter((a: any) => parseInt(a.time.split(":")[0]) === hour)
-                const isCurrent = hour === currentHour
-                const isPast = hour < currentHour
-                return (
-                  <div key={hour} className={`flex gap-4 px-6 py-4 transition ${isCurrent ? "bg-[#F0FDF6]" : isPast ? "opacity-50" : ""}`}>
-                    <div className="flex-shrink-0 w-16 pt-0.5">
-                      <div className={`text-xs font-bold ${isCurrent ? "text-[#18A66D]" : "text-[#9CA3AF]"}`}>
-                        {String(hour).padStart(2, "0")}:00
-                      </div>
-                      {isCurrent && <div className="text-[9px] text-[#18A66D] font-semibold mt-0.5">Jetzt</div>}
+            {hours.map(hour => {
+              const slot = dayAppts.filter(a => parseInt(a.time?.split(":")[0] || "0") === hour)
+              const isCur = isSameDay(cursor, today) && hour === today.getHours()
+              const isPast = isSameDay(cursor, today) && hour < today.getHours()
+              return (
+                <div key={hour} style={{ display: "flex", gap: 16, padding: "14px 24px", borderBottom: "1px solid #F9FAFB", background: isCur ? "#F0FBF6" : isPast ? "transparent" : undefined, opacity: isPast ? .5 : 1 }}>
+                  <div style={{ flexShrink: 0, width: 52 }}>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: isCur ? "#18A66D" : "#9CA3AF" }}>
+                      {String(hour).padStart(2,"0")}:00
                     </div>
-                    <div className="flex-1">
-                      {slot.length === 0 ? (
-                        <div className="text-xs text-[#D1D5DB] py-1">—</div>
-                      ) : (
-                        <div className="flex flex-col gap-2">
-                          {slot.map((a: any) => {
-                            const isDone = a.status === "done"
-                            return (
-                              <div
-                                key={a.id}
-                                onClick={() => { setSelected(a); setConfirmDelete(false) }}
-                                className={`flex items-center justify-between px-4 py-3 rounded-xl cursor-pointer transition ${
-                                  isDone ? "bg-[#F0FDF6] border border-[#6EE7B7]/40" : "bg-[#1F2A37] text-white hover:bg-[#2D3A4A]"
-                                }`}
-                              >
-                                <div className="flex items-center gap-3">
-                                  <div className={`text-xs font-bold px-2 py-1 rounded-lg shrink-0 ${isDone ? "bg-[#D1FAE5] text-[#18A66D]" : "bg-white/10 text-white/80"}`}>
-                                    {a.time}
-                                  </div>
-                                  <div>
-                                    <div className={`text-sm font-semibold ${isDone ? "text-[#1F2A37] line-through opacity-60" : "text-white"}`}>
-                                      {a.name}
-                                    </div>
-                                    {a.note && <div className={`text-xs mt-0.5 ${isDone ? "text-[#6B7280]" : "text-white/50"}`}>{a.note}</div>}
-                                  </div>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                  <div className={`hidden sm:flex items-center gap-1 text-xs px-2 py-1 rounded-full font-medium ${isDone ? "bg-[#D1FAE5] text-[#18A66D]" : "bg-[#18A66D]/20 text-[#18A66D]"}`}>
-                                    <span className="w-1 h-1 bg-[#18A66D] rounded-full" />
-                                    SMS ✓
-                                  </div>
-                                  <button
-                                    onClick={(e) => { e.stopPropagation(); toggleDone(a) }}
-                                    className={`w-7 h-7 rounded-full border-2 transition-all flex items-center justify-center shrink-0 ${
-                                      isDone ? "bg-[#18A66D] border-[#18A66D]" : "border-white/30 hover:border-white"
-                                    }`}
-                                  >
-                                    {isDone && <span className="text-white text-xs">✓</span>}
-                                  </button>
-                                </div>
-                              </div>
-                            )
-                          })}
-                        </div>
-                      )}
-                    </div>
+                    {isCur && <div style={{ fontSize: 9, color: "#18A66D", fontWeight: 700 }}>Jetzt</div>}
                   </div>
-                )
-              })}
-            </div>
+                  <div style={{ flex: 1 }}>
+                    {slot.length === 0
+                      ? <div style={{ fontSize: 12, color: "#E5E7EB" }}>—</div>
+                      : slot.map(a => {
+                          const done = a.status === "done"
+                          return (
+                            <div key={a.id} onClick={() => { setSelected(a); setConfirmDelete(false) }}
+                              style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 16px", borderRadius: 12, cursor: "pointer", marginBottom: 6, transition: "all .15s",
+                                background: done ? "#F0FBF6" : "#1F2A37", color: done ? "#111827" : "#fff",
+                              }}>
+                              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                                <span style={{ fontSize: 12, fontWeight: 800, padding: "2px 8px", borderRadius: 7, background: done ? "#D1F5E3" : "rgba(255,255,255,0.12)", color: done ? "#18A66D" : "rgba(255,255,255,0.8)" }}>{a.time}</span>
+                                <div>
+                                  <div style={{ fontSize: 13, fontWeight: 700, textDecoration: done ? "line-through" : undefined, opacity: done ? .6 : 1 }}>{a.name}</div>
+                                  {a.note && <div style={{ fontSize: 11, opacity: .6, marginTop: 2 }}>{a.note}</div>}
+                                </div>
+                              </div>
+                              <button onClick={e => { e.stopPropagation(); toggleDone(a) }}
+                                style={{ width: 26, height: 26, borderRadius: "50%", border: `2px solid ${done ? "#18A66D" : "rgba(255,255,255,0.3)"}`, background: done ? "#18A66D" : "transparent", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                                {done && <span style={{ color: "#fff", fontSize: 11, fontWeight: 900 }}>✓</span>}
+                              </button>
+                            </div>
+                          )
+                        })}
+                  </div>
+                </div>
+              )
+            })}
           </div>
         )}
 
-        {/* ─── WEEK VIEW ─── */}
+        {/* ════ WEEK VIEW ════ */}
         {view === "week" && (
-          <>
-            {/* Mobile: nächste 2 Tage, scrollbar */}
-            <div className="md:hidden overflow-x-auto pb-2">
-              <div className="flex gap-3 min-w-0" style={{ minWidth: "max-content" }}>
-                {weekDays.map((day, i) => {
-                  const dStr = day.toISOString().split("T")[0]
-                  const items = appointments.filter(a => a.date === dStr)
-                  const isToday = dStr === todayStr
-                  const doneCount = items.filter(a => a.status === "done").length
-                  return (
-                    <div key={i} style={{ width: "calc(50vw - 24px)", minWidth: 160 }} className={`rounded-2xl border overflow-hidden transition flex-shrink-0 ${isToday ? "border-[#18A66D] shadow-md shadow-[#18A66D]/10" : "border-[#E5E7EB] bg-white"}`}>
-                      <div className={`px-4 py-3 text-center border-b ${isToday ? "bg-[#18A66D]" : "bg-[#F7FAFC] border-[#E5E7EB]"}`}>
-                        <div className={`text-xs font-semibold uppercase tracking-wide ${isToday ? "text-white/80" : "text-[#9CA3AF]"}`}>
-                          {day.toLocaleDateString("de-DE", { weekday: "long" })}
-                        </div>
-                        <div className={`text-2xl font-black mt-0.5 ${isToday ? "text-white" : "text-[#1F2A37]"}`}>
-                          {day.getDate()}. {day.toLocaleDateString("de-DE", { month: "short" })}
-                        </div>
-                        {items.length > 0 && (
-                          <div className={`text-[10px] font-medium mt-1 ${isToday ? "text-white/70" : "text-[#6B7280]"}`}>
-                            {items.length} Termin{items.length !== 1 ? "e" : ""}
-                          </div>
-                        )}
-                      </div>
-                      <div className={`p-3 flex flex-col gap-2 min-h-[160px] ${isToday ? "bg-[#F0FDF6]" : "bg-white"}`}>
-                        {items.length === 0 ? (
-                          <div className="flex items-center justify-center h-full pt-6">
-                            <span className="text-xs text-[#D1D5DB]">Keine Termine</span>
-                          </div>
-                        ) : (
-                          <>
-                            {items.slice(0, 6).map((a: any) => (
-                              <div
-                                key={a.id}
-                                onClick={() => { setSelected(a); setConfirmDelete(false) }}
-                                className={`text-xs px-3 py-2 rounded-xl cursor-pointer transition flex items-center gap-2 ${
-                                  a.status === "done"
-                                    ? "bg-[#D1FAE5] text-[#18A66D] line-through opacity-60"
-                                    : isToday
-                                    ? "bg-[#18A66D] text-white"
-                                    : "bg-[#F7FAFC] text-[#1F2A37] border border-[#E5E7EB]"
-                                }`}
-                              >
-                                <span className="font-bold shrink-0">{a.time}</span>
-                                <span className="truncate">{a.name}</span>
-                              </div>
-                            ))}
-                            {items.length > 6 && (
-                              <div className="text-xs text-[#9CA3AF] text-center pt-1">+{items.length - 6} weitere</div>
-                            )}
-                          </>
-                        )}
-                      </div>
-                      {items.length > 0 && (
-                        <div className="px-3 pb-3">
-                          <div className="w-full bg-[#E5E7EB] rounded-full h-1.5">
-                            <div className="bg-[#18A66D] h-1.5 rounded-full transition-all" style={{ width: `${Math.round((doneCount / items.length) * 100)}%` }} />
-                          </div>
-                        </div>
-                      )}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 10 }}>
+            {weekDays.map((day, i) => {
+              const dStr   = toStr(day)
+              const items  = appointments.filter(a => a.date === dStr)
+              const isT    = dStr === todayStr
+              const isPast = dStr < todayStr
+              const done   = items.filter(a => a.status === "done").length
+              return (
+                <div key={i} style={{ borderRadius: 18, border: `1.5px solid ${isT ? "#18A66D" : "#E5E7EB"}`, overflow: "hidden", background: "#fff", opacity: isPast && !isT ? .75 : 1 }}>
+                  {/* Day header */}
+                  <div style={{ padding: "12px 8px", textAlign: "center", background: isT ? "#18A66D" : "#F9FAFB", borderBottom: `1px solid ${isT ? "transparent" : "#E5E7EB"}` }}>
+                    <div style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: .8, color: isT ? "rgba(255,255,255,0.8)" : "#9CA3AF", marginBottom: 4 }}>
+                      {WEEKDAYS_SHORT[i]}
                     </div>
-                  )
-                })}
-              </div>
-            </div>
-
-            {/* Desktop: 7 Tage Grid, scrollbar */}
-            <div className="hidden md:grid grid-cols-7 gap-3">
-              {weekDays.map((day, i) => {
-                const dStr = day.toISOString().split("T")[0]
-                const items = appointments.filter(a => a.date === dStr)
-                const isToday = dStr === todayStr
-                const doneCount = items.filter(a => a.status === "done").length
-                return (
-                  <div key={i} className={`rounded-2xl border overflow-hidden transition ${isToday ? "border-[#18A66D] shadow-md shadow-[#18A66D]/10" : "border-[#E5E7EB] bg-white"}`}>
-                    <div className={`px-3 py-3 text-center border-b ${isToday ? "bg-[#18A66D]" : "bg-[#F7FAFC] border-[#E5E7EB]"}`}>
-                      <div className={`text-xs font-semibold uppercase tracking-wide ${isToday ? "text-white/80" : "text-[#9CA3AF]"}`}>
-                        {day.toLocaleDateString("de-DE", { weekday: "short" })}
-                      </div>
-                      <div className={`text-xl font-black mt-0.5 ${isToday ? "text-white" : "text-[#1F2A37]"}`}>
-                        {day.getDate()}
-                      </div>
-                      {items.length > 0 && (
-                        <div className={`text-[10px] font-medium mt-1 ${isToday ? "text-white/70" : "text-[#6B7280]"}`}>
-                          {items.length} Termin{items.length !== 1 ? "e" : ""}
-                        </div>
-                      )}
-                    </div>
-                    <div className={`p-2 flex flex-col gap-1.5 overflow-y-auto ${isToday ? "bg-[#F0FDF6]" : "bg-white"}`} style={{ minHeight: 120, maxHeight: 320 }}>
-                      {items.length === 0 ? (
-                        <div className="flex items-center justify-center h-full pt-4">
-                          <span className="text-[10px] text-[#D1D5DB]">Frei</span>
-                        </div>
-                      ) : (
-                        items.map((a: any) => (
-                          <div
-                            key={a.id}
-                            onClick={() => { setSelected(a); setConfirmDelete(false) }}
-                            className={`text-[10px] px-2 py-1.5 rounded-lg cursor-pointer transition flex items-center gap-1 ${
-                              a.status === "done"
-                                ? "bg-[#D1FAE5] text-[#18A66D] line-through opacity-60"
-                                : isToday
-                                ? "bg-[#18A66D] text-white"
-                                : "bg-[#F7FAFC] text-[#1F2A37] border border-[#E5E7EB] hover:border-[#18A66D]"
-                            }`}
-                          >
-                            <span className="font-bold shrink-0">{a.time}</span>
-                            <span className="truncate">{a.name}</span>
-                          </div>
-                        ))
-                      )}
+                    <div style={{ fontSize: 20, fontWeight: 900, color: isT ? "#fff" : "#111827" }}>{day.getDate()}</div>
+                    <div style={{ fontSize: 10, color: isT ? "rgba(255,255,255,0.7)" : "#9CA3AF", marginTop: 2 }}>
+                      {MONTHS_DE[day.getMonth()].slice(0, 3)}
                     </div>
                     {items.length > 0 && (
-                      <div className="px-2 pb-2">
-                        <div className="w-full bg-[#E5E7EB] rounded-full h-1">
-                          <div className="bg-[#18A66D] h-1 rounded-full transition-all" style={{ width: `${Math.round((doneCount / items.length) * 100)}%` }} />
-                        </div>
+                      <div style={{ fontSize: 9, fontWeight: 700, marginTop: 4, color: isT ? "rgba(255,255,255,0.7)" : "#6B7280" }}>
+                        {items.length} Termin{items.length !== 1 ? "e" : ""}
                       </div>
                     )}
                   </div>
+                  {/* Items */}
+                  <div style={{ padding: "8px 6px", minHeight: 120, maxHeight: 300, overflowY: "auto", background: isT ? "#F0FBF6" : "#fff" }}>
+                    {items.length === 0
+                      ? <div style={{ textAlign: "center", paddingTop: 20, fontSize: 10, color: "#E5E7EB" }}>Frei</div>
+                      : items.map(a => (
+                          <div key={a.id} onClick={() => { setSelected(a); setConfirmDelete(false) }}
+                            style={{ fontSize: 11, padding: "6px 8px", borderRadius: 8, marginBottom: 4, cursor: "pointer", display: "flex", alignItems: "center", gap: 5, transition: "all .15s",
+                              background: a.status === "done" ? "#D1F5E3" : isT ? "#18A66D" : "#F3F4F6",
+                              color: a.status === "done" ? "#18A66D" : isT ? "#fff" : "#374151",
+                              textDecoration: a.status === "done" ? "line-through" : undefined,
+                              opacity: a.status === "done" ? .7 : 1,
+                            }}>
+                            <span style={{ fontWeight: 800, flexShrink: 0 }}>{a.time}</span>
+                            <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{a.name}</span>
+                          </div>
+                        ))
+                    }
+                  </div>
+                  {/* Progress bar */}
+                  {items.length > 0 && (
+                    <div style={{ padding: "0 8px 8px" }}>
+                      <div style={{ height: 3, background: "#F3F4F6", borderRadius: 4 }}>
+                        <div style={{ height: "100%", borderRadius: 4, background: "#18A66D", width: `${Math.round((done/items.length)*100)}%`, transition: "width .4s" }} />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+        )}
+
+        {/* ════ MONTH VIEW ════ */}
+        {view === "month" && (
+          <div style={{ background: "#fff", border: "1px solid #E5E7EB", borderRadius: 18, overflow: "hidden" }}>
+            {/* Weekday headers */}
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)", borderBottom: "1px solid #F3F4F6" }}>
+              {WEEKDAYS_SHORT.map(d => (
+                <div key={d} style={{ padding: "12px 0", textAlign: "center", fontSize: 11, fontWeight: 700, color: "#9CA3AF", textTransform: "uppercase", letterSpacing: .8 }}>{d}</div>
+              ))}
+            </div>
+            {/* Calendar grid */}
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)" }}>
+              {monthDays.map((day, i) => {
+                if (!day) return <div key={i} style={{ minHeight: 90, borderRight: "1px solid #F9FAFB", borderBottom: "1px solid #F9FAFB", background: "#FAFAFA" }} />
+                const dStr   = toStr(day)
+                const items  = appointments.filter(a => a.date === dStr)
+                const isT    = dStr === todayStr
+                const isPast = dStr < todayStr
+                const isCurM = day.getMonth() === cursor.getMonth()
+                return (
+                  <div key={i} onClick={() => { setCursor(day); setView("day") }}
+                    style={{ minHeight: 90, borderRight: "1px solid #F9FAFB", borderBottom: "1px solid #F9FAFB", padding: "8px 6px", cursor: "pointer", transition: "background .15s",
+                      background: isT ? "#F0FBF6" : "transparent", opacity: isCurM ? 1 : .4,
+                    }}
+                    onMouseEnter={e => { if (!isT) (e.currentTarget as HTMLElement).style.background = "#F9FAFB" }}
+                    onMouseLeave={e => { if (!isT) (e.currentTarget as HTMLElement).style.background = "transparent" }}>
+                    {/* Day number */}
+                    <div style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 28, height: 28, borderRadius: "50%", marginBottom: 4,
+                      background: isT ? "#18A66D" : "transparent",
+                      color: isT ? "#fff" : isPast ? "#9CA3AF" : "#111827",
+                      fontSize: 13, fontWeight: isT ? 900 : 600,
+                    }}>
+                      {day.getDate()}
+                    </div>
+                    {/* Appointment dots / chips */}
+                    <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                      {items.slice(0, 3).map(a => (
+                        <div key={a.id} style={{ fontSize: 10, padding: "2px 6px", borderRadius: 5, fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+                          background: a.status === "done" ? "#D1F5E3" : isT ? "#18A66D" : "#F0FBF6",
+                          color: a.status === "done" ? "#065F46" : isT ? "#fff" : "#18A66D",
+                        }}>
+                          {a.time} {a.name}
+                        </div>
+                      ))}
+                      {items.length > 3 && (
+                        <div style={{ fontSize: 10, color: "#9CA3AF", fontWeight: 600, paddingLeft: 6 }}>+{items.length - 3} weitere</div>
+                      )}
+                    </div>
+                  </div>
                 )
               })}
             </div>
-          </>
+          </div>
         )}
+
+        {/* ── Upcoming (nächste Termine) ── */}
+        {view === "month" && (() => {
+          const upcoming = appointments
+            .filter(a => a.date && a.date >= todayStr && a.status !== "done")
+            .slice(0, 5)
+          if (!upcoming.length) return null
+          return (
+            <div style={{ marginTop: 20, background: "#fff", border: "1px solid #E5E7EB", borderRadius: 18, overflow: "hidden" }}>
+              <div style={{ padding: "14px 20px", borderBottom: "1px solid #F3F4F6" }}>
+                <span style={{ fontSize: 13, fontWeight: 700, color: "#111827" }}>Nächste Termine</span>
+              </div>
+              {upcoming.map(a => (
+                <div key={a.id} onClick={() => { setSelected(a); setConfirmDelete(false) }}
+                  style={{ display: "flex", alignItems: "center", gap: 14, padding: "12px 20px", borderBottom: "1px solid #F9FAFB", cursor: "pointer", transition: "background .12s" }}
+                  onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = "#F9FAFB"}
+                  onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = "transparent"}>
+                  <div style={{ flexShrink: 0, textAlign: "center", background: "#F0FBF6", border: "1px solid #D1F5E3", borderRadius: 10, padding: "6px 10px", minWidth: 50 }}>
+                    <div style={{ fontSize: 10, fontWeight: 700, color: "#18A66D", textTransform: "uppercase" }}>
+                      {parseStr(a.date).toLocaleDateString("de-DE", { month: "short" })}
+                    </div>
+                    <div style={{ fontSize: 20, fontWeight: 900, color: "#111827", lineHeight: 1 }}>
+                      {parseStr(a.date).getDate()}
+                    </div>
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: "#111827" }}>{a.name}</div>
+                    <div style={{ fontSize: 12, color: "#9CA3AF", marginTop: 2 }}>
+                      {a.time} Uhr · {parseStr(a.date).toLocaleDateString("de-DE", { weekday: "long" })}
+                    </div>
+                  </div>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D1D5DB" strokeWidth="2.5" strokeLinecap="round"><path d="M9 18l6-6-6-6"/></svg>
+                </div>
+              ))}
+            </div>
+          )
+        })()}
+
       </div>
 
-
-      {/* ─── DETAIL POPUP ─── */}
+      {/* ── DETAIL POPUP ── */}
       {selected && (
-        <div
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 px-4"
-          onClick={() => { setSelected(null); setConfirmDelete(false) }}
-        >
-          <div
-            className="bg-white rounded-2xl w-full max-w-sm shadow-2xl overflow-hidden"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Popup Header */}
-            <div className={`px-6 py-5 ${selected.status === "done" ? "bg-[#F0FDF6]" : "bg-[#1F2A37]"}`}>
-              <div className="flex items-center justify-between mb-3">
-                <div className={`text-xs font-semibold uppercase tracking-wider ${selected.status === "done" ? "text-[#18A66D]" : "text-white/50"}`}>
-                  Termindetails
-                </div>
-                <button
-                  onClick={() => { setSelected(null); setConfirmDelete(false) }}
-                  className={`w-7 h-7 rounded-full flex items-center justify-center text-sm transition ${selected.status === "done" ? "bg-[#E5E7EB] text-[#6B7280] hover:bg-[#D1D5DB]" : "bg-white/10 text-white hover:bg-white/20"}`}
-                >
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 50, padding: "0 16px" }}
+          onClick={() => { setSelected(null); setConfirmDelete(false) }}>
+          <div style={{ background: "#fff", borderRadius: 24, width: "100%", maxWidth: 360, boxShadow: "0 24px 80px rgba(0,0,0,0.2)", overflow: "hidden" }}
+            onClick={e => e.stopPropagation()}>
+            {/* Header */}
+            <div style={{ padding: "20px 24px 18px", background: selected.status === "done" ? "#F0FBF6" : "#1F2A37" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+                <span style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: .8, color: selected.status === "done" ? "#18A66D" : "rgba(255,255,255,0.4)" }}>Termindetails</span>
+                <button onClick={() => { setSelected(null); setConfirmDelete(false) }}
+                  style={{ width: 28, height: 28, borderRadius: "50%", border: "none", cursor: "pointer", background: selected.status === "done" ? "#E5E7EB" : "rgba(255,255,255,0.1)", color: selected.status === "done" ? "#6B7280" : "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13 }}>
                   ✕
                 </button>
               </div>
-              <div className={`text-xl font-bold ${selected.status === "done" ? "text-[#1F2A37]" : "text-white"}`}>
-                {selected.name}
-              </div>
-              <div className={`text-sm mt-1 ${selected.status === "done" ? "text-[#6B7280]" : "text-white/60"}`}>
-                {selected.date} · {selected.time} Uhr
+              <div style={{ fontSize: 20, fontWeight: 800, color: selected.status === "done" ? "#111827" : "#fff" }}>{selected.name}</div>
+              <div style={{ fontSize: 13, marginTop: 4, color: selected.status === "done" ? "#6B7280" : "rgba(255,255,255,0.55)" }}>
+                {selected.date && parseStr(selected.date).toLocaleDateString("de-DE", { weekday: "long", day: "numeric", month: "long" })}
+                {selected.time && ` · ${selected.time} Uhr`}
               </div>
             </div>
-
-            {/* Popup Body */}
-            <div className="px-6 py-5 space-y-4">
+            {/* Body */}
+            <div style={{ padding: "18px 24px", display: "flex", flexDirection: "column", gap: 14 }}>
               {selected.phone && (
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 bg-[#F7FAFC] border border-[#E5E7EB] rounded-lg flex items-center justify-center text-sm shrink-0">📞</div>
+                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                  <div style={{ width: 36, height: 36, background: "#F9FAFB", border: "1px solid #E5E7EB", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, flexShrink: 0 }}>📞</div>
                   <div>
-                    <div className="text-xs text-[#6B7280] font-medium">Telefon</div>
-                    <div className="text-sm font-semibold text-[#1F2A37]">{selected.phone}</div>
+                    <div style={{ fontSize: 11, color: "#9CA3AF", fontWeight: 600 }}>Telefon</div>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: "#111827" }}>{selected.phone}</div>
                   </div>
                 </div>
               )}
               {selected.note && (
-                <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 bg-[#F7FAFC] border border-[#E5E7EB] rounded-lg flex items-center justify-center text-sm shrink-0">📝</div>
+                <div style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
+                  <div style={{ width: 36, height: 36, background: "#F9FAFB", border: "1px solid #E5E7EB", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, flexShrink: 0 }}>📝</div>
                   <div>
-                    <div className="text-xs text-[#6B7280] font-medium">Notiz</div>
-                    <div className="text-sm text-[#1F2A37]">{selected.note}</div>
+                    <div style={{ fontSize: 11, color: "#9CA3AF", fontWeight: 600 }}>Notiz</div>
+                    <div style={{ fontSize: 14, color: "#111827" }}>{selected.note}</div>
                   </div>
                 </div>
               )}
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-[#E8FBF3] border border-[#6EE7B7]/40 rounded-lg flex items-center justify-center text-sm shrink-0">📱</div>
-                <div>
-                  <div className="text-xs text-[#6B7280] font-medium">SMS-Erinnerung</div>
-                  <div className="text-sm font-semibold text-[#18A66D]">Gesendet ✓</div>
-                </div>
-              </div>
-              <div className={`flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-semibold ${
-                selected.status === "done" ? "bg-[#E8FBF3] text-[#18A66D]" : "bg-[#FEF3C7] text-[#D97706]"
-              }`}>
-                <span>{selected.status === "done" ? "✓ Termin wahrgenommen" : "⏳ Ausstehend"}</span>
+              <div style={{ padding: "10px 14px", borderRadius: 12, fontSize: 13, fontWeight: 700,
+                background: selected.status === "done" ? "#F0FBF6" : "#FFFBEB",
+                color: selected.status === "done" ? "#18A66D" : "#D97706" }}>
+                {selected.status === "done" ? "✓ Termin wahrgenommen" : "⏳ Ausstehend"}
               </div>
             </div>
-
-            {/* Popup Footer */}
-            <div className="px-6 pb-6 flex flex-col gap-2">
-              <button
-                onClick={() => toggleDone(selected)}
-                className={`w-full py-3.5 rounded-xl font-bold text-sm transition shadow-md ${
-                  selected.status === "done"
-                    ? "bg-[#F7FAFC] border border-[#E5E7EB] text-[#6B7280] hover:bg-[#E5E7EB]"
-                    : "bg-[#18A66D] text-white hover:bg-[#0F8F63] shadow-[#18A66D]/20"
-                }`}
-              >
+            {/* Footer */}
+            <div style={{ padding: "0 24px 24px", display: "flex", flexDirection: "column", gap: 8 }}>
+              <button onClick={() => toggleDone(selected)} style={{ width: "100%", padding: "14px", borderRadius: 13, border: "none", cursor: "pointer", fontSize: 14, fontWeight: 700, transition: "all .15s",
+                background: selected.status === "done" ? "#F3F4F6" : "#18A66D",
+                color: selected.status === "done" ? "#6B7280" : "#fff",
+                boxShadow: selected.status === "done" ? "none" : "0 4px 16px rgba(24,166,109,0.25)" }}>
                 {selected.status === "done" ? "Als offen markieren" : "Als erledigt markieren ✓"}
               </button>
-
-              {/* ─── LÖSCHEN ─── */}
-              {!confirmDelete ? (
-                <button
-                  onClick={() => setConfirmDelete(true)}
-                  className="w-full py-3 rounded-xl font-semibold text-sm text-[#EF4444] border border-[#FECACA] hover:bg-[#FEF2F2] transition"
-                >
-                  Termin löschen
-                </button>
-              ) : (
-                <div className="bg-[#FEF2F2] border border-[#FECACA] rounded-xl px-4 py-3">
-                  <p className="text-xs text-[#EF4444] font-semibold text-center mb-3">
-                    Wirklich löschen? Das kann nicht rückgängig gemacht werden.
-                  </p>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => setConfirmDelete(false)}
-                      className="flex-1 py-2.5 rounded-lg text-sm font-semibold bg-white border border-[#E5E7EB] text-[#6B7280] hover:bg-[#F7FAFC] transition"
-                    >
-                      Abbrechen
-                    </button>
-                    <button
-                      onClick={() => deleteAppointment(selected.id)}
-                      className="flex-1 py-2.5 rounded-lg text-sm font-bold bg-[#EF4444] text-white hover:bg-[#DC2626] transition"
-                    >
-                      Ja, löschen
-                    </button>
+              {!confirmDelete
+                ? <button onClick={() => setConfirmDelete(true)} style={{ width: "100%", padding: "12px", borderRadius: 13, border: "1.5px solid #FECACA", cursor: "pointer", fontSize: 13, fontWeight: 700, color: "#EF4444", background: "transparent", transition: "all .15s" }}>
+                    Termin löschen
+                  </button>
+                : <div style={{ background: "#FEF2F2", border: "1px solid #FECACA", borderRadius: 12, padding: "14px 16px" }}>
+                    <p style={{ fontSize: 12, color: "#EF4444", fontWeight: 600, textAlign: "center", margin: "0 0 12px" }}>Wirklich löschen? Kann nicht rückgängig gemacht werden.</p>
+                    <div style={{ display: "flex", gap: 8 }}>
+                      <button onClick={() => setConfirmDelete(false)} style={{ flex: 1, padding: "10px", borderRadius: 10, border: "1px solid #E5E7EB", background: "#fff", color: "#6B7280", cursor: "pointer", fontSize: 13, fontWeight: 700 }}>Abbrechen</button>
+                      <button onClick={() => deleteAppointment(selected.id)} style={{ flex: 1, padding: "10px", borderRadius: 10, border: "none", background: "#EF4444", color: "#fff", cursor: "pointer", fontSize: 13, fontWeight: 700 }}>Löschen</button>
+                    </div>
                   </div>
-                </div>
-              )}
+              }
             </div>
           </div>
         </div>
       )}
+
+      <style>{`
+        @media (max-width: 640px) {
+          .week-grid { grid-template-columns: repeat(3, 1fr) !important; }
+        }
+      `}</style>
     </div>
   )
+}
+
+const navBtn: React.CSSProperties = {
+  width: 34, height: 34, borderRadius: 10, border: "1.5px solid #E5E7EB",
+  background: "#fff", cursor: "pointer", display: "flex", alignItems: "center",
+  justifyContent: "center", color: "#6B7280", transition: "all .15s",
 }
