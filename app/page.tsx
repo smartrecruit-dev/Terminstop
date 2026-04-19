@@ -585,6 +585,17 @@ export default function LandingPage() {
           .nav-pad        { padding:0 18px !important; }
         }
 
+        /* ─── Responsive Grids ─── */
+        .grid-2col { grid-template-columns: repeat(2, 1fr) !important; }
+        .grid-3col { grid-template-columns: repeat(3, 1fr) !important; }
+        @media (max-width: 860px) {
+          .grid-2col { grid-template-columns: 1fr !important; }
+          .grid-3col { grid-template-columns: repeat(2, 1fr) !important; }
+        }
+        @media (max-width: 560px) {
+          .grid-3col { grid-template-columns: 1fr !important; }
+        }
+
         /* ─── Reduce motion ─── */
         @media (prefers-reduced-motion: reduce) {
           *, *::before, *::after {
@@ -649,15 +660,16 @@ export default function LandingPage() {
               onClick={() => setNavOpen(true)}
               aria-label="Menü öffnen"
               style={{
-                width: 42, height: 42, borderRadius: 10,
+                width: 52, height: 42, borderRadius: 10,
                 background: C.bg2, border: `1px solid ${C.border}`,
                 display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-                gap: 5, cursor: "pointer",
+                gap: 4, cursor: "pointer", padding: "6px 10px",
               }}
             >
-              <span style={{ width: 18, height: 1.8, background: C.text, borderRadius: 2 }} />
-              <span style={{ width: 18, height: 1.8, background: C.text, borderRadius: 2 }} />
-              <span style={{ width: 18, height: 1.8, background: C.text, borderRadius: 2 }} />
+              <span style={{ width: 20, height: 2, background: C.text, borderRadius: 2 }} />
+              <span style={{ width: 20, height: 2, background: C.text, borderRadius: 2 }} />
+              <span style={{ width: 20, height: 2, background: C.text, borderRadius: 2 }} />
+              <span style={{ fontSize: 8, fontWeight: 700, color: C.muted, letterSpacing: 0.5, marginTop: 1 }}>MENÜ</span>
             </button>
           </div>
         </nav>
@@ -1111,7 +1123,7 @@ export default function LandingPage() {
               </div>
             </Reveal>
 
-            <div style={{ display: "grid", gap: 18, gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))" }}>
+            <div className="grid-2col" style={{ display: "grid", gap: 18 }}>
               {features.map((f, i) => (
                 <Reveal key={i} delay={i * 80}>
                   <div className="lift" style={{
@@ -1313,7 +1325,7 @@ export default function LandingPage() {
               </div>
             </Reveal>
 
-            <div style={{ display: "grid", gap: 14, gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))" }}>
+            <div className="grid-3col" style={{ display: "grid", gap: 14 }}>
               {addonFeatures.map((f, i) => (
                 <Reveal key={i} delay={i * 60}>
                   <div className="lift" style={{
@@ -1510,6 +1522,7 @@ export default function LandingPage() {
                   <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
                     <a href="/impressum" style={{ fontSize: 13.5, color: C.text2, textDecoration: "none", fontWeight: 500 }}>Impressum</a>
                     <a href="/datenschutz" style={{ fontSize: 13.5, color: C.text2, textDecoration: "none", fontWeight: 500 }}>Datenschutz</a>
+                    <a href="/agb" style={{ fontSize: 13.5, color: C.text2, textDecoration: "none", fontWeight: 500 }}>AGB</a>
                     <a href="/avv" style={{ fontSize: 13.5, color: C.text2, textDecoration: "none", fontWeight: 500 }}>AVV</a>
                   </div>
                 </div>
