@@ -140,27 +140,29 @@ export default function Dashboard() {
   const [showSuggestions, setShowSuggestions]     = useState(false)
   const [loading, setLoading]         = useState(true)
 
+  // Alle drei Checks parallel → halbe Ladezeit
   useEffect(() => {
     const storedId   = localStorage.getItem("company_id")
     const storedName = localStorage.getItem("company_name")
     if (!storedId) { window.location.href = "/login"; return }
-    supabase.from("companies").select("paused").eq("id", storedId).single()
-      .then(({ data }) => {
-        if (data?.paused) {
-          localStorage.removeItem("company_id"); localStorage.removeItem("company_name")
-          window.location.href = "/login"
-        } else {
-          setCompanyId(storedId); setCompanyName(storedName || "")
-        }
-      })
+    setCompanyName(storedName || "")
+    Promise.all([
+      supabase.from("companies").select("paused").eq("id", storedId).single(),
+      supabase.from("appointments").select("*")
+        .eq("company_id", storedId)
+        .order("date", { ascending: true }).order("time", { ascending: true }),
+      supabase.from("customers").select("*")
+        .eq("company_id", storedId).order("name", { ascending: true }),
+    ]).then(([pausedRes, apptRes, custRes]) => {
+      if (pausedRes.data?.paused) {
+        localStorage.removeItem("company_id"); localStorage.removeItem("company_name")
+        window.location.href = "/login"; return
+      }
+      setCompanyId(storedId)
+      if (apptRes.data) setAppointments(apptRes.data)
+      if (custRes.data)  setCustomers(custRes.data)
+    }).finally(() => setLoading(false))
   }, [])
-
-  useEffect(() => {
-    if (companyId) {
-      // Beide Fetches parallel – erst wenn beide fertig sind, wird loading=false
-      Promise.all([loadAppointments(), loadCustomers()]).finally(() => setLoading(false))
-    }
-  }, [companyId])
 
   async function loadAppointments() {
     if (!companyId) return
@@ -171,6 +173,7 @@ export default function Dashboard() {
   }
 
   async function loadCustomers() {
+    if (!companyId) return
     const { data } = await supabase.from("customers").select("*")
       .eq("company_id", companyId).order("name", { ascending: true })
     if (data) setCustomers(data)

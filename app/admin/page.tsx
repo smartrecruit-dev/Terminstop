@@ -18,7 +18,7 @@ type Company = {
   appointments: number; customers: number; created_at: string
 }
 
-type Tab = "zentrale" | "betriebe" | "coldcall" | "notizen" | "rueckrufe" | "leads"
+type Tab = "zentrale" | "betriebe" | "coldcall" | "notizen" | "rueckrufe" | "leads" | "prozesse"
 
 type LeadStatus = "neu" | "angerufen" | "nicht_erreicht" | "interesse" | "kein_interesse" | "termin" | "kunde"
 
@@ -468,6 +468,7 @@ export default function AdminPage() {
               ["coldcall",   "📞 Skript"],
               ["rueckrufe",  "📋 Rückrufe"],
               ["leads",      "🔍 Lead-Finder"],
+              ["prozesse",   "📖 Prozesse"],
               ["notizen",    "📝 Notizen"],
             ] as [Tab, string][]).map(([t, label]) => (
               <button key={t} onClick={() => setTab(t)} style={{
@@ -1350,6 +1351,170 @@ export default function AdminPage() {
             </div>
           )
         })()}
+
+        {/* ════ PROZESSE ════ */}
+        {tab === "prozesse" && (
+          <div style={{ maxWidth: 860 }}>
+            <h1 style={{ fontSize: 20, fontWeight: 900, color: T, margin: "0 0 6px", letterSpacing: "-.4px" }}>📖 Prozesse & Anleitungen</h1>
+            <p style={{ fontSize: 13, color: M, margin: "0 0 28px" }}>Schritt-für-Schritt-Anleitungen für die täglichen Abläufe bei TerminStop.</p>
+
+            {/* ── Prozess 1: Neuen Kunden anlegen ── */}
+            <div style={{ background: "#fff", border: `1px solid ${BD}`, borderRadius: 18, marginBottom: 20, overflow: "hidden" }}>
+              <div style={{ background: `linear-gradient(135deg, ${G}, #15955F)`, padding: "20px 24px", color: "#fff" }}>
+                <div style={{ fontSize: 11, fontWeight: 700, opacity: .8, textTransform: "uppercase", letterSpacing: .5, marginBottom: 4 }}>Prozess 01</div>
+                <div style={{ fontSize: 18, fontWeight: 900 }}>🆕 Neuen Kunden anlegen</div>
+                <div style={{ fontSize: 12, opacity: .8, marginTop: 4 }}>Vom Cold-Call bis zum ersten Login – so geht's Schritt für Schritt</div>
+              </div>
+              <div style={{ padding: "24px" }}>
+                {[
+                  {
+                    nr: "01", icon: "📞", title: "Cold-Call erfolgreich – Daten notieren",
+                    color: "#EFF6FF", border: "#BFDBFE", text: "Du hast jemanden überzeugt? Top. Notiere dir während des Gesprächs:",
+                    items: ["✅ Vollständiger Firmenname (z.B. \"Friseur Schönheit GmbH\")", "✅ E-Mail-Adresse (die, mit der sie sich einloggen sollen)", "✅ Handynummer (für SMS-Erinnerungen an deren Kunden)", "✅ Kategorie / Branche (Friseur, Praxis, Kosmetik…)"],
+                    tip: "Tipp: Frag nach der E-Mail nochmal nach – Buchstabieren lassen falls nötig.",
+                  },
+                  {
+                    nr: "02", icon: "🌐", title: "Supabase öffnen",
+                    color: "#F5F3FF", border: "#DDD6FE",
+                    text: "Gehe auf supabase.com → Log in → Dein TerminStop-Projekt öffnen.",
+                    items: ["→ Linkes Menü: Authentication → Users"],
+                    tip: "Alternativ direkt: supabase.com/dashboard → Projekt auswählen",
+                  },
+                  {
+                    nr: "03", icon: "👤", title: "Auth-User anlegen (E-Mail + Passwort)",
+                    color: GL, border: GB,
+                    text: "Im Authentication-Bereich → Tab \"Users\" → Button \"Add user\" → \"Create new user\":",
+                    items: [
+                      "E-Mail: Die E-Mail des Kunden eingeben",
+                      "Passwort: Ein sicheres Startpasswort vergeben (z.B. Termin2024! + Firmenname-Abkürzung)",
+                      "\"Auto Confirm User\" aktivieren – damit der Kunde sich sofort einloggen kann",
+                      "Auf \"Create user\" klicken",
+                    ],
+                    tip: "⚠️ Wichtig: Die User-ID, die Supabase automatisch vergibt, brauchst du gleich für Schritt 4.",
+                  },
+                  {
+                    nr: "04", icon: "🏢", title: "Company-Eintrag in der Datenbank anlegen",
+                    color: "#FFFBEB", border: "#FDE68A",
+                    text: "Linkes Menü → Table Editor → Tabelle \"companies\" → \"Insert row\":",
+                    items: [
+                      "id: Wird automatisch generiert (UUID) – leer lassen",
+                      "name: Firmenname des Kunden",
+                      "email: Gleiche E-Mail wie beim Auth-User",
+                      "notification_phone: Handynummer des Betriebs (für SMS-Empfang)",
+                      "paused: false (Kunde ist aktiv)",
+                      "booking_addon: false (nur auf true setzen wenn Add-on gebucht)",
+                      "slug: Kleinbuchstaben, keine Leerzeichen z.B. \"friseur-schoenheit\" (nur für Buchungsseite nötig)",
+                    ],
+                    tip: "Die Spalte 'user_id' wurde aus Sicherheitsgründen entfernt – kein Mapping nötig. Der Login läuft über die E-Mail.",
+                  },
+                  {
+                    nr: "05", icon: "🔑", title: "Login-Daten an den Kunden schicken",
+                    color: GL, border: GB,
+                    text: "Schick dem Kunden eine kurze E-Mail oder Nachricht mit:",
+                    items: [
+                      "🔗 Login-Link: www.terminstop.de/login",
+                      "📧 E-Mail: [ihre E-Mail]",
+                      "🔐 Passwort: [das Passwort aus Schritt 3]",
+                      "💡 Hinweis: Passwort bitte nach erstem Login ändern (Einstellungen → Passwort ändern)",
+                    ],
+                    tip: "Vorlage: \"Hallo [Name], hier sind Ihre TerminStop-Zugangsdaten: Login: terminstop.de/login | E-Mail: [...] | Passwort: [...] – Bitte nach dem ersten Login ändern.\"",
+                  },
+                  {
+                    nr: "06", icon: "✅", title: "Prüfen ob alles läuft",
+                    color: "#ECFDF5", border: "#6EE7B7",
+                    text: "Kurz kontrollieren bevor du auflegt oder die E-Mail schickst:",
+                    items: [
+                      "✓ Betrieb erscheint in der Admin-Zentrale unter \"Betriebe\"",
+                      "✓ Status ist aktiv (nicht pausiert)",
+                      "✓ Kunde kann sich einloggen (kurz selbst testen mit seinen Daten)",
+                      "✓ Ggf. ersten Termin gemeinsam im Onboarding-Call eintragen",
+                    ],
+                    tip: "Falls Login nicht klappt: In Supabase Auth → Users → User suchen → \"Send reset email\" schicken.",
+                  },
+                ].map(step => (
+                  <div key={step.nr} style={{ display: "flex", gap: 16, marginBottom: 20 }}>
+                    <div style={{ flexShrink: 0, width: 40, height: 40, borderRadius: 12, background: step.color, border: `1.5px solid ${step.border}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>
+                      {step.icon}
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+                        <span style={{ fontSize: 10, fontWeight: 800, color: M, letterSpacing: .5 }}>SCHRITT {step.nr}</span>
+                        <span style={{ fontSize: 14, fontWeight: 800, color: T }}>{step.title}</span>
+                      </div>
+                      <p style={{ fontSize: 13, color: M, margin: "0 0 8px" }}>{step.text}</p>
+                      <div style={{ background: step.color, border: `1px solid ${step.border}`, borderRadius: 10, padding: "10px 14px", marginBottom: step.tip ? 8 : 0 }}>
+                        {step.items.map((item, i) => (
+                          <div key={i} style={{ fontSize: 12.5, color: T, lineHeight: 1.7 }}>{item}</div>
+                        ))}
+                      </div>
+                      {step.tip && (
+                        <div style={{ fontSize: 11.5, color: "#7C3AED", background: "#F5F3FF", border: "1px solid #DDD6FE", borderRadius: 8, padding: "7px 12px" }}>
+                          💡 {step.tip}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* ── Prozess 2: Kunden pausieren / reaktivieren ── */}
+            <div style={{ background: "#fff", border: `1px solid ${BD}`, borderRadius: 18, marginBottom: 20, overflow: "hidden" }}>
+              <div style={{ background: "linear-gradient(135deg, #D97706, #B45309)", padding: "20px 24px", color: "#fff" }}>
+                <div style={{ fontSize: 11, fontWeight: 700, opacity: .8, textTransform: "uppercase", letterSpacing: .5, marginBottom: 4 }}>Prozess 02</div>
+                <div style={{ fontSize: 18, fontWeight: 900 }}>⏸️ Kunden pausieren oder reaktivieren</div>
+                <div style={{ fontSize: 12, opacity: .8, marginTop: 4 }}>Wenn jemand kündigt oder eine Pause macht</div>
+              </div>
+              <div style={{ padding: "24px" }}>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
+                  <div style={{ background: "#FEF2F2", border: "1px solid #FECACA", borderRadius: 12, padding: 16 }}>
+                    <div style={{ fontSize: 14, fontWeight: 800, color: RED, marginBottom: 8 }}>⏸ Pausieren</div>
+                    <div style={{ fontSize: 12.5, color: T, lineHeight: 1.7 }}>
+                      Admin → Tab "Betriebe" → Betrieb suchen → Aufklappen → Schalter "Pausiert" aktivieren → Speichern.<br/><br/>
+                      Der Kunde wird beim nächsten Login automatisch ausgeloggt und kann sich nicht mehr einloggen, solange er pausiert ist.
+                    </div>
+                  </div>
+                  <div style={{ background: GL, border: `1px solid ${GB}`, borderRadius: 12, padding: 16 }}>
+                    <div style={{ fontSize: 14, fontWeight: 800, color: G, marginBottom: 8 }}>▶️ Reaktivieren</div>
+                    <div style={{ fontSize: 12.5, color: T, lineHeight: 1.7 }}>
+                      Gleicher Weg – Schalter "Pausiert" deaktivieren → Speichern.<br/><br/>
+                      Kunde kann sich sofort wieder einloggen. Alle Daten (Termine, Kunden) sind noch vorhanden.
+                    </div>
+                  </div>
+                </div>
+                <div style={{ background: "#FFFBEB", border: "1px solid #FDE68A", borderRadius: 10, padding: "10px 14px", fontSize: 12.5, color: "#92400E" }}>
+                  ⚠️ Hinweis: Beim Pausieren werden keine Daten gelöscht. Falls ein Kunde dauerhaft weg ist und die Daten löschen möchte, musst du das manuell in Supabase unter Table Editor → companies → Zeile löschen tun. Auth-User ebenfalls unter Authentication → Users löschen.
+                </div>
+              </div>
+            </div>
+
+            {/* ── Prozess 3: Booking Add-on aktivieren ── */}
+            <div style={{ background: "#fff", border: `1px solid ${BD}`, borderRadius: 18, overflow: "hidden" }}>
+              <div style={{ background: "linear-gradient(135deg, #7C3AED, #6D28D9)", padding: "20px 24px", color: "#fff" }}>
+                <div style={{ fontSize: 11, fontWeight: 700, opacity: .8, textTransform: "uppercase", letterSpacing: .5, marginBottom: 4 }}>Prozess 03</div>
+                <div style={{ fontSize: 18, fontWeight: 900 }}>🔖 Buchungs-Add-on aktivieren</div>
+                <div style={{ fontSize: 12, opacity: .8, marginTop: 4 }}>Wenn ein Kunde das Online-Buchungs-Feature dazu bucht</div>
+              </div>
+              <div style={{ padding: "24px" }}>
+                {[
+                  "Admin → Tab \"Betriebe\" → Betrieb aufklappen",
+                  "Schalter \"Booking Add-on\" aktivieren",
+                  "Einen eindeutigen Slug vergeben (z.B. \"friseur-berlin-mitte\") – nur Kleinbuchstaben und Bindestriche",
+                  "Speichern → Kunde hat sofort Zugriff auf seine Buchungsseite unter: terminstop.de/b/[slug]",
+                  "Kunden informieren: Im Dashboard erscheint jetzt ein neuer Tab \"Buchungsseite\" mit allen Einstellungen",
+                ].map((step, i) => (
+                  <div key={i} style={{ display: "flex", gap: 12, marginBottom: 12, alignItems: "flex-start" }}>
+                    <div style={{ flexShrink: 0, width: 24, height: 24, borderRadius: 8, background: "#F5F3FF", border: "1px solid #DDD6FE", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 800, color: "#7C3AED" }}>{i + 1}</div>
+                    <div style={{ fontSize: 13, color: T, lineHeight: 1.6, paddingTop: 2 }}>{step}</div>
+                  </div>
+                ))}
+                <div style={{ background: GL, border: `1px solid ${GB}`, borderRadius: 10, padding: "10px 14px", fontSize: 12.5, color: "#065F46", marginTop: 8 }}>
+                  💡 Der Slug ist die öffentliche URL der Buchungsseite. Einmal vergeben, möglichst nicht mehr ändern – sonst funktionieren alte Links nicht mehr.
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* ════ NOTIZEN ════ */}
         {tab === "notizen" && (
