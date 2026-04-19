@@ -20,17 +20,36 @@ type Company = {
 
 type Tab = "zentrale" | "betriebe" | "coldcall" | "notizen" | "rueckrufe" | "leads"
 
+type LeadStatus = "neu" | "angerufen" | "nicht_erreicht" | "interesse" | "kein_interesse" | "termin" | "kunde"
+
 type Lead = {
-  place_id: string
+  id: string
   name: string
-  address: string
   phone: string
-  website: string
-  rating: number | null
-  total_ratings: number
-  maps_url: string
-  status: string
+  email: string
+  city: string
+  category: string
+  notiz: string
+  status: LeadStatus
+  createdAt: string
+  updatedAt: string
 }
+
+const LEAD_STATUS: Record<LeadStatus, { label: string; color: string; bg: string; border: string; emoji: string }> = {
+  neu:             { emoji: "🔵", label: "Neu",              color: "#6B7280", bg: "#F9FAFB", border: BD        },
+  angerufen:       { emoji: "📞", label: "Angerufen",        color: "#3B82F6", bg: "#EFF6FF", border: "#BFDBFE" },
+  nicht_erreicht:  { emoji: "📵", label: "Nicht erreicht",   color: "#D97706", bg: "#FFFBEB", border: "#FDE68A" },
+  interesse:       { emoji: "💬", label: "Interesse",        color: "#7C3AED", bg: "#F5F3FF", border: "#DDD6FE" },
+  kein_interesse:  { emoji: "❌", label: "Kein Interesse",   color: M,         bg: "#F3F4F6", border: BD        },
+  termin:          { emoji: "📅", label: "Termin vereinbart",color: "#D97706", bg: "#FFF7ED", border: "#FED7AA" },
+  kunde:           { emoji: "✅", label: "Kunde geworden",   color: G,         bg: GL,        border: GB        },
+}
+
+const LEAD_CATEGORIES = [
+  "Kosmetikstudio", "Friseursalon", "Nagelstudio", "Zahnarztpraxis",
+  "Physiotherapie", "Massagepraxis", "Yogastudio", "Fitnessstudio",
+  "Tattoo-Studio", "Hundesalon", "Heilpraktiker", "Optiker", "Sonstiges",
+]
 
 type PriceRow = { id: string; name: string; price: string; desc: string }
 
@@ -175,44 +194,44 @@ export default function AdminPage() {
   const [rfOpen, setRfOpen]           = useState<string | null>(null)
   const [newRF, setNewRF]             = useState<Partial<Rückruf>>({ status: "offen", datum: todayKey })
 
-  // ── Leads / Lead-Finder ──────────────────────────────────────────────────
-  const CATEGORIES = [
-    "Kosmetikstudio", "Friseursalon", "Nagelstudio", "Zahnarztpraxis",
-    "Physiotherapie", "Massagepraxis", "Yogastudio", "Fitnessstudio",
-    "Tattoo-Studio", "Hundesalon", "Heilpraktiker", "Optiker",
-  ]
-  const [leadQuery, setLeadQuery]       = useState(CATEGORIES[0])
-  const [leadCity, setLeadCity]         = useState("Hannover")
+  // ── Leads (manuell) ──────────────────────────────────────────────────────
   const [leads, setLeads]               = useState<Lead[]>([])
-  const [leadsLoading, setLeadsLoading] = useState(false)
-  const [leadsError, setLeadsError]     = useState("")
-  const [addedLeads, setAddedLeads]     = useState<Set<string>>(new Set())
-  const [customQuery, setCustomQuery]   = useState("")
+  const [leadSearch, setLeadSearch]     = useState("")
+  const [leadCityFilter, setLeadCityFilter] = useState("Alle")
+  const [leadCatFilter, setLeadCatFilter]   = useState("Alle")
+  const [leadStatusFilter, setLeadStatusFilter] = useState<LeadStatus | "alle">("alle")
+  const [leadExpanded, setLeadExpanded] = useState<string | null>(null)
+  const [showLeadForm, setShowLeadForm] = useState(false)
+  const [newLead, setNewLead]           = useState<Partial<Lead>>({ status: "neu", category: LEAD_CATEGORIES[0] })
 
-  async function searchLeads() {
-    setLeadsLoading(true); setLeadsError(""); setLeads([])
-    const q = customQuery.trim() || leadQuery
-    const res = await fetch(`/api/admin/search-leads?query=${encodeURIComponent(q)}&city=${encodeURIComponent(leadCity)}`, {
-      headers: { "x-admin-secret": secret }
-    })
-    const json = await res.json()
-    if (json.error) { setLeadsError(json.error); setLeadsLoading(false); return }
-    setLeads(json.leads || [])
-    setLeadsLoading(false)
+  function saveLeads(list: Lead[]) {
+    setLeads(list)
+    localStorage.setItem("admin_leads", JSON.stringify(list))
   }
-
-  function addLeadToRueckrufe(lead: Lead) {
-    const rf: Rückruf = {
-      id: Date.now().toString() + lead.place_id.slice(-4),
-      name: lead.name,
-      phone: lead.phone || "",
-      datum: todayKey,
-      notiz: [lead.address, lead.website].filter(Boolean).join(" | "),
-      status: "offen",
+  function addLead() {
+    if (!newLead.name?.trim()) return
+    const lead: Lead = {
+      id: Date.now().toString(),
+      name: newLead.name.trim(),
+      phone: newLead.phone?.trim() || "",
+      email: newLead.email?.trim() || "",
+      city: newLead.city?.trim() || "",
+      category: newLead.category || LEAD_CATEGORIES[0],
+      notiz: newLead.notiz?.trim() || "",
+      status: newLead.status || "neu",
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
     }
-    saveRueckrufe([rf, ...rueckrufe])
-    setAddedLeads(prev => new Set(prev).add(lead.place_id))
-    showToast(`${lead.name} → Rückruf-Liste ✓`)
+    saveLeads([lead, ...leads])
+    setNewLead({ status: "neu", category: newLead.category || LEAD_CATEGORIES[0], city: newLead.city || "" })
+    setShowLeadForm(false)
+    showToast("Lead hinzugefügt ✓")
+  }
+  function updateLead(id: string, updates: Partial<Lead>) {
+    saveLeads(leads.map(l => l.id === id ? { ...l, ...updates, updatedAt: new Date().toISOString() } : l))
+  }
+  function deleteLead(id: string) {
+    saveLeads(leads.filter(l => l.id !== id))
   }
 
   // ── Notizen ──────────────────────────────────────────────────────────────
@@ -242,6 +261,8 @@ export default function AdminPage() {
       if (p)  setPrices(JSON.parse(p))
       if (sc) { const parsed = JSON.parse(sc); setScript(parsed); setEditScript(parsed) }
       if (rf) setRueckrufe(JSON.parse(rf))
+      const ld = localStorage.getItem("admin_leads")
+      if (ld) setLeads(JSON.parse(ld))
     } catch {}
   }, [])
 
@@ -1099,171 +1120,236 @@ export default function AdminPage() {
           </div>
         )}
 
-        {/* ════ LEAD-FINDER ════ */}
-        {tab === "leads" && (
-          <div style={{ maxWidth: 860 }}>
-            <h1 style={{ fontSize: 20, fontWeight: 900, color: T, margin: "0 0 6px", letterSpacing: "-.4px" }}>🔍 Lead-Finder</h1>
-            <p style={{ fontSize: 13, color: M, margin: "0 0 20px" }}>Betriebe in deiner Zielregion finden — Telefon + Webseite direkt aus Google Maps.</p>
+        {/* ════ LEADS ════ */}
+        {tab === "leads" && (() => {
+          // Alle Städte + Kategorien aus vorhandenen Leads ableiten
+          const allCities = ["Alle", ...Array.from(new Set(leads.map(l => l.city).filter(Boolean))).sort()]
+          const allCats   = ["Alle", ...LEAD_CATEGORIES]
 
-            {/* Suchmaske */}
-            <div style={{ background: "#fff", border: `1px solid ${BD}`, borderRadius: 20, padding: "20px 22px", marginBottom: 20, boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}>
-              <div style={{ fontSize: 13, fontWeight: 800, color: T, marginBottom: 14 }}>Wonach suchst du?</div>
+          const filteredLeads = leads.filter(l => {
+            if (leadCityFilter !== "Alle" && l.city !== leadCityFilter) return false
+            if (leadCatFilter !== "Alle" && l.category !== leadCatFilter) return false
+            if (leadStatusFilter !== "alle" && l.status !== leadStatusFilter) return false
+            if (leadSearch && !l.name.toLowerCase().includes(leadSearch.toLowerCase()) &&
+                !l.phone.includes(leadSearch) && !l.city.toLowerCase().includes(leadSearch.toLowerCase())) return false
+            return true
+          })
 
-              {/* Kategorie-Chips */}
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 14 }}>
-                {CATEGORIES.map(cat => (
-                  <button key={cat} onClick={() => { setLeadQuery(cat); setCustomQuery("") }}
-                    style={{
-                      padding: "6px 14px", borderRadius: 20, border: "none", cursor: "pointer", fontSize: 12, fontWeight: 600,
-                      background: leadQuery === cat && !customQuery ? G : BG,
-                      color: leadQuery === cat && !customQuery ? "#fff" : T,
-                      transition: "all .12s",
-                    }}>
-                    {cat}
-                  </button>
-                ))}
-              </div>
+          // KPI-Zahlen
+          const kpis = (Object.keys(LEAD_STATUS) as LeadStatus[]).map(s => ({
+            ...LEAD_STATUS[s], key: s, count: leads.filter(l => l.status === s).length
+          })).filter(k => k.count > 0)
 
-              {/* Oder eigene Kategorie */}
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr auto", gap: 10, alignItems: "end" }}>
-                <div>
-                  <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: M, textTransform: "uppercase", letterSpacing: .4, marginBottom: 5 }}>Eigene Suche (optional)</label>
-                  <input value={customQuery} onChange={e => setCustomQuery(e.target.value)} placeholder="z.B. Podologie, Waxing-Studio …"
-                    style={{ ...inp, fontSize: 12 }} onKeyDown={e => e.key === "Enter" && searchLeads()} />
-                </div>
-                <div>
-                  <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: M, textTransform: "uppercase", letterSpacing: .4, marginBottom: 5 }}>Stadt / Region</label>
-                  <input value={leadCity} onChange={e => setLeadCity(e.target.value)} placeholder="z.B. Hannover, Berlin-Mitte …"
-                    style={{ ...inp, fontSize: 12 }} onKeyDown={e => e.key === "Enter" && searchLeads()} />
-                </div>
-                <button onClick={searchLeads} disabled={leadsLoading}
-                  style={{ ...btnStyle("green"), padding: "10px 22px", fontSize: 13, opacity: leadsLoading ? .7 : 1 }}>
-                  {leadsLoading ? "Suche …" : "🔍 Suchen"}
+          return (
+            <div style={{ maxWidth: 960 }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6, flexWrap: "wrap", gap: 10 }}>
+                <h1 style={{ fontSize: 20, fontWeight: 900, color: T, margin: 0, letterSpacing: "-.4px" }}>🔍 Lead-Manager</h1>
+                <button onClick={() => setShowLeadForm(v => !v)} style={{ ...btnStyle("green"), padding: "9px 18px" }}>
+                  {showLeadForm ? "✕ Abbrechen" : "+ Lead eintragen"}
                 </button>
               </div>
-            </div>
+              <p style={{ fontSize: 13, color: M, margin: "0 0 18px" }}>
+                Alle Betriebe die du recherchiert hast — Status tracken, filtern, direkt anrufen.
+              </p>
 
-            {/* Fehler */}
-            {leadsError && (
-              <div style={{ background: "#FEF2F2", border: "1px solid #FECACA", borderRadius: 14, padding: "14px 18px", marginBottom: 16, color: RED, fontSize: 13 }}>
-                ⚠️ {leadsError}
-                {leadsError.includes("GOOGLE_PLACES_API_KEY") && (
-                  <div style={{ marginTop: 8, fontSize: 12, color: T }}>
-                    👉 Füge <code style={{ background: "#F3F4F6", padding: "2px 6px", borderRadius: 4 }}>GOOGLE_PLACES_API_KEY</code> in deinen Vercel Environment Variables hinzu.
-                    <a href="https://console.cloud.google.com/apis/library/places-backend.googleapis.com" target="_blank" rel="noopener"
-                      style={{ color: "#3B82F6", marginLeft: 6, fontSize: 11, fontWeight: 700 }}>→ Google Console öffnen</a>
+              {/* ── Formular: neuer Lead ── */}
+              {showLeadForm && (
+                <div style={{ background: GL, border: `1px solid ${GB}`, borderRadius: 20, padding: "20px 22px", marginBottom: 18 }}>
+                  <div style={{ fontSize: 13, fontWeight: 800, color: T, marginBottom: 14 }}>Neuen Lead eintragen</div>
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 10, marginBottom: 10 }}>
+                    <div>
+                      <label style={{ display: "block", fontSize: 10, fontWeight: 700, color: M, textTransform: "uppercase", letterSpacing: .4, marginBottom: 4 }}>Name / Firma *</label>
+                      <input value={newLead.name || ""} onChange={e => setNewLead(p => ({ ...p, name: e.target.value }))} placeholder="z.B. Kosmetik Müller" style={{ ...inp, fontSize: 12 }} autoFocus />
+                    </div>
+                    <div>
+                      <label style={{ display: "block", fontSize: 10, fontWeight: 700, color: M, textTransform: "uppercase", letterSpacing: .4, marginBottom: 4 }}>Telefon</label>
+                      <input value={newLead.phone || ""} onChange={e => setNewLead(p => ({ ...p, phone: e.target.value }))} placeholder="0511 123456" style={{ ...inp, fontSize: 12 }} type="tel" />
+                    </div>
+                    <div>
+                      <label style={{ display: "block", fontSize: 10, fontWeight: 700, color: M, textTransform: "uppercase", letterSpacing: .4, marginBottom: 4 }}>E-Mail</label>
+                      <input value={newLead.email || ""} onChange={e => setNewLead(p => ({ ...p, email: e.target.value }))} placeholder="info@beispiel.de" style={{ ...inp, fontSize: 12 }} type="email" />
+                    </div>
+                    <div>
+                      <label style={{ display: "block", fontSize: 10, fontWeight: 700, color: M, textTransform: "uppercase", letterSpacing: .4, marginBottom: 4 }}>Stadt</label>
+                      <input value={newLead.city || ""} onChange={e => setNewLead(p => ({ ...p, city: e.target.value }))} placeholder="z.B. Hannover" style={{ ...inp, fontSize: 12 }} />
+                    </div>
+                    <div>
+                      <label style={{ display: "block", fontSize: 10, fontWeight: 700, color: M, textTransform: "uppercase", letterSpacing: .4, marginBottom: 4 }}>Kategorie</label>
+                      <select value={newLead.category || LEAD_CATEGORIES[0]} onChange={e => setNewLead(p => ({ ...p, category: e.target.value }))} style={{ ...inp, fontSize: 12, cursor: "pointer" }}>
+                        {LEAD_CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+                      </select>
+                    </div>
+                    <div>
+                      <label style={{ display: "block", fontSize: 10, fontWeight: 700, color: M, textTransform: "uppercase", letterSpacing: .4, marginBottom: 4 }}>Notiz</label>
+                      <input value={newLead.notiz || ""} onChange={e => setNewLead(p => ({ ...p, notiz: e.target.value }))} placeholder="z.B. Inhaberin heißt Petra" style={{ ...inp, fontSize: 12 }}
+                        onKeyDown={e => e.key === "Enter" && addLead()} />
+                    </div>
                   </div>
-                )}
-              </div>
-            )}
-
-            {/* Lade-Spinner */}
-            {leadsLoading && (
-              <div style={{ background: "#fff", border: `1px solid ${BD}`, borderRadius: 16, padding: "48px 20px", textAlign: "center", color: M }}>
-                <div style={{ fontSize: 28, marginBottom: 10 }}>🔍</div>
-                <div style={{ fontSize: 14, fontWeight: 700 }}>Suche in Google Maps …</div>
-                <div style={{ fontSize: 12, marginTop: 4 }}>Rufe Details für jeden Betrieb ab</div>
-              </div>
-            )}
-
-            {/* Ergebnisse */}
-            {!leadsLoading && leads.length > 0 && (
-              <>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12, flexWrap: "wrap", gap: 8 }}>
-                  <div style={{ fontSize: 13, fontWeight: 800, color: T }}>
-                    {leads.length} Betriebe gefunden
-                    <span style={{ fontSize: 12, color: M, fontWeight: 500, marginLeft: 8 }}>
-                      — {leads.filter(l => l.phone).length} mit Telefonnummer
-                    </span>
-                  </div>
-                  <div style={{ fontSize: 12, color: M }}>
-                    {addedLeads.size > 0 && <span style={{ color: G, fontWeight: 700 }}>✓ {addedLeads.size} zur Rückruf-Liste hinzugefügt</span>}
-                  </div>
+                  <button onClick={addLead} style={{ ...btnStyle("green"), padding: "10px 22px" }}>✓ Hinzufügen</button>
                 </div>
+              )}
 
-                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                  {leads.map((lead, i) => {
-                    const alreadyAdded = addedLeads.has(lead.place_id)
-                    const noPhone      = !lead.phone
-                    return (
-                      <div key={lead.place_id} style={{
-                        background: alreadyAdded ? GL : "#fff",
-                        border: `1px solid ${alreadyAdded ? GB : noPhone ? "#F3F4F6" : BD}`,
-                        borderRadius: 14,
-                        padding: "14px 18px",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 14,
-                        flexWrap: "wrap",
-                        opacity: noPhone ? .7 : 1,
-                        boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
+              {/* ── Status-KPIs ── */}
+              {kpis.length > 0 && (
+                <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 16 }}>
+                  <div onClick={() => setLeadStatusFilter("alle")} style={{
+                    padding: "8px 16px", borderRadius: 20, cursor: "pointer",
+                    background: leadStatusFilter === "alle" ? T : "#fff",
+                    color: leadStatusFilter === "alle" ? "#fff" : T,
+                    fontSize: 12, fontWeight: 700, border: `1px solid ${BD}`,
+                  }}>
+                    Alle ({leads.length})
+                  </div>
+                  {kpis.map(k => (
+                    <div key={k.key} onClick={() => setLeadStatusFilter(k.key === leadStatusFilter ? "alle" : k.key as LeadStatus)}
+                      style={{
+                        padding: "8px 16px", borderRadius: 20, cursor: "pointer",
+                        background: leadStatusFilter === k.key ? k.bg : "#fff",
+                        color: leadStatusFilter === k.key ? k.color : M,
+                        fontSize: 12, fontWeight: 700, border: `1px solid ${leadStatusFilter === k.key ? k.border : BD}`,
+                        transition: "all .12s",
                       }}>
+                      {k.emoji} {k.label} ({k.count})
+                    </div>
+                  ))}
+                </div>
+              )}
 
-                        {/* Rang + Rating */}
-                        <div style={{ textAlign: "center", minWidth: 36, flexShrink: 0 }}>
-                          <div style={{ fontSize: 12, fontWeight: 900, color: M }}>#{i + 1}</div>
-                          {lead.rating && (
-                            <div style={{ fontSize: 10, color: "#D97706", fontWeight: 700 }}>★ {lead.rating}</div>
-                          )}
+              {/* ── Filter-Leiste ── */}
+              <div style={{ display: "flex", gap: 8, marginBottom: 16, flexWrap: "wrap", alignItems: "center" }}>
+                <input value={leadSearch} onChange={e => setLeadSearch(e.target.value)} placeholder="🔎 Name, Telefon, Stadt …"
+                  style={{ ...inp, width: 220, fontSize: 12 }} />
+                <select value={leadCityFilter} onChange={e => setLeadCityFilter(e.target.value)}
+                  style={{ ...inp, width: "auto", fontSize: 12, cursor: "pointer" }}>
+                  {allCities.map(c => <option key={c} value={c}>{c === "Alle" ? "📍 Alle Städte" : c}</option>)}
+                </select>
+                <select value={leadCatFilter} onChange={e => setLeadCatFilter(e.target.value)}
+                  style={{ ...inp, width: "auto", fontSize: 12, cursor: "pointer" }}>
+                  {allCats.map(c => <option key={c} value={c}>{c === "Alle" ? "🏷 Alle Kategorien" : c}</option>)}
+                </select>
+                {(leadSearch || leadCityFilter !== "Alle" || leadCatFilter !== "Alle" || leadStatusFilter !== "alle") && (
+                  <button onClick={() => { setLeadSearch(""); setLeadCityFilter("Alle"); setLeadCatFilter("Alle"); setLeadStatusFilter("alle") }}
+                    style={{ ...btnStyle("gray"), fontSize: 11 }}>✕ Filter zurücksetzen</button>
+                )}
+                <span style={{ fontSize: 12, color: M, marginLeft: "auto" }}>{filteredLeads.length} Ergebnisse</span>
+              </div>
+
+              {/* ── Lead-Liste ── */}
+              {leads.length === 0 ? (
+                <div style={{ background: "#fff", border: `1px solid ${BD}`, borderRadius: 16, padding: "60px 20px", textAlign: "center" }}>
+                  <div style={{ fontSize: 36, marginBottom: 12 }}>📋</div>
+                  <div style={{ fontSize: 15, fontWeight: 700, color: T, marginBottom: 6 }}>Noch keine Leads eingetragen</div>
+                  <div style={{ fontSize: 13, color: M, marginBottom: 16 }}>Trag Betriebe ein die du auf Google findest — Name, Telefon, Stadt, Kategorie.</div>
+                  <button onClick={() => setShowLeadForm(true)} style={{ ...btnStyle("green"), padding: "10px 20px" }}>+ Ersten Lead eintragen</button>
+                </div>
+              ) : filteredLeads.length === 0 ? (
+                <div style={{ background: "#fff", border: `1px solid ${BD}`, borderRadius: 16, padding: "40px 20px", textAlign: "center", color: M, fontSize: 13 }}>
+                  Keine Leads für diese Filter.
+                </div>
+              ) : (
+                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                  {filteredLeads.map(lead => {
+                    const meta   = LEAD_STATUS[lead.status]
+                    const isOpen = leadExpanded === lead.id
+                    return (
+                      <div key={lead.id} style={{ background: "#fff", border: `1px solid ${lead.status === "kunde" ? GB : lead.status === "termin" ? "#FED7AA" : BD}`, borderRadius: 14, overflow: "hidden", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "13px 18px", flexWrap: "wrap" }}>
+
+                          {/* Status-Dot */}
+                          <div style={{ fontSize: 18, flexShrink: 0 }}>{meta.emoji}</div>
+
+                          {/* Info */}
+                          <div style={{ flex: 1, minWidth: 140 }}>
+                            <div style={{ fontSize: 14, fontWeight: 800, color: T }}>{lead.name}</div>
+                            <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 2 }}>
+                              {lead.city && <span style={{ fontSize: 11, color: M }}>📍 {lead.city}</span>}
+                              {lead.category && <span style={{ fontSize: 11, color: M }}>· {lead.category}</span>}
+                              {lead.phone && <span style={{ fontSize: 11, color: T, fontWeight: 600 }}>📞 {lead.phone}</span>}
+                              {lead.email && <span style={{ fontSize: 11, color: "#3B82F6" }}>✉ {lead.email}</span>}
+                            </div>
+                            {lead.notiz && <div style={{ fontSize: 11, color: M, marginTop: 3, fontStyle: "italic" }}>{lead.notiz}</div>}
+                          </div>
+
+                          {/* Status-Badge */}
+                          <span style={{ fontSize: 10, fontWeight: 700, padding: "4px 12px", borderRadius: 20, background: meta.bg, color: meta.color, border: `1px solid ${meta.border}`, flexShrink: 0 }}>
+                            {meta.label}
+                          </span>
+
+                          {/* Schnell-Status: die wichtigsten Aktionen */}
+                          <div style={{ display: "flex", gap: 4, flexShrink: 0, flexWrap: "wrap" }}>
+                            {lead.phone && (
+                              <a href={`tel:${lead.phone}`} style={{ ...btnStyle("green"), textDecoration: "none", padding: "6px 10px", fontSize: 11 }}>📞</a>
+                            )}
+                            {(["angerufen", "nicht_erreicht", "interesse", "kein_interesse", "termin", "kunde"] as LeadStatus[])
+                              .filter(s => s !== lead.status)
+                              .slice(0, 3)
+                              .map(s => (
+                                <button key={s} onClick={() => updateLead(lead.id, { status: s })}
+                                  style={{ ...btnStyle("gray"), padding: "6px 9px", fontSize: 10, color: LEAD_STATUS[s].color, background: LEAD_STATUS[s].bg, border: `1px solid ${LEAD_STATUS[s].border}` }}>
+                                  {LEAD_STATUS[s].emoji}
+                                </button>
+                              ))
+                            }
+                            <button onClick={() => setLeadExpanded(isOpen ? null : lead.id)} style={{ ...btnStyle("gray"), padding: "6px 10px", fontSize: 11 }}>
+                              {isOpen ? "▲" : "✏️"}
+                            </button>
+                            <button onClick={() => deleteLead(lead.id)} style={{ ...btnStyle("red"), padding: "6px 9px", fontSize: 11 }}>✕</button>
+                          </div>
                         </div>
 
-                        {/* Info */}
-                        <div style={{ flex: 1, minWidth: 180 }}>
-                          <div style={{ fontSize: 14, fontWeight: 800, color: T, marginBottom: 2 }}>{lead.name}</div>
-                          <div style={{ fontSize: 11, color: M, marginBottom: noPhone ? 0 : 3 }}>{lead.address}</div>
-                          {lead.phone ? (
-                            <div style={{ fontSize: 13, fontWeight: 700, color: T }}>📞 {lead.phone}</div>
-                          ) : (
-                            <div style={{ fontSize: 11, color: M, fontStyle: "italic" }}>Keine Telefonnummer gefunden</div>
-                          )}
-                        </div>
-
-                        {/* Webseite */}
-                        {lead.website && (
-                          <a href={lead.website} target="_blank" rel="noopener"
-                            style={{ fontSize: 11, color: "#3B82F6", fontWeight: 600, textDecoration: "none", flexShrink: 0, maxWidth: 160, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                            🌐 {lead.website.replace(/^https?:\/\/(www\.)?/, "").split("/")[0]}
-                          </a>
+                        {/* Detail-Editor */}
+                        {isOpen && (
+                          <div style={{ borderTop: `1px solid ${BD}`, background: BG, padding: "16px 18px" }}>
+                            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))", gap: 10, marginBottom: 12 }}>
+                              <div>
+                                <label style={{ display: "block", fontSize: 10, fontWeight: 700, color: M, textTransform: "uppercase", letterSpacing: .4, marginBottom: 4 }}>Name</label>
+                                <input value={lead.name} onChange={e => updateLead(lead.id, { name: e.target.value })} style={{ ...inp, fontSize: 12 }} />
+                              </div>
+                              <div>
+                                <label style={{ display: "block", fontSize: 10, fontWeight: 700, color: M, textTransform: "uppercase", letterSpacing: .4, marginBottom: 4 }}>Telefon</label>
+                                <input value={lead.phone} onChange={e => updateLead(lead.id, { phone: e.target.value })} style={{ ...inp, fontSize: 12 }} type="tel" />
+                              </div>
+                              <div>
+                                <label style={{ display: "block", fontSize: 10, fontWeight: 700, color: M, textTransform: "uppercase", letterSpacing: .4, marginBottom: 4 }}>E-Mail</label>
+                                <input value={lead.email} onChange={e => updateLead(lead.id, { email: e.target.value })} style={{ ...inp, fontSize: 12 }} />
+                              </div>
+                              <div>
+                                <label style={{ display: "block", fontSize: 10, fontWeight: 700, color: M, textTransform: "uppercase", letterSpacing: .4, marginBottom: 4 }}>Stadt</label>
+                                <input value={lead.city} onChange={e => updateLead(lead.id, { city: e.target.value })} style={{ ...inp, fontSize: 12 }} />
+                              </div>
+                              <div>
+                                <label style={{ display: "block", fontSize: 10, fontWeight: 700, color: M, textTransform: "uppercase", letterSpacing: .4, marginBottom: 4 }}>Kategorie</label>
+                                <select value={lead.category} onChange={e => updateLead(lead.id, { category: e.target.value })} style={{ ...inp, fontSize: 12, cursor: "pointer" }}>
+                                  {LEAD_CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+                                </select>
+                              </div>
+                              <div>
+                                <label style={{ display: "block", fontSize: 10, fontWeight: 700, color: M, textTransform: "uppercase", letterSpacing: .4, marginBottom: 4 }}>Status</label>
+                                <select value={lead.status} onChange={e => updateLead(lead.id, { status: e.target.value as LeadStatus })} style={{ ...inp, fontSize: 12, cursor: "pointer" }}>
+                                  {(Object.keys(LEAD_STATUS) as LeadStatus[]).map(s => (
+                                    <option key={s} value={s}>{LEAD_STATUS[s].emoji} {LEAD_STATUS[s].label}</option>
+                                  ))}
+                                </select>
+                              </div>
+                            </div>
+                            <div>
+                              <label style={{ display: "block", fontSize: 10, fontWeight: 700, color: M, textTransform: "uppercase", letterSpacing: .4, marginBottom: 4 }}>Notiz / Gesprächsnotiz</label>
+                              <textarea value={lead.notiz} onChange={e => updateLead(lead.id, { notiz: e.target.value })} rows={2}
+                                style={{ ...inp, resize: "vertical", fontSize: 12, lineHeight: 1.6 }} />
+                            </div>
+                            <div style={{ fontSize: 10, color: M, marginTop: 8 }}>
+                              Eingetragen: {new Date(lead.createdAt).toLocaleDateString("de-DE")} · Zuletzt geändert: {new Date(lead.updatedAt).toLocaleDateString("de-DE")}
+                            </div>
+                          </div>
                         )}
-
-                        {/* Aktionen */}
-                        <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
-                          <a href={lead.maps_url} target="_blank" rel="noopener" style={{ ...btnStyle("blue"), textDecoration: "none", padding: "6px 10px", fontSize: 11 }}>
-                            📍 Maps
-                          </a>
-                          {lead.phone && (
-                            <a href={`tel:${lead.phone}`} style={{ ...btnStyle("gray"), textDecoration: "none", padding: "6px 10px", fontSize: 11 }}>
-                              📞
-                            </a>
-                          )}
-                          <button
-                            onClick={() => addLeadToRueckrufe(lead)}
-                            disabled={alreadyAdded}
-                            style={{
-                              ...btnStyle(alreadyAdded ? "gray" : "green"),
-                              padding: "6px 12px", fontSize: 11,
-                              opacity: alreadyAdded ? .6 : 1,
-                              cursor: alreadyAdded ? "default" : "pointer",
-                            }}>
-                            {alreadyAdded ? "✓ Hinzugefügt" : "+ Rückruf"}
-                          </button>
-                        </div>
                       </div>
                     )
                   })}
                 </div>
-              </>
-            )}
-
-            {!leadsLoading && leads.length === 0 && !leadsError && (
-              <div style={{ background: "#fff", border: `1px solid ${BD}`, borderRadius: 16, padding: "60px 20px", textAlign: "center" }}>
-                <div style={{ fontSize: 40, marginBottom: 12 }}>🔍</div>
-                <div style={{ fontSize: 15, fontWeight: 700, color: T, marginBottom: 6 }}>Kategorie wählen und Stadt eingeben</div>
-                <div style={{ fontSize: 13, color: M }}>z.B. „Kosmetikstudio" in „Hannover" → bis zu 20 Betriebe mit Kontaktdaten</div>
-              </div>
-            )}
-          </div>
-        )}
+              )}
+            </div>
+          )
+        })()}
 
         {/* ════ NOTIZEN ════ */}
         {tab === "notizen" && (
