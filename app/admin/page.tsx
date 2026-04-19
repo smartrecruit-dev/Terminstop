@@ -18,7 +18,19 @@ type Company = {
   appointments: number; customers: number; created_at: string
 }
 
-type Tab = "zentrale" | "betriebe" | "coldcall" | "notizen" | "rueckrufe"
+type Tab = "zentrale" | "betriebe" | "coldcall" | "notizen" | "rueckrufe" | "leads"
+
+type Lead = {
+  place_id: string
+  name: string
+  address: string
+  phone: string
+  website: string
+  rating: number | null
+  total_ratings: number
+  maps_url: string
+  status: string
+}
 
 type PriceRow = { id: string; name: string; price: string; desc: string }
 
@@ -162,6 +174,46 @@ export default function AdminPage() {
   const [rfFilter, setRfFilter]       = useState<"alle" | Rückruf["status"]>("alle")
   const [rfOpen, setRfOpen]           = useState<string | null>(null)
   const [newRF, setNewRF]             = useState<Partial<Rückruf>>({ status: "offen", datum: todayKey })
+
+  // ── Leads / Lead-Finder ──────────────────────────────────────────────────
+  const CATEGORIES = [
+    "Kosmetikstudio", "Friseursalon", "Nagelstudio", "Zahnarztpraxis",
+    "Physiotherapie", "Massagepraxis", "Yogastudio", "Fitnessstudio",
+    "Tattoo-Studio", "Hundesalon", "Heilpraktiker", "Optiker",
+  ]
+  const [leadQuery, setLeadQuery]       = useState(CATEGORIES[0])
+  const [leadCity, setLeadCity]         = useState("Hannover")
+  const [leads, setLeads]               = useState<Lead[]>([])
+  const [leadsLoading, setLeadsLoading] = useState(false)
+  const [leadsError, setLeadsError]     = useState("")
+  const [addedLeads, setAddedLeads]     = useState<Set<string>>(new Set())
+  const [customQuery, setCustomQuery]   = useState("")
+
+  async function searchLeads() {
+    setLeadsLoading(true); setLeadsError(""); setLeads([])
+    const q = customQuery.trim() || leadQuery
+    const res = await fetch(`/api/admin/search-leads?query=${encodeURIComponent(q)}&city=${encodeURIComponent(leadCity)}`, {
+      headers: { "x-admin-secret": secret }
+    })
+    const json = await res.json()
+    if (json.error) { setLeadsError(json.error); setLeadsLoading(false); return }
+    setLeads(json.leads || [])
+    setLeadsLoading(false)
+  }
+
+  function addLeadToRueckrufe(lead: Lead) {
+    const rf: Rückruf = {
+      id: Date.now().toString() + lead.place_id.slice(-4),
+      name: lead.name,
+      phone: lead.phone || "",
+      datum: todayKey,
+      notiz: [lead.address, lead.website].filter(Boolean).join(" | "),
+      status: "offen",
+    }
+    saveRueckrufe([rf, ...rueckrufe])
+    setAddedLeads(prev => new Set(prev).add(lead.place_id))
+    showToast(`${lead.name} → Rückruf-Liste ✓`)
+  }
 
   // ── Notizen ──────────────────────────────────────────────────────────────
   const [notes, setNotes]             = useState("")
@@ -394,6 +446,7 @@ export default function AdminPage() {
               ["betriebe",   "🏢 Betriebe"],
               ["coldcall",   "📞 Skript"],
               ["rueckrufe",  "📋 Rückrufe"],
+              ["leads",      "🔍 Lead-Finder"],
               ["notizen",    "📝 Notizen"],
             ] as [Tab, string][]).map(([t, label]) => (
               <button key={t} onClick={() => setTab(t)} style={{
@@ -1041,6 +1094,172 @@ export default function AdminPage() {
                     </div>
                   )
                 })}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ════ LEAD-FINDER ════ */}
+        {tab === "leads" && (
+          <div style={{ maxWidth: 860 }}>
+            <h1 style={{ fontSize: 20, fontWeight: 900, color: T, margin: "0 0 6px", letterSpacing: "-.4px" }}>🔍 Lead-Finder</h1>
+            <p style={{ fontSize: 13, color: M, margin: "0 0 20px" }}>Betriebe in deiner Zielregion finden — Telefon + Webseite direkt aus Google Maps.</p>
+
+            {/* Suchmaske */}
+            <div style={{ background: "#fff", border: `1px solid ${BD}`, borderRadius: 20, padding: "20px 22px", marginBottom: 20, boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}>
+              <div style={{ fontSize: 13, fontWeight: 800, color: T, marginBottom: 14 }}>Wonach suchst du?</div>
+
+              {/* Kategorie-Chips */}
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 14 }}>
+                {CATEGORIES.map(cat => (
+                  <button key={cat} onClick={() => { setLeadQuery(cat); setCustomQuery("") }}
+                    style={{
+                      padding: "6px 14px", borderRadius: 20, border: "none", cursor: "pointer", fontSize: 12, fontWeight: 600,
+                      background: leadQuery === cat && !customQuery ? G : BG,
+                      color: leadQuery === cat && !customQuery ? "#fff" : T,
+                      transition: "all .12s",
+                    }}>
+                    {cat}
+                  </button>
+                ))}
+              </div>
+
+              {/* Oder eigene Kategorie */}
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr auto", gap: 10, alignItems: "end" }}>
+                <div>
+                  <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: M, textTransform: "uppercase", letterSpacing: .4, marginBottom: 5 }}>Eigene Suche (optional)</label>
+                  <input value={customQuery} onChange={e => setCustomQuery(e.target.value)} placeholder="z.B. Podologie, Waxing-Studio …"
+                    style={{ ...inp, fontSize: 12 }} onKeyDown={e => e.key === "Enter" && searchLeads()} />
+                </div>
+                <div>
+                  <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: M, textTransform: "uppercase", letterSpacing: .4, marginBottom: 5 }}>Stadt / Region</label>
+                  <input value={leadCity} onChange={e => setLeadCity(e.target.value)} placeholder="z.B. Hannover, Berlin-Mitte …"
+                    style={{ ...inp, fontSize: 12 }} onKeyDown={e => e.key === "Enter" && searchLeads()} />
+                </div>
+                <button onClick={searchLeads} disabled={leadsLoading}
+                  style={{ ...btnStyle("green"), padding: "10px 22px", fontSize: 13, opacity: leadsLoading ? .7 : 1 }}>
+                  {leadsLoading ? "Suche …" : "🔍 Suchen"}
+                </button>
+              </div>
+            </div>
+
+            {/* Fehler */}
+            {leadsError && (
+              <div style={{ background: "#FEF2F2", border: "1px solid #FECACA", borderRadius: 14, padding: "14px 18px", marginBottom: 16, color: RED, fontSize: 13 }}>
+                ⚠️ {leadsError}
+                {leadsError.includes("GOOGLE_PLACES_API_KEY") && (
+                  <div style={{ marginTop: 8, fontSize: 12, color: T }}>
+                    👉 Füge <code style={{ background: "#F3F4F6", padding: "2px 6px", borderRadius: 4 }}>GOOGLE_PLACES_API_KEY</code> in deinen Vercel Environment Variables hinzu.
+                    <a href="https://console.cloud.google.com/apis/library/places-backend.googleapis.com" target="_blank" rel="noopener"
+                      style={{ color: "#3B82F6", marginLeft: 6, fontSize: 11, fontWeight: 700 }}>→ Google Console öffnen</a>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Lade-Spinner */}
+            {leadsLoading && (
+              <div style={{ background: "#fff", border: `1px solid ${BD}`, borderRadius: 16, padding: "48px 20px", textAlign: "center", color: M }}>
+                <div style={{ fontSize: 28, marginBottom: 10 }}>🔍</div>
+                <div style={{ fontSize: 14, fontWeight: 700 }}>Suche in Google Maps …</div>
+                <div style={{ fontSize: 12, marginTop: 4 }}>Rufe Details für jeden Betrieb ab</div>
+              </div>
+            )}
+
+            {/* Ergebnisse */}
+            {!leadsLoading && leads.length > 0 && (
+              <>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12, flexWrap: "wrap", gap: 8 }}>
+                  <div style={{ fontSize: 13, fontWeight: 800, color: T }}>
+                    {leads.length} Betriebe gefunden
+                    <span style={{ fontSize: 12, color: M, fontWeight: 500, marginLeft: 8 }}>
+                      — {leads.filter(l => l.phone).length} mit Telefonnummer
+                    </span>
+                  </div>
+                  <div style={{ fontSize: 12, color: M }}>
+                    {addedLeads.size > 0 && <span style={{ color: G, fontWeight: 700 }}>✓ {addedLeads.size} zur Rückruf-Liste hinzugefügt</span>}
+                  </div>
+                </div>
+
+                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                  {leads.map((lead, i) => {
+                    const alreadyAdded = addedLeads.has(lead.place_id)
+                    const noPhone      = !lead.phone
+                    return (
+                      <div key={lead.place_id} style={{
+                        background: alreadyAdded ? GL : "#fff",
+                        border: `1px solid ${alreadyAdded ? GB : noPhone ? "#F3F4F6" : BD}`,
+                        borderRadius: 14,
+                        padding: "14px 18px",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 14,
+                        flexWrap: "wrap",
+                        opacity: noPhone ? .7 : 1,
+                        boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
+                      }}>
+
+                        {/* Rang + Rating */}
+                        <div style={{ textAlign: "center", minWidth: 36, flexShrink: 0 }}>
+                          <div style={{ fontSize: 12, fontWeight: 900, color: M }}>#{i + 1}</div>
+                          {lead.rating && (
+                            <div style={{ fontSize: 10, color: "#D97706", fontWeight: 700 }}>★ {lead.rating}</div>
+                          )}
+                        </div>
+
+                        {/* Info */}
+                        <div style={{ flex: 1, minWidth: 180 }}>
+                          <div style={{ fontSize: 14, fontWeight: 800, color: T, marginBottom: 2 }}>{lead.name}</div>
+                          <div style={{ fontSize: 11, color: M, marginBottom: noPhone ? 0 : 3 }}>{lead.address}</div>
+                          {lead.phone ? (
+                            <div style={{ fontSize: 13, fontWeight: 700, color: T }}>📞 {lead.phone}</div>
+                          ) : (
+                            <div style={{ fontSize: 11, color: M, fontStyle: "italic" }}>Keine Telefonnummer gefunden</div>
+                          )}
+                        </div>
+
+                        {/* Webseite */}
+                        {lead.website && (
+                          <a href={lead.website} target="_blank" rel="noopener"
+                            style={{ fontSize: 11, color: "#3B82F6", fontWeight: 600, textDecoration: "none", flexShrink: 0, maxWidth: 160, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                            🌐 {lead.website.replace(/^https?:\/\/(www\.)?/, "").split("/")[0]}
+                          </a>
+                        )}
+
+                        {/* Aktionen */}
+                        <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
+                          <a href={lead.maps_url} target="_blank" rel="noopener" style={{ ...btnStyle("blue"), textDecoration: "none", padding: "6px 10px", fontSize: 11 }}>
+                            📍 Maps
+                          </a>
+                          {lead.phone && (
+                            <a href={`tel:${lead.phone}`} style={{ ...btnStyle("gray"), textDecoration: "none", padding: "6px 10px", fontSize: 11 }}>
+                              📞
+                            </a>
+                          )}
+                          <button
+                            onClick={() => addLeadToRueckrufe(lead)}
+                            disabled={alreadyAdded}
+                            style={{
+                              ...btnStyle(alreadyAdded ? "gray" : "green"),
+                              padding: "6px 12px", fontSize: 11,
+                              opacity: alreadyAdded ? .6 : 1,
+                              cursor: alreadyAdded ? "default" : "pointer",
+                            }}>
+                            {alreadyAdded ? "✓ Hinzugefügt" : "+ Rückruf"}
+                          </button>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              </>
+            )}
+
+            {!leadsLoading && leads.length === 0 && !leadsError && (
+              <div style={{ background: "#fff", border: `1px solid ${BD}`, borderRadius: 16, padding: "60px 20px", textAlign: "center" }}>
+                <div style={{ fontSize: 40, marginBottom: 12 }}>🔍</div>
+                <div style={{ fontSize: 15, fontWeight: 700, color: T, marginBottom: 6 }}>Kategorie wählen und Stadt eingeben</div>
+                <div style={{ fontSize: 13, color: M }}>z.B. „Kosmetikstudio" in „Hannover" → bis zu 20 Betriebe mit Kontaktdaten</div>
               </div>
             )}
           </div>
