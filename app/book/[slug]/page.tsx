@@ -4,8 +4,8 @@ import { useEffect, useState } from "react"
 import { useParams } from "next/navigation"
 import { supabase } from "../../lib/supabaseClient"
 
-type Service    = { id: string; name: string; duration: number; price: number | null }
-type Company    = { id: string; name: string; booking_note: string | null }
+type Service     = { id: string; name: string; duration: number; price: number | null }
+type Company     = { id: string; name: string; booking_note: string | null }
 type BookingType = "service" | "open" | "callback"
 type Step        = "type" | "service" | "datetime" | "contact" | "confirm" | "done"
 
@@ -30,32 +30,6 @@ const STEP_ORDER: Record<BookingType, Step[]> = {
   callback: ["type", "contact", "confirm"],
 }
 
-const G  = "#18A66D"
-const GL = "#F0FBF6"
-const GB = "#D1F5E3"
-const T  = "#111827"
-const M  = "#6B7280"
-const M2 = "#9CA3AF"
-const BG = "#F9FAFB"
-const WH = "#FFFFFF"
-const BD = "#E5E7EB"
-
-/* ── shared input style ─────────────────────────────────────── */
-const inp: React.CSSProperties = {
-  width: "100%", padding: "13px 16px",
-  border: `1.5px solid ${BD}`, borderRadius: 12,
-  fontSize: 15, color: T, outline: "none",
-  boxSizing: "border-box", fontFamily: "inherit",
-  background: WH, transition: "border-color .15s, box-shadow .15s",
-}
-const lbl: React.CSSProperties = {
-  display: "block", fontSize: 13, fontWeight: 700,
-  color: "#374151", marginBottom: 6,
-}
-
-/* ══════════════════════════════════════════════════════════════
-   MAIN PAGE
-══════════════════════════════════════════════════════════════ */
 export default function BookingPage() {
   const params = useParams()
   const slug   = params?.slug as string
@@ -107,7 +81,6 @@ export default function BookingPage() {
     if (idx > 0) setStep(steps[idx - 1])
     else setStep("type")
   }
-
   function progressPct() {
     const steps = STEP_ORDER[bookingType]
     const idx   = steps.indexOf(step)
@@ -136,222 +109,297 @@ export default function BookingPage() {
       online_booking: true,
       request_text:   requestText.trim() || null,
     })
-
     if (insertErr) {
       setError(insertErr.message?.includes("RATE_LIMIT")
         ? "Du hast heute bereits 3 Anfragen gesendet. Bitte morgen erneut versuchen."
         : "Etwas ist schiefgelaufen. Bitte versuche es erneut.")
       setSubmitting(false); return
     }
-
-    // Betreiber-Benachrichtigung deaktiviert
-
     setStep("done"); setSubmitting(false)
   }
 
   const today = new Date().toISOString().split("T")[0]
+  const initials = company?.name
+    ? company.name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase()
+    : "?"
 
-  /* ── Loading ─────────────────────────────────────────────── */
+  /* ── CSS ── */
+  const css = `
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+    *, *::before, *::after { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body { margin: 0; }
+    @keyframes spin    { to { transform: rotate(360deg); } }
+    @keyframes fadeUp  { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+    @keyframes popIn   { 0% { opacity:0; transform:scale(.75); } 100% { opacity:1; transform:scale(1); } }
+    @keyframes shimmer { 0% { background-position: -400px 0; } 100% { background-position: 400px 0; } }
+    @keyframes checkDraw { from { stroke-dashoffset: 40; } to { stroke-dashoffset: 0; } }
+    .step-enter { animation: fadeUp .32s cubic-bezier(.16,1,.3,1); }
+    .card-hover { transition: all .2s ease; }
+    .card-hover:hover { border-color: #18A66D !important; transform: translateY(-2px); box-shadow: 0 8px 30px rgba(24,166,109,0.13) !important; }
+    .card-hover:active { transform: translateY(0); }
+    .svc-hover { transition: all .18s ease; }
+    .svc-hover:hover { border-color: #18A66D !important; background: #F0FBF6 !important; }
+    input[type="date"]::-webkit-calendar-picker-indicator { opacity: .5; cursor: pointer; }
+    input:focus, textarea:focus { border-color: #18A66D !important; box-shadow: 0 0 0 4px rgba(24,166,109,0.1) !important; outline: none !important; }
+    .ts-input { width:100%; padding:14px 16px; border:1.5px solid #E5E7EB; border-radius:13px; font-size:15px; color:#111827; background:#fff; font-family:inherit; transition:border-color .15s, box-shadow .15s; }
+    .ts-input::placeholder { color: #9CA3AF; }
+    textarea.ts-input { resize:none; }
+    .primary-btn { width:100%; padding:16px; background:#18A66D; color:#fff; border:none; border-radius:14px; font-size:15px; font-weight:700; cursor:pointer; letter-spacing:.2px; box-shadow:0 6px 24px rgba(24,166,109,0.28); transition:all .2s; display:flex; align-items:center; justify-content:center; gap:8px; }
+    .primary-btn:hover { background:#15955F; transform:translateY(-1px); box-shadow:0 8px 28px rgba(24,166,109,0.35); }
+    .primary-btn:active { transform:translateY(0); }
+    .primary-btn:disabled { background:#E5E7EB; color:#9CA3AF; cursor:not-allowed; box-shadow:none; transform:none; }
+    .back-btn { display:flex; align-items:center; gap:6px; background:none; border:none; cursor:pointer; color:#6B7280; font-size:14px; font-weight:600; padding:8px 0; transition:color .15s; }
+    .back-btn:hover { color:#111827; }
+    .skeleton { background: linear-gradient(90deg, #F3F4F6 25%, #E5E7EB 50%, #F3F4F6 75%); background-size: 400px 100%; animation: shimmer 1.4s ease infinite; border-radius: 8px; }
+  `
+
+  /* ── Loading ── */
   if (loading) return (
-    <Shell>
-      <div style={{ display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", flex:1, gap:14, padding:"80px 0" }}>
-        <div style={{ width:44, height:44, border:`3px solid ${GB}`, borderTopColor:G, borderRadius:"50%", animation:"spin .7s linear infinite" }} />
-        <p style={{ color:M2, fontSize:14, margin:0 }}>Lädt …</p>
+    <Shell css={css}>
+      <div style={{ background:"#fff" }}>
+        <div style={{ maxWidth:540, margin:"0 auto", padding:"28px 20px" }}>
+          <div className="skeleton" style={{ width:140, height:14, marginBottom:12 }} />
+          <div className="skeleton" style={{ width:240, height:28, marginBottom:8 }} />
+          <div className="skeleton" style={{ width:"80%", height:14 }} />
+        </div>
       </div>
-      <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
+      <div style={{ maxWidth:540, margin:"0 auto", padding:"24px 20px", display:"flex", flexDirection:"column", gap:12 }}>
+        {[1,2,3].map(i => (
+          <div key={i} className="skeleton" style={{ height:82, borderRadius:16 }} />
+        ))}
+      </div>
     </Shell>
   )
 
+  /* ── Not Found ── */
   if (notFound) return (
-    <Shell>
+    <Shell css={css}>
       <div style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", padding:"60px 24px", textAlign:"center" }}>
-        <div style={{ width:72, height:72, background:BG, border:`1.5px solid ${BD}`, borderRadius:20, display:"flex", alignItems:"center", justifyContent:"center", fontSize:32, marginBottom:20 }}>🔍</div>
-        <h1 style={{ fontSize:22, fontWeight:800, color:T, margin:"0 0 10px" }}>Link nicht gefunden</h1>
-        <p style={{ color:M, lineHeight:1.65, fontSize:15, margin:0, maxWidth:300 }}>Dieser Buchungslink ist nicht aktiv. Bitte wende dich direkt an den Betrieb.</p>
+        <div style={{ width:80, height:80, background:"#F9FAFB", border:"1.5px solid #E5E7EB", borderRadius:24, display:"flex", alignItems:"center", justifyContent:"center", fontSize:36, marginBottom:20 }}>🔍</div>
+        <h1 style={{ fontSize:22, fontWeight:800, color:"#111827", margin:"0 0 10px" }}>Buchungsseite nicht gefunden</h1>
+        <p style={{ color:"#6B7280", lineHeight:1.65, fontSize:15, margin:0, maxWidth:300 }}>Dieser Link ist nicht aktiv. Bitte wende dich direkt an den Betrieb.</p>
       </div>
     </Shell>
   )
 
-  /* ── Done ────────────────────────────────────────────────── */
+  /* ── Done ── */
   if (step === "done") return (
-    <Shell>
-      <style>{`@keyframes popIn{0%{opacity:0;transform:scale(.8)}100%{opacity:1;transform:scale(1)}}`}</style>
-      <div style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", padding:"40px 24px", textAlign:"center" }}>
-        <div style={{ width:80, height:80, background:G, borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", fontSize:36, color:"#fff", marginBottom:24, boxShadow:`0 12px 40px rgba(24,166,109,0.3)`, animation:"popIn .5s cubic-bezier(.16,1,.3,1)" }}>✓</div>
-        <h2 style={{ fontSize:26, fontWeight:900, color:T, margin:"0 0 10px", letterSpacing:"-.5px" }}>
+    <Shell css={css}>
+      <div style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", padding:"32px 20px", textAlign:"center" }}>
+
+        {/* Success icon */}
+        <div style={{ position:"relative", marginBottom:28 }}>
+          <div style={{ width:96, height:96, background:"linear-gradient(135deg, #18A66D, #15955F)", borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", boxShadow:"0 16px 48px rgba(24,166,109,0.35)", animation:"popIn .5s cubic-bezier(.16,1,.3,1)" }}>
+            <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
+              <path d="M10 22L18 30L34 14" stroke="white" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round"
+                style={{ strokeDasharray:40, strokeDashoffset:40, animation:"checkDraw .4s .3s ease forwards" }} />
+            </svg>
+          </div>
+          <div style={{ position:"absolute", inset:-8, borderRadius:"50%", border:"2px solid #D1F5E3", animation:"popIn .6s .1s ease backwards" }} />
+        </div>
+
+        <h2 style={{ fontSize:28, fontWeight:900, color:"#111827", margin:"0 0 10px", letterSpacing:"-.6px" }}>
           {bookingType === "callback" ? "Rückruf angefragt!" : "Anfrage gesendet!"}
         </h2>
-        <p style={{ color:M, lineHeight:1.7, fontSize:15, margin:"0 0 32px", maxWidth:340 }}>
-          Deine Anfrage bei <strong style={{ color:T }}>{company?.name}</strong> ist eingegangen.
+        <p style={{ color:"#6B7280", lineHeight:1.7, fontSize:15, margin:"0 0 8px", maxWidth:360 }}>
+          Deine Anfrage bei <strong style={{ color:"#111827" }}>{company?.name}</strong> ist eingegangen.
+        </p>
+        <p style={{ color:"#9CA3AF", fontSize:13, margin:"0 0 36px", maxWidth:320, lineHeight:1.6 }}>
           {bookingType === "callback"
-            ? " Du wirst so bald wie möglich zurückgerufen."
-            : " Du erhältst eine Bestätigung, sobald der Termin freigegeben wurde."}
+            ? "Du wirst so bald wie möglich zurückgerufen."
+            : "Der Betrieb wird sich mit einer Bestätigung bei dir melden."}
         </p>
 
-        <div style={{ width:"100%", maxWidth:400, background:WH, border:`1.5px solid ${BD}`, borderRadius:16, overflow:"hidden" }}>
-          {bookingType !== "callback" && date && <SRow label="Wunschtermin" value={formatDT(date, time)} />}
-          {selectedService && <SRow label="Leistung" value={selectedService.name} />}
-          {requestText && <SRow label="Anliegen" value={requestText} />}
-          <SRow label="Name"    value={name} />
-          <SRow label="Telefon" value={phone} last />
-        </div>
-
-        <p style={{ marginTop:28, fontSize:13, color:M2 }}>Du kannst dieses Fenster jetzt schließen.</p>
-
-        <div style={{ marginTop:32, display:"flex", alignItems:"center", gap:6 }}>
-          <div style={{ width:20, height:20, background:G, borderRadius:6, display:"flex", alignItems:"center", justifyContent:"center" }}>
-            <span style={{ color:"#fff", fontSize:10, fontWeight:900 }}>T</span>
+        {/* Summary */}
+        <div style={{ width:"100%", maxWidth:420, background:"#fff", border:"1.5px solid #E5E7EB", borderRadius:18, overflow:"hidden", marginBottom:24, boxShadow:"0 4px 20px rgba(0,0,0,0.04)", textAlign:"left" }}>
+          <div style={{ background:"#F0FBF6", borderBottom:"1px solid #D1F5E3", padding:"12px 18px" }}>
+            <span style={{ fontSize:12, fontWeight:700, color:"#18A66D", textTransform:"uppercase", letterSpacing:.8 }}>Zusammenfassung</span>
           </div>
-          <span style={{ fontSize:12, color:M2 }}>Powered by <strong style={{ color:G }}>TerminStop</strong></span>
+          {bookingType !== "callback" && date && <DRow label="Wunschtermin" value={formatDT(date, time)} />}
+          {bookingType === "callback" && <DRow label="Art" value="Rückruf" />}
+          {selectedService && <DRow label="Leistung" value={selectedService.name} />}
+          {requestText && <DRow label="Anliegen" value={requestText} />}
+          <DRow label="Name"    value={name} />
+          <DRow label="Telefon" value={phone} last />
         </div>
+
+        <p style={{ fontSize:13, color:"#9CA3AF", marginBottom:32 }}>Du kannst dieses Fenster jetzt schließen.</p>
+
+        <PoweredBy />
       </div>
     </Shell>
   )
 
-  /* ── Main ────────────────────────────────────────────────── */
+  /* ── Main ── */
   const showBack = step !== "type"
+  const stepLabel: Record<Step, string> = {
+    type: "", service: "Leistung wählen", datetime: "Datum & Uhrzeit",
+    contact: "Kontakt", confirm: "Bestätigung", done: "",
+  }
 
   return (
-    <Shell>
-      <style>{`
-        @keyframes spin { to { transform:rotate(360deg); } }
-        @keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
-        input:focus, textarea:focus { border-color:${G}!important; box-shadow:0 0 0 3px rgba(24,166,109,0.12)!important; outline:none; }
-        input[type="date"]::-webkit-calendar-picker-indicator { opacity:.5; cursor:pointer; }
-        * { -webkit-tap-highlight-color:transparent; }
-        .step-anim { animation:fadeUp .35s cubic-bezier(.16,1,.3,1); }
-        .type-card { transition:all .18s ease; }
-        .type-card:hover { border-color:${G}!important; background:${GL}!important; transform:translateY(-1px); box-shadow:0 6px 20px rgba(24,166,109,0.1); }
-        .svc-btn { transition:all .18s ease; }
-        .svc-btn:hover { border-color:${G}!important; background:${GL}!important; }
-      `}</style>
+    <Shell css={css}>
 
-      {/* ── Header ── */}
-      <div style={{ background:WH, borderBottom:`1px solid ${BD}`, padding:"env(safe-area-inset-top,0) 0 0" }}>
-        <div style={{ maxWidth:520, margin:"0 auto", padding:"16px 20px 16px" }}>
+      {/* ══ HERO HEADER ══ */}
+      <div style={{ background:"linear-gradient(160deg, #0F1923 0%, #1a2e20 50%, #0F1923 100%)", padding:"env(safe-area-inset-top,0) 0 0", position:"relative", overflow:"hidden" }}>
 
-          {/* Top row: back + brand */}
-          <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:16 }}>
+        {/* Subtle background orbs */}
+        <div style={{ position:"absolute", top:-60, right:-60, width:260, height:260, borderRadius:"50%", background:"radial-gradient(circle, rgba(24,166,109,0.18) 0%, transparent 70%)", pointerEvents:"none" }} />
+        <div style={{ position:"absolute", bottom:-40, left:-40, width:200, height:200, borderRadius:"50%", background:"radial-gradient(circle, rgba(24,166,109,0.1) 0%, transparent 70%)", pointerEvents:"none" }} />
+
+        <div style={{ maxWidth:540, margin:"0 auto", padding:"22px 20px 24px", position:"relative" }}>
+
+          {/* Top row */}
+          <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:22 }}>
             {showBack ? (
-              <button onClick={goBack} style={{ display:"flex", alignItems:"center", gap:6, background:"none", border:"none", cursor:"pointer", color:M, fontSize:14, fontWeight:600, padding:"4px 0" }}>
-                <span style={{ fontSize:18, lineHeight:1 }}>←</span> Zurück
+              <button className="back-btn" onClick={goBack} style={{ color:"rgba(255,255,255,0.6)" }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+                Zurück
               </button>
             ) : <div />}
-            <div style={{ display:"flex", alignItems:"center", gap:6 }}>
-              <div style={{ width:22, height:22, background:G, borderRadius:6, display:"flex", alignItems:"center", justifyContent:"center" }}>
-                <span style={{ color:"#fff", fontSize:10, fontWeight:900 }}>T</span>
+            <div style={{ display:"flex", alignItems:"center", gap:7, opacity:.7 }}>
+              <div style={{ width:20, height:20, background:"#18A66D", borderRadius:6, display:"flex", alignItems:"center", justifyContent:"center" }}>
+                <span style={{ color:"#fff", fontSize:9, fontWeight:900 }}>T</span>
               </div>
-              <span style={{ fontSize:12, color:M2, fontWeight:600 }}>TerminStop</span>
+              <span style={{ fontSize:11, color:"rgba(255,255,255,0.7)", fontWeight:600, letterSpacing:.3 }}>TerminStop</span>
             </div>
           </div>
 
           {/* Company info */}
-          <div style={{ display:"flex", alignItems:"flex-start", gap:14 }}>
-            <div style={{ width:52, height:52, background:GL, border:`1.5px solid ${GB}`, borderRadius:16, display:"flex", alignItems:"center", justifyContent:"center", fontSize:24, flexShrink:0 }}>📅</div>
-            <div style={{ flex:1, minWidth:0 }}>
-              <div style={{ fontSize:11, fontWeight:700, color:G, letterSpacing:.8, textTransform:"uppercase", marginBottom:3 }}>Online-Buchung</div>
-              <h1 style={{ fontSize:20, fontWeight:900, color:T, margin:0, letterSpacing:"-.4px", lineHeight:1.2 }}>{company?.name}</h1>
+          <div style={{ display:"flex", alignItems:"center", gap:16 }}>
+            <div style={{ width:58, height:58, background:"linear-gradient(135deg, #18A66D, #15955F)", borderRadius:18, display:"flex", alignItems:"center", justifyContent:"center", fontSize:20, fontWeight:900, color:"#fff", flexShrink:0, boxShadow:"0 6px 20px rgba(24,166,109,0.4)", letterSpacing:"-1px" }}>
+              {initials}
+            </div>
+            <div>
+              <div style={{ fontSize:11, fontWeight:700, color:"rgba(255,255,255,0.5)", letterSpacing:1, textTransform:"uppercase", marginBottom:4 }}>Online-Buchung</div>
+              <h1 style={{ fontSize:22, fontWeight:900, color:"#fff", margin:0, letterSpacing:"-.5px", lineHeight:1.15 }}>{company?.name}</h1>
               {company?.booking_note && (
-                <p style={{ fontSize:13, color:M, margin:"5px 0 0", lineHeight:1.5 }}>{company.booking_note}</p>
+                <p style={{ fontSize:13, color:"rgba(255,255,255,0.6)", margin:"6px 0 0", lineHeight:1.5 }}>{company.booking_note}</p>
               )}
             </div>
           </div>
 
-          {/* Progress bar */}
+          {/* Progress */}
           {showBack && (
-            <div style={{ marginTop:16 }}>
-              <div style={{ height:3, background:BG, borderRadius:4, overflow:"hidden" }}>
-                <div style={{ height:"100%", background:G, borderRadius:4, width:`${progressPct()}%`, transition:"width .4s ease" }} />
+            <div style={{ marginTop:20 }}>
+              <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:8 }}>
+                <span style={{ fontSize:11, color:"rgba(255,255,255,0.5)", fontWeight:600 }}>{stepLabel[step]}</span>
+                <span style={{ fontSize:11, color:"rgba(255,255,255,0.4)", fontWeight:600 }}>{progressPct()}%</span>
+              </div>
+              <div style={{ height:3, background:"rgba(255,255,255,0.1)", borderRadius:4, overflow:"hidden" }}>
+                <div style={{ height:"100%", background:"#18A66D", borderRadius:4, width:`${progressPct()}%`, transition:"width .4s ease", boxShadow:"0 0 8px rgba(24,166,109,0.6)" }} />
               </div>
             </div>
           )}
         </div>
       </div>
 
-      {/* ── Content ── */}
-      <div style={{ flex:1, maxWidth:520, margin:"0 auto", width:"100%", padding:"20px 16px 40px" }}>
+      {/* ══ CONTENT ══ */}
+      <div style={{ flex:1, maxWidth:540, margin:"0 auto", width:"100%", padding:"24px 16px 48px" }}>
 
         {/* ── STEP: type ── */}
         {step === "type" && (
-          <div className="step-anim">
+          <div className="step-enter">
             <div style={{ marginBottom:24 }}>
-              <h2 style={{ fontSize:20, fontWeight:800, color:T, margin:"0 0 6px", letterSpacing:"-.4px" }}>Wie kann ich helfen?</h2>
-              <p style={{ color:M, fontSize:14, margin:0, lineHeight:1.5 }}>Wähle, wie du einen Termin vereinbaren möchtest.</p>
+              <h2 style={{ fontSize:21, fontWeight:800, color:"#111827", margin:"0 0 6px", letterSpacing:"-.4px" }}>Wie kann ich dir helfen?</h2>
+              <p style={{ color:"#6B7280", fontSize:14, margin:0, lineHeight:1.6 }}>Wähle, wie du einen Termin vereinbaren möchtest.</p>
             </div>
 
-            <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
+            <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
               {services.length > 0 && (
-                <button className="type-card" onClick={() => { setBookingType("service"); setSelectedService(null); setStep("service") }}
-                  style={{ background:WH, border:`1.5px solid ${BD}`, borderRadius:16, padding:"18px 18px", textAlign:"left", cursor:"pointer", display:"flex", alignItems:"center", gap:14, width:"100%" }}>
-                  <div style={{ width:48, height:48, background:GL, border:`1px solid ${GB}`, borderRadius:14, display:"flex", alignItems:"center", justifyContent:"center", fontSize:22, flexShrink:0 }}>✂️</div>
+                <button className="card-hover"
+                  onClick={() => { setBookingType("service"); setSelectedService(null); setStep("service") }}
+                  style={{ background:"#fff", border:"1.5px solid #E5E7EB", borderRadius:18, padding:"20px", textAlign:"left", cursor:"pointer", display:"flex", alignItems:"center", gap:16, width:"100%", boxShadow:"0 2px 12px rgba(0,0,0,0.04)" }}>
+                  <div style={{ width:52, height:52, background:"linear-gradient(135deg, #F0FBF6, #D1F5E3)", border:"1.5px solid #D1F5E3", borderRadius:16, display:"flex", alignItems:"center", justifyContent:"center", fontSize:24, flexShrink:0 }}>✂️</div>
                   <div style={{ flex:1, minWidth:0 }}>
-                    <p style={{ fontWeight:700, color:T, margin:"0 0 4px", fontSize:15 }}>Leistung wählen</p>
-                    <p style={{ color:M2, margin:0, fontSize:13 }}>{services.length} Leistung{services.length > 1 ? "en" : ""} verfügbar</p>
+                    <p style={{ fontWeight:800, color:"#111827", margin:"0 0 4px", fontSize:15 }}>Leistung buchen</p>
+                    <p style={{ color:"#9CA3AF", margin:0, fontSize:13 }}>{services.length} Leistung{services.length > 1 ? "en" : ""} verfügbar</p>
                   </div>
-                  <span style={{ color:M2, fontSize:20, fontWeight:300 }}>›</span>
+                  <div style={{ width:32, height:32, background:"#F9FAFB", borderRadius:10, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="2.5" strokeLinecap="round"><path d="M9 18l6-6-6-6"/></svg>
+                  </div>
                 </button>
               )}
 
-              <button className="type-card" onClick={() => { setBookingType("open"); setStep("datetime") }}
-                style={{ background:WH, border:`1.5px solid ${BD}`, borderRadius:16, padding:"18px 18px", textAlign:"left", cursor:"pointer", display:"flex", alignItems:"center", gap:14, width:"100%" }}>
-                <div style={{ width:48, height:48, background:"#EEF2FF", border:"1px solid #C7D2FE", borderRadius:14, display:"flex", alignItems:"center", justifyContent:"center", fontSize:22, flexShrink:0 }}>🗓️</div>
+              <button className="card-hover"
+                onClick={() => { setBookingType("open"); setStep("datetime") }}
+                style={{ background:"#fff", border:"1.5px solid #E5E7EB", borderRadius:18, padding:"20px", textAlign:"left", cursor:"pointer", display:"flex", alignItems:"center", gap:16, width:"100%", boxShadow:"0 2px 12px rgba(0,0,0,0.04)" }}>
+                <div style={{ width:52, height:52, background:"linear-gradient(135deg, #EEF2FF, #C7D2FE)", border:"1.5px solid #C7D2FE", borderRadius:16, display:"flex", alignItems:"center", justifyContent:"center", fontSize:24, flexShrink:0 }}>🗓️</div>
                 <div style={{ flex:1, minWidth:0 }}>
-                  <p style={{ fontWeight:700, color:T, margin:"0 0 4px", fontSize:15 }}>Termin vereinbaren</p>
-                  <p style={{ color:M2, margin:0, fontSize:13 }}>Ich möchte einfach einen Termin anfragen</p>
+                  <p style={{ fontWeight:800, color:"#111827", margin:"0 0 4px", fontSize:15 }}>Termin anfragen</p>
+                  <p style={{ color:"#9CA3AF", margin:0, fontSize:13 }}>Wunschtermin wählen & anfragen</p>
                 </div>
-                <span style={{ color:M2, fontSize:20, fontWeight:300 }}>›</span>
+                <div style={{ width:32, height:32, background:"#F9FAFB", borderRadius:10, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="2.5" strokeLinecap="round"><path d="M9 18l6-6-6-6"/></svg>
+                </div>
               </button>
 
-              <button className="type-card" onClick={() => { setBookingType("callback"); setStep("contact") }}
-                style={{ background:WH, border:`1.5px solid ${BD}`, borderRadius:16, padding:"18px 18px", textAlign:"left", cursor:"pointer", display:"flex", alignItems:"center", gap:14, width:"100%" }}>
-                <div style={{ width:48, height:48, background:"#FFF7ED", border:"1px solid #FED7AA", borderRadius:14, display:"flex", alignItems:"center", justifyContent:"center", fontSize:22, flexShrink:0 }}>📞</div>
+              <button className="card-hover"
+                onClick={() => { setBookingType("callback"); setStep("contact") }}
+                style={{ background:"#fff", border:"1.5px solid #E5E7EB", borderRadius:18, padding:"20px", textAlign:"left", cursor:"pointer", display:"flex", alignItems:"center", gap:16, width:"100%", boxShadow:"0 2px 12px rgba(0,0,0,0.04)" }}>
+                <div style={{ width:52, height:52, background:"linear-gradient(135deg, #FFF7ED, #FED7AA)", border:"1.5px solid #FED7AA", borderRadius:16, display:"flex", alignItems:"center", justifyContent:"center", fontSize:24, flexShrink:0 }}>📞</div>
                 <div style={{ flex:1, minWidth:0 }}>
-                  <p style={{ fontWeight:700, color:T, margin:"0 0 4px", fontSize:15 }}>Rückruf wünschen</p>
-                  <p style={{ color:M2, margin:0, fontSize:13 }}>Ich möchte zuerst kurz sprechen</p>
+                  <p style={{ fontWeight:800, color:"#111827", margin:"0 0 4px", fontSize:15 }}>Rückruf anfragen</p>
+                  <p style={{ color:"#9CA3AF", margin:0, fontSize:13 }}>Ich werde so schnell wie möglich zurückgerufen</p>
                 </div>
-                <span style={{ color:M2, fontSize:20, fontWeight:300 }}>›</span>
+                <div style={{ width:32, height:32, background:"#F9FAFB", borderRadius:10, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="2.5" strokeLinecap="round"><path d="M9 18l6-6-6-6"/></svg>
+                </div>
               </button>
+            </div>
+
+            {/* Trust signals */}
+            <div style={{ marginTop:28, display:"flex", justifyContent:"center", gap:20, flexWrap:"wrap" }}>
+              {[["🔒", "Sicher & verschlüsselt"], ["⚡", "In 2 Min. gebucht"], ["✓", "Kostenlos anfragen"]].map(([icon, label]) => (
+                <div key={label} style={{ display:"flex", alignItems:"center", gap:6 }}>
+                  <span style={{ fontSize:13 }}>{icon}</span>
+                  <span style={{ fontSize:12, color:"#9CA3AF", fontWeight:600 }}>{label}</span>
+                </div>
+              ))}
             </div>
           </div>
         )}
 
         {/* ── STEP: service ── */}
         {step === "service" && (
-          <div className="step-anim">
+          <div className="step-enter">
             <div style={{ marginBottom:22 }}>
-              <h2 style={{ fontSize:20, fontWeight:800, color:T, margin:"0 0 6px", letterSpacing:"-.4px" }}>Leistung wählen</h2>
-              <p style={{ color:M, fontSize:14, margin:0 }}>Was soll für dich gemacht werden?</p>
+              <h2 style={{ fontSize:21, fontWeight:800, color:"#111827", margin:"0 0 6px", letterSpacing:"-.4px" }}>Leistung auswählen</h2>
+              <p style={{ color:"#6B7280", fontSize:14, margin:0 }}>Was soll für dich gemacht werden?</p>
             </div>
 
-            <div style={{ display:"flex", flexDirection:"column", gap:8, marginBottom:20 }}>
+            <div style={{ display:"flex", flexDirection:"column", gap:10, marginBottom:20 }}>
               {services.map(svc => (
-                <button key={svc.id} className="svc-btn"
+                <button key={svc.id} className="svc-hover"
                   onClick={() => { setSelectedService(svc); goNext() }}
-                  style={{ background:WH, border:`1.5px solid ${BD}`, borderRadius:14, padding:"15px 16px", textAlign:"left", cursor:"pointer", display:"flex", alignItems:"center", gap:14, width:"100%" }}>
-                  <div style={{ width:40, height:40, background:GL, borderRadius:12, display:"flex", alignItems:"center", justifyContent:"center", fontSize:16, flexShrink:0, color:G, fontWeight:800 }}>
+                  style={{ background:"#fff", border:"1.5px solid #E5E7EB", borderRadius:16, padding:"16px 18px", textAlign:"left", cursor:"pointer", display:"flex", alignItems:"center", gap:14, width:"100%", boxShadow:"0 1px 8px rgba(0,0,0,0.04)" }}>
+                  <div style={{ width:44, height:44, background:"linear-gradient(135deg, #F0FBF6, #D1F5E3)", borderRadius:13, display:"flex", alignItems:"center", justifyContent:"center", fontSize:17, fontWeight:800, color:"#18A66D", flexShrink:0, letterSpacing:"-1px" }}>
                     {svc.name.charAt(0).toUpperCase()}
                   </div>
                   <div style={{ flex:1, minWidth:0 }}>
-                    <p style={{ fontWeight:700, color:T, margin:"0 0 3px", fontSize:15, lineHeight:1.3 }}>{svc.name}</p>
-                    <p style={{ color:M2, margin:0, fontSize:13 }}>{formatDur(svc.duration)}</p>
+                    <p style={{ fontWeight:700, color:"#111827", margin:"0 0 4px", fontSize:15, lineHeight:1.3 }}>{svc.name}</p>
+                    <div style={{ display:"flex", gap:8, alignItems:"center" }}>
+                      <span style={{ fontSize:12, color:"#9CA3AF", background:"#F3F4F6", padding:"2px 8px", borderRadius:6, fontWeight:600 }}>{formatDur(svc.duration)}</span>
+                      {svc.price != null && (
+                        <span style={{ fontSize:12, color:"#18A66D", background:"#F0FBF6", padding:"2px 8px", borderRadius:6, fontWeight:700 }}>{formatPrice(svc.price)}</span>
+                      )}
+                    </div>
                   </div>
-                  {svc.price != null && (
-                    <span style={{ fontWeight:800, color:T, fontSize:15, background:BG, padding:"4px 10px", borderRadius:8, whiteSpace:"nowrap", flexShrink:0 }}>{formatPrice(svc.price)}</span>
-                  )}
-                  <span style={{ color:M2, fontSize:18, flexShrink:0 }}>›</span>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#D1D5DB" strokeWidth="2.5" strokeLinecap="round"><path d="M9 18l6-6-6-6"/></svg>
                 </button>
               ))}
             </div>
 
-            <div style={{ background:BG, border:`1.5px solid ${BD}`, borderRadius:14, padding:"16px" }}>
-              <p style={{ fontSize:13, fontWeight:700, color:T, margin:"0 0 10px" }}>Oder kurz beschreiben:</p>
+            {/* Free-text option */}
+            <div style={{ background:"#F9FAFB", border:"1.5px solid #E5E7EB", borderRadius:16, padding:"18px" }}>
+              <p style={{ fontSize:13, fontWeight:700, color:"#374151", margin:"0 0 10px" }}>Oder kurz beschreiben:</p>
               <LimitedTextarea value={requestText} onChange={setRequestText}
-                placeholder="z.B. Farbbehandlung, Beratung, Nagelpflege …" rows={2} />
+                placeholder="z.B. Farbbehandlung, Beratung …" rows={2} />
               {requestText.trim() && (
                 <div style={{ marginTop:10 }}>
-                  <PrimaryBtn onClick={() => { setSelectedService(null); goNext() }}>
+                  <button className="primary-btn" onClick={() => { setSelectedService(null); goNext() }}>
                     Weiter mit dieser Beschreibung →
-                  </PrimaryBtn>
+                  </button>
                 </div>
               )}
             </div>
@@ -360,183 +408,188 @@ export default function BookingPage() {
 
         {/* ── STEP: datetime ── */}
         {step === "datetime" && (
-          <div className="step-anim">
+          <div className="step-enter">
             <div style={{ marginBottom:22 }}>
-              <h2 style={{ fontSize:20, fontWeight:800, color:T, margin:"0 0 6px", letterSpacing:"-.4px" }}>Wann passt es?</h2>
-              <p style={{ color:M, fontSize:14, margin:0 }}>Wähle deinen Wunschtermin.</p>
+              <h2 style={{ fontSize:21, fontWeight:800, color:"#111827", margin:"0 0 6px", letterSpacing:"-.4px" }}>Wann passt es dir?</h2>
+              <p style={{ color:"#6B7280", fontSize:14, margin:0 }}>Wähle deinen Wunschtermin.</p>
             </div>
 
             {selectedService && (
-              <div style={{ display:"inline-flex", alignItems:"center", gap:8, background:GL, border:`1px solid ${GB}`, borderRadius:10, padding:"7px 14px", marginBottom:20 }}>
-                <span style={{ fontSize:13, fontWeight:700, color:G }}>{selectedService.name}</span>
-                <span style={{ color:GB }}>·</span>
-                <span style={{ fontSize:13, color:M }}>{formatDur(selectedService.duration)}</span>
+              <div style={{ display:"inline-flex", alignItems:"center", gap:8, background:"#F0FBF6", border:"1.5px solid #D1F5E3", borderRadius:12, padding:"8px 16px", marginBottom:22 }}>
+                <div style={{ width:8, height:8, background:"#18A66D", borderRadius:"50%" }} />
+                <span style={{ fontSize:13, fontWeight:700, color:"#18A66D" }}>{selectedService.name}</span>
+                <span style={{ fontSize:13, color:"#9CA3AF" }}>·</span>
+                <span style={{ fontSize:13, color:"#6B7280" }}>{formatDur(selectedService.duration)}</span>
               </div>
             )}
 
             {bookingType === "open" && (
-              <div style={{ marginBottom:18 }}>
-                <label style={lbl}>Dein Anliegen <span style={{ fontWeight:400, color:M2 }}>(optional)</span></label>
+              <div style={{ marginBottom:20 }}>
+                <label style={{ display:"block", fontSize:13, fontWeight:700, color:"#374151", marginBottom:8 }}>
+                  Dein Anliegen <span style={{ fontWeight:400, color:"#9CA3AF" }}>(optional)</span>
+                </label>
                 <LimitedTextarea value={requestText} onChange={setRequestText}
-                  placeholder="z.B. Inspektion, Beratung, Haarschnitt …" rows={2} />
+                  placeholder="z.B. Haarschnitt, Inspektion, Beratung …" rows={2} />
               </div>
             )}
 
-            <div style={{ display:"flex", flexDirection:"column", gap:14, marginBottom:24 }}>
+            <div style={{ display:"flex", flexDirection:"column", gap:16, marginBottom:24 }}>
               <div>
-                <label style={lbl}>Datum</label>
-                <input type="date" value={date} min={today} onChange={e => setDate(e.target.value)} style={inp} />
+                <label style={{ display:"block", fontSize:13, fontWeight:700, color:"#374151", marginBottom:8 }}>Datum</label>
+                <input type="date" value={date} min={today} onChange={e => setDate(e.target.value)} className="ts-input" />
               </div>
               <div>
-                <label style={lbl}>Uhrzeit</label>
-                <input type="time" value={time} onChange={e => setTime(e.target.value)} step={900} style={inp} />
+                <label style={{ display:"block", fontSize:13, fontWeight:700, color:"#374151", marginBottom:8 }}>Uhrzeit</label>
+                <input type="time" value={time} onChange={e => setTime(e.target.value)} step={900} className="ts-input" />
               </div>
             </div>
 
-            <PrimaryBtn onClick={goNext} disabled={!date || !time}>Weiter →</PrimaryBtn>
+            <button className="primary-btn" onClick={goNext} disabled={!date || !time}>
+              Weiter →
+            </button>
           </div>
         )}
 
         {/* ── STEP: contact ── */}
         {step === "contact" && (
-          <div className="step-anim">
+          <div className="step-enter">
             <div style={{ marginBottom:22 }}>
-              <h2 style={{ fontSize:20, fontWeight:800, color:T, margin:"0 0 6px", letterSpacing:"-.4px" }}>Deine Kontaktdaten</h2>
-              <p style={{ color:M, fontSize:14, margin:0, lineHeight:1.5 }}>
+              <h2 style={{ fontSize:21, fontWeight:800, color:"#111827", margin:"0 0 6px", letterSpacing:"-.4px" }}>Deine Kontaktdaten</h2>
+              <p style={{ color:"#6B7280", fontSize:14, margin:0, lineHeight:1.6 }}>
                 {bookingType === "callback"
-                  ? "Hinterlasse deine Nummer — der Betrieb ruft zurück."
+                  ? "Hinterlasse deine Nummer — der Betrieb ruft dich zurück."
                   : "Damit der Betrieb deinen Termin bestätigen kann."}
               </p>
             </div>
 
             {bookingType === "callback" && (
-              <div style={{ marginBottom:18 }}>
-                <label style={lbl}>Was ist dein Anliegen? <span style={{ fontWeight:400, color:M2 }}>(optional)</span></label>
+              <div style={{ marginBottom:20 }}>
+                <label style={{ display:"block", fontSize:13, fontWeight:700, color:"#374151", marginBottom:8 }}>
+                  Dein Anliegen <span style={{ fontWeight:400, color:"#9CA3AF" }}>(optional)</span>
+                </label>
                 <LimitedTextarea value={requestText} onChange={setRequestText}
                   placeholder="z.B. Frage zum Preis, Beratung …" rows={2} />
               </div>
             )}
 
-            <div style={{ display:"flex", flexDirection:"column", gap:14, marginBottom:24 }}>
+            <div style={{ display:"flex", flexDirection:"column", gap:16, marginBottom:24 }}>
               <div>
-                <label style={lbl}>Vor- und Nachname *</label>
+                <label style={{ display:"block", fontSize:13, fontWeight:700, color:"#374151", marginBottom:8 }}>Vor- und Nachname *</label>
                 <input type="text" value={name} onChange={e => setName(e.target.value)}
-                  placeholder="Max Mustermann" style={inp} autoComplete="name" />
+                  placeholder="Max Mustermann" className="ts-input" autoComplete="name" />
               </div>
               <div>
-                <label style={lbl}>Telefonnummer *</label>
+                <label style={{ display:"block", fontSize:13, fontWeight:700, color:"#374151", marginBottom:8 }}>Telefonnummer *</label>
                 <input type="tel" value={phone} onChange={e => setPhone(e.target.value)}
-                  placeholder="0151 12345678" style={inp} autoComplete="tel" />
+                  placeholder="0151 12345678" className="ts-input" autoComplete="tel" />
               </div>
               <div>
-                <label style={lbl}>Anmerkung <span style={{ fontWeight:400, color:M2 }}>(optional)</span></label>
+                <label style={{ display:"block", fontSize:13, fontWeight:700, color:"#374151", marginBottom:8 }}>
+                  Anmerkung <span style={{ fontWeight:400, color:"#9CA3AF" }}>(optional)</span>
+                </label>
                 <LimitedTextarea value={note} onChange={setNote}
-                  placeholder="z.B. bitte kurz klingeln" rows={2} />
+                  placeholder="z.B. bitte kurz klingeln …" rows={2} />
               </div>
             </div>
 
-            <PrimaryBtn onClick={goNext} disabled={!name.trim() || !phone.trim()}>Weiter →</PrimaryBtn>
+            <button className="primary-btn" onClick={goNext} disabled={!name.trim() || !phone.trim()}>
+              Weiter →
+            </button>
           </div>
         )}
 
         {/* ── STEP: confirm ── */}
         {step === "confirm" && (
-          <div className="step-anim">
+          <div className="step-enter">
             <div style={{ marginBottom:22 }}>
-              <h2 style={{ fontSize:20, fontWeight:800, color:T, margin:"0 0 6px", letterSpacing:"-.4px" }}>Alles korrekt?</h2>
-              <p style={{ color:M, fontSize:14, margin:0 }}>Überprüfe deine Angaben.</p>
+              <h2 style={{ fontSize:21, fontWeight:800, color:"#111827", margin:"0 0 6px", letterSpacing:"-.4px" }}>Alles korrekt?</h2>
+              <p style={{ color:"#6B7280", fontSize:14, margin:0 }}>Bitte überprüfe deine Angaben vor dem Absenden.</p>
             </div>
 
             {/* Summary card */}
-            <div style={{ background:WH, border:`1.5px solid ${BD}`, borderRadius:16, overflow:"hidden", marginBottom:16 }}>
-              <div style={{ background:GL, borderBottom:`1px solid ${GB}`, padding:"12px 18px", display:"flex", alignItems:"center", gap:8 }}>
-                <div style={{ width:28, height:28, background:G, borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center", fontSize:13 }}>📋</div>
-                <span style={{ fontSize:13, fontWeight:700, color:G }}>Deine Anfrage</span>
+            <div style={{ background:"#fff", border:"1.5px solid #E5E7EB", borderRadius:18, overflow:"hidden", marginBottom:16, boxShadow:"0 4px 20px rgba(0,0,0,0.05)" }}>
+              <div style={{ background:"linear-gradient(135deg, #F0FBF6, #E8F8F2)", borderBottom:"1px solid #D1F5E3", padding:"14px 20px", display:"flex", alignItems:"center", gap:10 }}>
+                <div style={{ width:30, height:30, background:"#18A66D", borderRadius:9, display:"flex", alignItems:"center", justifyContent:"center" }}>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                </div>
+                <span style={{ fontSize:13, fontWeight:800, color:"#18A66D" }}>Deine Anfrage</span>
               </div>
-              {bookingType !== "callback" && date && <SRow label="Wunschtermin" value={formatDT(date, time)} />}
-              {bookingType === "callback" && <SRow label="Art" value="Rückruf" />}
-              {selectedService && <SRow label="Leistung" value={`${selectedService.name} · ${formatDur(selectedService.duration)}`} />}
-              {selectedService?.price != null && <SRow label="Preis" value={formatPrice(selectedService.price) || ""} />}
-              {requestText && <SRow label="Anliegen" value={requestText} />}
-              <SRow label="Name"    value={name} />
-              <SRow label="Telefon" value={phone} last={!note} />
-              {note && <SRow label="Anmerkung" value={note} last />}
+              {bookingType !== "callback" && date && <DRow label="Wunschtermin" value={formatDT(date, time)} />}
+              {bookingType === "callback" && <DRow label="Art" value="Rückruf" />}
+              {selectedService && <DRow label="Leistung" value={`${selectedService.name} · ${formatDur(selectedService.duration)}`} />}
+              {selectedService?.price != null && <DRow label="Preis" value={formatPrice(selectedService.price) || ""} />}
+              {requestText && <DRow label="Anliegen" value={requestText} />}
+              <DRow label="Name"    value={name} />
+              <DRow label="Telefon" value={phone} last={!note} />
+              {note && <DRow label="Anmerkung" value={note} last />}
             </div>
 
-            {/* Info box */}
-            <div style={{ background:"#FFFBEB", border:"1px solid #FDE68A", borderRadius:12, padding:"12px 16px", marginBottom:20, fontSize:13, color:"#92400E", lineHeight:1.6, display:"flex", gap:10 }}>
-              <span style={{ flexShrink:0 }}>ℹ️</span>
-              <span>{bookingType === "callback"
-                ? `${company?.name} wird dich so bald wie möglich zurückrufen.`
-                : `Dies ist eine Anfrage — ${company?.name} bestätigt den Termin und meldet sich bei dir.`}
-              </span>
+            {/* Info */}
+            <div style={{ background:"#FFFBEB", border:"1px solid #FDE68A", borderRadius:14, padding:"14px 18px", marginBottom:20, display:"flex", gap:12, alignItems:"flex-start" }}>
+              <span style={{ fontSize:18, flexShrink:0, lineHeight:1 }}>ℹ️</span>
+              <p style={{ fontSize:13, color:"#92400E", lineHeight:1.65, margin:0 }}>
+                {bookingType === "callback"
+                  ? `${company?.name} ruft dich so bald wie möglich zurück.`
+                  : `Dies ist eine Anfrage. ${company?.name} bestätigt deinen Termin und meldet sich bei dir.`}
+              </p>
             </div>
 
             {error && (
-              <div style={{ background:"#FEF2F2", border:"1px solid #FECACA", borderRadius:12, padding:"12px 16px", marginBottom:16, fontSize:14, color:"#DC2626", lineHeight:1.5, display:"flex", gap:10 }}>
-                <span>⚠️</span><span>{error}</span>
+              <div style={{ background:"#FEF2F2", border:"1px solid #FECACA", borderRadius:14, padding:"14px 18px", marginBottom:16, display:"flex", gap:10, alignItems:"flex-start" }}>
+                <span>⚠️</span>
+                <p style={{ fontSize:13, color:"#DC2626", lineHeight:1.6, margin:0 }}>{error}</p>
               </div>
             )}
 
-            <PrimaryBtn onClick={submitBooking} disabled={submitting}>
+            <button className="primary-btn" onClick={submitBooking} disabled={submitting}>
               {submitting
-                ? <><Spin /> Wird gesendet …</>
-                : bookingType === "callback" ? "Rückruf anfragen →" : "Anfrage absenden →"}
-            </PrimaryBtn>
+                ? <><Spin /><span>Wird gesendet …</span></>
+                : bookingType === "callback" ? "Rückruf anfragen →" : "Anfrage jetzt absenden →"}
+            </button>
 
-            <p style={{ textAlign:"center", fontSize:12, color:M2, marginTop:12, lineHeight:1.5 }}>
-              Mit dem Absenden stimmst du der Verarbeitung deiner Kontaktdaten zu.
+            <p style={{ textAlign:"center", fontSize:12, color:"#9CA3AF", marginTop:14, lineHeight:1.6 }}>
+              🔒 Deine Daten werden sicher übertragen und nur für diese Anfrage verwendet.
             </p>
           </div>
         )}
       </div>
 
-      {/* ── Footer ── */}
-      <div style={{ borderTop:`1px solid ${BD}`, padding:"14px 20px", textAlign:"center", background:WH }}>
-        <div style={{ display:"inline-flex", alignItems:"center", gap:6 }}>
-          <div style={{ width:18, height:18, background:G, borderRadius:5, display:"flex", alignItems:"center", justifyContent:"center" }}>
-            <span style={{ color:"#fff", fontSize:9, fontWeight:900 }}>T</span>
-          </div>
-          <span style={{ fontSize:12, color:M2 }}>Powered by <strong style={{ color:G }}>TerminStop</strong></span>
-        </div>
+      {/* ══ FOOTER ══ */}
+      <div style={{ borderTop:"1px solid #F3F4F6", padding:"16px 20px", background:"#fff", textAlign:"center" }}>
+        <PoweredBy />
       </div>
     </Shell>
   )
 }
 
-/* ── Shell ───────────────────────────────────────────────────── */
-function Shell({ children }: { children: React.ReactNode }) {
+/* ── Shell ─────────────────────────────────────────────────────── */
+function Shell({ children, css }: { children: React.ReactNode; css?: string }) {
   return (
-    <div style={{ minHeight:"100dvh", background:BG, fontFamily:"-apple-system,BlinkMacSystemFont,'SF Pro Display','Inter',sans-serif", display:"flex", flexDirection:"column" }}>
+    <div style={{ minHeight:"100dvh", background:"#F9FAFB", fontFamily:"'Inter',-apple-system,BlinkMacSystemFont,'SF Pro Display',sans-serif", display:"flex", flexDirection:"column" }}>
+      {css && <style dangerouslySetInnerHTML={{ __html: css }} />}
       {children}
     </div>
   )
 }
 
-/* ── Primary Button ─────────────────────────────────────────── */
-function PrimaryBtn({ onClick, disabled, children }: { onClick:()=>void; disabled?:boolean; children:React.ReactNode }) {
+/* ── Powered By ─────────────────────────────────────────────────── */
+function PoweredBy() {
   return (
-    <button onClick={onClick} disabled={disabled} style={{
-      width:"100%", padding:"15px 0",
-      background: disabled ? "#E5E7EB" : G,
-      color: disabled ? "#9CA3AF" : "#fff",
-      border:"none", borderRadius:13, fontSize:15, fontWeight:700,
-      cursor: disabled ? "not-allowed" : "pointer",
-      transition:"all .18s", letterSpacing:0.1,
-      boxShadow: disabled ? "none" : "0 4px 20px rgba(24,166,109,0.28)",
-      display:"flex", alignItems:"center", justifyContent:"center", gap:8,
-    }}>
-      {children}
-    </button>
+    <div style={{ display:"inline-flex", alignItems:"center", gap:7 }}>
+      <div style={{ width:20, height:20, background:"linear-gradient(135deg, #18A66D, #15955F)", borderRadius:6, display:"flex", alignItems:"center", justifyContent:"center" }}>
+        <span style={{ color:"#fff", fontSize:9, fontWeight:900 }}>T</span>
+      </div>
+      <span style={{ fontSize:12, color:"#9CA3AF" }}>Powered by <strong style={{ color:"#18A66D" }}>TerminStop</strong></span>
+    </div>
   )
 }
 
-/* ── Spinner ─────────────────────────────────────────────────── */
+/* ── Spinner ───────────────────────────────────────────────────── */
 function Spin() {
-  return <div style={{ width:16, height:16, border:"2px solid rgba(255,255,255,0.3)", borderTopColor:"#fff", borderRadius:"50%", animation:"spin .7s linear infinite", flexShrink:0 }} />
+  return <div style={{ width:16, height:16, border:"2.5px solid rgba(255,255,255,0.35)", borderTopColor:"#fff", borderRadius:"50%", animation:"spin .7s linear infinite", flexShrink:0 }} />
 }
 
-/* ── Limited Textarea (max 160 Zeichen) ──────────────────────── */
+/* ── Limited Textarea ──────────────────────────────────────────── */
 const MAX = 160
 function LimitedTextarea({ value, onChange, placeholder, rows = 2 }: {
   value: string; onChange: (v: string) => void; placeholder?: string; rows?: number
@@ -545,32 +598,22 @@ function LimitedTextarea({ value, onChange, placeholder, rows = 2 }: {
   const warn = left <= 20
   return (
     <div style={{ position:"relative" }}>
-      <textarea
-        value={value}
-        onChange={e => onChange(e.target.value.slice(0, MAX))}
-        placeholder={placeholder}
-        rows={rows}
-        maxLength={MAX}
-        style={{ ...inp, resize:"none", paddingBottom:24 }}
-      />
-      <span style={{
-        position:"absolute", bottom:8, right:12,
-        fontSize:11, fontWeight:600,
-        color: warn ? (left <= 0 ? "#DC2626" : "#F59E0B") : M2,
-        pointerEvents:"none",
-      }}>
+      <textarea value={value} onChange={e => onChange(e.target.value.slice(0, MAX))}
+        placeholder={placeholder} rows={rows} maxLength={MAX}
+        className="ts-input" style={{ paddingBottom:28 }} />
+      <span style={{ position:"absolute", bottom:10, right:12, fontSize:11, fontWeight:600, color: warn ? (left <= 0 ? "#DC2626" : "#F59E0B") : "#9CA3AF", pointerEvents:"none" }}>
         {left} Zeichen übrig
       </span>
     </div>
   )
 }
 
-/* ── Summary Row ─────────────────────────────────────────────── */
-function SRow({ label, value, last }: { label:string; value:string; last?:boolean }) {
+/* ── Detail Row ────────────────────────────────────────────────── */
+function DRow({ label, value, last }: { label:string; value:string; last?:boolean }) {
   return (
-    <div style={{ display:"flex", justifyContent:"space-between", gap:16, padding:"12px 18px", borderBottom: last ? "none" : `1px solid ${BD}` }}>
-      <span style={{ fontSize:13, color:M2, flexShrink:0 }}>{label}</span>
-      <span style={{ fontSize:13, color:T, fontWeight:600, textAlign:"right", wordBreak:"break-word" }}>{value}</span>
+    <div style={{ display:"flex", justifyContent:"space-between", gap:16, padding:"13px 20px", borderBottom: last ? "none" : "1px solid #F3F4F6" }}>
+      <span style={{ fontSize:13, color:"#9CA3AF", flexShrink:0, fontWeight:500 }}>{label}</span>
+      <span style={{ fontSize:13, color:"#111827", fontWeight:700, textAlign:"right", wordBreak:"break-word" }}>{value}</span>
     </div>
   )
 }
