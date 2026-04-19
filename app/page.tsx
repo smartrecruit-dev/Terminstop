@@ -120,47 +120,37 @@ function DashboardMock() {
   ]
   return (
     <div style={{
-      background: C.surface,
-      borderRadius: 18,
-      border: `1px solid ${C.border}`,
-      overflow: "hidden",
+      background: C.surface, borderRadius: 18, border: `1px solid ${C.border}`, overflow: "hidden",
       boxShadow: "0 30px 80px -20px rgba(15,27,45,0.18), 0 8px 24px -8px rgba(15,27,45,0.08)",
       fontFamily: "inherit",
     }}>
       {/* Browser chrome */}
-      <div style={{
-        background: C.bg2, borderBottom: `1px solid ${C.borderSoft}`,
-        padding: "11px 18px", display: "flex", alignItems: "center", gap: 10,
-      }}>
+      <div style={{ background: C.bg2, borderBottom: `1px solid ${C.borderSoft}`, padding: "11px 18px", display: "flex", alignItems: "center", gap: 10 }}>
         <div style={{ display: "flex", gap: 6 }}>
           {["#FF5F57", "#FEBC2E", "#28C840"].map((c, i) => (
             <div key={i} style={{ width: 11, height: 11, borderRadius: "50%", background: c }} />
           ))}
         </div>
-        <div style={{
-          flex: 1, background: "#fff", border: `1px solid ${C.borderSoft}`,
-          borderRadius: 7, padding: "5px 14px", fontSize: 11, color: C.muted2,
-          textAlign: "center", maxWidth: 280, margin: "0 auto",
-          fontFamily: "ui-monospace, SF Mono, Menlo, monospace",
-        }}>
+        <div style={{ flex: 1, background: "#fff", border: `1px solid ${C.borderSoft}`, borderRadius: 7, padding: "5px 14px", fontSize: 11, color: C.muted2, textAlign: "center", maxWidth: 280, margin: "0 auto", fontFamily: "ui-monospace, SF Mono, Menlo, monospace" }}>
           app.terminstop.de/dashboard
         </div>
       </div>
 
       {/* App header */}
-      <div style={{
-        borderBottom: `1px solid ${C.borderSoft}`, padding: "14px 22px",
-        display: "flex", justifyContent: "space-between", alignItems: "center",
-      }}>
+      <div style={{ borderBottom: `1px solid ${C.borderSoft}`, padding: "14px 22px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <span style={{ fontWeight: 800, fontSize: 14, letterSpacing: "-0.3px" }}>
           <span style={{ color: C.text }}>Termin</span><span style={{ color: C.green }}>Stop</span>
         </span>
-        <div style={{ display: "flex", gap: 7, alignItems: "center" }}>
-          <span style={{
-            width: 7, height: 7, background: C.green, borderRadius: "50%",
-            boxShadow: `0 0 0 3px ${C.greenSoft}`,
-          }} />
-          <span style={{ fontSize: 11, color: C.green, fontWeight: 700 }}>System aktiv</span>
+        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          {/* Online-Buchung Badge */}
+          <div style={{ display: "flex", alignItems: "center", gap: 5, background: "#FEF3C7", border: "1px solid #FDE68A", borderRadius: 8, padding: "4px 10px", animation: `popIn 0.6s ${EASE} 0.8s both` }}>
+            <span style={{ width: 6, height: 6, background: "#F59E0B", borderRadius: "50%", display: "inline-block" }} />
+            <span style={{ fontSize: 10, fontWeight: 800, color: "#92400E" }}>2 neue Anfragen</span>
+          </div>
+          <div style={{ display: "flex", gap: 7, alignItems: "center" }}>
+            <span style={{ width: 7, height: 7, background: C.green, borderRadius: "50%", boxShadow: `0 0 0 3px ${C.greenSoft}` }} />
+            <span style={{ fontSize: 11, color: C.green, fontWeight: 700 }}>System aktiv</span>
+          </div>
         </div>
       </div>
 
@@ -168,67 +158,118 @@ function DashboardMock() {
       <div style={{ padding: "18px 22px 22px" }}>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 10, marginBottom: 18 }}>
           {[
-            { label: "Heute",        val: "5", icon: "📅" },
-            { label: "SMS gesendet", val: "4", icon: "✉️" },
-            { label: "Ausfälle",     val: "0", icon: "✅" },
+            { label: "Heute",        val: "5",  icon: "📅" },
+            { label: "SMS gesendet", val: "4",  icon: "✉️" },
+            { label: "Online-Anfr.", val: "2",  icon: "🔔", highlight: true },
           ].map((s, i) => (
-            <div key={i} style={{
-              background: C.bg2, border: `1px solid ${C.borderSoft}`,
-              borderRadius: 11, padding: "11px 12px", textAlign: "center",
-            }}>
+            <div key={i} style={{ background: s.highlight ? "#FFFBEB" : C.bg2, border: `1px solid ${s.highlight ? "#FDE68A" : C.borderSoft}`, borderRadius: 11, padding: "11px 12px", textAlign: "center" }}>
               <div style={{ fontSize: 16 }}>{s.icon}</div>
-              <div style={{ fontSize: 17, fontWeight: 900, color: C.text, lineHeight: 1.2, letterSpacing: "-0.5px" }}>{s.val}</div>
+              <div style={{ fontSize: 17, fontWeight: 900, color: s.highlight ? "#D97706" : C.text, lineHeight: 1.2, letterSpacing: "-0.5px" }}>{s.val}</div>
               <div style={{ fontSize: 10, color: C.muted2, marginTop: 2, fontWeight: 500 }}>{s.label}</div>
             </div>
           ))}
         </div>
 
-        <div style={{
-          fontSize: 11, fontWeight: 700, color: C.muted2, letterSpacing: "0.8px",
-          textTransform: "uppercase", marginBottom: 9,
-        }}>
-          Heutige Termine
+        {/* Online-Buchung Anfragen */}
+        <div style={{ background: "#FFFBEB", border: "1px solid #FDE68A", borderRadius: 12, padding: "12px 14px", marginBottom: 14, animation: `slideUp 0.5s ${EASE} 0.2s both` }}>
+          <div style={{ fontSize: 10, fontWeight: 800, color: "#92400E", textTransform: "uppercase", letterSpacing: .8, marginBottom: 8 }}>🔔 Neue Online-Anfragen</div>
+          {[
+            { name: "Julia M.", service: "Haarschnitt", time: "Fr, 14:00" },
+            { name: "David K.", service: "Coloring",    time: "Sa, 10:30" },
+          ].map((r, i) => (
+            <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "6px 0", borderTop: i > 0 ? "1px solid #FDE68A" : "none" }}>
+              <div style={{ width: 24, height: 24, background: "#FEF3C7", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 800, color: "#92400E", flexShrink: 0 }}>{r.name[0]}</div>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: C.text }}>{r.name} · {r.service}</div>
+                <div style={{ fontSize: 10, color: C.muted2 }}>Wunschtermin: {r.time}</div>
+              </div>
+              <div style={{ fontSize: 10, fontWeight: 700, background: C.green, color: "#fff", borderRadius: 6, padding: "3px 8px", cursor: "pointer" }}>✓ OK</div>
+            </div>
+          ))}
         </div>
 
+        <div style={{ fontSize: 11, fontWeight: 700, color: C.muted2, letterSpacing: "0.8px", textTransform: "uppercase", marginBottom: 9 }}>Heutige Termine</div>
         <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
-          {appts.map((a, i) => (
-            <div
-              key={i}
-              style={{
-                display: "flex", alignItems: "center", gap: 11,
-                padding: "9px 12px",
-                background: a.status === "pending" ? "#FFFBEB" : C.bg2,
-                border: `1px solid ${a.status === "pending" ? "#FDE68A" : C.borderSoft}`,
-                borderRadius: 10,
-                animation: `slideUp 0.5s ${EASE} ${0.1 + i * 0.06}s both`,
-              }}
-            >
+          {appts.slice(0, 4).map((a, i) => (
+            <div key={i} style={{ display: "flex", alignItems: "center", gap: 11, padding: "9px 12px", background: a.status === "pending" ? "#FFFBEB" : C.bg2, border: `1px solid ${a.status === "pending" ? "#FDE68A" : C.borderSoft}`, borderRadius: 10, animation: `slideUp 0.5s ${EASE} ${0.3 + i * 0.06}s both` }}>
               <div style={{ fontSize: 11, fontWeight: 700, color: C.muted2, width: 38, flexShrink: 0 }}>{a.time}</div>
-              <div style={{
-                width: 28, height: 28,
-                background: a.status === "pending" ? "#FEF3C7" : C.green,
-                borderRadius: "50%", display: "flex", alignItems: "center",
-                justifyContent: "center", fontSize: 11,
-                color: a.status === "pending" ? "#92400E" : "#fff",
-                fontWeight: 800, flexShrink: 0,
-              }}>
+              <div style={{ width: 28, height: 28, background: a.status === "pending" ? "#FEF3C7" : C.green, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, color: a.status === "pending" ? "#92400E" : "#fff", fontWeight: 800, flexShrink: 0 }}>
                 {a.name.charAt(0)}
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontSize: 12, fontWeight: 700, color: C.text, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{a.name}</div>
                 <div style={{ fontSize: 10, color: C.muted2 }}>{a.service}</div>
               </div>
-              <div style={{
-                fontSize: 10, fontWeight: 700, padding: "3px 9px",
-                borderRadius: 980,
-                background: a.status === "pending" ? "#FEF3C7" : C.greenSoft,
-                color: a.status === "pending" ? "#B45309" : C.greenInk,
-              }}>
+              <div style={{ fontSize: 10, fontWeight: 700, padding: "3px 9px", borderRadius: 980, background: a.status === "pending" ? "#FEF3C7" : C.greenSoft, color: a.status === "pending" ? "#B45309" : C.greenInk }}>
                 {a.status === "pending" ? "Ausstehend" : "✓ SMS"}
               </div>
             </div>
           ))}
         </div>
+      </div>
+    </div>
+  )
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   BOOKING PAGE MOCK — Phone showing booking flow
+═══════════════════════════════════════════════════════════════ */
+function BookingMock() {
+  return (
+    <div style={{ width: 220, position: "relative", margin: "0 auto" }}>
+      {/* Phone frame */}
+      <div style={{ background: "#0F1923", borderRadius: 36, padding: 10, boxShadow: "0 30px 80px -10px rgba(15,27,45,0.35), 0 10px 24px -8px rgba(15,27,45,0.2)", border: "6px solid #1a2535" }}>
+        {/* Notch */}
+        <div style={{ width: 70, height: 18, background: "#0F1923", borderRadius: "0 0 12px 12px", margin: "0 auto 6px" }} />
+        {/* Screen */}
+        <div style={{ background: "#fff", borderRadius: 26, overflow: "hidden", minHeight: 380 }}>
+          {/* Dark hero header */}
+          <div style={{ background: "linear-gradient(160deg, #0F1923 0%, #1a2e20 100%)", padding: "14px 14px 16px", position: "relative" }}>
+            <div style={{ fontSize: 8, fontWeight: 700, color: "rgba(255,255,255,0.45)", textTransform: "uppercase", letterSpacing: .8, marginBottom: 5 }}>Online-Buchung</div>
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <div style={{ width: 28, height: 28, background: "linear-gradient(135deg, #18A66D, #15955F)", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 900, color: "#fff" }}>FM</div>
+              <div style={{ fontSize: 13, fontWeight: 900, color: "#fff", letterSpacing: "-.3px" }}>Friseur Müller</div>
+            </div>
+          </div>
+          {/* Content */}
+          <div style={{ padding: "12px 12px 8px" }}>
+            <div style={{ fontSize: 11, fontWeight: 800, color: "#111827", marginBottom: 10 }}>Wie kann ich dir helfen?</div>
+            {/* Option cards */}
+            {[
+              { icon: "✂️", label: "Leistung buchen", sub: "3 Leistungen verfügbar", bg: "#F0FBF6", border: "#D1F5E3", active: true },
+              { icon: "🗓️", label: "Termin anfragen", sub: "Wunschtermin wählen", bg: "#EEF2FF", border: "#C7D2FE", active: false },
+              { icon: "📞", label: "Rückruf anfragen", sub: "Ich werde zurückgerufen", bg: "#FFF7ED", border: "#FED7AA", active: false },
+            ].map((opt, i) => (
+              <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 10px", borderRadius: 10, border: `1.5px solid ${opt.active ? "#18A66D" : opt.border}`, background: opt.active ? opt.bg : "#fff", marginBottom: 6, transition: "all .15s" }}>
+                <div style={{ width: 28, height: 28, borderRadius: 8, background: opt.bg, border: `1px solid ${opt.border}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, flexShrink: 0 }}>{opt.icon}</div>
+                <div>
+                  <div style={{ fontSize: 10, fontWeight: 800, color: "#111827" }}>{opt.label}</div>
+                  <div style={{ fontSize: 9, color: "#9CA3AF" }}>{opt.sub}</div>
+                </div>
+                {opt.active && <div style={{ marginLeft: "auto", width: 14, height: 14, borderRadius: "50%", background: "#18A66D", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                  <span style={{ color: "#fff", fontSize: 8, fontWeight: 900 }}>✓</span>
+                </div>}
+              </div>
+            ))}
+            {/* Trust signals */}
+            <div style={{ display: "flex", justifyContent: "center", gap: 10, marginTop: 10, padding: "8px 0", borderTop: "1px solid #F3F4F6" }}>
+              {["🔒 Sicher", "⚡ 2 Min.", "✓ Kostenlos"].map((t, i) => (
+                <span key={i} style={{ fontSize: 8, color: "#9CA3AF", fontWeight: 600 }}>{t}</span>
+              ))}
+            </div>
+            {/* Powered by */}
+            <div style={{ textAlign: "center", marginTop: 4 }}>
+              <span style={{ fontSize: 8, color: "#9CA3AF" }}>Powered by <strong style={{ color: "#18A66D" }}>TerminStop</strong></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      {/* QR Code floating badge */}
+      <div style={{ position: "absolute", bottom: -10, right: -24, background: "#fff", border: "1px solid #E5E7EB", borderRadius: 12, padding: "8px 10px", boxShadow: "0 8px 24px -6px rgba(15,27,45,0.16)", animation: `popIn 0.6s ${EASE} 0.9s both` }}>
+        <div style={{ fontSize: 8, fontWeight: 700, color: "#6B7280", marginBottom: 4 }}>QR-Code</div>
+        {/* Mini QR placeholder */}
+        <div style={{ width: 44, height: 44, background: "#F3F4F6", borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>⬛</div>
+        <div style={{ fontSize: 7, color: "#9CA3AF", marginTop: 3, textAlign: "center" }}>Scannen & buchen</div>
       </div>
     </div>
   )
@@ -1303,66 +1344,101 @@ export default function LandingPage() {
         </section>
 
         {/* ═══════════════ ADD-ON ═══════════════ */}
-        <section id="online-buchung" className="sec-pad" style={{ padding: "112px 32px", background: C.bg2 }}>
-          <div style={{ maxWidth: 1080, margin: "0 auto" }}>
-            <Reveal>
-              <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 22, flexWrap: "wrap" }}>
-                <div className="tag-green">
-                  <span className="dot pulse-dot" />
-                  <span>Add-on · Optional zubuchbar</span>
-                </div>
-              </div>
-              <div style={{ maxWidth: 640, marginBottom: 52 }}>
-                <h2 style={{
-                  fontSize: "clamp(32px, 4.5vw, 54px)", fontWeight: 900,
-                  letterSpacing: "-2px", lineHeight: 1.05, margin: "0 0 16px", color: C.ink,
-                }}>
-                  Online-Buchung —<br />Kunden buchen rund um die Uhr.
-                </h2>
-                <p style={{ fontSize: 17, color: C.muted, lineHeight: 1.65, margin: 0 }}>
-                  Geben Sie Ihrem Betrieb eine eigene Buchungsseite. Kunden scannen den QR-Code und fragen Termine an — Sie bestätigen mit einem Klick.
-                </p>
-              </div>
-            </Reveal>
+        <section id="online-buchung" style={{
+          padding: "0 0 0", background: "#0F1923", position: "relative", overflow: "hidden",
+        }}>
+          {/* Background orbs */}
+          <div style={{ position: "absolute", top: -120, right: -80, width: 480, height: 480, borderRadius: "50%", background: "radial-gradient(circle, rgba(24,166,109,0.14) 0%, transparent 70%)", pointerEvents: "none" }} />
+          <div style={{ position: "absolute", bottom: -100, left: -60, width: 360, height: 360, borderRadius: "50%", background: "radial-gradient(circle, rgba(24,166,109,0.08) 0%, transparent 70%)", pointerEvents: "none" }} />
 
-            <div className="grid-3col" style={{ display: "grid", gap: 14 }}>
-              {addonFeatures.map((f, i) => (
-                <Reveal key={i} delay={i * 60}>
-                  <div className="lift" style={{
-                    background: C.bg, border: `1px solid ${C.border}`, borderRadius: 14,
-                    padding: "24px", height: "100%", boxSizing: "border-box",
-                    boxShadow: "0 1px 4px rgba(15,27,45,0.04)",
-                  }}>
-                    <div style={{
-                      width: 44, height: 44,
-                      background: `linear-gradient(135deg, ${C.greenSoft}, #fff)`,
-                      border: `1px solid ${C.greenBorder}`, borderRadius: 11,
-                      display: "flex", alignItems: "center", justifyContent: "center",
-                      fontSize: 20, marginBottom: 16,
-                    }}>{f.icon}</div>
-                    <div style={{ fontSize: 15, fontWeight: 800, color: C.text, marginBottom: 7, letterSpacing: "-0.2px" }}>{f.title}</div>
-                    <div style={{ fontSize: 13.5, color: C.muted, lineHeight: 1.65 }}>{f.desc}</div>
+          {/* Hero split row */}
+          <div style={{ maxWidth: 1080, margin: "0 auto", padding: "100px 32px 80px", display: "flex", alignItems: "center", gap: 64, flexWrap: "wrap" }}>
+
+            {/* LEFT: copy */}
+            <div style={{ flex: "1 1 400px", minWidth: 0 }}>
+              <Reveal>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 28 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 7, background: "rgba(24,166,109,0.18)", border: "1px solid rgba(24,166,109,0.35)", borderRadius: 100, padding: "5px 14px" }}>
+                    <span style={{ width: 6, height: 6, background: "#18A66D", borderRadius: "50%", display: "inline-block", boxShadow: "0 0 0 0 #18A66D", animation: "pulse 2s infinite" }} />
+                    <span style={{ fontSize: 11, fontWeight: 800, color: "#4ade80", textTransform: "uppercase", letterSpacing: 1 }}>Add-on · Optional zubuchbar</span>
                   </div>
-                </Reveal>
-              ))}
+                </div>
+                <h2 style={{
+                  fontSize: "clamp(34px, 4.5vw, 58px)", fontWeight: 900,
+                  letterSpacing: "-2.5px", lineHeight: 1.0, margin: "0 0 20px", color: "#fff",
+                }}>
+                  Kunden buchen<br /><span style={{ color: "#18A66D" }}>rund um die Uhr.</span>
+                </h2>
+                <p style={{ fontSize: 17, color: "rgba(255,255,255,0.6)", lineHeight: 1.7, margin: "0 0 36px", maxWidth: 460 }}>
+                  Ihr Betrieb bekommt eine eigene Buchungsseite — mit QR-Code, automatischer SMS und allem was dazugehört. Kunden buchen selbst, Sie bestätigen mit einem Klick.
+                </p>
+
+                {/* Price block */}
+                <div style={{ display: "flex", alignItems: "flex-end", gap: 16, marginBottom: 36, flexWrap: "wrap" }}>
+                  <div style={{ background: "rgba(24,166,109,0.12)", border: "1px solid rgba(24,166,109,0.3)", borderRadius: 16, padding: "18px 24px" }}>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.45)", textTransform: "uppercase", letterSpacing: 1, marginBottom: 4 }}>Add-on Preis</div>
+                    <div style={{ display: "flex", alignItems: "baseline", gap: 4 }}>
+                      <span style={{ fontSize: 42, fontWeight: 900, color: "#fff", letterSpacing: "-2px", lineHeight: 1 }}>229 €</span>
+                      <span style={{ fontSize: 15, color: "rgba(255,255,255,0.45)", fontWeight: 600 }}>/Monat</span>
+                    </div>
+                    <div style={{ fontSize: 12, color: "rgba(255,255,255,0.35)", marginTop: 4 }}>Monatlich kündbar · Kein Risiko</div>
+                  </div>
+                  <div style={{ paddingBottom: 8 }}>
+                    <div style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", marginBottom: 5 }}>✓ &nbsp;Zu jedem Paket zubuchbar</div>
+                    <div style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", marginBottom: 5 }}>✓ &nbsp;Einrichtung inklusive</div>
+                    <div style={{ fontSize: 13, color: "rgba(255,255,255,0.5)" }}>✓ &nbsp;QR-Code & Buchungsseite sofort aktiv</div>
+                  </div>
+                </div>
+
+                <a href="/lead" style={{
+                  display: "inline-flex", alignItems: "center", gap: 8,
+                  background: "linear-gradient(135deg, #18A66D, #15955F)",
+                  color: "#fff", fontWeight: 800, fontSize: 15,
+                  padding: "15px 28px", borderRadius: 12, textDecoration: "none",
+                  boxShadow: "0 4px 20px rgba(24,166,109,0.4)",
+                  letterSpacing: "-0.2px",
+                }}>
+                  Jetzt Add-on anfragen
+                  <span style={{ fontSize: 18 }}>→</span>
+                </a>
+              </Reveal>
             </div>
 
-            <Reveal delay={140}>
-              <div style={{
-                marginTop: 22, background: `linear-gradient(180deg, ${C.greenSoft}, #fff)`,
-                border: `1px solid ${C.greenBorder}`, borderRadius: 16,
-                padding: "26px 30px", display: "flex", alignItems: "center",
-                justifyContent: "space-between", gap: 22, flexWrap: "wrap",
-              }}>
-                <div>
-                  <span style={{ color: C.text, fontWeight: 800, fontSize: 16, letterSpacing: "-0.3px" }}>Online-Buchung als Add-on hinzubuchen.</span>
-                  <span style={{ color: C.muted, fontSize: 14, marginLeft: 12 }}>Auf Anfrage · Zu jedem Paket</span>
+            {/* RIGHT: phone mockup */}
+            <div style={{ flex: "0 0 auto", display: "flex", justifyContent: "center", alignItems: "center" }}>
+              <Reveal delay={120}>
+                <div style={{ filter: "drop-shadow(0 32px 64px rgba(0,0,0,0.5))" }}>
+                  <BookingMock />
                 </div>
-                <a href="/lead" className="btn btn-primary" style={{ fontSize: 14, padding: "12px 24px", flexShrink: 0 }}>
-                  Jetzt anfragen →
-                </a>
+              </Reveal>
+            </div>
+          </div>
+
+          {/* Feature grid strip — dark cards */}
+          <div style={{ background: "rgba(255,255,255,0.03)", borderTop: "1px solid rgba(255,255,255,0.07)" }}>
+            <div style={{ maxWidth: 1080, margin: "0 auto", padding: "64px 32px" }}>
+              <div className="grid-3col" style={{ display: "grid", gap: 14 }}>
+                {addonFeatures.map((f, i) => (
+                  <Reveal key={i} delay={i * 60}>
+                    <div className="lift" style={{
+                      background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.09)",
+                      borderRadius: 14, padding: "22px", height: "100%", boxSizing: "border-box",
+                      transition: "border-color .2s, background .2s",
+                    }}>
+                      <div style={{
+                        width: 42, height: 42,
+                        background: "rgba(24,166,109,0.15)",
+                        border: "1px solid rgba(24,166,109,0.25)", borderRadius: 10,
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        fontSize: 19, marginBottom: 14,
+                      }}>{f.icon}</div>
+                      <div style={{ fontSize: 14.5, fontWeight: 800, color: "#fff", marginBottom: 6, letterSpacing: "-0.2px" }}>{f.title}</div>
+                      <div style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", lineHeight: 1.65 }}>{f.desc}</div>
+                    </div>
+                  </Reveal>
+                ))}
               </div>
-            </Reveal>
+            </div>
           </div>
         </section>
 
