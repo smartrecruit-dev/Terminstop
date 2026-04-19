@@ -138,6 +138,7 @@ export default function Dashboard() {
   const [customers, setCustomers]     = useState<any[]>([])
   const [customerSearch, setCustomerSearch]       = useState("")
   const [showSuggestions, setShowSuggestions]     = useState(false)
+  const [loading, setLoading]         = useState(true)
 
   useEffect(() => {
     const storedId   = localStorage.getItem("company_id")
@@ -155,7 +156,10 @@ export default function Dashboard() {
   }, [])
 
   useEffect(() => {
-    if (companyId) { loadAppointments(); loadCustomers() }
+    if (companyId) {
+      // Beide Fetches parallel – erst wenn beide fertig sind, wird loading=false
+      Promise.all([loadAppointments(), loadCustomers()]).finally(() => setLoading(false))
+    }
   }, [companyId])
 
   async function loadAppointments() {
@@ -217,6 +221,42 @@ export default function Dashboard() {
     customerSearch, setCustomerSearch, showSuggestions, setShowSuggestions,
     onSubmit: handleSubmit,
   }
+
+  // ── Skeleton während Daten laden ──
+  if (loading) return (
+    <div className="min-h-screen" style={{ fontFamily: "'Inter','Manrope',sans-serif", backgroundColor: "#F9FAFB" }}>
+      <DashNav active="/dashboard" companyId={companyId} onLogout={handleLogout} />
+      <div className="max-w-4xl mx-auto px-4 py-6">
+        {/* Header Skeleton */}
+        <div className="mb-5">
+          <div style={{ width: 120, height: 12, borderRadius: 8, background: "#E5E7EB", marginBottom: 8, animation: "skpulse 1.4s ease-in-out infinite" }} />
+          <div style={{ width: 200, height: 20, borderRadius: 8, background: "#E5E7EB", animation: "skpulse 1.4s ease-in-out infinite 0.1s" }} />
+        </div>
+        {/* Progress Bar Skeleton */}
+        <div style={{ background: "#fff", border: "1px solid #E5E7EB", borderRadius: 16, padding: "16px 20px", marginBottom: 16 }}>
+          <div style={{ width: "100%", height: 10, borderRadius: 99, background: "#F3F4F6", overflow: "hidden" }}>
+            <div style={{ width: "60%", height: "100%", background: "#E5E7EB", borderRadius: 99, animation: "skpulse 1.4s ease-in-out infinite" }} />
+          </div>
+        </div>
+        {/* Liste Skeleton */}
+        <div style={{ background: "#fff", border: "1px solid #E5E7EB", borderRadius: 16, overflow: "hidden" }}>
+          {[1, 2, 3].map(i => (
+            <div key={i} style={{ display: "flex", alignItems: "center", gap: 16, padding: "16px 20px", borderBottom: "1px solid #F3F4F6" }}>
+              <div style={{ width: 46, height: 30, borderRadius: 10, background: "#F3F4F6", animation: `skpulse 1.4s ease-in-out infinite ${i * 0.1}s` }} />
+              <div style={{ flex: 1 }}>
+                <div style={{ width: "50%", height: 13, borderRadius: 8, background: "#F3F4F6", marginBottom: 6, animation: `skpulse 1.4s ease-in-out infinite ${i * 0.1}s` }} />
+                <div style={{ width: "30%", height: 10, borderRadius: 8, background: "#F3F4F6", animation: `skpulse 1.4s ease-in-out infinite ${i * 0.1 + 0.05}s` }} />
+              </div>
+              <div style={{ width: 28, height: 28, borderRadius: "50%", background: "#F3F4F6", animation: `skpulse 1.4s ease-in-out infinite ${i * 0.1}s` }} />
+            </div>
+          ))}
+        </div>
+      </div>
+      <style>{`
+        @keyframes skpulse { 0%,100%{opacity:1} 50%{opacity:.45} }
+      `}</style>
+    </div>
+  )
 
   return (
     <div className="min-h-screen" style={{ fontFamily: "'Inter','Manrope',sans-serif", backgroundColor: "#F9FAFB" }}>
