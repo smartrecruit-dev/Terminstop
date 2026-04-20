@@ -176,6 +176,12 @@ export default function AdminPage() {
 
   const [toast, setToast] = useState<{ msg: string; ok: boolean } | null>(null)
 
+  // ── Neuen Betrieb anlegen ────────────────────────────────────────────────
+  const [showCreateForm, setShowCreateForm] = useState(false)
+  const [newBetrieb, setNewBetrieb]         = useState({ name: "", email: "", password: "", phone: "" })
+  const [creating, setCreating]             = useState(false)
+  const [createResult, setCreateResult]     = useState<{ email: string; password: string; name: string } | null>(null)
+
   // ── Sales Tracker ────────────────────────────────────────────────────────
   type SalesEntry = { anrufe: number; gespraeche: number; termine: number; closes: number }
   const todayKey = new Date().toISOString().split("T")[0]
@@ -359,6 +365,29 @@ export default function AdminPage() {
   }
 
   // ── General helpers ───────────────────────────────────────────────────────
+  async function createBetrieb(e: React.FormEvent) {
+    e.preventDefault()
+    if (!newBetrieb.name || !newBetrieb.email || !newBetrieb.password) return
+    setCreating(true)
+    try {
+      const res = await fetch("/api/admin/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-admin-secret": secret },
+        body: JSON.stringify(newBetrieb),
+      })
+      const data = await res.json()
+      if (!res.ok) { showToast("❌ " + (data.error || "Fehler"), false); return }
+      setCreateResult({ email: data.email, password: data.password, name: data.name })
+      setNewBetrieb({ name: "", email: "", password: "", phone: "" })
+      loadCompanies()
+      showToast(`✅ ${data.name} wurde angelegt!`)
+    } catch (err: any) {
+      showToast("❌ " + err.message, false)
+    } finally {
+      setCreating(false)
+    }
+  }
+
   function showToast(msg: string, ok = true) {
     setToast({ msg, ok })
     setTimeout(() => setToast(null), 3000)
@@ -783,8 +812,60 @@ export default function AdminPage() {
                     {f === "all" ? "Alle" : f === "active" ? "✅ Aktiv" : f === "paused" ? "⏸ Pausiert" : "🔖 Add-on"}
                   </button>
                 ))}
+                <button onClick={() => { setShowCreateForm(v => !v); setCreateResult(null) }} style={{ ...btnStyle("green") }}>
+                  {showCreateForm ? "✕ Abbrechen" : "＋ Neuer Betrieb"}
+                </button>
               </div>
             </div>
+
+            {/* ── Formular: Neuen Betrieb anlegen ── */}
+            {showCreateForm && (
+              <div style={{ background: "#fff", border: `1.5px solid ${G}`, borderRadius: 16, padding: 24, marginBottom: 20, boxShadow: "0 4px 20px rgba(24,166,109,0.08)" }}>
+                <div style={{ fontSize: 15, fontWeight: 900, color: T, marginBottom: 16 }}>🆕 Neuen Betrieb anlegen</div>
+                {createResult ? (
+                  <div style={{ background: GL, border: `1px solid ${GB}`, borderRadius: 12, padding: 20 }}>
+                    <div style={{ fontSize: 14, fontWeight: 800, color: G, marginBottom: 12 }}>✅ {createResult.name} wurde erfolgreich angelegt!</div>
+                    <div style={{ fontSize: 13, color: T, marginBottom: 6 }}>Login-Daten für den Kunden:</div>
+                    <div style={{ display: "flex", flexDirection: "column" as const, gap: 8 }}>
+                      {[{ label: "E-Mail", value: createResult.email }, { label: "Passwort", value: createResult.password }].map(row => (
+                        <div key={row.label} style={{ display: "flex", alignItems: "center", gap: 10, background: "#fff", border: `1px solid ${BD}`, borderRadius: 10, padding: "10px 14px" }}>
+                          <span style={{ fontSize: 11, fontWeight: 700, color: M, width: 70, flexShrink: 0 }}>{row.label}</span>
+                          <code style={{ flex: 1, fontSize: 13, fontWeight: 700, color: T }}>{row.value}</code>
+                          <CopyBtn text={row.value} />
+                        </div>
+                      ))}
+                    </div>
+                    <button onClick={() => { setCreateResult(null); setShowCreateForm(false) }} style={{ ...btnStyle("gray"), marginTop: 14, fontSize: 12 }}>Schließen</button>
+                  </div>
+                ) : (
+                  <form onSubmit={createBetrieb} style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 14 }}>
+                    {[
+                      { key: "name",     label: "Betriebsname *",  placeholder: "Friseur Müller",       type: "text"     },
+                      { key: "email",    label: "E-Mail *",         placeholder: "info@friseur.de",      type: "email"    },
+                      { key: "password", label: "Passwort *",       placeholder: "mind. 6 Zeichen",      type: "text"     },
+                      { key: "phone",    label: "Telefon (optional)",placeholder: "+49 151 …",           type: "tel"      },
+                    ].map(field => (
+                      <div key={field.key}>
+                        <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: M, textTransform: "uppercase" as const, letterSpacing: .4, marginBottom: 5 }}>{field.label}</label>
+                        <input
+                          type={field.type}
+                          placeholder={field.placeholder}
+                          value={(newBetrieb as any)[field.key]}
+                          onChange={ev => setNewBetrieb(p => ({ ...p, [field.key]: ev.target.value }))}
+                          style={{ ...inp }}
+                          required={field.key !== "phone"}
+                        />
+                      </div>
+                    ))}
+                    <div style={{ display: "flex", alignItems: "flex-end" }}>
+                      <button type="submit" disabled={creating} style={{ ...btnStyle("green"), width: "100%", padding: "11px 14px", fontSize: 13, opacity: creating ? .7 : 1 }}>
+                        {creating ? "Wird angelegt …" : "Betrieb anlegen →"}
+                      </button>
+                    </div>
+                  </form>
+                )}
+              </div>
+            )}
 
             {loading ? (
               <div style={{ textAlign: "center", padding: 60, color: M }}>Lädt …</div>
