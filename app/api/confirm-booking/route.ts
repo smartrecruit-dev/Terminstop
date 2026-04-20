@@ -73,6 +73,17 @@ export async function POST(req: NextRequest) {
     }
 
     if (action === "confirm") {
+      // Company des eingeloggten Users laden (über user_id, nicht über company.id = user.id)
+      const { data: company } = await supabaseAdmin
+        .from("companies")
+        .select("id")
+        .eq("user_id", user.id)
+        .single()
+
+      if (!company) {
+        return NextResponse.json({ error: "Kein Betrieb gefunden" }, { status: 403 })
+      }
+
       // Load appointment first to verify ownership
       const { data: appt } = await supabaseAdmin
         .from("appointments")
@@ -84,8 +95,8 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: "Termin nicht gefunden" }, { status: 404 })
       }
 
-      // Verify ownership: appointment.company_id must match the user's company
-      if (appt.company_id !== user.id) {
+      // Verify ownership: appointment.company_id must match the user's actual company id
+      if (appt.company_id !== company.id) {
         return NextResponse.json({ error: "Nicht berechtigt" }, { status: 403 })
       }
 
