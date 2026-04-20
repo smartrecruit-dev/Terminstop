@@ -502,8 +502,9 @@ export default function AdminPage() {
   }).length
   const risikoList   = companies.filter(c => !c.paused && c.appointments === 0)
   const topList      = [...companies].sort((a, b) => b.appointments - a.appointments).slice(0, 5)
-  // Betriebe die ≥80% ihres SMS-Limits erreicht haben
-  const smsWarnList  = companies.filter(c => !c.paused && (c.sms_limit || 200) > 0 && (c.sms_count_month || 0) >= (c.sms_limit || 200) * 0.8)
+  // Betriebe ≥90% des Limits (10% Toleranz) → Warnung; >100% → Nachberechnung
+  const smsWarnList  = companies.filter(c => !c.paused && (c.sms_limit || 200) > 0 && (c.sms_count_month || 0) >= (c.sms_limit || 200) * 0.9)
+  const smsOverList  = companies.filter(c => !c.paused && (c.sms_limit || 200) > 0 && (c.sms_count_month || 0) > (c.sms_limit || 200))
 
   const filtered = companies
     .filter(c => filter === "all" ? true : filter === "active" ? !c.paused : filter === "paused" ? c.paused : c.booking_addon)
@@ -628,16 +629,39 @@ export default function AdminPage() {
               ))}
             </div>
 
-            {/* SMS-Warnung Banner */}
-            {smsWarnList.length > 0 && (
+            {/* SMS Nachberechnung Banner — über Limit */}
+            {smsOverList.length > 0 && (
+              <div style={{ background: "#FEF2F2", border: "1px solid #FECACA", borderRadius: 14, padding: "14px 20px", marginBottom: 10, display: "flex", alignItems: "center", gap: 14 }}>
+                <span style={{ fontSize: 22, flexShrink: 0 }}>🔴</span>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 13, fontWeight: 800, color: RED, marginBottom: 4 }}>
+                    {smsOverList.length} Betrieb{smsOverList.length > 1 ? "e" : ""} über SMS-Limit → Nachberechnung (0,10 €/SMS)
+                  </div>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                    {smsOverList.map(c => {
+                      const over = (c.sms_count_month || 0) - (c.sms_limit || 200)
+                      return (
+                        <span key={c.id} onClick={() => { setTab("betriebe"); setExpanded(c.id); loadCompanyDetail(c.id) }}
+                          style={{ fontSize: 11, fontWeight: 700, background: "#FEE2E2", color: RED, padding: "3px 10px", borderRadius: 8, cursor: "pointer", border: "1px solid #FECACA" }}>
+                          {c.name} (+{over} SMS = {(over * 0.10).toFixed(2)} €)
+                        </span>
+                      )
+                    })}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* SMS-Warnung Banner — nahe am Limit (90%) */}
+            {smsWarnList.filter(c => (c.sms_count_month || 0) <= (c.sms_limit || 200)).length > 0 && (
               <div style={{ background: "#FFFBEB", border: "1px solid #FDE68A", borderRadius: 14, padding: "14px 20px", marginBottom: 16, display: "flex", alignItems: "center", gap: 14 }}>
                 <span style={{ fontSize: 22, flexShrink: 0 }}>⚠️</span>
                 <div style={{ flex: 1 }}>
                   <div style={{ fontSize: 13, fontWeight: 800, color: "#92400E", marginBottom: 4 }}>
-                    {smsWarnList.length} Betrieb{smsWarnList.length > 1 ? "e" : ""} nahe am SMS-Limit
+                    Betriebe nahe am SMS-Limit (90%+)
                   </div>
                   <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-                    {smsWarnList.map(c => (
+                    {smsWarnList.filter(c => (c.sms_count_month || 0) <= (c.sms_limit || 200)).map(c => (
                       <span key={c.id} onClick={() => { setTab("betriebe"); setExpanded(c.id); loadCompanyDetail(c.id) }}
                         style={{ fontSize: 11, fontWeight: 700, background: "#FEF3C7", color: "#92400E", padding: "3px 10px", borderRadius: 8, cursor: "pointer", border: "1px solid #FDE68A" }}>
                         {c.name} ({c.sms_count_month || 0}/{c.sms_limit || 200})

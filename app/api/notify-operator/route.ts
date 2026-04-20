@@ -75,10 +75,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ skipped: true, reason: "Betrieb ist pausiert" })
     }
 
-    // Enforce SMS limit: check sms_count_month against sms_limit
-    if (company.sms_limit && company.sms_count_month >= company.sms_limit) {
-      return NextResponse.json({ error: "SMS-Limit erreicht" }, { status: 429 })
-    }
+    // Hinweis: SMS-Limit wird nur zur Überwachung geführt, blockiert nicht.
+    // Admin sieht im Dashboard wenn Betrieb über Limit ist (Nachberechnung 0,10 €/SMS).
 
     // Nachricht zusammenbauen
     const cleanName = (validCustomerName || "Unbekannt").replace(/\s*\[.*?\]\s*/g, "").trim()
