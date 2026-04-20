@@ -52,7 +52,9 @@ export async function POST(req: NextRequest) {
     // 2. Company-Record anlegen
     const companyData: any = {
       id: userId,
+      user_id: userId,
       name: name.trim(),
+      email: email.trim(),
       paused: false,
       booking_addon: false,
       sms_count: 0,
