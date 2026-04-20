@@ -29,24 +29,28 @@ export default function LoginPage() {
       password: password.trim(),
     })
 
-    if (authError || !authData?.user) {
+    if (authError || !authData?.user || !authData?.session) {
       setError("E-Mail oder Passwort ist nicht korrekt.")
       setLoading(false)
       return
     }
 
-    const { data: company, error: companyError } = await supabase
-      .from("companies")
-      .select("id, name, paused")
-      .eq("user_id", authData.user.id)
-      .single()
+    // Company über Server-Route laden (Service Role – umgeht RLS)
+    const res = await fetch("/api/auth/company", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ access_token: authData.session.access_token }),
+    })
+    const json = await res.json()
 
-    if (companyError || !company) {
+    if (!res.ok || !json.company) {
       setError("Konto nicht gefunden. Bitte Administrator kontaktieren.")
       await supabase.auth.signOut()
       setLoading(false)
       return
     }
+
+    const company = json.company
 
     if (company.paused) {
       setError("Ihr Zugang wurde vorübergehend pausiert. Bitte kontaktieren Sie uns unter terminstop.business@gmail.com.")
