@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@supabase/supabase-js"
-import { formatPhone } from "@/app/lib/security"
+import { formatPhone, isValidPhone } from "@/app/lib/security"
 
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -63,6 +63,11 @@ export async function POST(req: NextRequest) {
 
     if (!company?.notification_phone) {
       return NextResponse.json({ skipped: true, reason: "Kein notification_phone hinterlegt" })
+    }
+
+    // Telefonnummer validieren bevor SMS-Versand
+    if (!isValidPhone(company.notification_phone)) {
+      return NextResponse.json({ skipped: true, reason: "Ungültige Telefonnummer" })
     }
 
     // Check if company has booking_addon enabled

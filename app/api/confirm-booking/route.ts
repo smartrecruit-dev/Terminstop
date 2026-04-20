@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@supabase/supabase-js"
 
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+const VALID_ACTIONS = ["confirm", "reject"] as const
+
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -70,6 +73,14 @@ export async function POST(req: NextRequest) {
     const { appointmentId, action, companyName, skipSms } = await req.json()
     if (!appointmentId || !action) {
       return NextResponse.json({ error: "appointmentId und action erforderlich" }, { status: 400 })
+    }
+    // UUID-Format validieren
+    if (!UUID_REGEX.test(String(appointmentId))) {
+      return NextResponse.json({ error: "Ungültige appointmentId" }, { status: 400 })
+    }
+    // Action-Whitelist
+    if (!VALID_ACTIONS.includes(action)) {
+      return NextResponse.json({ error: "Ungültige action" }, { status: 400 })
     }
 
     if (action === "confirm") {

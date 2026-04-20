@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@supabase/supabase-js"
+import { randomInt } from "crypto"
 
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -13,12 +14,10 @@ function checkAdminAuth(req: NextRequest) {
   return secret === expected
 }
 
-// Sicheres zufälliges Passwort generieren
+// Sicheres zufälliges Passwort generieren via Node.js crypto (CSPRNG)
 function generatePassword(length = 12): string {
   const chars = "abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789!@#$"
   let password = ""
-  // Node crypto für sichere Zufälligkeit
-  const { randomInt } = require("crypto")
   for (let i = 0; i < length; i++) {
     password += chars[randomInt(0, chars.length)]
   }
