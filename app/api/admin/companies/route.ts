@@ -22,7 +22,7 @@ export async function GET(req: NextRequest) {
     // Companies ohne created_at (Spalte existiert nicht in der Tabelle)
     const { data: companies, error } = await supabaseAdmin
       .from("companies")
-      .select("id, name, paused, slug, booking_addon, notification_phone, booking_note, sms_count")
+      .select("id, name, paused, slug, booking_addon, notification_phone, booking_note, sms_count, sms_count_month, sms_limit, sms_month")
 
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 

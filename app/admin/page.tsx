@@ -15,7 +15,17 @@ type Company = {
   id: string; name: string; email: string; paused: boolean
   slug: string | null; booking_addon: boolean
   notification_phone: string | null; sms_count: number
+  sms_count_month: number; sms_limit: number; sms_month: string | null
   appointments: number; customers: number; created_at: string
+}
+
+type CompanyDetail = {
+  todayAppointments: { id: string; name: string; phone: string; time: string | null; status: string; note: string | null; reminded: boolean }[]
+  monthAppointments: { id: string; name: string; date: string; time: string | null; status: string; reminded: boolean }[]
+  upcomingAppointments: { id: string; name: string; date: string; time: string | null; status: string; reminded: boolean }[]
+  customers: { id: string; name: string; phone: string; created_at: string }[]
+  services: { id: string; name: string; duration: number; price: number | null; active: boolean }[]
+  stats: { totalThisMonth: number; doneThisMonth: number; smsThisMonth: number; customerCount: number }
 }
 
 type Tab = "zentrale" | "betriebe" | "coldcall" | "notizen" | "rueckrufe" | "leads" | "prozesse"
@@ -173,6 +183,15 @@ export default function AdminPage() {
   const [expanded, setExpanded]   = useState<string | null>(null)
   const [edits, setEdits]         = useState<Record<string, Partial<Company>>>({})
   const [saving, setSaving]       = useState<string | null>(null)
+
+  // ── Company Detail ────────────────────────────────────────────────────────
+  const [companyDetail, setCompanyDetail]   = useState<Record<string, CompanyDetail>>({})
+  const [detailLoading, setDetailLoading]   = useState<string | null>(null)
+  const [newSmsLimit, setNewSmsLimit]       = useState<Record<string, string>>({})
+  const [smsLimitSaving, setSmsLimitSaving] = useState<string | null>(null)
+  const [pwResetResult, setPwResetResult]   = useState<Record<string, string>>({})
+  const [pwResetting, setPwResetting]       = useState<string | null>(null)
+  const [detailTab, setDetailTab]           = useState<Record<string, "heute" | "monat" | "kunden" | "einstellungen">>({})
 
   const [toast, setToast] = useState<{ msg: string; ok: boolean } | null>(null)
 
@@ -430,10 +449,51 @@ export default function AdminPage() {
     setEdits(prev => { const n = { ...prev }; delete n[companyId]; return n })
   }
 
+  // ── Company Detail laden ─────────────────────────────────────────────────
+  async function loadCompanyDetail(companyId: string, force = false) {
+    if (companyDetail[companyId] && !force) return
+    setDetailLoading(companyId)
+    try {
+      const res = await fetch(`/api/admin/company-detail?id=${companyId}`, { headers: { "x-admin-secret": secret } })
+      const json = await res.json()
+      if (res.ok) setCompanyDetail(prev => ({ ...prev, [companyId]: json }))
+    } catch {}
+    setDetailLoading(null)
+  }
+
+  async function saveSmsLimit(companyId: string) {
+    const limit = newSmsLimit[companyId]
+    if (!limit) return
+    setSmsLimitSaving(companyId)
+    const res = await fetch("/api/admin/set-sms-limit", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "x-admin-secret": secret },
+      body: JSON.stringify({ companyId, limit: parseInt(limit) }),
+    })
+    const json = await res.json()
+    if (json.success) { showToast(`SMS-Limit auf ${json.sms_limit} gesetzt ✓`); loadCompanies() }
+    else showToast(json.error || "Fehler beim Setzen", false)
+    setSmsLimitSaving(null)
+  }
+
+  async function doResetPassword(userId: string, companyId: string) {
+    setPwResetting(companyId)
+    const res = await fetch("/api/admin/reset-password", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "x-admin-secret": secret },
+      body: JSON.stringify({ userId }),
+    })
+    const json = await res.json()
+    if (json.success) { setPwResetResult(prev => ({ ...prev, [companyId]: json.password })); showToast("Neues Passwort generiert ✓") }
+    else showToast(json.error || "Fehler beim Zurücksetzen", false)
+    setPwResetting(null)
+  }
+
   // ── Stats ──────────────────────────────────────────────────────────────────
   const activeCount  = companies.filter(c => !c.paused).length
   const addonCount   = companies.filter(c => c.booking_addon).length
   const totalSMS     = companies.reduce((s, c) => s + (c.sms_count || 0), 0)
+  const totalSMSMonth = companies.reduce((s, c) => s + (c.sms_count_month || 0), 0)
   const totalAppts   = companies.reduce((s, c) => s + (c.appointments || 0), 0)
   const totalCusts   = companies.reduce((s, c) => s + (c.customers || 0), 0)
   const thisMonth    = companies.filter(c => {
@@ -442,6 +502,8 @@ export default function AdminPage() {
   }).length
   const risikoList   = companies.filter(c => !c.paused && c.appointments === 0)
   const topList      = [...companies].sort((a, b) => b.appointments - a.appointments).slice(0, 5)
+  // Betriebe die ≥80% ihres SMS-Limits erreicht haben
+  const smsWarnList  = companies.filter(c => !c.paused && (c.sms_limit || 200) > 0 && (c.sms_count_month || 0) >= (c.sms_limit || 200) * 0.8)
 
   const filtered = companies
     .filter(c => filter === "all" ? true : filter === "active" ? !c.paused : filter === "paused" ? c.paused : c.booking_addon)
@@ -551,12 +613,12 @@ export default function AdminPage() {
             {/* KPI Grid */}
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 12, marginBottom: 24 }}>
               {[
-                { icon: "🏢", label: "Betriebe gesamt",  value: companies.length,               color: T },
-                { icon: "✅", label: "Aktiv",             value: activeCount,                    color: G },
-                { icon: "🔖", label: "Buchungs-Add-on",  value: addonCount,                     color: "#3B82F6" },
-                { icon: "📱", label: "SMS gesamt",        value: totalSMS.toLocaleString("de"),  color: T },
-                { icon: "📅", label: "Termine gesamt",   value: totalAppts.toLocaleString("de"), color: T },
-                { icon: "👥", label: "Kunden gesamt",    value: totalCusts.toLocaleString("de"), color: T },
+                { icon: "🏢", label: "Betriebe gesamt",  value: companies.length,                    color: T },
+                { icon: "✅", label: "Aktiv",             value: activeCount,                         color: G },
+                { icon: "🔖", label: "Buchungs-Add-on",  value: addonCount,                          color: "#3B82F6" },
+                { icon: "📱", label: "SMS dieser Monat", value: totalSMSMonth.toLocaleString("de"),  color: smsWarnList.length > 0 ? "#D97706" : T },
+                { icon: "📅", label: "Termine gesamt",   value: totalAppts.toLocaleString("de"),     color: T },
+                { icon: "👥", label: "Kunden gesamt",    value: totalCusts.toLocaleString("de"),     color: T },
               ].map(k => (
                 <div key={k.label} style={{ background: "#fff", border: `1px solid ${BD}`, borderRadius: 16, padding: "18px 20px", boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}>
                   <div style={{ fontSize: 24, marginBottom: 6 }}>{k.icon}</div>
@@ -565,6 +627,26 @@ export default function AdminPage() {
                 </div>
               ))}
             </div>
+
+            {/* SMS-Warnung Banner */}
+            {smsWarnList.length > 0 && (
+              <div style={{ background: "#FFFBEB", border: "1px solid #FDE68A", borderRadius: 14, padding: "14px 20px", marginBottom: 16, display: "flex", alignItems: "center", gap: 14 }}>
+                <span style={{ fontSize: 22, flexShrink: 0 }}>⚠️</span>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 13, fontWeight: 800, color: "#92400E", marginBottom: 4 }}>
+                    {smsWarnList.length} Betrieb{smsWarnList.length > 1 ? "e" : ""} nahe am SMS-Limit
+                  </div>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                    {smsWarnList.map(c => (
+                      <span key={c.id} onClick={() => { setTab("betriebe"); setExpanded(c.id); loadCompanyDetail(c.id) }}
+                        style={{ fontSize: 11, fontWeight: 700, background: "#FEF3C7", color: "#92400E", padding: "3px 10px", borderRadius: 8, cursor: "pointer", border: "1px solid #FDE68A" }}>
+                        {c.name} ({c.sms_count_month || 0}/{c.sms_limit || 200})
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Risiko + Top-Performer nebeneinander */}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 20 }}>
@@ -909,7 +991,11 @@ export default function AdminPage() {
                           <button onClick={() => quickUpdate(c.id, { paused: !c.paused })} style={{ ...btnStyle(c.paused ? "green" : "yellow"), padding: "6px 10px", fontSize: 11 }}>
                             {c.paused ? "▶ Aktiv" : "⏸ Pause"}
                           </button>
-                          <button onClick={() => setExpanded(isOpen ? null : c.id)} style={{ ...btnStyle("gray"), padding: "6px 10px", fontSize: 11 }}>
+                          <button onClick={() => {
+                            const next = isOpen ? null : c.id
+                            setExpanded(next)
+                            if (next) loadCompanyDetail(next)
+                          }} style={{ ...btnStyle("gray"), padding: "6px 10px", fontSize: 11 }}>
                             {isOpen ? "▲ Zu" : "✏️ Details"}
                           </button>
                         </div>
@@ -960,15 +1046,185 @@ export default function AdminPage() {
                             </button>
                             <button onClick={() => { setEdits(p => { const n = { ...p }; delete n[c.id]; return n }); setExpanded(null) }} style={btnStyle("gray")}>Abbrechen</button>
                           </div>
-                          <div style={{ background: "#fff", border: `1px solid ${BD}`, borderRadius: 12, padding: "12px 16px", display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: "8px 24px" }}>
-                            {[{ label: "User-ID", value: c.id }, { label: "E-Mail", value: c.email }, { label: "Erstellt", value: new Date(c.created_at).toLocaleString("de-DE") }, { label: "Termine", value: String(c.appointments) }, { label: "Kunden", value: String(c.customers) }, { label: "SMS", value: String(c.sms_count || 0) }].map(row => (
+                          <div style={{ background: "#fff", border: `1px solid ${BD}`, borderRadius: 12, padding: "12px 16px", display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: "8px 24px", marginBottom: 20 }}>
+                            {[{ label: "User-ID", value: c.id }, { label: "E-Mail", value: c.email }, { label: "Erstellt", value: new Date(c.created_at).toLocaleString("de-DE") }, { label: "Termine", value: String(c.appointments) }, { label: "Kunden", value: String(c.customers) }, { label: "SMS gesamt", value: String(c.sms_count || 0) }].map(row => (
                               <div key={row.label} style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                                <span style={{ fontSize: 11, color: M, fontWeight: 700, minWidth: 75 }}>{row.label}:</span>
+                                <span style={{ fontSize: 11, color: M, fontWeight: 700, minWidth: 80 }}>{row.label}:</span>
                                 <span style={{ fontSize: 11, color: T, fontFamily: row.label === "User-ID" ? "monospace" : "inherit", wordBreak: "break-all" }}>{row.value}</span>
                                 {(row.label === "User-ID" || row.label === "E-Mail") && <CopyBtn text={row.value} label="⎘" />}
                               </div>
                             ))}
                           </div>
+
+                          {/* ── SMS-Limit & Passwort Reset ── */}
+                          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 20 }}>
+                            {/* SMS Limit */}
+                            <div style={{ background: "#fff", border: `1px solid ${BD}`, borderRadius: 12, padding: "14px 16px" }}>
+                              <div style={{ fontSize: 12, fontWeight: 800, color: T, marginBottom: 4 }}>📱 SMS-Limit diesen Monat</div>
+                              <div style={{ fontSize: 11, color: M, marginBottom: 10 }}>
+                                Verbraucht: <strong style={{ color: (c.sms_count_month || 0) >= (c.sms_limit || 200) * 0.8 ? RED : G }}>{c.sms_count_month || 0}</strong> / {c.sms_limit || 200} SMS
+                              </div>
+                              {/* Progress bar */}
+                              <div style={{ height: 6, background: BD, borderRadius: 3, overflow: "hidden", marginBottom: 10 }}>
+                                <div style={{ height: "100%", width: `${Math.min(100, Math.round(((c.sms_count_month || 0) / (c.sms_limit || 200)) * 100))}%`, background: (c.sms_count_month || 0) >= (c.sms_limit || 200) * 0.8 ? "#EF4444" : G, borderRadius: 3, transition: "width .4s" }} />
+                              </div>
+                              <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+                                <input
+                                  type="number" min={0} max={10000}
+                                  placeholder={String(c.sms_limit || 200)}
+                                  value={newSmsLimit[c.id] ?? ""}
+                                  onChange={ev => setNewSmsLimit(p => ({ ...p, [c.id]: ev.target.value }))}
+                                  style={{ ...inp, fontSize: 12, flex: 1 }}
+                                />
+                                <button onClick={() => saveSmsLimit(c.id)} disabled={smsLimitSaving === c.id || !newSmsLimit[c.id]}
+                                  style={{ ...btnStyle("green"), opacity: !newSmsLimit[c.id] ? .5 : 1, fontSize: 11, whiteSpace: "nowrap" }}>
+                                  {smsLimitSaving === c.id ? "…" : "Limit setzen"}
+                                </button>
+                              </div>
+                            </div>
+
+                            {/* Passwort Reset */}
+                            <div style={{ background: "#fff", border: `1px solid ${BD}`, borderRadius: 12, padding: "14px 16px" }}>
+                              <div style={{ fontSize: 12, fontWeight: 800, color: T, marginBottom: 4 }}>🔑 Passwort zurücksetzen</div>
+                              <div style={{ fontSize: 11, color: M, marginBottom: 10 }}>
+                                Generiert ein neues zufälliges Passwort für den Betrieb.
+                              </div>
+                              {pwResetResult[c.id] ? (
+                                <div style={{ background: GL, border: `1px solid ${GB}`, borderRadius: 8, padding: "8px 12px", display: "flex", alignItems: "center", gap: 8 }}>
+                                  <code style={{ fontSize: 13, fontWeight: 800, color: T, flex: 1 }}>{pwResetResult[c.id]}</code>
+                                  <CopyBtn text={pwResetResult[c.id]} />
+                                  <button onClick={() => setPwResetResult(p => { const n = { ...p }; delete n[c.id]; return n })} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 12, color: M }}>✕</button>
+                                </div>
+                              ) : (
+                                <button onClick={() => doResetPassword(c.id, c.id)} disabled={pwResetting === c.id}
+                                  style={{ ...btnStyle("yellow"), fontSize: 11, opacity: pwResetting === c.id ? .7 : 1 }}>
+                                  {pwResetting === c.id ? "Setzt zurück …" : "🔑 Neues Passwort generieren"}
+                                </button>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* ── Live-Detail: Termine & Kunden ── */}
+                          {(() => {
+                            const dt = companyDetail[c.id]
+                            const dtTab = detailTab[c.id] || "heute"
+                            return (
+                              <div style={{ background: "#fff", border: `1px solid ${BD}`, borderRadius: 14, overflow: "hidden" }}>
+                                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px", borderBottom: `1px solid ${BD}`, flexWrap: "wrap", gap: 8 }}>
+                                  <div style={{ fontSize: 12, fontWeight: 800, color: T }}>📊 Live-Auswertung</div>
+                                  <div style={{ display: "flex", gap: 4 }}>
+                                    {(["heute", "monat", "kunden", "einstellungen"] as const).map(t => (
+                                      <button key={t} onClick={() => setDetailTab(p => ({ ...p, [c.id]: t }))}
+                                        style={{ padding: "4px 10px", borderRadius: 7, border: "none", cursor: "pointer", fontSize: 11, fontWeight: dtTab === t ? 800 : 500, background: dtTab === t ? GL : BG, color: dtTab === t ? G : M }}>
+                                        {t === "heute" ? "Heute" : t === "monat" ? "Dieser Monat" : t === "kunden" ? "Kunden" : "Services"}
+                                      </button>
+                                    ))}
+                                    <button onClick={() => loadCompanyDetail(c.id, true)} style={{ ...btnStyle("gray"), padding: "4px 8px", fontSize: 10 }}>⟳</button>
+                                  </div>
+                                </div>
+
+                                {detailLoading === c.id ? (
+                                  <div style={{ padding: "28px 20px", textAlign: "center", color: M, fontSize: 12 }}>Lädt …</div>
+                                ) : !dt ? (
+                                  <div style={{ padding: "20px", textAlign: "center", color: M, fontSize: 12 }}>
+                                    <button onClick={() => loadCompanyDetail(c.id)} style={{ ...btnStyle("gray"), fontSize: 11 }}>Daten laden</button>
+                                  </div>
+                                ) : (
+                                  <>
+                                    {/* Mini-Stats Zeile */}
+                                    <div style={{ display: "flex", gap: 0, borderBottom: `1px solid ${BD}` }}>
+                                      {[
+                                        { icon: "📅", label: "Termine / Monat", value: dt.stats.totalThisMonth },
+                                        { icon: "✅", label: "Erledigt", value: dt.stats.doneThisMonth },
+                                        { icon: "📱", label: "SMS / Monat", value: dt.stats.smsThisMonth },
+                                        { icon: "👥", label: "Kunden", value: dt.stats.customerCount },
+                                      ].map((s, i, arr) => (
+                                        <div key={s.label} style={{ flex: 1, padding: "10px 12px", textAlign: "center", borderRight: i < arr.length - 1 ? `1px solid ${BD}` : "none" }}>
+                                          <div style={{ fontSize: 18, fontWeight: 900, color: T }}>{s.value}</div>
+                                          <div style={{ fontSize: 9, color: M, fontWeight: 700, textTransform: "uppercase", letterSpacing: .3 }}>{s.label}</div>
+                                        </div>
+                                      ))}
+                                    </div>
+
+                                    {/* Heute-Tab */}
+                                    {dtTab === "heute" && (
+                                      <div style={{ maxHeight: 280, overflowY: "auto" }}>
+                                        {dt.todayAppointments.length === 0 ? (
+                                          <div style={{ padding: "20px 16px", fontSize: 12, color: M, textAlign: "center" }}>Keine Termine heute</div>
+                                        ) : dt.todayAppointments.map((a, i) => (
+                                          <div key={a.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 16px", borderBottom: i < dt.todayAppointments.length - 1 ? `1px solid ${BD}` : "none" }}>
+                                            <div style={{ fontSize: 12, fontWeight: 800, color: M, minWidth: 40 }}>{a.time || "—"}</div>
+                                            <div style={{ flex: 1, minWidth: 0 }}>
+                                              <div style={{ fontSize: 12, fontWeight: 700, color: T }}>{a.name}</div>
+                                              <div style={{ fontSize: 10, color: M }}>{a.phone}{a.note ? ` · ${a.note}` : ""}</div>
+                                            </div>
+                                            <div style={{ display: "flex", gap: 5 }}>
+                                              {a.reminded && <span style={{ fontSize: 10, background: GL, color: G, padding: "2px 7px", borderRadius: 8, fontWeight: 700 }}>SMS ✓</span>}
+                                              {a.status === "done" ? <span style={{ fontSize: 10, background: "#F3F4F6", color: M, padding: "2px 7px", borderRadius: 8, fontWeight: 700 }}>Erledigt</span>
+                                                : <span style={{ fontSize: 10, background: "#FFF7ED", color: "#D97706", padding: "2px 7px", borderRadius: 8, fontWeight: 700 }}>Offen</span>}
+                                            </div>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    )}
+
+                                    {/* Monat-Tab */}
+                                    {dtTab === "monat" && (
+                                      <div style={{ maxHeight: 280, overflowY: "auto" }}>
+                                        {dt.upcomingAppointments.length === 0 ? (
+                                          <div style={{ padding: "20px 16px", fontSize: 12, color: M, textAlign: "center" }}>Keine bevorstehenden Termine</div>
+                                        ) : dt.upcomingAppointments.map((a, i) => (
+                                          <div key={a.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 16px", borderBottom: i < dt.upcomingAppointments.length - 1 ? `1px solid ${BD}` : "none" }}>
+                                            <div style={{ fontSize: 11, color: M, minWidth: 70 }}>{new Date(a.date).toLocaleDateString("de-DE", { weekday: "short", day: "numeric", month: "short" })}</div>
+                                            <div style={{ fontSize: 11, color: M, minWidth: 36 }}>{a.time || "—"}</div>
+                                            <div style={{ flex: 1, fontSize: 12, fontWeight: 700, color: T }}>{a.name}</div>
+                                            {a.reminded && <span style={{ fontSize: 10, background: GL, color: G, padding: "2px 7px", borderRadius: 8, fontWeight: 700 }}>SMS ✓</span>}
+                                          </div>
+                                        ))}
+                                      </div>
+                                    )}
+
+                                    {/* Kunden-Tab */}
+                                    {dtTab === "kunden" && (
+                                      <div style={{ maxHeight: 280, overflowY: "auto" }}>
+                                        {dt.customers.length === 0 ? (
+                                          <div style={{ padding: "20px 16px", fontSize: 12, color: M, textAlign: "center" }}>Noch keine Kunden angelegt</div>
+                                        ) : dt.customers.map((cu, i) => (
+                                          <div key={cu.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 16px", borderBottom: i < dt.customers.length - 1 ? `1px solid ${BD}` : "none" }}>
+                                            <div style={{ width: 28, height: 28, borderRadius: "50%", background: GL, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 900, color: G, flexShrink: 0 }}>
+                                              {cu.name.charAt(0).toUpperCase()}
+                                            </div>
+                                            <div style={{ flex: 1, minWidth: 0 }}>
+                                              <div style={{ fontSize: 12, fontWeight: 700, color: T }}>{cu.name}</div>
+                                              <div style={{ fontSize: 10, color: M }}>{cu.phone}</div>
+                                            </div>
+                                            <div style={{ fontSize: 10, color: M }}>{new Date(cu.created_at).toLocaleDateString("de-DE", { day: "numeric", month: "short" })}</div>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    )}
+
+                                    {/* Services-Tab */}
+                                    {dtTab === "einstellungen" && (
+                                      <div style={{ maxHeight: 280, overflowY: "auto" }}>
+                                        {dt.services.length === 0 ? (
+                                          <div style={{ padding: "20px 16px", fontSize: 12, color: M, textAlign: "center" }}>Noch keine Services angelegt</div>
+                                        ) : dt.services.map((s, i) => (
+                                          <div key={s.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 16px", borderBottom: i < dt.services.length - 1 ? `1px solid ${BD}` : "none" }}>
+                                            <div style={{ flex: 1 }}>
+                                              <div style={{ fontSize: 12, fontWeight: 700, color: s.active ? T : M }}>{s.name}</div>
+                                              <div style={{ fontSize: 10, color: M }}>{s.duration} Min{s.price != null ? ` · ${Number(s.price).toFixed(2)} €` : ""}</div>
+                                            </div>
+                                            {!s.active && <span style={{ fontSize: 10, background: "#F3F4F6", color: M, padding: "2px 7px", borderRadius: 8, fontWeight: 700 }}>Inaktiv</span>}
+                                          </div>
+                                        ))}
+                                      </div>
+                                    )}
+                                  </>
+                                )}
+                              </div>
+                            )
+                          })()}
                         </div>
                       )}
                     </div>
