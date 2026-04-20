@@ -96,7 +96,7 @@ export default function DemoCustomersPage() {
       </nav>
 
       {/* MOBILE BOTTOM NAV */}
-      <div className="md:hidden" style={{ display: "flex", position: "fixed", bottom: 0, left: 0, right: 0, background: "#fff", borderTop: "1px solid #E5E7EB", boxShadow: "0 -2px 12px rgba(0,0,0,0.06)", zIndex: 50, paddingBottom: "max(10px,env(safe-area-inset-bottom))", justifyContent: "space-around", alignItems: "center", paddingTop: 8 }}>
+      <div className="flex md:hidden" style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: "#fff", borderTop: "1px solid #E5E7EB", boxShadow: "0 -2px 12px rgba(0,0,0,0.06)", zIndex: 50, paddingBottom: "max(10px,env(safe-area-inset-bottom))", justifyContent: "space-around", alignItems: "center", paddingTop: 8 }}>
         {[
           { href: "/demo", label: "Start", icon: <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5Z"/><path d="M9 21V12h6v9"/></svg> },
           { href: "/demo/calendar", label: "Kalender", icon: <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg> },
