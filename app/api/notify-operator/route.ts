@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@supabase/supabase-js"
+import { formatPhone } from "@/app/lib/security"
 
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
 
-// In-Memory Rate-Limit: max 5 Anfragen pro IP pro Minute
+// In-Memory Rate-Limit: max 3 requests per IP per minute (stricter than before)
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>()
 function isRateLimited(ip: string): boolean {
   const now = Date.now()
@@ -15,16 +16,9 @@ function isRateLimited(ip: string): boolean {
     rateLimitMap.set(ip, { count: 1, resetAt: now + 60_000 })
     return false
   }
-  if (entry.count >= 5) return true
+  if (entry.count >= 3) return true
   entry.count++
   return false
-}
-
-function formatPhone(phone: string) {
-  let cleaned = phone.replace(/\s+/g, "")
-  if (cleaned.startsWith("0")) cleaned = "+49" + cleaned.substring(1)
-  if (!cleaned.startsWith("+")) cleaned = "+" + cleaned
-  return cleaned
 }
 
 export async function POST(req: NextRequest) {
@@ -41,27 +35,61 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "company_id fehlt" }, { status: 400 })
     }
 
-    // Betreiber-Telefon laden
+    // Input validation: sanitize and validate field lengths
+    const validCustomerName = typeof customer_name === "string" ? customer_name.trim().slice(0, 100) : ""
+    const validBookingType = typeof booking_type === "string" ? booking_type.trim().slice(0, 50) : ""
+    const validServiceName = typeof service_name === "string" ? service_name.trim().slice(0, 100) : ""
+
+    // Validate date format (YYYY-MM-DD)
+    if (date && !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+      return NextResponse.json({ error: "Ungültiges Datumsformat (YYYY-MM-DD)" }, { status: 400 })
+    }
+
+    // Validate time format (HH:MM)
+    if (time && !/^\d{2}:\d{2}$/.test(time)) {
+      return NextResponse.json({ error: "Ungültiges Zeitformat (HH:MM)" }, { status: 400 })
+    }
+
+    // Betreiber-Telefon laden and check company status
     const { data: company } = await supabaseAdmin
       .from("companies")
-      .select("name, notification_phone")
+      .select("id, name, notification_phone, booking_addon, paused, sms_count_month, sms_limit")
       .eq("id", company_id)
       .single()
+
+    if (!company) {
+      return NextResponse.json({ error: "Betrieb nicht gefunden" }, { status: 404 })
+    }
 
     if (!company?.notification_phone) {
       return NextResponse.json({ skipped: true, reason: "Kein notification_phone hinterlegt" })
     }
 
+    // Check if company has booking_addon enabled
+    if (!company.booking_addon) {
+      return NextResponse.json({ skipped: true, reason: "Booking-Addon nicht aktiviert" })
+    }
+
+    // Check if company is paused
+    if (company.paused) {
+      return NextResponse.json({ skipped: true, reason: "Betrieb ist pausiert" })
+    }
+
+    // Enforce SMS limit: check sms_count_month against sms_limit
+    if (company.sms_limit && company.sms_count_month >= company.sms_limit) {
+      return NextResponse.json({ error: "SMS-Limit erreicht" }, { status: 429 })
+    }
+
     // Nachricht zusammenbauen
-    const cleanName = (customer_name || "Unbekannt").replace(/\s*\[.*?\]\s*/g, "").trim()
+    const cleanName = (validCustomerName || "Unbekannt").replace(/\s*\[.*?\]\s*/g, "").trim()
     let msg = `TerminStop: Neue Buchungsanfrage von ${cleanName}`
-    if (service_name) msg += ` (${service_name})`
+    if (validServiceName) msg += ` (${validServiceName})`
     if (date && time) {
       const dt = new Date(`${date}T${time}`).toLocaleString("de-DE", {
         weekday: "short", day: "numeric", month: "numeric", hour: "2-digit", minute: "2-digit"
       })
       msg += ` am ${dt} Uhr`
-    } else if (booking_type === "callback") {
+    } else if (validBookingType === "callback") {
       msg += ` – Rückrufanfrage`
     }
     msg += `. Jetzt bestätigen: terminstop.de/requests`

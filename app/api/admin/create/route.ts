@@ -1,10 +1,25 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@supabase/supabase-js"
+import { isValidEmail, formatPhone } from "@/app/lib/security"
 
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
+
+// In-memory rate limiter for company creation: max 10 per hour per IP
+const creationRateLimitMap = new Map<string, { count: number; resetAt: number }>()
+function isCreationRateLimited(ip: string): boolean {
+  const now = Date.now()
+  const entry = creationRateLimitMap.get(ip)
+  if (!entry || now > entry.resetAt) {
+    creationRateLimitMap.set(ip, { count: 1, resetAt: now + 60 * 60 * 1000 })
+    return false
+  }
+  if (entry.count >= 10) return true
+  entry.count++
+  return false
+}
 
 function checkAdminAuth(req: NextRequest) {
   const secret = (req.headers.get("x-admin-secret") || "").trim()
@@ -13,27 +28,32 @@ function checkAdminAuth(req: NextRequest) {
   return secret === expected
 }
 
-function formatPhone(phone: string) {
-  let cleaned = phone.replace(/\s+/g, "")
-  if (cleaned.startsWith("0")) cleaned = "+49" + cleaned.substring(1)
-  if (!cleaned.startsWith("+")) cleaned = "+" + cleaned
-  return cleaned
-}
-
 export async function POST(req: NextRequest) {
   if (!checkAdminAuth(req)) {
     return NextResponse.json({ error: "Nicht autorisiert" }, { status: 401 })
   }
 
   try {
+    // Rate limiting: max 10 company creations per hour per IP
+    const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown"
+    if (isCreationRateLimited(ip)) {
+      return NextResponse.json({ error: "Zu viele Erstellungen. Bitte versuchen Sie es in einer Stunde erneut." }, { status: 429 })
+    }
+
     const { name, email, phone, password } = await req.json()
 
     if (!name || !email || !password) {
       return NextResponse.json({ error: "Name, E-Mail und Passwort sind erforderlich" }, { status: 400 })
     }
 
-    if (password.length < 6) {
-      return NextResponse.json({ error: "Passwort muss mindestens 6 Zeichen haben" }, { status: 400 })
+    // Basic email format validation
+    if (!isValidEmail(email)) {
+      return NextResponse.json({ error: "Ungültige E-Mail-Adresse" }, { status: 400 })
+    }
+
+    // Minimum password length 8 (increased from 6)
+    if (password.length < 8) {
+      return NextResponse.json({ error: "Passwort muss mindestens 8 Zeichen haben" }, { status: 400 })
     }
 
     // 1. Auth-User anlegen mit eigenem Passwort
@@ -75,7 +95,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: companyError.message }, { status: 500 })
     }
 
-    // Kein SMS-Versand mehr – Marvin schickt manuell eine E-Mail
+    // Return the plaintext password so admin can send it to customer
+    // (Note: admin must securely share this with the customer separately)
     return NextResponse.json({
       success: true,
       userId,

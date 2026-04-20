@@ -73,19 +73,28 @@ export async function POST(req: NextRequest) {
     }
 
     if (action === "confirm") {
+      // Load appointment first to verify ownership
+      const { data: appt } = await supabaseAdmin
+        .from("appointments")
+        .select("id, phone, name, date, time, company_id, status")
+        .eq("id", appointmentId)
+        .single()
+
+      if (!appt) {
+        return NextResponse.json({ error: "Termin nicht gefunden" }, { status: 404 })
+      }
+
+      // Verify ownership: appointment.company_id must match the user's company
+      if (appt.company_id !== user.id) {
+        return NextResponse.json({ error: "Nicht berechtigt" }, { status: 403 })
+      }
+
       // Termin bestätigen
       const { error: updateErr } = await supabaseAdmin
         .from("appointments")
         .update({ status: "confirmed" })
         .eq("id", appointmentId)
       if (updateErr) return NextResponse.json({ error: updateErr.message }, { status: 500 })
-
-      // Kundendaten laden für SMS
-      const { data: appt } = await supabaseAdmin
-        .from("appointments")
-        .select("phone, name, date, time, company_id")
-        .eq("id", appointmentId)
-        .single()
 
       if (appt?.phone) {
         try {

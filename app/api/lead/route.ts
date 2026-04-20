@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@supabase/supabase-js"
+import { isValidEmail, sanitize } from "@/app/lib/security"
 
 // Server-side Supabase client with service role key
 const supabase = createClient(
@@ -73,23 +74,30 @@ export async function POST(req: NextRequest) {
     )
   }
 
-  // Einfache E-Mail-Validierung
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+  // Email validation using centralized security utility
+  if (!isValidEmail(email)) {
     return NextResponse.json(
       { error: "Ungültige E-Mail-Adresse." },
       { status: 400 }
     )
   }
 
+  // Sanitize all input fields using centralized utility
+  const sanitizedName = sanitize(name, 200)
+  const sanitizedPhone = sanitize(phone, 50)
+  const sanitizedEmail = sanitize(email, 200).toLowerCase()
+  const sanitizedCompany = sanitize(company, 200) || null
+  const sanitizedMessage = sanitize(message, 1000) || null
+
   // In Datenbank eintragen
   const { error } = await supabase
     .from("leads")
     .insert([{
-      name:    name.trim().slice(0, 200),
-      phone:   phone.trim().slice(0, 50),
-      email:   email.trim().toLowerCase().slice(0, 200),
-      company: company?.trim().slice(0, 200) || null,
-      message: message?.trim().slice(0, 1000) || null,
+      name:    sanitizedName,
+      phone:   sanitizedPhone,
+      email:   sanitizedEmail,
+      company: sanitizedCompany,
+      message: sanitizedMessage,
     }])
 
   if (error) {
