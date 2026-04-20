@@ -62,43 +62,54 @@ export default function DemoCustomersPage() {
       <DemoBanner />
 
       {/* NAV */}
-      <nav className="flex justify-between items-center px-4 md:px-12 py-4 border-b border-[#E5E7EB] bg-white sticky top-0 z-50">
-        <div className="flex items-center gap-4 md:gap-8">
-          <span className="text-base font-bold">
-            <span className="text-[#18A66D]">Termin</span>
-            <span className="text-[#1F2A37]">Stop</span>
-          </span>
-          <div className="hidden md:flex gap-1">
-            <a href="/demo" className="text-sm text-[#6B7280] hover:text-[#1F2A37] hover:bg-[#F7FAFC] px-4 py-2 rounded-lg transition">Dashboard</a>
-            <a href="/demo/calendar" className="text-sm text-[#6B7280] hover:text-[#1F2A37] hover:bg-[#F7FAFC] px-4 py-2 rounded-lg transition">Kalender</a>
-            <a href="/demo/customers" className="text-sm font-semibold text-[#1F2A37] bg-[#F7FAFC] px-4 py-2 rounded-lg">Kunden</a>
+      <nav style={{ background: "#fff", borderBottom: "1px solid #E5E7EB", boxShadow: "0 1px 3px rgba(0,0,0,0.04)", position: "sticky", top: 0, zIndex: 50, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 24px", height: 58 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 28 }}>
+          <a href="/" style={{ fontSize: 17, fontWeight: 900, letterSpacing: "-.3px", textDecoration: "none" }}>
+            <span style={{ color: "#18A66D" }}>Termin</span><span style={{ color: "#111827" }}>Stop</span>
+          </a>
+          <div className="hidden md:flex" style={{ gap: 2 }}>
+            {[
+              { href: "/demo", label: "Dashboard" },
+              { href: "/demo/calendar", label: "Kalender" },
+              { href: "/demo/customers", label: "Kunden", active: true },
+            ].map(item => (
+              <a key={item.href} href={item.href} style={{ position: "relative", textDecoration: "none", padding: "6px 14px", borderRadius: 9, fontSize: 13.5, fontWeight: item.active ? 700 : 500, color: item.active ? "#111827" : "#6B7280", background: item.active ? "#F0FBF6" : "transparent" }}>
+                {item.label}
+                {item.active && <span style={{ position: "absolute", bottom: -1, left: "50%", transform: "translateX(-50%)", width: 20, height: 2.5, borderRadius: 99, background: "#18A66D" }} />}
+              </a>
+            ))}
           </div>
         </div>
-        <div className="flex items-center gap-3">
-          <div className="hidden md:flex items-center gap-2 text-xs text-[#18A66D] font-medium">
-            <span className="w-1.5 h-1.5 bg-[#18A66D] rounded-full animate-pulse" />
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <div className="hidden md:flex" style={{ alignItems: "center", gap: 6, fontSize: 12, color: "#18A66D", fontWeight: 600, marginRight: 4 }}>
+            <span style={{ width: 7, height: 7, background: "#18A66D", borderRadius: "50%", display: "inline-block" }} />
             Demo aktiv
           </div>
-          <a href="/" className="text-sm text-[#6B7280] hover:text-[#1F2A37] transition px-3 py-1.5 rounded-lg hover:bg-[#F7FAFC]">← Start</a>
+          <a href="/demo/buchung" className="hidden md:inline-flex" style={{ alignItems: "center", gap: 6, background: "#0F1923", color: "#fff", fontSize: 12, fontWeight: 700, padding: "6px 13px", borderRadius: 8, textDecoration: "none", border: "1px solid rgba(24,166,109,0.4)" }}>
+            <span style={{ width: 6, height: 6, background: "#18A66D", borderRadius: "50%", display: "inline-block" }} />
+            Buchungs-Add-on
+          </a>
+          <a href="/lead" style={{ fontSize: 13, color: "#fff", background: "#18A66D", padding: "7px 16px", borderRadius: 9, fontWeight: 700, textDecoration: "none" }}>
+            Jetzt testen →
+          </a>
         </div>
       </nav>
 
       {/* MOBILE BOTTOM NAV */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-[#E5E7EB] z-50 flex justify-around items-center px-2 py-2">
+      <div className="md:hidden" style={{ display: "flex", position: "fixed", bottom: 0, left: 0, right: 0, background: "#fff", borderTop: "1px solid #E5E7EB", boxShadow: "0 -2px 12px rgba(0,0,0,0.06)", zIndex: 50, paddingBottom: "max(10px,env(safe-area-inset-bottom))", justifyContent: "space-around", alignItems: "center", paddingTop: 8 }}>
         {[
-          { href: "/demo", label: "Dashboard", icon: "🏠" },
-          { href: "/demo/calendar", label: "Kalender", icon: "📅" },
-          { href: "/demo/customers", label: "Kunden", icon: "👥", active: true },
-        ].map((item) => (
-          <a key={item.href} href={item.href} className={`flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl transition ${item.active ? "text-[#18A66D]" : "text-[#9CA3AF]"}`}>
-            <span className="text-lg">{item.icon}</span>
-            <span className="text-[10px] font-medium">{item.label}</span>
+          { href: "/demo", label: "Start", icon: <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5Z"/><path d="M9 21V12h6v9"/></svg> },
+          { href: "/demo/calendar", label: "Kalender", icon: <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg> },
+          { href: "/demo/customers", label: "Kunden", active: true, icon: <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg> },
+          { href: "/demo/buchung", label: "Buchung", icon: <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg> },
+          { href: "/lead", label: "Testen", icon: <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> },
+        ].map(item => (
+          <a key={item.href} href={item.href} style={{ position: "relative", display: "flex", flexDirection: "column" as const, alignItems: "center", gap: 3, padding: "4px 8px", textDecoration: "none", color: item.active ? "#18A66D" : "#9CA3AF", minWidth: 44 }}>
+            {item.active && <span style={{ position: "absolute", top: -8, left: "50%", transform: "translateX(-50%)", width: 24, height: 3, borderRadius: 99, background: "#18A66D" }} />}
+            {item.icon}
+            <span style={{ fontSize: 10, fontWeight: item.active ? 700 : 500, letterSpacing: 0.2 }}>{item.label}</span>
           </a>
         ))}
-        <a href="/lead" className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl bg-[#18A66D] text-white">
-          <span className="text-lg">✨</span>
-          <span className="text-[10px] font-medium">Testen</span>
-        </a>
       </div>
 
       <div className="max-w-6xl mx-auto px-4 md:px-10 py-8 pb-24 md:pb-10">
