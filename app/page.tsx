@@ -338,7 +338,8 @@ export default function LandingPage() {
   const [scrolled, setScrolled] = useState(false)
   const [navOpen, setNavOpen] = useState(false)
 
-  const words = ["Friseur.", "Werkstatt.", "Praxis.", "Studio.", "Betrieb."]
+  const words        = ["Friseur.", "Werkstatt.", "Praxis.", "Studio.", "Betrieb."]
+  const wordArticles = ["Ihren",   "Ihre",       "Ihre",   "Ihr",    "Ihren"]
 
   useEffect(() => {
     const t = setInterval(() => setHeroWord((w: number) => (w + 1) % words.length), 2600)
@@ -788,7 +789,7 @@ export default function LandingPage() {
               <Reveal>
                 <div className="tag-green" style={{ marginBottom: 28 }}>
                   <span className="dot pulse-dot" />
-                  <span>Digitales Terminbüro für Ihren&nbsp;
+                  <span>Digitales Terminbüro für <span key={`art-${heroWord}`} className="word-slot">{wordArticles[heroWord]}</span>&nbsp;
                     <span style={{ fontWeight: 800 }} key={heroWord} className="word-slot">{words[heroWord]}</span>
                   </span>
                 </div>
@@ -1402,17 +1403,29 @@ export default function LandingPage() {
                   </div>
                 </div>
 
-                <a href="/lead" style={{
-                  display: "inline-flex", alignItems: "center", gap: 8,
-                  background: "linear-gradient(135deg, #18A66D, #15955F)",
-                  color: "#fff", fontWeight: 800, fontSize: 15,
-                  padding: "15px 28px", borderRadius: 12, textDecoration: "none",
-                  boxShadow: "0 4px 20px rgba(24,166,109,0.4)",
-                  letterSpacing: "-0.2px",
-                }}>
-                  Jetzt Add-on anfragen
-                  <span style={{ fontSize: 18 }}>→</span>
-                </a>
+                <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+                  <a href="/lead" style={{
+                    display: "inline-flex", alignItems: "center", gap: 8,
+                    background: "linear-gradient(135deg, #18A66D, #15955F)",
+                    color: "#fff", fontWeight: 800, fontSize: 15,
+                    padding: "15px 28px", borderRadius: 12, textDecoration: "none",
+                    boxShadow: "0 4px 20px rgba(24,166,109,0.4)",
+                    letterSpacing: "-0.2px",
+                  }}>
+                    Jetzt Add-on anfragen
+                    <span style={{ fontSize: 18 }}>→</span>
+                  </a>
+                  <a href="/demo/buchung" style={{
+                    display: "inline-flex", alignItems: "center", gap: 8,
+                    background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.2)",
+                    color: "#fff", fontWeight: 600, fontSize: 15,
+                    padding: "15px 24px", borderRadius: 12, textDecoration: "none",
+                    letterSpacing: "-0.2px",
+                  }}>
+                    <span style={{ width: 7, height: 7, background: "#18A66D", borderRadius: "50%", display: "inline-block" }} />
+                    Live-Demo ansehen
+                  </a>
+                </div>
               </Reveal>
             </div>
 
