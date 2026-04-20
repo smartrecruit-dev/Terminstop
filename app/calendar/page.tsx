@@ -147,7 +147,7 @@ export default function CalendarPage() {
       <div style={{ maxWidth: 1200, margin: "0 auto", padding: "28px 16px 100px" }}>
 
         {/* ── HEADER ── */}
-        <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: 16, marginBottom: 24 }}>
+        <div className="cal-header" style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: 16, marginBottom: 24 }}>
 
           {/* Left: title + label */}
           <div>
@@ -164,7 +164,7 @@ export default function CalendarPage() {
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M9 18l6-6-6-6"/></svg>
                 </button>
               </div>
-              <h1 style={{ fontSize: 20, fontWeight: 800, color: "#111827", margin: 0, letterSpacing: "-.4px" }}>
+              <h1 className="cal-nav-title" style={{ fontSize: 20, fontWeight: 800, color: "#111827", margin: 0, letterSpacing: "-.4px" }}>
                 {periodLabel()}
               </h1>
               {!isToday && view === "day" && (
@@ -181,7 +181,7 @@ export default function CalendarPage() {
           </div>
 
           {/* Right: view switcher */}
-          <div style={{ display: "flex", alignItems: "center", gap: 4, background: "#fff", border: "1.5px solid #E5E7EB", borderRadius: 12, padding: 4 }}>
+          <div className="cal-view-switch" style={{ display: "flex", alignItems: "center", gap: 4, background: "#fff", border: "1.5px solid #E5E7EB", borderRadius: 12, padding: 4 }}>
             {(["day", "week", "month"] as View[]).map(v => (
               <button key={v} onClick={() => setView(v)} style={{
                 padding: "8px 16px", borderRadius: 9, border: "none", cursor: "pointer",
@@ -197,7 +197,7 @@ export default function CalendarPage() {
 
         {/* ── DAY STATS ── */}
         {view === "day" && (
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12, marginBottom: 20 }}>
+          <div className="cal-day-stats" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12, marginBottom: 20 }}>
             {[
               { label: "Gesamt", value: dayAppts.length, sub: "Termine" },
               { label: "Erledigt", value: doneToday, sub: "abgehakt", green: true },
@@ -264,7 +264,7 @@ export default function CalendarPage() {
 
         {/* ════ WEEK VIEW ════ */}
         {view === "week" && (
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 10 }}>
+          <div className="cal-week-scroll"><div className="cal-week-grid" style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 10 }}>
             {weekDays.map((day, i) => {
               const dStr   = toStr(day)
               const items  = appointments.filter(a => a.date === dStr)
@@ -272,7 +272,7 @@ export default function CalendarPage() {
               const isPast = dStr < todayStr
               const done   = items.filter(a => a.status === "done").length
               return (
-                <div key={i} style={{ borderRadius: 18, border: `1.5px solid ${isT ? "#18A66D" : "#E5E7EB"}`, overflow: "hidden", background: "#fff", opacity: isPast && !isT ? .75 : 1 }}>
+                <div key={i} className="cal-week-col" style={{ borderRadius: 18, border: `1.5px solid ${isT ? "#18A66D" : "#E5E7EB"}`, overflow: "hidden", background: "#fff", opacity: isPast && !isT ? .75 : 1 }}>
                   {/* Day header */}
                   <div style={{ padding: "12px 8px", textAlign: "center", background: isT ? "#18A66D" : "#F9FAFB", borderBottom: `1px solid ${isT ? "transparent" : "#E5E7EB"}` }}>
                     <div style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: .8, color: isT ? "rgba(255,255,255,0.8)" : "#9CA3AF", marginBottom: 4 }}>
@@ -317,7 +317,7 @@ export default function CalendarPage() {
                 </div>
               )
             })}
-          </div>
+          </div></div>
         )}
 
         {/* ════ MONTH VIEW ════ */}
@@ -353,8 +353,8 @@ export default function CalendarPage() {
                     }}>
                       {day.getDate()}
                     </div>
-                    {/* Appointment dots / chips */}
-                    <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                    {/* Desktop: text chips */}
+                    <div className="cal-month-chip" style={{ display: "flex", flexDirection: "column", gap: 2 }}>
                       {items.slice(0, 3).map(a => (
                         <div key={a.id} style={{ fontSize: 10, padding: "2px 6px", borderRadius: 5, fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
                           background: a.status === "done" ? "#D1F5E3" : isT ? "#18A66D" : "#F0FBF6",
@@ -366,6 +366,13 @@ export default function CalendarPage() {
                       {items.length > 3 && (
                         <div style={{ fontSize: 10, color: "#9CA3AF", fontWeight: 600, paddingLeft: 6 }}>+{items.length - 3} weitere</div>
                       )}
+                    </div>
+                    {/* Mobile: dots only */}
+                    <div className="cal-month-dot-row" style={{ display: "none", flexWrap: "wrap", gap: 3, marginTop: 2 }}>
+                      {items.slice(0, 4).map((a, di) => (
+                        <div key={di} style={{ width: 6, height: 6, borderRadius: "50%", background: a.status === "done" ? "#18A66D" : isT ? "#fff" : "#18A66D", opacity: a.status === "done" ? .6 : 1 }} />
+                      ))}
+                      {items.length > 4 && <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#9CA3AF" }} />}
                     </div>
                   </div>
                 )
@@ -486,10 +493,20 @@ export default function CalendarPage() {
       )}
 
       <style>{`
-        @media (max-width: 640px) {
-          .week-grid { grid-template-columns: repeat(3, 1fr) !important; }
-        }
-      `}</style>
+  * { box-sizing: border-box; }
+  @media (max-width: 640px) {
+    .cal-week-scroll { overflow-x: auto; padding-bottom: 12px; -webkit-overflow-scrolling: touch; }
+    .cal-week-grid { display: flex !important; gap: 10px; min-width: 640px; }
+    .cal-week-col { flex: 0 0 120px !important; }
+    .cal-month-chip { display: none !important; }
+    .cal-month-dot-row { display: flex !important; }
+    .cal-header { flex-direction: column !important; align-items: flex-start !important; }
+    .cal-view-switch { align-self: stretch; width: 100%; }
+    .cal-view-switch button { flex: 1; }
+    .cal-day-stats { grid-template-columns: repeat(3, 1fr) !important; gap: 8px !important; }
+    .cal-nav-title { font-size: 16px !important; }
+  }
+`}</style>
     </div>
   )
 }
