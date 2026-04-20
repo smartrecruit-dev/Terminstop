@@ -75,24 +75,28 @@ const [companyId,    setCompanyId]    = useState<string | null>(null)
     setLoading(false)
   }
 
-  async function act(id: string, action: "confirm" | "reject") {
+  async function act(id: string, action: "confirm" | "reject", skipSms = false) {
     setActing(id)
     const { data: { session } } = await supabase.auth.getSession()
     const token = session?.access_token || ""
     const res = await fetch("/api/confirm-booking", {
       method: "POST",
       headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
-      body: JSON.stringify({ appointmentId: id, action, companyName })
+      body: JSON.stringify({ appointmentId: id, action, companyName, skipSms })
     })
     const json = await res.json()
     setActing(null)
     if (json.success) {
       if (action === "confirm") {
-        const smsOk = json.sms === "sent"
-        showToast(
-          smsOk ? "✓ Bestätigt — SMS an Kunden gesendet" : "✓ Bestätigt — SMS konnte nicht gesendet werden",
-          smsOk
-        )
+        if (skipSms) {
+          showToast("✓ Als erledigt markiert", true)
+        } else {
+          const smsOk = json.sms === "sent"
+          showToast(
+            smsOk ? "✓ Bestätigt — SMS an Kunden gesendet" : "✓ Bestätigt — SMS konnte nicht gesendet werden",
+            smsOk
+          )
+        }
       } else {
         showToast("Anfrage abgelehnt", false)
       }
@@ -230,11 +234,14 @@ const [companyId,    setCompanyId]    = useState<string | null>(null)
                   </p>
                 </div>
                 <div className="space-y-3">
-                  {pending.map(r => (
-                    <RequestCard key={r.id} r={r} acting={acting}
-                      onConfirm={() => act(r.id, "confirm")}
-                      onReject={() => act(r.id, "reject")} />
-                  ))}
+                  {pending.map(r => {
+                    const isCallback = getTag(r.name) === "Rückruf"
+                    return (
+                      <RequestCard key={r.id} r={r} acting={acting}
+                        onConfirm={() => act(r.id, "confirm", isCallback)}
+                        onReject={() => act(r.id, "reject")} />
+                    )
+                  })}
                 </div>
               </section>
             )}
@@ -287,9 +294,9 @@ function RequestCard({ r, acting, onConfirm, onReject, done }: {
   onReject?: () => void
   done?: boolean
 }) {
-  const tag  = getTag(r.name)
-  const name = cleanName(r.name)
-  const dt   = formatDate(r.date, r.time)
+  const tag        = getTag(r.name)
+  const name       = cleanName(r.name)
+  const dt         = formatDate(r.date, r.time)
   const isCallback = tag === "Rückruf"
   const isLoading  = acting === r.id
 
@@ -414,7 +421,7 @@ function RequestCard({ r, acting, onConfirm, onReject, done }: {
             }}>
             {isLoading ? (
               <span style={{ display: "inline-block", width: 14, height: 14, border: "2px solid #fff", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.7s linear infinite" }} />
-            ) : "✓"} {isLoading ? "…" : "Bestätigen + SMS"}
+            ) : "✓"} {isLoading ? "…" : isCallback ? "Als erledigt markieren" : "Bestätigen + SMS"}
           </button>
 
           <button
@@ -431,8 +438,8 @@ function RequestCard({ r, acting, onConfirm, onReject, done }: {
         </div>
       )}
 
-      {/* SMS hint for confirmed */}
-      {isConfirmed && (
+      {/* SMS hint for confirmed — nur bei Nicht-Rückrufen */}
+      {isConfirmed && !isCallback && (
         <div style={{
           margin: "0 16px 14px",
           background: "#F0FDF4", border: "1px solid #D1FAE5",
@@ -440,6 +447,16 @@ function RequestCard({ r, acting, onConfirm, onReject, done }: {
           fontSize: 12, color: "#065F46", fontWeight: 500
         }}>
           📱 SMS-Bestätigung wurde an den Kunden gesendet
+        </div>
+      )}
+      {isConfirmed && isCallback && (
+        <div style={{
+          margin: "0 16px 14px",
+          background: "#F0FBF6", border: "1px solid #D1F5E3",
+          borderRadius: 10, padding: "8px 12px",
+          fontSize: 12, color: "#065F46", fontWeight: 500
+        }}>
+          ✓ Rückruf erledigt
         </div>
       )}
     </div>

@@ -67,7 +67,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Ungültige Sitzung" }, { status: 401 })
     }
 
-    const { appointmentId, action, companyName } = await req.json()
+    const { appointmentId, action, companyName, skipSms } = await req.json()
     if (!appointmentId || !action) {
       return NextResponse.json({ error: "appointmentId und action erforderlich" }, { status: 400 })
     }
@@ -95,6 +95,11 @@ export async function POST(req: NextRequest) {
         .update({ status: "confirmed" })
         .eq("id", appointmentId)
       if (updateErr) return NextResponse.json({ error: updateErr.message }, { status: 500 })
+
+      // Rückruf-Anfragen: kein SMS senden, nur als erledigt markieren
+      if (skipSms) {
+        return NextResponse.json({ success: true, action: "confirmed", sms: "skipped" })
+      }
 
       if (appt?.phone) {
         try {

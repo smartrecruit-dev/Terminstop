@@ -127,30 +127,35 @@ export default function BookingPage() {
   const css = `
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
     *, *::before, *::after { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-    body { margin: 0; }
-    @keyframes spin    { to { transform: rotate(360deg); } }
-    @keyframes fadeUp  { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
-    @keyframes popIn   { 0% { opacity:0; transform:scale(.75); } 100% { opacity:1; transform:scale(1); } }
-    @keyframes shimmer { 0% { background-position: -400px 0; } 100% { background-position: 400px 0; } }
+    body { margin: 0; background: #0A0F0D; }
+    @keyframes spin      { to { transform: rotate(360deg); } }
+    @keyframes fadeUp    { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+    @keyframes fadeIn    { from { opacity:0; } to { opacity:1; } }
+    @keyframes popIn     { 0% { opacity:0; transform:scale(.7); } 60% { transform:scale(1.06); } 100% { opacity:1; transform:scale(1); } }
+    @keyframes shimmer   { 0% { background-position: -400px 0; } 100% { background-position: 400px 0; } }
     @keyframes checkDraw { from { stroke-dashoffset: 40; } to { stroke-dashoffset: 0; } }
-    .step-enter { animation: fadeUp .32s cubic-bezier(.16,1,.3,1); }
-    .card-hover { transition: all .2s ease; }
-    .card-hover:hover { border-color: #18A66D !important; transform: translateY(-2px); box-shadow: 0 8px 30px rgba(24,166,109,0.13) !important; }
-    .card-hover:active { transform: translateY(0); }
+    @keyframes pulse     { 0%,100% { opacity:.6; transform:scale(1); } 50% { opacity:1; transform:scale(1.04); } }
+    .step-enter { animation: fadeUp .38s cubic-bezier(.16,1,.3,1) both; }
+    .card-hover { transition: all .22s cubic-bezier(.16,1,.3,1); }
+    .card-hover:hover { border-color: #18A66D !important; transform: translateY(-3px); box-shadow: 0 12px 40px rgba(24,166,109,0.18) !important; }
+    .card-hover:active { transform: translateY(0) scale(.99); }
     .svc-hover { transition: all .18s ease; }
-    .svc-hover:hover { border-color: #18A66D !important; background: #F0FBF6 !important; }
+    .svc-hover:hover { border-color: #18A66D !important; background: #F0FBF6 !important; box-shadow: 0 6px 20px rgba(24,166,109,0.1) !important; }
     input[type="date"]::-webkit-calendar-picker-indicator { opacity: .5; cursor: pointer; }
-    input:focus, textarea:focus { border-color: #18A66D !important; box-shadow: 0 0 0 4px rgba(24,166,109,0.1) !important; outline: none !important; }
-    .ts-input { width:100%; padding:14px 16px; border:1.5px solid #E5E7EB; border-radius:13px; font-size:15px; color:#111827; background:#fff; font-family:inherit; transition:border-color .15s, box-shadow .15s; }
-    .ts-input::placeholder { color: #9CA3AF; }
-    textarea.ts-input { resize:none; }
-    .primary-btn { width:100%; padding:16px; background:#18A66D; color:#fff; border:none; border-radius:14px; font-size:15px; font-weight:700; cursor:pointer; letter-spacing:.2px; box-shadow:0 6px 24px rgba(24,166,109,0.28); transition:all .2s; display:flex; align-items:center; justify-content:center; gap:8px; }
-    .primary-btn:hover { background:#15955F; transform:translateY(-1px); box-shadow:0 8px 28px rgba(24,166,109,0.35); }
+    input:focus, textarea:focus { border-color: #18A66D !important; box-shadow: 0 0 0 4px rgba(24,166,109,0.12) !important; outline: none !important; }
+    .ts-input { width:100%; padding:15px 18px; border:1.5px solid #E5E7EB; border-radius:14px; font-size:15px; color:#111827; background:#fff; font-family:inherit; transition:border-color .15s, box-shadow .15s; }
+    .ts-input::placeholder { color: #C4C9D4; }
+    textarea.ts-input { resize:none; line-height:1.6; }
+    .primary-btn { width:100%; padding:17px; background:linear-gradient(135deg,#18A66D,#15955F); color:#fff; border:none; border-radius:15px; font-size:15px; font-weight:800; cursor:pointer; letter-spacing:.2px; box-shadow:0 8px 28px rgba(24,166,109,0.35); transition:all .22s; display:flex; align-items:center; justify-content:center; gap:8px; }
+    .primary-btn:hover { transform:translateY(-2px); box-shadow:0 12px 36px rgba(24,166,109,0.45); }
     .primary-btn:active { transform:translateY(0); }
-    .primary-btn:disabled { background:#E5E7EB; color:#9CA3AF; cursor:not-allowed; box-shadow:none; transform:none; }
-    .back-btn { display:flex; align-items:center; gap:6px; background:none; border:none; cursor:pointer; color:#6B7280; font-size:14px; font-weight:600; padding:8px 0; transition:color .15s; }
-    .back-btn:hover { color:#111827; }
-    .skeleton { background: linear-gradient(90deg, #F3F4F6 25%, #E5E7EB 50%, #F3F4F6 75%); background-size: 400px 100%; animation: shimmer 1.4s ease infinite; border-radius: 8px; }
+    .primary-btn:disabled { background:linear-gradient(135deg,#D1D5DB,#9CA3AF); cursor:not-allowed; box-shadow:none; transform:none; }
+    .back-btn { display:flex; align-items:center; gap:6px; background:none; border:none; cursor:pointer; color:rgba(255,255,255,0.55); font-size:14px; font-weight:600; padding:8px 0; transition:color .15s; }
+    .back-btn:hover { color:rgba(255,255,255,0.9); }
+    .skeleton { background: linear-gradient(90deg, #F3F4F6 25%, #E5E7EB 50%, #F3F4F6 75%); background-size: 400px 100%; animation: shimmer 1.4s ease infinite; border-radius: 10px; }
+    .type-card { background:#fff; border:1.5px solid #F0F0F0; border-radius:20px; padding:22px; text-align:left; cursor:pointer; display:flex; align-items:center; gap:18px; width:100%; box-shadow:0 2px 16px rgba(0,0,0,0.05); transition:all .22s cubic-bezier(.16,1,.3,1); }
+    .type-card:hover { border-color:#18A66D; transform:translateY(-3px); box-shadow:0 12px 40px rgba(24,166,109,0.15); }
+    .type-card:active { transform:translateY(0) scale(.99); }
   `
 
   /* ── Loading ── */
@@ -241,53 +246,54 @@ export default function BookingPage() {
     <Shell css={css}>
 
       {/* ══ HERO HEADER ══ */}
-      <div style={{ background:"linear-gradient(160deg, #0F1923 0%, #1a2e20 50%, #0F1923 100%)", padding:"env(safe-area-inset-top,0) 0 0", position:"relative", overflow:"hidden" }}>
+      <div style={{ background:"linear-gradient(170deg, #0A0F0D 0%, #0D1F15 40%, #0F2318 100%)", padding:"env(safe-area-inset-top,0) 0 0", position:"relative", overflow:"hidden" }}>
 
-        {/* Subtle background orbs */}
-        <div style={{ position:"absolute", top:-60, right:-60, width:260, height:260, borderRadius:"50%", background:"radial-gradient(circle, rgba(24,166,109,0.18) 0%, transparent 70%)", pointerEvents:"none" }} />
-        <div style={{ position:"absolute", bottom:-40, left:-40, width:200, height:200, borderRadius:"50%", background:"radial-gradient(circle, rgba(24,166,109,0.1) 0%, transparent 70%)", pointerEvents:"none" }} />
+        {/* Background orbs */}
+        <div style={{ position:"absolute", top:-80, right:-80, width:340, height:340, borderRadius:"50%", background:"radial-gradient(circle, rgba(24,166,109,0.22) 0%, transparent 65%)", pointerEvents:"none" }} />
+        <div style={{ position:"absolute", bottom:-60, left:-60, width:260, height:260, borderRadius:"50%", background:"radial-gradient(circle, rgba(24,166,109,0.12) 0%, transparent 65%)", pointerEvents:"none" }} />
+        <div style={{ position:"absolute", top:"50%", left:"50%", transform:"translate(-50%,-50%)", width:500, height:500, borderRadius:"50%", background:"radial-gradient(circle, rgba(24,166,109,0.06) 0%, transparent 60%)", pointerEvents:"none" }} />
 
-        <div style={{ maxWidth:540, margin:"0 auto", padding:"22px 20px 24px", position:"relative" }}>
+        <div style={{ maxWidth:560, margin:"0 auto", padding:"20px 22px 28px", position:"relative" }}>
 
           {/* Top row */}
-          <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:22 }}>
+          <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:28 }}>
             {showBack ? (
-              <button className="back-btn" onClick={goBack} style={{ color:"rgba(255,255,255,0.6)" }}>
+              <button className="back-btn" onClick={goBack}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
                 Zurück
               </button>
             ) : <div />}
-            <div style={{ display:"flex", alignItems:"center", gap:7, opacity:.7 }}>
-              <div style={{ width:20, height:20, background:"#18A66D", borderRadius:6, display:"flex", alignItems:"center", justifyContent:"center" }}>
-                <span style={{ color:"#fff", fontSize:9, fontWeight:900 }}>T</span>
+            <div style={{ display:"flex", alignItems:"center", gap:7, background:"rgba(255,255,255,0.07)", backdropFilter:"blur(8px)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:20, padding:"5px 12px 5px 6px" }}>
+              <div style={{ width:22, height:22, background:"linear-gradient(135deg,#18A66D,#0F8F63)", borderRadius:7, display:"flex", alignItems:"center", justifyContent:"center" }}>
+                <span style={{ color:"#fff", fontSize:10, fontWeight:900 }}>T</span>
               </div>
-              <span style={{ fontSize:11, color:"rgba(255,255,255,0.7)", fontWeight:600, letterSpacing:.3 }}>TerminStop</span>
+              <span style={{ fontSize:11, color:"rgba(255,255,255,0.75)", fontWeight:700, letterSpacing:.4 }}>TerminStop</span>
             </div>
           </div>
 
           {/* Company info */}
-          <div style={{ display:"flex", alignItems:"center", gap:16 }}>
-            <div style={{ width:58, height:58, background:"linear-gradient(135deg, #18A66D, #15955F)", borderRadius:18, display:"flex", alignItems:"center", justifyContent:"center", fontSize:20, fontWeight:900, color:"#fff", flexShrink:0, boxShadow:"0 6px 20px rgba(24,166,109,0.4)", letterSpacing:"-1px" }}>
+          <div style={{ display:"flex", alignItems:"center", gap:18 }}>
+            <div style={{ width:66, height:66, background:"linear-gradient(135deg, #18A66D, #0F8F63)", borderRadius:22, display:"flex", alignItems:"center", justifyContent:"center", fontSize:22, fontWeight:900, color:"#fff", flexShrink:0, boxShadow:"0 8px 32px rgba(24,166,109,0.5), inset 0 1px 0 rgba(255,255,255,0.2)", letterSpacing:"-1px" }}>
               {initials}
             </div>
-            <div>
-              <div style={{ fontSize:11, fontWeight:700, color:"rgba(255,255,255,0.5)", letterSpacing:1, textTransform:"uppercase", marginBottom:4 }}>Online-Buchung</div>
-              <h1 style={{ fontSize:22, fontWeight:900, color:"#fff", margin:0, letterSpacing:"-.5px", lineHeight:1.15 }}>{company?.name}</h1>
+            <div style={{ flex:1, minWidth:0 }}>
+              <div style={{ fontSize:10, fontWeight:800, color:"rgba(24,166,109,0.8)", letterSpacing:1.5, textTransform:"uppercase", marginBottom:5 }}>Online-Buchung</div>
+              <h1 style={{ fontSize:24, fontWeight:900, color:"#fff", margin:0, letterSpacing:"-.6px", lineHeight:1.1 }}>{company?.name}</h1>
               {company?.booking_note && (
-                <p style={{ fontSize:13, color:"rgba(255,255,255,0.6)", margin:"6px 0 0", lineHeight:1.5 }}>{company.booking_note}</p>
+                <p style={{ fontSize:13, color:"rgba(255,255,255,0.5)", margin:"8px 0 0", lineHeight:1.55, fontWeight:500 }}>{company.booking_note}</p>
               )}
             </div>
           </div>
 
           {/* Progress */}
           {showBack && (
-            <div style={{ marginTop:20 }}>
-              <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:8 }}>
-                <span style={{ fontSize:11, color:"rgba(255,255,255,0.5)", fontWeight:600 }}>{stepLabel[step]}</span>
-                <span style={{ fontSize:11, color:"rgba(255,255,255,0.4)", fontWeight:600 }}>{progressPct()}%</span>
+            <div style={{ marginTop:24 }}>
+              <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:10 }}>
+                <span style={{ fontSize:11, color:"rgba(255,255,255,0.45)", fontWeight:700, textTransform:"uppercase", letterSpacing:.5 }}>{stepLabel[step]}</span>
+                <span style={{ fontSize:11, color:"rgba(24,166,109,0.9)", fontWeight:800 }}>{progressPct()}%</span>
               </div>
-              <div style={{ height:3, background:"rgba(255,255,255,0.1)", borderRadius:4, overflow:"hidden" }}>
-                <div style={{ height:"100%", background:"#18A66D", borderRadius:4, width:`${progressPct()}%`, transition:"width .4s ease", boxShadow:"0 0 8px rgba(24,166,109,0.6)" }} />
+              <div style={{ height:4, background:"rgba(255,255,255,0.08)", borderRadius:4, overflow:"hidden" }}>
+                <div style={{ height:"100%", background:"linear-gradient(90deg, #18A66D, #22C97E)", borderRadius:4, width:`${progressPct()}%`, transition:"width .5s cubic-bezier(.16,1,.3,1)", boxShadow:"0 0 12px rgba(24,166,109,0.7)" }} />
               </div>
             </div>
           )}
@@ -295,67 +301,71 @@ export default function BookingPage() {
       </div>
 
       {/* ══ CONTENT ══ */}
-      <div style={{ flex:1, maxWidth:540, margin:"0 auto", width:"100%", padding:"24px 16px 48px" }}>
+      <div style={{ flex:1, maxWidth:560, margin:"0 auto", width:"100%", padding:"28px 18px 60px" }}>
 
         {/* ── STEP: type ── */}
         {step === "type" && (
           <div className="step-enter">
-            <div style={{ marginBottom:24 }}>
-              <h2 style={{ fontSize:21, fontWeight:800, color:"#111827", margin:"0 0 6px", letterSpacing:"-.4px" }}>Wie kann ich dir helfen?</h2>
-              <p style={{ color:"#6B7280", fontSize:14, margin:0, lineHeight:1.6 }}>Wähle, wie du einen Termin vereinbaren möchtest.</p>
+            <div style={{ marginBottom:28 }}>
+              <h2 style={{ fontSize:23, fontWeight:900, color:"#111827", margin:"0 0 8px", letterSpacing:"-.5px" }}>Wie kann ich helfen?</h2>
+              <p style={{ color:"#9CA3AF", fontSize:14, margin:0, lineHeight:1.65, fontWeight:500 }}>Wähle, wie du einen Termin vereinbaren möchtest.</p>
             </div>
 
-            <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
+            <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
               {services.length > 0 && (
-                <button className="card-hover"
-                  onClick={() => { setBookingType("service"); setSelectedService(null); setStep("service") }}
-                  style={{ background:"#fff", border:"1.5px solid #E5E7EB", borderRadius:18, padding:"20px", textAlign:"left", cursor:"pointer", display:"flex", alignItems:"center", gap:16, width:"100%", boxShadow:"0 2px 12px rgba(0,0,0,0.04)" }}>
-                  <div style={{ width:52, height:52, background:"linear-gradient(135deg, #F0FBF6, #D1F5E3)", border:"1.5px solid #D1F5E3", borderRadius:16, display:"flex", alignItems:"center", justifyContent:"center", fontSize:24, flexShrink:0 }}>✂️</div>
+                <button className="type-card"
+                  onClick={() => { setBookingType("service"); setSelectedService(null); setStep("service") }}>
+                  <div style={{ width:56, height:56, background:"linear-gradient(135deg, #18A66D, #0F8F63)", borderRadius:18, display:"flex", alignItems:"center", justifyContent:"center", fontSize:24, flexShrink:0, boxShadow:"0 6px 20px rgba(24,166,109,0.35)" }}>✂️</div>
                   <div style={{ flex:1, minWidth:0 }}>
-                    <p style={{ fontWeight:800, color:"#111827", margin:"0 0 4px", fontSize:15 }}>Leistung buchen</p>
-                    <p style={{ color:"#9CA3AF", margin:0, fontSize:13 }}>{services.length} Leistung{services.length > 1 ? "en" : ""} verfügbar</p>
+                    <p style={{ fontWeight:800, color:"#111827", margin:"0 0 5px", fontSize:16 }}>Leistung buchen</p>
+                    <p style={{ color:"#9CA3AF", margin:0, fontSize:13, fontWeight:500 }}>{services.length} Leistung{services.length > 1 ? "en" : ""} verfügbar · direkt buchen</p>
                   </div>
-                  <div style={{ width:32, height:32, background:"#F9FAFB", borderRadius:10, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="2.5" strokeLinecap="round"><path d="M9 18l6-6-6-6"/></svg>
+                  <div style={{ width:36, height:36, background:"#F0FBF6", borderRadius:11, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#18A66D" strokeWidth="2.5" strokeLinecap="round"><path d="M9 18l6-6-6-6"/></svg>
                   </div>
                 </button>
               )}
 
-              <button className="card-hover"
-                onClick={() => { setBookingType("open"); setStep("datetime") }}
-                style={{ background:"#fff", border:"1.5px solid #E5E7EB", borderRadius:18, padding:"20px", textAlign:"left", cursor:"pointer", display:"flex", alignItems:"center", gap:16, width:"100%", boxShadow:"0 2px 12px rgba(0,0,0,0.04)" }}>
-                <div style={{ width:52, height:52, background:"linear-gradient(135deg, #EEF2FF, #C7D2FE)", border:"1.5px solid #C7D2FE", borderRadius:16, display:"flex", alignItems:"center", justifyContent:"center", fontSize:24, flexShrink:0 }}>🗓️</div>
+              <button className="type-card"
+                onClick={() => { setBookingType("open"); setStep("datetime") }}>
+                <div style={{ width:56, height:56, background:"linear-gradient(135deg, #4F46E5, #7C3AED)", borderRadius:18, display:"flex", alignItems:"center", justifyContent:"center", fontSize:24, flexShrink:0, boxShadow:"0 6px 20px rgba(79,70,229,0.35)" }}>🗓️</div>
                 <div style={{ flex:1, minWidth:0 }}>
-                  <p style={{ fontWeight:800, color:"#111827", margin:"0 0 4px", fontSize:15 }}>Termin anfragen</p>
-                  <p style={{ color:"#9CA3AF", margin:0, fontSize:13 }}>Wunschtermin wählen & anfragen</p>
+                  <p style={{ fontWeight:800, color:"#111827", margin:"0 0 5px", fontSize:16 }}>Termin anfragen</p>
+                  <p style={{ color:"#9CA3AF", margin:0, fontSize:13, fontWeight:500 }}>Wunschtermin wählen & anfragen</p>
                 </div>
-                <div style={{ width:32, height:32, background:"#F9FAFB", borderRadius:10, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="2.5" strokeLinecap="round"><path d="M9 18l6-6-6-6"/></svg>
+                <div style={{ width:36, height:36, background:"#EEF2FF", borderRadius:11, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4F46E5" strokeWidth="2.5" strokeLinecap="round"><path d="M9 18l6-6-6-6"/></svg>
                 </div>
               </button>
 
-              <button className="card-hover"
-                onClick={() => { setBookingType("callback"); setStep("contact") }}
-                style={{ background:"#fff", border:"1.5px solid #E5E7EB", borderRadius:18, padding:"20px", textAlign:"left", cursor:"pointer", display:"flex", alignItems:"center", gap:16, width:"100%", boxShadow:"0 2px 12px rgba(0,0,0,0.04)" }}>
-                <div style={{ width:52, height:52, background:"linear-gradient(135deg, #FFF7ED, #FED7AA)", border:"1.5px solid #FED7AA", borderRadius:16, display:"flex", alignItems:"center", justifyContent:"center", fontSize:24, flexShrink:0 }}>📞</div>
+              <button className="type-card"
+                onClick={() => { setBookingType("callback"); setStep("contact") }}>
+                <div style={{ width:56, height:56, background:"linear-gradient(135deg, #F59E0B, #D97706)", borderRadius:18, display:"flex", alignItems:"center", justifyContent:"center", fontSize:24, flexShrink:0, boxShadow:"0 6px 20px rgba(245,158,11,0.35)" }}>📞</div>
                 <div style={{ flex:1, minWidth:0 }}>
-                  <p style={{ fontWeight:800, color:"#111827", margin:"0 0 4px", fontSize:15 }}>Rückruf anfragen</p>
-                  <p style={{ color:"#9CA3AF", margin:0, fontSize:13 }}>Ich werde so schnell wie möglich zurückgerufen</p>
+                  <p style={{ fontWeight:800, color:"#111827", margin:"0 0 5px", fontSize:16 }}>Rückruf anfragen</p>
+                  <p style={{ color:"#9CA3AF", margin:0, fontSize:13, fontWeight:500 }}>Nummer hinterlassen · ich rufe zurück</p>
                 </div>
-                <div style={{ width:32, height:32, background:"#F9FAFB", borderRadius:10, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="2.5" strokeLinecap="round"><path d="M9 18l6-6-6-6"/></svg>
+                <div style={{ width:36, height:36, background:"#FFFBEB", borderRadius:11, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D97706" strokeWidth="2.5" strokeLinecap="round"><path d="M9 18l6-6-6-6"/></svg>
                 </div>
               </button>
             </div>
 
-            {/* Trust signals */}
-            <div style={{ marginTop:28, display:"flex", justifyContent:"center", gap:20, flexWrap:"wrap" }}>
-              {[["🔒", "Sicher & verschlüsselt"], ["⚡", "In 2 Min. gebucht"], ["✓", "Kostenlos anfragen"]].map(([icon, label]) => (
-                <div key={label} style={{ display:"flex", alignItems:"center", gap:6 }}>
-                  <span style={{ fontSize:13 }}>{icon}</span>
-                  <span style={{ fontSize:12, color:"#9CA3AF", fontWeight:600 }}>{label}</span>
-                </div>
-              ))}
+            {/* Trust bar */}
+            <div style={{ marginTop:32, background:"#fff", border:"1.5px solid #F0F0F0", borderRadius:16, padding:"16px 20px" }}>
+              <div style={{ display:"flex", justifyContent:"space-around", gap:12 }}>
+                {[
+                  { icon:"🔒", label:"Datenschutz", sub:"DSGVO-konform" },
+                  { icon:"⚡", label:"Schnell", sub:"In 2 Minuten fertig" },
+                  { icon:"✉️", label:"Kostenlos", sub:"Keine Kosten für dich" },
+                ].map(t => (
+                  <div key={t.label} style={{ textAlign:"center" }}>
+                    <div style={{ fontSize:20, marginBottom:4 }}>{t.icon}</div>
+                    <div style={{ fontSize:11, fontWeight:800, color:"#374151" }}>{t.label}</div>
+                    <div style={{ fontSize:10, color:"#9CA3AF", fontWeight:500, marginTop:1 }}>{t.sub}</div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         )}
@@ -555,7 +565,7 @@ export default function BookingPage() {
       </div>
 
       {/* ══ FOOTER ══ */}
-      <div style={{ borderTop:"1px solid #F3F4F6", padding:"16px 20px", background:"#fff", textAlign:"center" }}>
+      <div style={{ borderTop:"1px solid #EAECEF", padding:"18px 20px", background:"#fff", textAlign:"center" }}>
         <PoweredBy />
       </div>
     </Shell>
@@ -565,7 +575,7 @@ export default function BookingPage() {
 /* ── Shell ─────────────────────────────────────────────────────── */
 function Shell({ children, css }: { children: React.ReactNode; css?: string }) {
   return (
-    <div style={{ minHeight:"100dvh", background:"#F9FAFB", fontFamily:"'Inter',-apple-system,BlinkMacSystemFont,'SF Pro Display',sans-serif", display:"flex", flexDirection:"column" }}>
+    <div style={{ minHeight:"100dvh", background:"#F4F6F8", fontFamily:"'Inter',-apple-system,BlinkMacSystemFont,'SF Pro Display',sans-serif", display:"flex", flexDirection:"column" }}>
       {css && <style dangerouslySetInnerHTML={{ __html: css }} />}
       {children}
     </div>
@@ -575,11 +585,11 @@ function Shell({ children, css }: { children: React.ReactNode; css?: string }) {
 /* ── Powered By ─────────────────────────────────────────────────── */
 function PoweredBy() {
   return (
-    <div style={{ display:"inline-flex", alignItems:"center", gap:7 }}>
-      <div style={{ width:20, height:20, background:"linear-gradient(135deg, #18A66D, #15955F)", borderRadius:6, display:"flex", alignItems:"center", justifyContent:"center" }}>
-        <span style={{ color:"#fff", fontSize:9, fontWeight:900 }}>T</span>
+    <div style={{ display:"inline-flex", alignItems:"center", gap:8, background:"#F9FAFB", border:"1px solid #EAECEF", borderRadius:20, padding:"6px 14px 6px 8px" }}>
+      <div style={{ width:22, height:22, background:"linear-gradient(135deg, #18A66D, #0F8F63)", borderRadius:7, display:"flex", alignItems:"center", justifyContent:"center" }}>
+        <span style={{ color:"#fff", fontSize:10, fontWeight:900 }}>T</span>
       </div>
-      <span style={{ fontSize:12, color:"#9CA3AF" }}>Powered by <strong style={{ color:"#18A66D" }}>TerminStop</strong></span>
+      <span style={{ fontSize:12, color:"#9CA3AF", fontWeight:500 }}>Powered by <strong style={{ color:"#18A66D", fontWeight:800 }}>TerminStop</strong></span>
     </div>
   )
 }
