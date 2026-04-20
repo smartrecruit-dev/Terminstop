@@ -24,12 +24,12 @@ export default function LoginPage() {
     localStorage.removeItem("company_id")
     localStorage.removeItem("company_name")
 
-    const { error: authError } = await supabase.auth.signInWithPassword({
+    const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
       email: email.trim(),
       password: password.trim(),
     })
 
-    if (authError) {
+    if (authError || !authData?.user) {
       setError("E-Mail oder Passwort ist nicht korrekt.")
       setLoading(false)
       return
@@ -38,6 +38,7 @@ export default function LoginPage() {
     const { data: company, error: companyError } = await supabase
       .from("companies")
       .select("id, name, paused")
+      .eq("user_id", authData.user.id)
       .single()
 
     if (companyError || !company) {
