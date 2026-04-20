@@ -291,8 +291,21 @@ export default function BuchungDemo() {
         @keyframes pulse     { 0%,100%{opacity:1} 50%{opacity:.5} }
         @keyframes glow      { 0%,100%{box-shadow:0 0 20px rgba(24,166,109,.2)} 50%{box-shadow:0 0 40px rgba(24,166,109,.4)} }
 
-        /* Hide bottom nav on tablet + desktop */
-        @media (min-width: 768px) { .demo-bottom-nav { display: none !important; } }
+        /* Bottom nav: flex on mobile, gone on tablet/desktop */
+        .demo-bottom-nav {
+          display: flex;
+          position: fixed;
+          bottom: 0; left: 0; right: 0;
+          background: #fff;
+          border-top: 1px solid #E5E7EB;
+          box-shadow: 0 -2px 12px rgba(0,0,0,0.06);
+          z-index: 50;
+          padding-top: 8px;
+          padding-bottom: max(10px, env(safe-area-inset-bottom));
+          justify-content: space-around;
+          align-items: center;
+        }
+        @media (min-width: 768px) { .demo-bottom-nav { display: none; } }
 
         /* Responsive: stack columns on mobile */
         @media (max-width: 768px) {
@@ -322,7 +335,8 @@ export default function BuchungDemo() {
 
       {/* ── Nav ── */}
       <nav style={{ background: "#fff", borderBottom: `1px solid ${G.border}`, boxShadow: "0 1px 3px rgba(0,0,0,0.04)", position: "sticky", top: 0, zIndex: 50, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 24px", height: 58 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 32 }}>
+        {/* Left: Logo + regular demo pages */}
+        <div style={{ display: "flex", alignItems: "center", gap: 28 }}>
           <a href="/" style={{ fontSize: 17, fontWeight: 900, letterSpacing: "-.3px", textDecoration: "none" }}>
             <span style={{ color: G.green }}>Termin</span><span style={{ color: G.ink }}>Stop</span>
           </a>
@@ -331,19 +345,20 @@ export default function BuchungDemo() {
               { href: "/demo", label: "Dashboard" },
               { href: "/demo/calendar", label: "Kalender" },
               { href: "/demo/customers", label: "Kunden" },
-              { href: "/demo/buchung", label: "🔗 Buchungs-Add-on", active: true },
             ].map(item => (
-              <a key={item.href} href={item.href} style={{ position: "relative", textDecoration: "none", padding: "6px 14px", borderRadius: 9, fontSize: 13.5, fontWeight: item.active ? 700 : 500, color: item.active ? G.ink : G.muted, background: item.active ? G.greenSoft : "transparent" }}>
+              <a key={item.href} href={item.href} style={{ position: "relative", textDecoration: "none", padding: "6px 14px", borderRadius: 9, fontSize: 13.5, fontWeight: 500, color: G.muted, background: "transparent", transition: "color .12s" }}>
                 {item.label}
-                {item.active && <span style={{ position: "absolute", bottom: -1, left: "50%", transform: "translateX(-50%)", width: 20, height: 2.5, borderRadius: 99, background: G.green }} />}
               </a>
             ))}
           </div>
         </div>
+        {/* Right: active indicator + back button + CTA */}
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <a href="/demo" className="hidden md:inline-flex" style={{ fontSize: 13, color: G.muted, fontWeight: 600, textDecoration: "none", padding: "7px 14px", borderRadius: 9, border: `1px solid ${G.border}` }}>
-            ← Zum Dashboard
-          </a>
+          {/* Active page label */}
+          <div className="hidden md:flex" style={{ alignItems: "center", gap: 7, background: G.dark, border: "1px solid rgba(24,166,109,0.35)", borderRadius: 8, padding: "5px 12px" }}>
+            <span style={{ width: 6, height: 6, background: G.green, borderRadius: "50%", display: "inline-block", animation: "pulse 2s infinite" }} />
+            <span style={{ fontSize: 12, fontWeight: 700, color: "#fff" }}>Buchungs-Add-on Demo</span>
+          </div>
           <a href="/lead" style={{ fontSize: 13, color: "#fff", background: G.green, padding: "7px 16px", borderRadius: 9, fontWeight: 700, textDecoration: "none" }}>
             Jetzt testen →
           </a>
@@ -833,14 +848,8 @@ export default function BuchungDemo() {
         </div>
       </section>
 
-      {/* ── Mobile Bottom Nav ── */}
-      <div className="demo-bottom-nav" style={{
-        display: "flex", position: "fixed", bottom: 0, left: 0, right: 0,
-        background: "#fff", borderTop: `1px solid ${G.border}`,
-        boxShadow: "0 -2px 12px rgba(0,0,0,0.06)", zIndex: 50,
-        paddingBottom: "max(10px,env(safe-area-inset-bottom))",
-        justifyContent: "space-around", alignItems: "center", paddingTop: 8,
-      }}>
+      {/* ── Mobile Bottom Nav — controlled by CSS class, no inline display ── */}
+      <div className="demo-bottom-nav">
         {[
           { href: "/demo", label: "Dashboard", icon: <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5Z"/><path d="M9 21V12h6v9"/></svg> },
           { href: "/demo/calendar", label: "Kalender", icon: <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg> },
