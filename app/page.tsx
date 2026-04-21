@@ -1488,7 +1488,7 @@ export default function LandingPage() {
             <Reveal>
               <div style={{ display: "flex", justifyContent: "center", gap: 0, marginBottom: 80, flexWrap: "wrap" }}>
                 {[
-                  { value: "1.200+", label: "Betriebe vertrauen uns" },
+                  { value: "50+",    label: "Betriebe vertrauen uns" },
                   { value: "94%",    label: "weniger Terminausfälle" },
                   { value: "4,9 ★",  label: "Kundenbewertung" },
                   { value: "10 Min", label: "bis zur ersten SMS" },
@@ -1538,30 +1538,6 @@ export default function LandingPage() {
                   name: "Petra W.",
                   role: "Kosmetikstudio, Berlin",
                   avatar: "PW",
-                  stars: 5,
-                  delay: 120,
-                },
-                {
-                  quote: "Das Preis-Leistungs-Verhältnis ist unschlagbar. Für weniger als einen Kaffee pro Tag spare ich jeden Monat mehrere Stunden.",
-                  name: "Marco F.",
-                  role: "Physiotherapie, Stuttgart",
-                  avatar: "MF",
-                  stars: 5,
-                  delay: 40,
-                },
-                {
-                  quote: "Endlich keine Zettelwirtschaft mehr. Alle Termine auf einen Blick, die Kundenkartei ist Gold wert — und die SMS laufen von alleine.",
-                  name: "Lena B.",
-                  role: "Nagelstudio, Köln",
-                  avatar: "LB",
-                  stars: 5,
-                  delay: 80,
-                },
-                {
-                  quote: "Wir haben TerminStop zuerst skeptisch getestet. Nach einer Woche waren wir überzeugt. Die Ausfallquote ist um fast 90% gesunken.",
-                  name: "Andreas R.",
-                  role: "Zahnarztpraxis, Frankfurt",
-                  avatar: "AR",
                   stars: 5,
                   delay: 120,
                 },
