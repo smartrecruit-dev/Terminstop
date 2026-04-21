@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react"
 import { supabase } from "../lib/supabaseClient"
 import { useRouter } from "next/navigation"
 
+
 const C = {
   green:      "#18A66D",
   greenHover: "#149A63",
@@ -39,6 +40,24 @@ type SlugState = "idle" | "checking" | "available" | "taken" | "invalid"
 
 export default function RegisterPage() {
   const router = useRouter()
+
+  // Registration gate
+  if (process.env.NEXT_PUBLIC_REGISTRATION_OPEN !== "true") {
+    return (
+      <div style={{ minHeight: "100dvh", display: "flex", alignItems: "center", justifyContent: "center", background: "#F4F6F9", fontFamily: FONT, padding: 24 }}>
+        <div style={{ textAlign: "center", maxWidth: 420 }}>
+          <div style={{ fontSize: 48, marginBottom: 16 }}>🔒</div>
+          <h1 style={{ fontSize: 24, fontWeight: 900, color: C.text, marginBottom: 12 }}>Bald verfügbar</h1>
+          <p style={{ fontSize: 15, color: C.muted, lineHeight: 1.6, marginBottom: 28 }}>
+            Wir arbeiten noch an ein paar letzten Details.<br />Die Registrierung öffnet in Kürze.
+          </p>
+          <a href="/" style={{ display: "inline-block", padding: "12px 28px", background: C.green, color: "#fff", borderRadius: 12, fontWeight: 700, fontSize: 14, textDecoration: "none" }}>
+            Zurück zur Startseite →
+          </a>
+        </div>
+      </div>
+    )
+  }
 
   const [companyName, setCompanyName] = useState("")
   const [email,       setEmail]       = useState("")
@@ -160,9 +179,10 @@ export default function RegisterPage() {
         localStorage.setItem("company_name", compJson.company.name)
       }
 
-      // Mark as new user → dashboard shows trial banner + onboarding
+      // Mark as new user → show onboarding flow
       localStorage.setItem("is_new_user", "1")
-      router.push("/dashboard")
+      localStorage.setItem("onboarding_pending", "1")
+      router.push("/onboarding")
     } catch (e: any) {
       setError("Ein Fehler ist aufgetreten. Bitte erneut versuchen.")
       setLoading(false)

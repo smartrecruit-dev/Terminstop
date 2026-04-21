@@ -25,6 +25,11 @@ function isRateLimited(ip: string): boolean {
 
 export async function POST(req: NextRequest) {
   try {
+    // Registration gate
+    if (process.env.NEXT_PUBLIC_REGISTRATION_OPEN !== "true") {
+      return NextResponse.json({ error: "Die Registrierung ist derzeit nicht verfügbar. Wir öffnen bald." }, { status: 503 })
+    }
+
     // Rate limiting
     const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown"
     if (isRateLimited(ip)) {

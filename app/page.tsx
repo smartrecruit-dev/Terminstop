@@ -332,6 +332,8 @@ function SmsMock() {
 /* ═══════════════════════════════════════════════════════════════
    MAIN LANDING PAGE
 ═══════════════════════════════════════════════════════════════ */
+const REG_OPEN = process.env.NEXT_PUBLIC_REGISTRATION_OPEN === "true"
+
 export default function LandingPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(0)
   const [heroWord, setHeroWord] = useState(0)
@@ -694,9 +696,10 @@ export default function LandingPage() {
 
           {/* CTA + mobile toggle */}
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <a href="/register" className="btn btn-primary hide-mobile" style={{ fontSize: 14, padding: "11px 20px" }}>
-              Kostenlos starten <span style={{ marginLeft: 2 }}>→</span>
-            </a>
+            {REG_OPEN
+              ? <a href="/register" className="btn btn-primary hide-mobile" style={{ fontSize: 14, padding: "11px 20px" }}>Kostenlos starten <span style={{ marginLeft: 2 }}>→</span></a>
+              : <span className="btn btn-primary hide-mobile" style={{ fontSize: 14, padding: "11px 20px", opacity: 0.7, cursor: "default" }}>🔒 Bald verfügbar</span>
+            }
 
             {/* Mobile hamburger */}
             <button
@@ -742,9 +745,10 @@ export default function LandingPage() {
           <a href="/demo" className="btn btn-outline" onClick={() => setNavOpen(false)} style={{ fontSize: 15, padding: "13px 20px", justifyContent: "center", marginBottom: 8 }}>
             Live-Demo ansehen →
           </a>
-          <a href="/register" className="btn btn-primary" onClick={() => setNavOpen(false)} style={{ fontSize: 15, padding: "14px 20px", justifyContent: "center" }}>
-            Kostenlos starten →
-          </a>
+          {REG_OPEN
+            ? <a href="/register" className="btn btn-primary" onClick={() => setNavOpen(false)} style={{ fontSize: 15, padding: "14px 20px", justifyContent: "center" }}>Kostenlos starten →</a>
+            : <span className="btn btn-primary" style={{ fontSize: 15, padding: "14px 20px", justifyContent: "center", opacity: 0.7, cursor: "default" }}>🔒 Bald verfügbar</span>
+          }
         </aside>
 
         {/* ═══════════════ HERO ═══════════════ */}
@@ -821,9 +825,10 @@ export default function LandingPage() {
 
               <Reveal delay={240}>
                 <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap", marginBottom: 18 }}>
-                  <a href="/register" className="btn btn-primary" style={{ fontSize: 16, padding: "16px 30px" }}>
-                    14 Tage gratis starten <span>→</span>
-                  </a>
+                  {REG_OPEN
+                    ? <a href="/register" className="btn btn-primary" style={{ fontSize: 16, padding: "16px 30px" }}>14 Tage gratis starten <span>→</span></a>
+                    : <span className="btn btn-primary" style={{ fontSize: 16, padding: "16px 30px", opacity: 0.7, cursor: "default" }}>🔒 Bald verfügbar</span>
+                  }
                   <a href="/demo" className="btn btn-outline" style={{ fontSize: 16, padding: "16px 26px", display: "inline-flex", alignItems: "center", gap: 8 }}>
                     <span style={{ width: 8, height: 8, background: "#18A66D", borderRadius: "50%", display: "inline-block", animation: "pulse 2s infinite" }} />
                     Live-Demo ansehen
@@ -1516,9 +1521,10 @@ export default function LandingPage() {
                       </div>
                     ))}
                   </div>
-                  <a href="/register" className="btn btn-outline" style={{ fontSize: 15, padding: "14px 20px", justifyContent: "center" }}>
-                    Gratis starten →
-                  </a>
+                  {REG_OPEN
+                    ? <a href="/register" className="btn btn-outline" style={{ fontSize: 15, padding: "14px 20px", justifyContent: "center" }}>Gratis starten →</a>
+                    : <span className="btn btn-outline" style={{ fontSize: 15, padding: "14px 20px", justifyContent: "center", opacity: 0.7, cursor: "default" }}>🔒 Bald verfügbar</span>
+                  }
                 </div>
               </Reveal>
 
@@ -1567,9 +1573,10 @@ export default function LandingPage() {
                       </div>
                     ))}
                   </div>
-                  <a href="/register" className="btn btn-white" style={{ fontSize: 15, padding: "14px 20px", justifyContent: "center", position: "relative", zIndex: 1 }}>
-                    Gratis starten →
-                  </a>
+                  {REG_OPEN
+                    ? <a href="/register" className="btn btn-white" style={{ fontSize: 15, padding: "14px 20px", justifyContent: "center", position: "relative", zIndex: 1 }}>Gratis starten →</a>
+                    : <span className="btn btn-white" style={{ fontSize: 15, padding: "14px 20px", justifyContent: "center", opacity: 0.7, cursor: "default", position: "relative", zIndex: 1 }}>🔒 Bald verfügbar</span>
+                  }
                 </div>
               </Reveal>
 
@@ -1604,9 +1611,10 @@ export default function LandingPage() {
                       </div>
                     ))}
                   </div>
-                  <a href="/register" className="btn btn-outline" style={{ fontSize: 15, padding: "14px 20px", justifyContent: "center" }}>
-                    Gratis starten →
-                  </a>
+                  {REG_OPEN
+                    ? <a href="/register" className="btn btn-outline" style={{ fontSize: 15, padding: "14px 20px", justifyContent: "center" }}>Gratis starten →</a>
+                    : <span className="btn btn-outline" style={{ fontSize: 15, padding: "14px 20px", justifyContent: "center", opacity: 0.7, cursor: "default" }}>🔒 Bald verfügbar</span>
+                  }
                 </div>
               </Reveal>
             </div>
@@ -1716,9 +1724,10 @@ export default function LandingPage() {
                 14 Tage gratis testen. Kein Vertrag, keine Kreditkarte nötig.<br />In 5 Minuten live — monatlich kündbar.
               </p>
               <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap", marginBottom: 28 }}>
-                <a href="/register" className="btn btn-white" style={{ fontSize: 16, padding: "16px 34px" }}>
-                  Jetzt kostenlos starten <span>→</span>
-                </a>
+                {REG_OPEN
+                  ? <a href="/register" className="btn btn-white" style={{ fontSize: 16, padding: "16px 34px" }}>Jetzt kostenlos starten <span>→</span></a>
+                  : <span className="btn btn-white" style={{ fontSize: 16, padding: "16px 34px", opacity: 0.7, cursor: "default" }}>🔒 Bald verfügbar</span>
+                }
                 <a href="/login" className="btn btn-ghost-light" style={{ fontSize: 16, padding: "16px 28px" }}>
                   Bereits Kunde? Login
                 </a>
@@ -1773,7 +1782,10 @@ export default function LandingPage() {
                 <div>
                   <div style={{ fontSize: 11, fontWeight: 700, color: C.muted2, letterSpacing: 1, textTransform: "uppercase", marginBottom: 14 }}>Account</div>
                   <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
-                    <a href="/register" style={{ fontSize: 13.5, color: C.text2, textDecoration: "none", fontWeight: 500 }}>Registrieren</a>
+                    {REG_OPEN
+                      ? <a href="/register" style={{ fontSize: 13.5, color: C.text2, textDecoration: "none", fontWeight: 500 }}>Registrieren</a>
+                      : <span style={{ fontSize: 13.5, color: C.muted2, fontWeight: 500 }}>Registrieren (bald)</span>
+                    }
                     <a href="/login" style={{ fontSize: 13.5, color: C.text2, textDecoration: "none", fontWeight: 500 }}>Login</a>
                     <a href="#preise" style={{ fontSize: 13.5, color: C.text2, textDecoration: "none", fontWeight: 500 }}>Preise</a>
                   </div>
