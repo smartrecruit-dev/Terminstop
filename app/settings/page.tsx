@@ -5,7 +5,7 @@ import { supabase } from "../lib/supabaseClient"
 import DashNav from "../components/DashNav"
 import QRCode from "../components/QRCode"
 
-type Section = "buchungsseite" | "konto" | "sms"
+type Section = "buchungsseite" | "konto" | "sms" | "abo"
 
 export default function SettingsPage() {
   useEffect(() => { document.title = "Einstellungen | TerminStop" }, [])
@@ -17,6 +17,9 @@ export default function SettingsPage() {
   const [loading,     setLoading]     = useState(true)
   const [bookingAddon, setBookingAddon] = useState(false)
   const [section, setSection]         = useState<Section>("konto")
+  const [plan,    setPlan]            = useState<string>("trial")
+  const [portalLoading, setPortalLoading] = useState(false)
+  const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null)
 
   // Buchungsseite
   const [bookingNote,   setBookingNote]   = useState("")
@@ -55,7 +58,7 @@ export default function SettingsPage() {
   async function loadSettings() {
     setLoading(true)
     const [{ data: co }, { data: { user } }] = await Promise.all([
-      supabase.from("companies").select("name, booking_note, slug, booking_addon").eq("id", companyId!).single(),
+      supabase.from("companies").select("name, booking_note, slug, booking_addon, plan, stripe_customer_id").eq("id", companyId!).single(),
       supabase.auth.getUser(),
     ])
     if (co) {
@@ -63,6 +66,7 @@ export default function SettingsPage() {
       setBookingNote(co.booking_note || "")
       setSlug(co.slug || "")
       setBookingAddon(!!co.booking_addon)
+      setPlan(co.plan || "trial")
       if (co.booking_addon) setSection("buchungsseite")
     }
     if (user) {
@@ -145,7 +149,43 @@ export default function SettingsPage() {
     ...(bookingAddon ? [{ id: "buchungsseite" as Section, label: "🔗 Buchungsseite" }] : []),
     { id: "konto",  label: "🔐 Passwort & Konto" },
     { id: "sms",    label: "📱 SMS-Vorschau"      },
+    { id: "abo",    label: "💳 Abo & Zahlung"     },
   ]
+
+  async function openPortal() {
+    setPortalLoading(true)
+    const { data: { session } } = await supabase.auth.getSession()
+    const res = await fetch("/api/stripe/portal", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${session?.access_token}` },
+    })
+    const json = await res.json()
+    setPortalLoading(false)
+    if (json.url) window.location.href = json.url
+  }
+
+  async function startCheckout(priceId: string, planKey: string) {
+    setCheckoutLoading(planKey)
+    const { data: { session } } = await supabase.auth.getSession()
+    const res = await fetch("/api/stripe/checkout", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${session?.access_token}` },
+      body: JSON.stringify({ priceId }),
+    })
+    const json = await res.json()
+    setCheckoutLoading(null)
+    if (json.url) window.location.href = json.url
+  }
+
+  const PLANS = [
+    { key: "starter",  label: "Starter",  price: "39 €",  sms: "100 SMS",  priceId: process.env.NEXT_PUBLIC_STRIPE_STARTER_PRICE_ID! },
+    { key: "pro",      label: "Pro",       price: "109 €", sms: "400 SMS",  priceId: process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID! },
+    { key: "business", label: "Business",  price: "229 €", sms: "1.000 SMS",priceId: process.env.NEXT_PUBLIC_STRIPE_BUSINESS_PRICE_ID! },
+  ]
+
+  const planLabel: Record<string, string> = {
+    trial: "Testzeitraum (14 Tage)", starter: "Starter", pro: "Pro", business: "Business", cancelled: "Gekündigt",
+  }
 
   if (loading) return (
     <div style={{ minHeight: "100dvh", background: "#F9FAFB" }}>
@@ -473,6 +513,106 @@ export default function SettingsPage() {
 
           </div>
         )}
+
+        {/* ── ABO & ZAHLUNG ── */}
+        {section === "abo" && (
+          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+
+            {/* Aktueller Plan */}
+            <div style={card}>
+              <h2 style={{ fontSize: 16, fontWeight: 800, color: T, margin: "0 0 6px" }}>💳 Dein aktuelles Paket</h2>
+              <p style={{ fontSize: 14, color: M, margin: "0 0 20px", lineHeight: 1.6 }}>
+                Hier siehst du dein aktives Paket und kannst es jederzeit ändern oder kündigen.
+              </p>
+
+              <div style={{ display: "flex", alignItems: "center", gap: 14, background: "#F0FBF6", border: "1px solid #D1F5E3", borderRadius: 14, padding: "16px 20px", marginBottom: 20 }}>
+                <div style={{ fontSize: 28 }}>
+                  {plan === "trial" ? "🎉" : plan === "starter" ? "⚡" : plan === "pro" ? "🚀" : plan === "business" ? "🏢" : "❌"}
+                </div>
+                <div>
+                  <div style={{ fontSize: 15, fontWeight: 800, color: T }}>{planLabel[plan] || plan}</div>
+                  <div style={{ fontSize: 13, color: M, marginTop: 2 }}>
+                    {plan === "trial" ? "14 Tage kostenlos testen — danach Paket wählen" :
+                     plan === "starter" ? "39 € / Monat · bis 100 SMS" :
+                     plan === "pro" ? "109 € / Monat · bis 400 SMS" :
+                     plan === "business" ? "229 € / Monat · bis 1.000 SMS" :
+                     "Kein aktives Abo"}
+                  </div>
+                </div>
+              </div>
+
+              {/* Portal Button (wenn bereits Abo) */}
+              {["starter", "pro", "business"].includes(plan) && (
+                <button
+                  onClick={openPortal}
+                  disabled={portalLoading}
+                  style={{ ...saveBtn(portalLoading), display: "flex", alignItems: "center", gap: 8 }}
+                >
+                  {portalLoading ? "Weiterleitung…" : "🔧 Abo verwalten / kündigen →"}
+                </button>
+              )}
+            </div>
+
+            {/* Pakete */}
+            {(plan === "trial" || plan === "cancelled") && (
+              <div style={card}>
+                <h2 style={{ fontSize: 16, fontWeight: 800, color: T, margin: "0 0 6px" }}>Paket wählen</h2>
+                <p style={{ fontSize: 14, color: M, margin: "0 0 20px", lineHeight: 1.6 }}>
+                  Alle Pakete beinhalten 14 Tage gratis — danach monatlich kündbar.
+                </p>
+                <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                  {PLANS.map(p => (
+                    <div key={p.key} style={{
+                      display: "flex", alignItems: "center", justifyContent: "space-between",
+                      border: `1.5px solid ${p.key === "pro" ? G : BD}`,
+                      borderRadius: 14, padding: "16px 20px",
+                      background: p.key === "pro" ? "#F0FBF6" : "#fff",
+                      gap: 16, flexWrap: "wrap",
+                    }}>
+                      <div>
+                        <div style={{ fontSize: 15, fontWeight: 800, color: T, display: "flex", alignItems: "center", gap: 8 }}>
+                          {p.label}
+                          {p.key === "pro" && <span style={{ fontSize: 11, fontWeight: 700, background: G, color: "#fff", padding: "2px 9px", borderRadius: 980 }}>Empfohlen</span>}
+                        </div>
+                        <div style={{ fontSize: 13, color: M, marginTop: 3 }}>{p.price} / Monat · {p.sms}</div>
+                      </div>
+                      <button
+                        onClick={() => startCheckout(p.priceId, p.key)}
+                        disabled={checkoutLoading === p.key}
+                        style={{
+                          padding: "10px 20px", borderRadius: 10, border: "none", cursor: "pointer",
+                          fontSize: 13, fontWeight: 700, background: p.key === "pro" ? G : "#F3F4F6",
+                          color: p.key === "pro" ? "#fff" : T, whiteSpace: "nowrap",
+                          opacity: checkoutLoading === p.key ? 0.6 : 1,
+                        }}
+                      >
+                        {checkoutLoading === p.key ? "Weiterleitung…" : "Jetzt wählen →"}
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Plan upgraden wenn bereits aktiv */}
+            {["starter", "pro", "business"].includes(plan) && (
+              <div style={card}>
+                <h2 style={{ fontSize: 16, fontWeight: 800, color: T, margin: "0 0 6px" }}>Paket wechseln</h2>
+                <p style={{ fontSize: 14, color: M, margin: "0 0 4px" }}>
+                  Upgrades und Downgrades über das Stripe-Kundenportal möglich.
+                </p>
+                <button
+                  onClick={openPortal}
+                  disabled={portalLoading}
+                  style={{ ...saveBtn(false), marginTop: 14, display: "inline-flex", alignItems: "center", gap: 8 }}
+                >
+                  {portalLoading ? "Weiterleitung…" : "Paket wechseln →"}
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
       </div>
       <style>{`
         @keyframes spin { to { transform: rotate(360deg) } }
