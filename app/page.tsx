@@ -683,9 +683,7 @@ export default function LandingPage() {
           <div className="hide-mobile" style={{ display: "flex", alignItems: "center", gap: 2 }}>
             <a href="#wie-es-funktioniert" className="nav-link">So funktioniert's</a>
             <a href="#features" className="nav-link">Features</a>
-            <a href="#online-buchung" className="nav-link" style={{ display: "inline-flex", alignItems: "center" }}>
-              <span className="new-pill">Neu</span> Online-Buchung
-            </a>
+            <a href="#preise" className="nav-link">Preise</a>
             <a href="/demo" className="nav-link" style={{ display: "inline-flex", alignItems: "center", gap: 5 }}>
               <span style={{ width: 6, height: 6, background: "#18A66D", borderRadius: "50%", display: "inline-block" }} />
               Live-Demo
@@ -696,8 +694,8 @@ export default function LandingPage() {
 
           {/* CTA + mobile toggle */}
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <a href="/lead" className="btn btn-primary hide-mobile" style={{ fontSize: 14, padding: "11px 20px" }}>
-              Kostenlos testen <span style={{ marginLeft: 2 }}>→</span>
+            <a href="/register" className="btn btn-primary hide-mobile" style={{ fontSize: 14, padding: "11px 20px" }}>
+              Kostenlos starten <span style={{ marginLeft: 2 }}>→</span>
             </a>
 
             {/* Mobile hamburger */}
@@ -733,7 +731,7 @@ export default function LandingPage() {
           </div>
           <a href="#wie-es-funktioniert" onClick={() => setNavOpen(false)}>So funktioniert's</a>
           <a href="#features" onClick={() => setNavOpen(false)}>Features</a>
-          <a href="#online-buchung" onClick={() => setNavOpen(false)}>Online-Buchung</a>
+          <a href="#preise" onClick={() => setNavOpen(false)}>Preise</a>
           <a href="/demo" onClick={() => setNavOpen(false)} style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <span style={{ width: 7, height: 7, background: "#18A66D", borderRadius: "50%", display: "inline-block" }} />
             Live-Demo ansehen
@@ -744,8 +742,8 @@ export default function LandingPage() {
           <a href="/demo" className="btn btn-outline" onClick={() => setNavOpen(false)} style={{ fontSize: 15, padding: "13px 20px", justifyContent: "center", marginBottom: 8 }}>
             Live-Demo ansehen →
           </a>
-          <a href="/lead" className="btn btn-primary" onClick={() => setNavOpen(false)} style={{ fontSize: 15, padding: "14px 20px", justifyContent: "center" }}>
-            Kostenlos testen →
+          <a href="/register" className="btn btn-primary" onClick={() => setNavOpen(false)} style={{ fontSize: 15, padding: "14px 20px", justifyContent: "center" }}>
+            Kostenlos starten →
           </a>
         </aside>
 
@@ -823,8 +821,8 @@ export default function LandingPage() {
 
               <Reveal delay={240}>
                 <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap", marginBottom: 18 }}>
-                  <a href="/lead" className="btn btn-primary" style={{ fontSize: 16, padding: "16px 30px" }}>
-                    Jetzt kostenlos testen <span>→</span>
+                  <a href="/register" className="btn btn-primary" style={{ fontSize: 16, padding: "16px 30px" }}>
+                    14 Tage gratis starten <span>→</span>
                   </a>
                   <a href="/demo" className="btn btn-outline" style={{ fontSize: 16, padding: "16px 26px", display: "inline-flex", alignItems: "center", gap: 8 }}>
                     <span style={{ width: 8, height: 8, background: "#18A66D", borderRadius: "50%", display: "inline-block", animation: "pulse 2s infinite" }} />
@@ -836,13 +834,13 @@ export default function LandingPage() {
               <Reveal delay={300}>
                 <div style={{ display: "flex", gap: 18, justifyContent: "center", flexWrap: "wrap", fontSize: 13, color: C.muted2 }}>
                   <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+                    <span style={{ color: C.green, fontWeight: 800 }}>✓</span> 14 Tage kostenlos
+                  </span>
+                  <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
                     <span style={{ color: C.green, fontWeight: 800 }}>✓</span> Kein Vertrag
                   </span>
                   <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
                     <span style={{ color: C.green, fontWeight: 800 }}>✓</span> Monatlich kündbar
-                  </span>
-                  <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
-                    <span style={{ color: C.green, fontWeight: 800 }}>✓</span> Persönliches Onboarding
                   </span>
                 </div>
               </Reveal>
@@ -1467,6 +1465,167 @@ export default function LandingPage() {
           </div>
         </section>
 
+        {/* ═══════════════ PRICING ═══════════════ */}
+        <section id="preise" className="sec-pad" style={{ padding: "112px 32px", background: C.bg3 }}>
+          <div style={{ maxWidth: 1080, margin: "0 auto" }}>
+            <Reveal>
+              <div style={{ textAlign: "center", marginBottom: 64 }}>
+                <div className="tag-green" style={{ marginBottom: 20 }}>Preise</div>
+                <h2 style={{
+                  fontSize: "clamp(28px, 4vw, 52px)", fontWeight: 900,
+                  letterSpacing: "-2px", lineHeight: 1.0, margin: "0 0 18px", color: C.ink,
+                }}>
+                  Transparent. Kein Kleingedrucktes.
+                </h2>
+                <p style={{ fontSize: 17, color: C.muted, lineHeight: 1.6, maxWidth: 500, margin: "0 auto" }}>
+                  Monatlich kündbar, keine Mindestlaufzeit.<br />14 Tage kostenlos testen — ohne Kreditkarte.
+                </p>
+              </div>
+            </Reveal>
+
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 20, alignItems: "stretch" }} className="grid-3col">
+
+              {/* ── Starter ── */}
+              <Reveal delay={0}>
+                <div className="lift" style={{
+                  background: C.bg, border: `1px solid ${C.border}`, borderRadius: 22,
+                  padding: "38px 32px", display: "flex", flexDirection: "column",
+                  boxShadow: "0 2px 16px -6px rgba(15,27,45,0.08)", height: "100%",
+                }}>
+                  <div style={{ marginBottom: 8 }}>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: C.muted2, letterSpacing: 1.4, textTransform: "uppercase", marginBottom: 14 }}>Starter</div>
+                    <div style={{ display: "flex", alignItems: "flex-end", gap: 4, marginBottom: 4 }}>
+                      <span style={{ fontSize: 52, fontWeight: 900, color: C.ink, letterSpacing: "-2px", lineHeight: 1 }}>39</span>
+                      <span style={{ fontSize: 15, fontWeight: 600, color: C.muted2, marginBottom: 10 }}>€&nbsp;/&nbsp;Monat</span>
+                    </div>
+                    <div style={{ fontSize: 13, color: C.muted2, fontWeight: 500, marginBottom: 28 }}>1,30 € pro Tag — weniger als ein Kaffee</div>
+                  </div>
+                  <div style={{ height: 1, background: C.borderSoft, marginBottom: 26 }} />
+                  <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 13, marginBottom: 32 }}>
+                    {[
+                      ["Bis zu 100 SMS / Monat", true],
+                      ["Eigene Buchungsseite mit QR-Code", true],
+                      ["Online-Kalender", true],
+                      ["Kundenkartei", true],
+                      ["Automatische SMS-Erinnerungen", true],
+                      ["Auswertungen & Einblicke", false],
+                      ["Prioritäts-Support", false],
+                    ].map(([f, active], i) => (
+                      <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, fontSize: 14, color: active ? C.text2 : C.muted3, fontWeight: active ? 500 : 400 }}>
+                        <span style={{ color: active ? C.green : C.muted3, fontWeight: 800, fontSize: 15, flexShrink: 0 }}>{active ? "✓" : "–"}</span> {f as string}
+                      </div>
+                    ))}
+                  </div>
+                  <a href="/register" className="btn btn-outline" style={{ fontSize: 15, padding: "14px 20px", justifyContent: "center" }}>
+                    Gratis starten →
+                  </a>
+                </div>
+              </Reveal>
+
+              {/* ── Pro (Empfohlen) ── */}
+              <Reveal delay={80}>
+                <div style={{
+                  background: `linear-gradient(165deg, ${C.greenDeep} 0%, ${C.greenInk} 100%)`,
+                  border: `2px solid ${C.greenDeep}`, borderRadius: 22,
+                  padding: "38px 32px", display: "flex", flexDirection: "column",
+                  boxShadow: `0 28px 70px -20px rgba(10,107,67,0.45), 0 8px 24px -8px rgba(15,27,45,0.12)`,
+                  position: "relative", overflow: "hidden",
+                  transform: "scale(1.04)", zIndex: 2, height: "100%",
+                }}>
+                  <div style={{ position: "absolute", top: -60, right: -60, width: 200, height: 200, borderRadius: "50%", background: "rgba(255,255,255,0.04)" }} />
+                  <div style={{ position: "absolute", bottom: -40, left: -30, width: 160, height: 160, borderRadius: "50%", background: "rgba(255,255,255,0.03)" }} />
+                  <div style={{
+                    position: "absolute", top: 20, right: 20,
+                    background: "#fff", color: C.greenInk,
+                    fontSize: 11, fontWeight: 800, padding: "5px 13px",
+                    borderRadius: 980, letterSpacing: 0.4,
+                    boxShadow: "0 2px 8px -2px rgba(0,0,0,0.15)",
+                  }}>
+                    ⭐ Empfohlen
+                  </div>
+                  <div style={{ marginBottom: 8 }}>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.5)", letterSpacing: 1.4, textTransform: "uppercase", marginBottom: 14 }}>Pro</div>
+                    <div style={{ display: "flex", alignItems: "flex-end", gap: 4, marginBottom: 4 }}>
+                      <span style={{ fontSize: 52, fontWeight: 900, color: "#fff", letterSpacing: "-2px", lineHeight: 1 }}>109</span>
+                      <span style={{ fontSize: 15, fontWeight: 600, color: "rgba(255,255,255,0.55)", marginBottom: 10 }}>€&nbsp;/&nbsp;Monat</span>
+                    </div>
+                    <div style={{ fontSize: 13, color: "rgba(255,255,255,0.45)", fontWeight: 500, marginBottom: 28 }}>3,63 € pro Tag · 4× mehr als Starter</div>
+                  </div>
+                  <div style={{ height: 1, background: "rgba(255,255,255,0.12)", marginBottom: 26 }} />
+                  <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 13, marginBottom: 32 }}>
+                    {[
+                      "Bis zu 400 SMS / Monat",
+                      "Eigene Buchungsseite mit QR-Code",
+                      "Online-Kalender",
+                      "Kundenkartei",
+                      "Automatische SMS-Erinnerungen",
+                      "Auswertungen & Einblicke",
+                      "Prioritäts-Support",
+                    ].map((f, i) => (
+                      <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, fontSize: 14, color: "rgba(255,255,255,0.88)", fontWeight: 500 }}>
+                        <span style={{ color: "#6EE7B7", fontWeight: 800, fontSize: 15, flexShrink: 0 }}>✓</span> {f}
+                      </div>
+                    ))}
+                  </div>
+                  <a href="/register" className="btn btn-white" style={{ fontSize: 15, padding: "14px 20px", justifyContent: "center", position: "relative", zIndex: 1 }}>
+                    Gratis starten →
+                  </a>
+                </div>
+              </Reveal>
+
+              {/* ── Business ── */}
+              <Reveal delay={160}>
+                <div className="lift" style={{
+                  background: C.bg, border: `1px solid ${C.border}`, borderRadius: 22,
+                  padding: "38px 32px", display: "flex", flexDirection: "column",
+                  boxShadow: "0 2px 16px -6px rgba(15,27,45,0.08)", height: "100%",
+                }}>
+                  <div style={{ marginBottom: 8 }}>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: C.muted2, letterSpacing: 1.4, textTransform: "uppercase", marginBottom: 14 }}>Business</div>
+                    <div style={{ display: "flex", alignItems: "flex-end", gap: 4, marginBottom: 4 }}>
+                      <span style={{ fontSize: 52, fontWeight: 900, color: C.ink, letterSpacing: "-2px", lineHeight: 1 }}>229</span>
+                      <span style={{ fontSize: 15, fontWeight: 600, color: C.muted2, marginBottom: 10 }}>€&nbsp;/&nbsp;Monat</span>
+                    </div>
+                    <div style={{ fontSize: 13, color: C.muted2, fontWeight: 500, marginBottom: 28 }}>7,63 € pro Tag · bis 1.000 SMS monatlich</div>
+                  </div>
+                  <div style={{ height: 1, background: C.borderSoft, marginBottom: 26 }} />
+                  <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 13, marginBottom: 32 }}>
+                    {[
+                      "Bis zu 1.000 SMS / Monat",
+                      "Eigene Buchungsseite mit QR-Code",
+                      "Online-Kalender",
+                      "Kundenkartei",
+                      "Automatische SMS-Erinnerungen",
+                      "Auswertungen & Einblicke",
+                      "Dedizierter Support",
+                    ].map((f, i) => (
+                      <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, fontSize: 14, color: C.text2, fontWeight: 500 }}>
+                        <span style={{ color: C.green, fontWeight: 800, fontSize: 15, flexShrink: 0 }}>✓</span> {f}
+                      </div>
+                    ))}
+                  </div>
+                  <a href="/register" className="btn btn-outline" style={{ fontSize: 15, padding: "14px 20px", justifyContent: "center" }}>
+                    Gratis starten →
+                  </a>
+                </div>
+              </Reveal>
+            </div>
+
+            <Reveal delay={200}>
+              <div style={{ textAlign: "center", marginTop: 40 }}>
+                <p style={{ fontSize: 14, color: C.muted2, lineHeight: 1.8 }}>
+                  Alle Pakete beinhalten Buchungsseite, Kalender, Kundenkartei & SMS-Erinnerungen. Keine versteckten Kosten.<br />
+                  Über 1.000 SMS pro Monat?{" "}
+                  <a href="mailto:hallo@terminstop.de" style={{ color: C.green, fontWeight: 700, textDecoration: "none" }}>
+                    Kontaktieren Sie uns
+                  </a>{" "}
+                  für ein individuelles Angebot.
+                </p>
+              </div>
+            </Reveal>
+          </div>
+        </section>
+
         {/* ═══════════════ FAQ ═══════════════ */}
         <section id="faq" className="sec-pad" style={{ padding: "112px 32px", background: C.bg }}>
           <div style={{ maxWidth: 760, margin: "0 auto" }}>
@@ -1554,18 +1713,18 @@ export default function LandingPage() {
                 Starten Sie noch heute.
               </h2>
               <p style={{ fontSize: 18, color: "rgba(255,255,255,0.85)", lineHeight: 1.65, margin: "0 0 42px", fontWeight: 400 }}>
-                Kostenlos testen, persönliches Onboarding, monatlich kündbar.<br />Kein Risiko, kein Kleingedrucktes.
+                14 Tage gratis testen. Kein Vertrag, keine Kreditkarte nötig.<br />In 5 Minuten live — monatlich kündbar.
               </p>
               <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap", marginBottom: 28 }}>
-                <a href="/lead" className="btn btn-white" style={{ fontSize: 16, padding: "16px 34px" }}>
-                  Jetzt kostenlos testen <span>→</span>
+                <a href="/register" className="btn btn-white" style={{ fontSize: 16, padding: "16px 34px" }}>
+                  Jetzt kostenlos starten <span>→</span>
                 </a>
                 <a href="/login" className="btn btn-ghost-light" style={{ fontSize: 16, padding: "16px 28px" }}>
                   Bereits Kunde? Login
                 </a>
               </div>
               <div style={{ display: "flex", gap: 22, justifyContent: "center", flexWrap: "wrap" }}>
-                {["✓ Kein Vertrag", "✓ Monatlich kündbar", "✓ Onboarding inklusive"].map((t, i) => (
+                {["✓ 14 Tage gratis", "✓ Kein Vertrag", "✓ Monatlich kündbar"].map((t, i) => (
                   <span key={i} style={{ fontSize: 13, color: "rgba(255,255,255,0.78)", fontWeight: 600 }}>{t}</span>
                 ))}
               </div>
@@ -1604,7 +1763,7 @@ export default function LandingPage() {
                     {[
                       { href: "#features", label: "Features" },
                       { href: "#wie-es-funktioniert", label: "So funktioniert's" },
-                      { href: "#online-buchung", label: "Online-Buchung" },
+                      { href: "#preise", label: "Preise" },
                       { href: "#faq", label: "FAQ" },
                     ].map(l => (
                       <a key={l.label} href={l.href} style={{ fontSize: 13.5, color: C.text2, textDecoration: "none", fontWeight: 500 }}>{l.label}</a>
@@ -1614,8 +1773,9 @@ export default function LandingPage() {
                 <div>
                   <div style={{ fontSize: 11, fontWeight: 700, color: C.muted2, letterSpacing: 1, textTransform: "uppercase", marginBottom: 14 }}>Account</div>
                   <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
+                    <a href="/register" style={{ fontSize: 13.5, color: C.text2, textDecoration: "none", fontWeight: 500 }}>Registrieren</a>
                     <a href="/login" style={{ fontSize: 13.5, color: C.text2, textDecoration: "none", fontWeight: 500 }}>Login</a>
-                    <a href="/lead" style={{ fontSize: 13.5, color: C.text2, textDecoration: "none", fontWeight: 500 }}>Kostenlos testen</a>
+                    <a href="#preise" style={{ fontSize: 13.5, color: C.text2, textDecoration: "none", fontWeight: 500 }}>Preise</a>
                   </div>
                 </div>
                 <div>
