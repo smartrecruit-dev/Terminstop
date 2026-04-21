@@ -103,17 +103,28 @@ function TrialBanner() {
     const isNew = localStorage.getItem("is_new_user") === "1"
     if (!isNew) return
 
-    // Calculate days left (14 from first visit)
-    const firstVisit = localStorage.getItem("trial_start")
-    if (!firstVisit) {
-      localStorage.setItem("trial_start", Date.now().toString())
-      setDaysLeft(14)
-    } else {
-      const elapsed = Date.now() - parseInt(firstVisit)
-      const days = Math.max(0, 14 - Math.floor(elapsed / (1000 * 60 * 60 * 24)))
-      setDaysLeft(days)
+    // Check plan from DB — hide banner if paid plan is active
+    const companyId = localStorage.getItem("company_id")
+    if (companyId) {
+      supabase.from("companies").select("plan").eq("id", companyId).single().then(({ data }) => {
+        if (data?.plan && data.plan !== "trial") {
+          localStorage.removeItem("is_new_user")
+          setVisible(false)
+          return
+        }
+        // Calculate days left (14 from first visit)
+        const firstVisit = localStorage.getItem("trial_start")
+        if (!firstVisit) {
+          localStorage.setItem("trial_start", Date.now().toString())
+          setDaysLeft(14)
+        } else {
+          const elapsed = Date.now() - parseInt(firstVisit)
+          const days = Math.max(0, 14 - Math.floor(elapsed / (1000 * 60 * 60 * 24)))
+          setDaysLeft(days)
+        }
+        setVisible(true)
+      })
     }
-    setVisible(true)
   }, [])
 
   if (!visible) return null
