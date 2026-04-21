@@ -395,8 +395,8 @@ export default function LandingPage() {
       a: "Nein. TerminStop ist monatlich kündbar — ohne Mindestlaufzeit, ohne Kündigungsfristen. Kein Risiko, kein Kleingedrucktes.",
     },
     {
-      q: "Was ist das Add-on Online-Buchung?",
-      a: "Das Online-Buchungs-Add-on gibt Ihrem Betrieb eine eigene Buchungsseite mit QR-Code. Kunden können damit rund um die Uhr Termine anfragen — ohne anzurufen. Die Anfragen landen direkt in Ihrem Dashboard. Sie bestätigen mit einem Klick, und der Kunde bekommt automatisch eine SMS.",
+      q: "Ist die Online-Buchungsseite in allen Paketen enthalten?",
+      a: "Ja — die eigene Buchungsseite mit QR-Code ist ab sofort in jedem Paket inklusive, ohne Aufpreis. Kunden können damit rund um die Uhr Termine anfragen — ohne anzurufen. Die Anfragen landen direkt in Ihrem Dashboard. Sie bestätigen mit einem Klick, und der Kunde bekommt automatisch eine SMS.",
     },
     {
       q: "Wie sieht es mit Datenschutz und DSGVO aus?",
@@ -441,7 +441,7 @@ export default function LandingPage() {
     },
   ]
 
-  const addonFeatures = [
+  const bookingFeatures = [
     { icon: "🔗", title: "Eigene Buchungsseite",         desc: "Ihre persönliche URL — Kunden buchen direkt, ohne Telefonanruf." },
     { icon: "📲", title: "QR-Code zum Aufstellen",       desc: "An der Kasse oder im Schaufenster — Kunden scannen und buchen sofort." },
     { icon: "📥", title: "Anfragen im Dashboard",        desc: "Alle Online-Buchungen landen direkt bei Ihnen. Sie bestätigen mit einem Klick." },
@@ -1359,7 +1359,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* ═══════════════ ADD-ON ═══════════════ */}
+        {/* ═══════════════ ONLINE-BUCHUNG (inklusive) ═══════════════ */}
         <section id="online-buchung" style={{
           padding: "0 0 0", background: "#0F1923", position: "relative", overflow: "hidden",
         }}>
@@ -1375,8 +1375,8 @@ export default function LandingPage() {
               <Reveal>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 28 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 7, background: "rgba(24,166,109,0.18)", border: "1px solid rgba(24,166,109,0.35)", borderRadius: 100, padding: "5px 14px" }}>
-                    <span style={{ width: 6, height: 6, background: "#18A66D", borderRadius: "50%", display: "inline-block", boxShadow: "0 0 0 0 #18A66D", animation: "pulse 2s infinite" }} />
-                    <span style={{ fontSize: 11, fontWeight: 800, color: "#4ade80", textTransform: "uppercase", letterSpacing: 1 }}>Add-on · Optional zubuchbar</span>
+                    <span style={{ width: 6, height: 6, background: "#18A66D", borderRadius: "50%", display: "inline-block", animation: "pulse 2s infinite" }} />
+                    <span style={{ fontSize: 11, fontWeight: 800, color: "#4ade80", textTransform: "uppercase", letterSpacing: 1 }}>In allen Paketen inklusive</span>
                   </div>
                 </div>
                 <h2 style={{
@@ -1386,38 +1386,48 @@ export default function LandingPage() {
                   Kunden buchen<br /><span style={{ color: "#18A66D" }}>rund um die Uhr.</span>
                 </h2>
                 <p style={{ fontSize: 17, color: "rgba(255,255,255,0.6)", lineHeight: 1.7, margin: "0 0 36px", maxWidth: 460 }}>
-                  Ihr Betrieb bekommt eine eigene Buchungsseite — mit QR-Code, automatischer SMS und allem was dazugehört. Kunden buchen selbst, Sie bestätigen mit einem Klick.
+                  Jedes Paket enthält Ihre eigene Buchungsseite — mit QR-Code, automatischer Bestätigungs-SMS und allem was dazugehört. Kunden buchen selbst, Sie bestätigen mit einem Klick. Kein Aufpreis, kein Extra-Abo.
                 </p>
 
-                {/* Price block */}
-                <div style={{ display: "flex", alignItems: "flex-end", gap: 16, marginBottom: 36, flexWrap: "wrap" }}>
+                {/* Included callout */}
+                <div style={{ display: "flex", alignItems: "flex-start", gap: 16, marginBottom: 36, flexWrap: "wrap" }}>
                   <div style={{ background: "rgba(24,166,109,0.12)", border: "1px solid rgba(24,166,109,0.3)", borderRadius: 16, padding: "18px 24px" }}>
-                    <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.45)", textTransform: "uppercase", letterSpacing: 1, marginBottom: 4 }}>Add-on Preis</div>
-                    <div style={{ display: "flex", alignItems: "baseline", gap: 4 }}>
-                      <span style={{ fontSize: 42, fontWeight: 900, color: "#fff", letterSpacing: "-2px", lineHeight: 1 }}>229 €</span>
-                      <span style={{ fontSize: 15, color: "rgba(255,255,255,0.45)", fontWeight: 600 }}>/Monat</span>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.45)", textTransform: "uppercase", letterSpacing: 1, marginBottom: 6 }}>Kein Aufpreis</div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                      <span style={{ fontSize: 28, fontWeight: 900, color: "#4ade80", letterSpacing: "-1px", lineHeight: 1 }}>inklusive</span>
+                      <span style={{ fontSize: 20 }}>🎁</span>
                     </div>
-                    <div style={{ fontSize: 12, color: "rgba(255,255,255,0.35)", marginTop: 4 }}>Monatlich kündbar · Kein Risiko</div>
+                    <div style={{ fontSize: 12, color: "rgba(255,255,255,0.35)", marginTop: 4 }}>in jedem Paket ab dem 1. Tag</div>
                   </div>
-                  <div style={{ paddingBottom: 8 }}>
-                    <div style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", marginBottom: 5 }}>✓ &nbsp;Zu jedem Paket zubuchbar</div>
-                    <div style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", marginBottom: 5 }}>✓ &nbsp;Einrichtung inklusive</div>
-                    <div style={{ fontSize: 13, color: "rgba(255,255,255,0.5)" }}>✓ &nbsp;QR-Code & Buchungsseite sofort aktiv</div>
+                  <div style={{ paddingTop: 4 }}>
+                    <div style={{ fontSize: 13, color: "rgba(255,255,255,0.6)", marginBottom: 8 }}>✓ &nbsp;Eigene URL für Ihre Buchungsseite</div>
+                    <div style={{ fontSize: 13, color: "rgba(255,255,255,0.6)", marginBottom: 8 }}>✓ &nbsp;QR-Code sofort druckfertig</div>
+                    <div style={{ fontSize: 13, color: "rgba(255,255,255,0.6)", marginBottom: 8 }}>✓ &nbsp;Bestätigungs-SMS automatisch</div>
+                    <div style={{ fontSize: 13, color: "rgba(255,255,255,0.6)" }}>✓ &nbsp;Kein Extra-Abo nötig</div>
                   </div>
                 </div>
 
                 <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-                  <a href="/lead" style={{
-                    display: "inline-flex", alignItems: "center", gap: 8,
-                    background: "linear-gradient(135deg, #18A66D, #15955F)",
-                    color: "#fff", fontWeight: 800, fontSize: 15,
-                    padding: "15px 28px", borderRadius: 12, textDecoration: "none",
-                    boxShadow: "0 4px 20px rgba(24,166,109,0.4)",
-                    letterSpacing: "-0.2px",
-                  }}>
-                    Jetzt Add-on anfragen
-                    <span style={{ fontSize: 18 }}>→</span>
-                  </a>
+                  {REG_OPEN
+                    ? <a href="/register" style={{
+                        display: "inline-flex", alignItems: "center", gap: 8,
+                        background: "linear-gradient(135deg, #18A66D, #15955F)",
+                        color: "#fff", fontWeight: 800, fontSize: 15,
+                        padding: "15px 28px", borderRadius: 12, textDecoration: "none",
+                        boxShadow: "0 4px 20px rgba(24,166,109,0.4)",
+                        letterSpacing: "-0.2px",
+                      }}>
+                        Jetzt kostenlos starten
+                        <span style={{ fontSize: 18 }}>→</span>
+                      </a>
+                    : <span style={{
+                        display: "inline-flex", alignItems: "center", gap: 8,
+                        background: "rgba(24,166,109,0.3)",
+                        color: "#fff", fontWeight: 800, fontSize: 15,
+                        padding: "15px 28px", borderRadius: 12,
+                        opacity: 0.7, cursor: "default",
+                      }}>🔒 Bald verfügbar</span>
+                  }
                   <a href="/demo/buchung" style={{
                     display: "inline-flex", alignItems: "center", gap: 8,
                     background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.2)",
@@ -1446,7 +1456,7 @@ export default function LandingPage() {
           <div style={{ background: "rgba(255,255,255,0.03)", borderTop: "1px solid rgba(255,255,255,0.07)" }}>
             <div style={{ maxWidth: 1080, margin: "0 auto", padding: "64px 32px" }}>
               <div className="grid-3col" style={{ display: "grid", gap: 14 }}>
-                {addonFeatures.map((f, i) => (
+                {bookingFeatures.map((f, i) => (
                   <Reveal key={i} delay={i * 60}>
                     <div className="lift" style={{
                       background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.09)",
@@ -1617,17 +1627,43 @@ export default function LandingPage() {
         <section id="preise" className="sec-pad" style={{ padding: "112px 32px", background: C.bg3 }}>
           <div style={{ maxWidth: 1080, margin: "0 auto" }}>
             <Reveal>
-              <div style={{ textAlign: "center", marginBottom: 64 }}>
+              <div style={{ textAlign: "center", marginBottom: 20 }}>
                 <div className="tag-green" style={{ marginBottom: 20 }}>Preise</div>
                 <h2 style={{
                   fontSize: "clamp(28px, 4vw, 52px)", fontWeight: 900,
                   letterSpacing: "-2px", lineHeight: 1.0, margin: "0 0 18px", color: C.ink,
                 }}>
-                  Transparent. Kein Kleingedrucktes.
+                  Alles inklusive.<br />Kein Kleingedrucktes.
                 </h2>
-                <p style={{ fontSize: 17, color: C.muted, lineHeight: 1.6, maxWidth: 500, margin: "0 auto" }}>
-                  Monatlich kündbar, keine Mindestlaufzeit.<br />14 Tage kostenlos testen — ohne Kreditkarte.
+                <p style={{ fontSize: 17, color: C.muted, lineHeight: 1.6, maxWidth: 500, margin: "0 auto 32px" }}>
+                  Buchungsseite, Kalender, Kundenkartei & SMS-Erinnerungen — in jedem Paket von Anfang an dabei.
+                  <br />Monatlich kündbar. 14 Tage kostenlos testen — ohne Kreditkarte.
                 </p>
+              </div>
+            </Reveal>
+
+            {/* ── Included-in-all banner ── */}
+            <Reveal delay={40}>
+              <div style={{
+                display: "flex", justifyContent: "center", gap: 12, flexWrap: "wrap",
+                marginBottom: 48,
+              }}>
+                {[
+                  "🗓️ Online-Kalender",
+                  "📲 Buchungsseite + QR-Code",
+                  "👥 Kundenkartei",
+                  "💬 SMS-Erinnerungen",
+                  "📊 Auswertungen",
+                ].map((item, i) => (
+                  <div key={i} style={{
+                    display: "flex", alignItems: "center", gap: 6,
+                    background: C.greenSoft, border: `1px solid ${C.greenBorder}`,
+                    borderRadius: 980, padding: "7px 16px",
+                    fontSize: 13, fontWeight: 600, color: C.greenInk,
+                  }}>
+                    {item}
+                  </div>
+                ))}
               </div>
             </Reveal>
 
@@ -1646,13 +1682,14 @@ export default function LandingPage() {
                       <span style={{ fontSize: 52, fontWeight: 900, color: C.ink, letterSpacing: "-2px", lineHeight: 1 }}>39</span>
                       <span style={{ fontSize: 15, fontWeight: 600, color: C.muted2, marginBottom: 10 }}>€&nbsp;/&nbsp;Monat</span>
                     </div>
-                    <div style={{ fontSize: 13, color: C.muted2, fontWeight: 500, marginBottom: 28 }}>1,30 € pro Tag — weniger als ein Kaffee</div>
+                    <div style={{ fontSize: 13, color: C.muted2, fontWeight: 500, marginBottom: 8 }}>1,30 € pro Tag — weniger als ein Kaffee</div>
+                    <div style={{ fontSize: 12, fontWeight: 600, color: C.green, marginBottom: 20 }}>✓ 14 Tage gratis testen</div>
                   </div>
                   <div style={{ height: 1, background: C.borderSoft, marginBottom: 26 }} />
                   <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 13, marginBottom: 32 }}>
                     {[
                       ["Bis zu 100 SMS / Monat", true],
-                      ["Eigene Buchungsseite mit QR-Code", true],
+                      ["Buchungsseite + QR-Code", true],
                       ["Online-Kalender", true],
                       ["Kundenkartei", true],
                       ["Automatische SMS-Erinnerungen", true],
@@ -1665,7 +1702,7 @@ export default function LandingPage() {
                     ))}
                   </div>
                   {REG_OPEN
-                    ? <a href="/register" className="btn btn-outline" style={{ fontSize: 15, padding: "14px 20px", justifyContent: "center" }}>Gratis starten →</a>
+                    ? <a href="/register" className="btn btn-outline" style={{ fontSize: 15, padding: "14px 20px", justifyContent: "center" }}>14 Tage kostenlos testen →</a>
                     : <span className="btn btn-outline" style={{ fontSize: 15, padding: "14px 20px", justifyContent: "center", opacity: 0.7, cursor: "default" }}>🔒 Bald verfügbar</span>
                   }
                 </div>
@@ -1690,7 +1727,7 @@ export default function LandingPage() {
                     borderRadius: 980, letterSpacing: 0.4,
                     boxShadow: "0 2px 8px -2px rgba(0,0,0,0.15)",
                   }}>
-                    ⭐ Empfohlen
+                    ⭐ Beliebtestes Paket
                   </div>
                   <div style={{ marginBottom: 8 }}>
                     <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.5)", letterSpacing: 1.4, textTransform: "uppercase", marginBottom: 14 }}>Pro</div>
@@ -1698,13 +1735,14 @@ export default function LandingPage() {
                       <span style={{ fontSize: 52, fontWeight: 900, color: "#fff", letterSpacing: "-2px", lineHeight: 1 }}>109</span>
                       <span style={{ fontSize: 15, fontWeight: 600, color: "rgba(255,255,255,0.55)", marginBottom: 10 }}>€&nbsp;/&nbsp;Monat</span>
                     </div>
-                    <div style={{ fontSize: 13, color: "rgba(255,255,255,0.45)", fontWeight: 500, marginBottom: 28 }}>3,63 € pro Tag · 4× mehr als Starter</div>
+                    <div style={{ fontSize: 13, color: "rgba(255,255,255,0.45)", fontWeight: 500, marginBottom: 8 }}>3,63 € pro Tag · 4× mehr SMS als Starter</div>
+                    <div style={{ fontSize: 12, fontWeight: 600, color: "#6EE7B7", marginBottom: 20 }}>✓ 14 Tage gratis testen</div>
                   </div>
                   <div style={{ height: 1, background: "rgba(255,255,255,0.12)", marginBottom: 26 }} />
                   <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 13, marginBottom: 32 }}>
                     {[
                       "Bis zu 400 SMS / Monat",
-                      "Eigene Buchungsseite mit QR-Code",
+                      "Buchungsseite + QR-Code",
                       "Online-Kalender",
                       "Kundenkartei",
                       "Automatische SMS-Erinnerungen",
@@ -1717,7 +1755,7 @@ export default function LandingPage() {
                     ))}
                   </div>
                   {REG_OPEN
-                    ? <a href="/register" className="btn btn-white" style={{ fontSize: 15, padding: "14px 20px", justifyContent: "center", position: "relative", zIndex: 1 }}>Gratis starten →</a>
+                    ? <a href="/register" className="btn btn-white" style={{ fontSize: 15, padding: "14px 20px", justifyContent: "center", position: "relative", zIndex: 1 }}>14 Tage kostenlos testen →</a>
                     : <span className="btn btn-white" style={{ fontSize: 15, padding: "14px 20px", justifyContent: "center", opacity: 0.7, cursor: "default", position: "relative", zIndex: 1 }}>🔒 Bald verfügbar</span>
                   }
                 </div>
@@ -1736,13 +1774,14 @@ export default function LandingPage() {
                       <span style={{ fontSize: 52, fontWeight: 900, color: C.ink, letterSpacing: "-2px", lineHeight: 1 }}>229</span>
                       <span style={{ fontSize: 15, fontWeight: 600, color: C.muted2, marginBottom: 10 }}>€&nbsp;/&nbsp;Monat</span>
                     </div>
-                    <div style={{ fontSize: 13, color: C.muted2, fontWeight: 500, marginBottom: 28 }}>7,63 € pro Tag · bis 1.000 SMS monatlich</div>
+                    <div style={{ fontSize: 13, color: C.muted2, fontWeight: 500, marginBottom: 8 }}>7,63 € pro Tag · bis 1.000 SMS monatlich</div>
+                    <div style={{ fontSize: 12, fontWeight: 600, color: C.green, marginBottom: 20 }}>✓ 14 Tage gratis testen</div>
                   </div>
                   <div style={{ height: 1, background: C.borderSoft, marginBottom: 26 }} />
                   <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 13, marginBottom: 32 }}>
                     {[
                       "Bis zu 1.000 SMS / Monat",
-                      "Eigene Buchungsseite mit QR-Code",
+                      "Buchungsseite + QR-Code",
                       "Online-Kalender",
                       "Kundenkartei",
                       "Automatische SMS-Erinnerungen",
@@ -1755,22 +1794,37 @@ export default function LandingPage() {
                     ))}
                   </div>
                   {REG_OPEN
-                    ? <a href="/register" className="btn btn-outline" style={{ fontSize: 15, padding: "14px 20px", justifyContent: "center" }}>Gratis starten →</a>
+                    ? <a href="/register" className="btn btn-outline" style={{ fontSize: 15, padding: "14px 20px", justifyContent: "center" }}>14 Tage kostenlos testen →</a>
                     : <span className="btn btn-outline" style={{ fontSize: 15, padding: "14px 20px", justifyContent: "center", opacity: 0.7, cursor: "default" }}>🔒 Bald verfügbar</span>
                   }
                 </div>
               </Reveal>
             </div>
 
+            {/* ── Bottom reassurance ── */}
             <Reveal delay={200}>
-              <div style={{ textAlign: "center", marginTop: 40 }}>
-                <p style={{ fontSize: 14, color: C.muted2, lineHeight: 1.8 }}>
-                  Alle Pakete beinhalten Buchungsseite, Kalender, Kundenkartei & SMS-Erinnerungen. Keine versteckten Kosten.<br />
+              <div style={{ marginTop: 48 }}>
+                {/* Risk-free row */}
+                <div style={{
+                  display: "flex", justifyContent: "center", gap: 32, flexWrap: "wrap",
+                  marginBottom: 24,
+                }}>
+                  {[
+                    { icon: "🔒", text: "Keine Kreditkarte für den Test" },
+                    { icon: "❌", text: "Jederzeit kündbar" },
+                    { icon: "⚡", text: "In 10 Minuten startklar" },
+                    { icon: "🇩🇪", text: "DSGVO-konform" },
+                  ].map((b, i) => (
+                    <div key={i} style={{ display: "flex", alignItems: "center", gap: 7, fontSize: 13, color: C.muted, fontWeight: 500 }}>
+                      <span>{b.icon}</span> {b.text}
+                    </div>
+                  ))}
+                </div>
+                <p style={{ textAlign: "center", fontSize: 14, color: C.muted2, lineHeight: 1.8, margin: 0 }}>
                   Über 1.000 SMS pro Monat?{" "}
                   <a href="mailto:hallo@terminstop.de" style={{ color: C.green, fontWeight: 700, textDecoration: "none" }}>
-                    Kontaktieren Sie uns
-                  </a>{" "}
-                  für ein individuelles Angebot.
+                    Individuelles Angebot anfragen →
+                  </a>
                 </p>
               </div>
             </Reveal>
