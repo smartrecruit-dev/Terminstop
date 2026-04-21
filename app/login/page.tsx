@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import type { FormEvent } from "react"
 import { supabase } from "../lib/supabaseClient"
 import { useRouter } from "next/navigation"
@@ -14,6 +14,12 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const [showPassword, setShowPassword] = useState(false)
+  const [registered, setRegistered] = useState(false)
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    if (params.get("registered") === "1") setRegistered(true)
+  }, [])
 
   async function handleLogin(e: FormEvent) {
     e.preventDefault()
@@ -118,6 +124,13 @@ export default function LoginPage() {
           <h1 className="text-2xl font-bold text-[#1F2A37] mb-1">Willkommen zurück</h1>
           <p className="text-sm text-[#6B7280]">Melden Sie sich an, um Ihr Dashboard zu öffnen.</p>
         </div>
+
+        {registered && (
+          <div className="flex items-center gap-3 bg-[#F0FBF6] border border-[#D1F5E3] rounded-xl px-4 py-3 mb-5">
+            <span className="text-[#18A66D] text-base flex-shrink-0">✓</span>
+            <span className="text-sm text-[#0A6B43] font-semibold">Account erfolgreich erstellt! Jetzt einloggen.</span>
+          </div>
+        )}
 
         {error && (
           <div className="flex items-center gap-3 bg-[#FEF2F2] border border-[#FECACA] rounded-xl px-4 py-3 mb-5">

@@ -160,6 +160,8 @@ export default function RegisterPage() {
         localStorage.setItem("company_name", compJson.company.name)
       }
 
+      // Mark as new user → dashboard shows trial banner + onboarding
+      localStorage.setItem("is_new_user", "1")
       router.push("/dashboard")
     } catch (e: any) {
       setError("Ein Fehler ist aufgetreten. Bitte erneut versuchen.")

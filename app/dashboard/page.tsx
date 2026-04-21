@@ -95,6 +95,73 @@ function AppointmentForm({
   )
 }
 
+function TrialBanner() {
+  const [visible, setVisible] = useState(false)
+  const [daysLeft, setDaysLeft] = useState(14)
+
+  useEffect(() => {
+    const isNew = localStorage.getItem("is_new_user") === "1"
+    if (!isNew) return
+
+    // Calculate days left (14 from first visit)
+    const firstVisit = localStorage.getItem("trial_start")
+    if (!firstVisit) {
+      localStorage.setItem("trial_start", Date.now().toString())
+      setDaysLeft(14)
+    } else {
+      const elapsed = Date.now() - parseInt(firstVisit)
+      const days = Math.max(0, 14 - Math.floor(elapsed / (1000 * 60 * 60 * 24)))
+      setDaysLeft(days)
+    }
+    setVisible(true)
+  }, [])
+
+  if (!visible) return null
+
+  return (
+    <div style={{
+      background: "linear-gradient(135deg, #0F8A57 0%, #0A6B43 100%)",
+      borderRadius: 16, padding: "16px 20px", marginBottom: 20,
+      display: "flex", alignItems: "center", justifyContent: "space-between",
+      gap: 16, flexWrap: "wrap",
+      boxShadow: "0 4px 20px -6px rgba(10,107,67,0.35)",
+    }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+        <div style={{
+          width: 40, height: 40, borderRadius: 12, flexShrink: 0,
+          background: "rgba(255,255,255,0.15)",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          fontSize: 20,
+        }}>🎉</div>
+        <div>
+          <div style={{ fontSize: 14, fontWeight: 800, color: "#fff", marginBottom: 2 }}>
+            Willkommen bei TerminStop! Dein Test läuft.
+          </div>
+          <div style={{ fontSize: 13, color: "rgba(255,255,255,0.75)" }}>
+            {daysLeft > 0
+              ? `Noch ${daysLeft} Tag${daysLeft !== 1 ? "e" : ""} kostenlos — danach einfach ein Paket wählen.`
+              : "Dein Testzeitraum ist abgelaufen — wähle jetzt dein Paket."}
+          </div>
+        </div>
+      </div>
+      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+        <a href="/#preise" style={{
+          fontSize: 13, fontWeight: 700, padding: "9px 18px", borderRadius: 10,
+          background: "#fff", color: "#0A6B43", textDecoration: "none",
+          boxShadow: "0 2px 8px rgba(0,0,0,0.12)", whiteSpace: "nowrap",
+        }}>
+          Pakete ansehen →
+        </a>
+        <button
+          onClick={() => { localStorage.removeItem("is_new_user"); setVisible(false) }}
+          style={{ background: "none", border: "none", cursor: "pointer", color: "rgba(255,255,255,0.6)", fontSize: 18, padding: 4, lineHeight: 1 }}
+          aria-label="Schließen"
+        >×</button>
+      </div>
+    </div>
+  )
+}
+
 function getGreeting() {
   const h = new Date().getHours()
   if (h < 12) return "Guten Morgen"
@@ -269,6 +336,9 @@ export default function Dashboard() {
       )}
 
       <div className="max-w-4xl mx-auto px-4 py-7 pb-28 md:pb-10">
+
+        {/* Trial-Banner für neue Nutzer */}
+        <TrialBanner />
 
         {/* Onboarding */}
         {companyId && <SetupChecklist companyId={companyId} appointmentCount={appointments.length} />}
