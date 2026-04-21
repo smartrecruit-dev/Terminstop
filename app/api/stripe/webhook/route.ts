@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import Stripe from "stripe"
 import { createClient } from "@supabase/supabase-js"
+import { sendPaymentConfirmationEmail } from "@/app/lib/email"
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2026-03-25.dahlia",
@@ -73,6 +74,15 @@ export async function POST(req: NextRequest) {
           .eq("id", companyId)
 
         console.log(`[webhook] Activated ${plan} for company ${companyId}`)
+
+        // Send payment confirmation email (fire & forget)
+        const { data: userData } = await supabaseAdmin.auth
+          .admin.getUserById((await supabaseAdmin.from("companies").select("user_id").eq("id", companyId).single()).data?.user_id || "")
+        if (userData?.user?.email) {
+          const { data: compData } = await supabaseAdmin.from("companies").select("name").eq("id", companyId).single()
+          sendPaymentConfirmationEmail(userData.user.email, compData?.name || "", plan)
+            .catch(e => console.error("[webhook] payment email failed:", e))
+        }
         break
       }
 

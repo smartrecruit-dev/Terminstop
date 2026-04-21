@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@supabase/supabase-js"
 import { sanitize, isValidEmail, isValidPhone } from "@/app/lib/security"
+import { sendWelcomeEmail } from "@/app/lib/email"
 
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -106,6 +107,9 @@ export async function POST(req: NextRequest) {
       console.error("[register] company insert failed:", companyError.message)
       return NextResponse.json({ error: "Registrierung fehlgeschlagen. Bitte erneut versuchen." }, { status: 500 })
     }
+
+    // Send welcome email (fire & forget)
+    sendWelcomeEmail(email, companyName).catch(e => console.error("[register] welcome email failed:", e))
 
     return NextResponse.json({ success: true, userId })
 

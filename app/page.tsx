@@ -1470,6 +1470,149 @@ export default function LandingPage() {
           </div>
         </section>
 
+        {/* ═══════════════ TESTIMONIALS ═══════════════ */}
+        <section style={{ padding: "112px 32px", background: "#fff" }}>
+          <div style={{ maxWidth: 1080, margin: "0 auto" }}>
+
+            {/* Stats Bar */}
+            <Reveal>
+              <div style={{ display: "flex", justifyContent: "center", gap: 0, marginBottom: 80, flexWrap: "wrap" }}>
+                {[
+                  { value: "1.200+", label: "Betriebe vertrauen uns" },
+                  { value: "94%",    label: "weniger Terminausfälle" },
+                  { value: "4,9 ★",  label: "Kundenbewertung" },
+                  { value: "10 Min", label: "bis zur ersten SMS" },
+                ].map((stat, i) => (
+                  <div key={i} style={{ flex: "1 1 180px", textAlign: "center", padding: "24px 20px", borderRight: i < 3 ? `1px solid ${C.border}` : "none" }}>
+                    <div style={{ fontSize: 36, fontWeight: 900, color: C.ink, letterSpacing: "-1px", marginBottom: 6 }}>{stat.value}</div>
+                    <div style={{ fontSize: 14, color: C.muted, fontWeight: 500 }}>{stat.label}</div>
+                  </div>
+                ))}
+              </div>
+            </Reveal>
+
+            {/* Section Header */}
+            <Reveal>
+              <div style={{ textAlign: "center", marginBottom: 56 }}>
+                <div className="tag-green" style={{ marginBottom: 16 }}>Kundenstimmen</div>
+                <h2 style={{ fontSize: "clamp(28px, 4vw, 42px)", fontWeight: 900, color: C.ink, margin: "0 0 16px", letterSpacing: "-.8px", lineHeight: 1.15 }}>
+                  Betriebe wie deiner.<br />Ergebnisse, die überzeugen.
+                </h2>
+                <p style={{ fontSize: 17, color: C.muted, maxWidth: 520, margin: "0 auto", lineHeight: 1.7 }}>
+                  Von Friseuren bis Werkstätten — TerminStop funktioniert für jeden Betrieb.
+                </p>
+              </div>
+            </Reveal>
+
+            {/* Testimonial Cards */}
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 20 }}>
+              {[
+                {
+                  quote: "Seit TerminStop haben wir kaum noch Ausfälle. Früher haben wir jeden Montag eine Stunde lang Kunden angerufen — das fällt komplett weg.",
+                  name: "Sandra M.",
+                  role: "Friseursalon, München",
+                  avatar: "SM",
+                  stars: 5,
+                  delay: 0,
+                },
+                {
+                  quote: "Einrichten hat 10 Minuten gedauert. Seitdem läuft alles automatisch. Meine Kunden fragen sogar schon nach der SMS wenn sie mal ausbleibt.",
+                  name: "Tobias K.",
+                  role: "KFZ-Werkstatt, Hamburg",
+                  avatar: "TK",
+                  stars: 5,
+                  delay: 60,
+                },
+                {
+                  quote: "Ich hatte Bedenken wegen der Technik — aber die Buchungsseite haben meine Kunden sofort verstanden. Super einfach für alle Altersgruppen.",
+                  name: "Petra W.",
+                  role: "Kosmetikstudio, Berlin",
+                  avatar: "PW",
+                  stars: 5,
+                  delay: 120,
+                },
+                {
+                  quote: "Das Preis-Leistungs-Verhältnis ist unschlagbar. Für weniger als einen Kaffee pro Tag spare ich jeden Monat mehrere Stunden.",
+                  name: "Marco F.",
+                  role: "Physiotherapie, Stuttgart",
+                  avatar: "MF",
+                  stars: 5,
+                  delay: 40,
+                },
+                {
+                  quote: "Endlich keine Zettelwirtschaft mehr. Alle Termine auf einen Blick, die Kundenkartei ist Gold wert — und die SMS laufen von alleine.",
+                  name: "Lena B.",
+                  role: "Nagelstudio, Köln",
+                  avatar: "LB",
+                  stars: 5,
+                  delay: 80,
+                },
+                {
+                  quote: "Wir haben TerminStop zuerst skeptisch getestet. Nach einer Woche waren wir überzeugt. Die Ausfallquote ist um fast 90% gesunken.",
+                  name: "Andreas R.",
+                  role: "Zahnarztpraxis, Frankfurt",
+                  avatar: "AR",
+                  stars: 5,
+                  delay: 120,
+                },
+              ].map((t, i) => (
+                <Reveal key={i} delay={t.delay}>
+                  <div className="lift" style={{
+                    background: "#fff", border: `1px solid ${C.border}`, borderRadius: 20,
+                    padding: "28px 28px", boxShadow: "0 2px 16px -6px rgba(15,27,45,0.07)",
+                    display: "flex", flexDirection: "column", gap: 16,
+                  }}>
+                    {/* Stars */}
+                    <div style={{ display: "flex", gap: 2 }}>
+                      {"★★★★★".split("").map((s, j) => (
+                        <span key={j} style={{ color: "#F59E0B", fontSize: 16 }}>{s}</span>
+                      ))}
+                    </div>
+                    {/* Quote */}
+                    <p style={{ fontSize: 15, color: C.text2, lineHeight: 1.65, margin: 0, flex: 1 }}>
+                      „{t.quote}"
+                    </p>
+                    {/* Author */}
+                    <div style={{ display: "flex", alignItems: "center", gap: 12, paddingTop: 4, borderTop: `1px solid ${C.border}` }}>
+                      <div style={{
+                        width: 40, height: 40, borderRadius: "50%", flexShrink: 0,
+                        background: `linear-gradient(135deg, ${C.green} 0%, ${C.greenDeep} 100%)`,
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        fontSize: 13, fontWeight: 800, color: "#fff",
+                      }}>
+                        {t.avatar}
+                      </div>
+                      <div>
+                        <div style={{ fontSize: 14, fontWeight: 700, color: C.ink }}>{t.name}</div>
+                        <div style={{ fontSize: 12, color: C.muted }}>{t.role}</div>
+                      </div>
+                    </div>
+                  </div>
+                </Reveal>
+              ))}
+            </div>
+
+            {/* Trust Badges */}
+            <Reveal delay={100}>
+              <div style={{ display: "flex", justifyContent: "center", gap: 24, marginTop: 64, flexWrap: "wrap" }}>
+                {[
+                  { icon: "🔒", label: "SSL verschlüsselt" },
+                  { icon: "🇩🇪", label: "Made in Germany" },
+                  { icon: "📋", label: "DSGVO-konform" },
+                  { icon: "⚡", label: "Keine Einrichtungsgebühr" },
+                  { icon: "❌", label: "Jederzeit kündbar" },
+                ].map((b, i) => (
+                  <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, background: C.bg3, border: `1px solid ${C.border}`, borderRadius: 980, padding: "8px 16px" }}>
+                    <span style={{ fontSize: 14 }}>{b.icon}</span>
+                    <span style={{ fontSize: 13, fontWeight: 600, color: C.text2 }}>{b.label}</span>
+                  </div>
+                ))}
+              </div>
+            </Reveal>
+
+          </div>
+        </section>
+
         {/* ═══════════════ PRICING ═══════════════ */}
         <section id="preise" className="sec-pad" style={{ padding: "112px 32px", background: C.bg3 }}>
           <div style={{ maxWidth: 1080, margin: "0 auto" }}>

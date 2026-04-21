@@ -4,10 +4,12 @@ import { useEffect, useState } from "react"
 import { supabase } from "../lib/supabaseClient"
 import DashNav from "../components/DashNav"
 import QRCode from "../components/QRCode"
+import { useToast } from "../components/Toast"
 
 type Section = "buchungsseite" | "konto" | "sms" | "abo"
 
 export default function SettingsPage() {
+  const toast = useToast()
   useEffect(() => { document.title = "Einstellungen | TerminStop" }, [])
 
   const [companyId,   setCompanyId]   = useState<string | null>(null)
@@ -91,8 +93,12 @@ export default function SettingsPage() {
       .update({ booking_note: bookingNote.trim() || null, slug: slug.trim() || null })
       .eq("id", companyId)
     setBookingSaving(false)
-    setBookingMsg(error ? "❌ Fehler beim Speichern." : "✓ Gespeichert")
-    setTimeout(() => setBookingMsg(""), 3000)
+    if (error) {
+      toast.error("Fehler beim Speichern", error.message)
+    } else {
+      toast.success("Gespeichert!", "Deine Buchungsseite wurde aktualisiert.")
+    }
+    setBookingMsg("")
   }
 
   async function savePassword() {
@@ -117,9 +123,9 @@ export default function SettingsPage() {
     const { error } = await supabase.auth.updateUser({ password: pwNew })
     setPwSaving(false)
     if (error) { setPwErr("Fehler: " + error.message); return }
-    setPwMsg("✓ Passwort erfolgreich geändert")
+    toast.success("Passwort geändert!", "Dein neues Passwort ist aktiv.")
+    setPwMsg("")
     setPwOld(""); setPwNew(""); setPwConfirm("")
-    setTimeout(() => setPwMsg(""), 4000)
   }
 
   const G = "#18A66D", GL = "#F0FBF6", GB = "#D1F5E3"
