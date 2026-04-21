@@ -1,10 +1,17 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@supabase/supabase-js"
+import { sendTrialReminderEmail } from "@/app/lib/email"
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
+
+// Current month as YYYYMM integer (e.g. 202604)
+function currentMonth() {
+  const d = new Date()
+  return d.getFullYear() * 100 + (d.getMonth() + 1)
+}
 
 async function sendSMS(to: string, message: string) {
   const response = await fetch("https://gateway.seven.io/api/sms", {
@@ -101,9 +108,35 @@ export async function GET(req: NextRequest) {
         try {
           const { data: company } = await supabase
             .from("companies")
-            .select("name")
+            .select("name, sms_limit, sms_count_month, sms_month, paused, plan")
             .eq("id", a.company_id)
             .single()
+
+          // ── Skip if company is paused ──
+          if (company?.paused) {
+            console.log(`⏭️ SKIPPED (paused): company ${a.company_id}`)
+            continue
+          }
+
+          // ── Monthly reset: if new month, reset counter ──
+          const month = currentMonth()
+          if (company && (company.sms_month || 0) !== month) {
+            await supabase.from("companies").update({
+              sms_count_month: 0,
+              sms_month: month,
+            }).eq("id", a.company_id)
+            company.sms_count_month = 0
+          }
+
+          // ── SMS-Limit check ──
+          const smsUsed  = company?.sms_count_month ?? 0
+          const smsLimit = company?.sms_limit ?? 100
+          if (smsUsed >= smsLimit) {
+            console.log(`⛔ SMS LIMIT REACHED: company ${a.company_id} (${smsUsed}/${smsLimit})`)
+            // Mark appointment so we don't try again
+            await supabase.from("appointments").update({ reminded: true, sms_sent_at: null }).eq("id", a.id)
+            continue
+          }
 
           const companyName = company?.name || "unserem Unternehmen"
           const customerName = cleanName(a.name || "Kunde")

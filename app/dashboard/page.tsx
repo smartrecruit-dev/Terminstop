@@ -216,6 +216,9 @@ export default function Dashboard() {
   const [customerSearch, setCustomerSearch]   = useState("")
   const [showSuggestions, setShowSuggestions] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [smsUsed, setSmsUsed]   = useState(0)
+  const [smsLimit, setSmsLimit] = useState(100)
+  const [plan, setPlan]         = useState("trial")
 
   useEffect(() => {
     const storedId   = localStorage.getItem("company_id")
@@ -223,16 +226,22 @@ export default function Dashboard() {
     if (!storedId) { window.location.href = "/login"; return }
     setCompanyName(storedName || "")
     Promise.all([
-      supabase.from("companies").select("paused").eq("id", storedId).single(),
+      supabase.from("companies").select("paused, sms_count_month, sms_limit, plan, name").eq("id", storedId).single(),
       supabase.from("appointments").select("*").eq("company_id", storedId)
         .order("date", { ascending: true }).order("time", { ascending: true }),
       supabase.from("customers").select("*").eq("company_id", storedId).order("name", { ascending: true }),
-    ]).then(([pausedRes, apptRes, custRes]) => {
-      if (pausedRes.data?.paused) {
+    ]).then(([coRes, apptRes, custRes]) => {
+      if (coRes.data?.paused) {
         localStorage.removeItem("company_id"); localStorage.removeItem("company_name")
         window.location.href = "/login"; return
       }
       setCompanyId(storedId)
+      if (coRes.data) {
+        setSmsUsed(coRes.data.sms_count_month || 0)
+        setSmsLimit(coRes.data.sms_limit || 100)
+        setPlan(coRes.data.plan || "trial")
+        if (coRes.data.name) setCompanyName(coRes.data.name)
+      }
       if (apptRes.data) setAppointments(apptRes.data)
       if (custRes.data) setCustomers(custRes.data)
     }).finally(() => setLoading(false))
@@ -351,6 +360,51 @@ export default function Dashboard() {
         {/* Trial-Banner für neue Nutzer */}
         <TrialBanner />
 
+        {/* SMS-Limit Banner */}
+        {smsUsed >= smsLimit && (
+          <div style={{
+            background: "linear-gradient(135deg, #DC2626 0%, #B91C1C 100%)",
+            borderRadius: 16, padding: "16px 20px", marginBottom: 20,
+            display: "flex", alignItems: "center", justifyContent: "space-between",
+            gap: 16, flexWrap: "wrap",
+            boxShadow: "0 4px 20px -6px rgba(220,38,38,0.35)",
+          }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+              <div style={{ width: 40, height: 40, borderRadius: 12, background: "rgba(255,255,255,0.15)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>⛔</div>
+              <div>
+                <div style={{ fontSize: 14, fontWeight: 800, color: "#fff", marginBottom: 2 }}>SMS-Limit erreicht</div>
+                <div style={{ fontSize: 13, color: "rgba(255,255,255,0.8)" }}>
+                  Du hast {smsUsed} von {smsLimit} SMS verbraucht. Keine weiteren SMS bis zum nächsten Monat — oder upgrade dein Paket.
+                </div>
+              </div>
+            </div>
+            <a href="/settings" style={{ fontSize: 13, fontWeight: 700, padding: "9px 18px", borderRadius: 10, background: "#fff", color: "#DC2626", textDecoration: "none", whiteSpace: "nowrap" }}>
+              Paket upgraden →
+            </a>
+          </div>
+        )}
+
+        {/* SMS-Limit Warnung bei 80% */}
+        {smsUsed < smsLimit && smsUsed / smsLimit >= 0.8 && (
+          <div style={{
+            background: "linear-gradient(135deg, #D97706 0%, #B45309 100%)",
+            borderRadius: 16, padding: "14px 20px", marginBottom: 20,
+            display: "flex", alignItems: "center", justifyContent: "space-between",
+            gap: 16, flexWrap: "wrap",
+            boxShadow: "0 4px 20px -6px rgba(217,119,6,0.3)",
+          }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+              <span style={{ fontSize: 20 }}>⚠️</span>
+              <div style={{ fontSize: 13, color: "#fff", fontWeight: 600 }}>
+                Noch {smsLimit - smsUsed} SMS übrig diesen Monat ({smsUsed}/{smsLimit} verbraucht)
+              </div>
+            </div>
+            <a href="/settings" style={{ fontSize: 13, fontWeight: 700, padding: "8px 16px", borderRadius: 10, background: "rgba(255,255,255,0.2)", color: "#fff", textDecoration: "none", whiteSpace: "nowrap" }}>
+              Upgrade →
+            </a>
+          </div>
+        )}
+
         {/* Onboarding */}
         {companyId && <SetupChecklist companyId={companyId} appointmentCount={appointments.length} />}
 
@@ -375,7 +429,7 @@ export default function Dashboard() {
         </div>
 
         {/* ── KPI-Karten ── */}
-        <div className="grid grid-cols-3 gap-3 mb-5">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
           {[
             {
               label: "Heute",
@@ -384,6 +438,7 @@ export default function Dashboard() {
               color: "#111827",
               bg: "#fff",
               accent: "#E5E7EB",
+              extra: null,
             },
             {
               label: "Erledigt",
@@ -392,6 +447,7 @@ export default function Dashboard() {
               color: "#18A66D",
               bg: "#F0FDF6",
               accent: "#B6F0D5",
+              extra: null,
             },
             {
               label: "Nächster",
@@ -400,6 +456,16 @@ export default function Dashboard() {
               color: "#111827",
               bg: "#fff",
               accent: "#E5E7EB",
+              extra: null,
+            },
+            {
+              label: "SMS diesen Monat",
+              value: `${smsUsed}/${smsLimit}`,
+              sub: smsUsed >= smsLimit ? "⛔ Limit erreicht" : `${smsLimit - smsUsed} übrig`,
+              color: smsUsed >= smsLimit ? "#DC2626" : smsUsed / smsLimit >= 0.8 ? "#D97706" : "#18A66D",
+              bg: smsUsed >= smsLimit ? "#FEF2F2" : "#fff",
+              accent: smsUsed >= smsLimit ? "#FECACA" : "#E5E7EB",
+              extra: { used: smsUsed, limit: smsLimit },
             },
           ].map((card, i) => (
             <div key={i} style={{
@@ -414,12 +480,22 @@ export default function Dashboard() {
               <div style={{ fontSize: 11, fontWeight: 700, color: "#9CA3AF", textTransform: "uppercase", letterSpacing: ".6px", marginBottom: 8 }}>
                 {card.label}
               </div>
-              <div style={{ fontSize: 26, fontWeight: 900, color: card.color, lineHeight: 1, letterSpacing: "-1px" }}>
+              <div style={{ fontSize: card.extra ? 20 : 26, fontWeight: 900, color: card.color, lineHeight: 1, letterSpacing: "-1px" }}>
                 {card.value}
               </div>
               <div style={{ fontSize: 11, color: "#9CA3AF", marginTop: 4, fontWeight: 500, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                 {card.sub}
               </div>
+              {card.extra && (
+                <div style={{ height: 4, background: "#F3F4F6", borderRadius: 99, marginTop: 8, overflow: "hidden" }}>
+                  <div style={{
+                    height: "100%", borderRadius: 99,
+                    width: `${Math.min(100, Math.round((card.extra.used / card.extra.limit) * 100))}%`,
+                    background: card.extra.used >= card.extra.limit ? "#DC2626" : card.extra.used / card.extra.limit >= 0.8 ? "#F59E0B" : "#18A66D",
+                    transition: "width .5s ease",
+                  }} />
+                </div>
+              )}
             </div>
           ))}
         </div>
