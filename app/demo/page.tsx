@@ -195,7 +195,7 @@ export default function DemoDashboard() {
             <span style={{ width: 7, height: 7, background: "#18A66D", borderRadius: "50%", display: "inline-block", animation: "pulse 2s infinite" }} />
             Demo aktiv
           </div>
-          {/* Booking add-on pill — clearly special, not a regular nav item */}
+          {/* Booking page demo pill */}
           <a href="/demo/buchung" className="hidden md:inline-flex" style={{
             alignItems: "center", gap: 6,
             background: "#0F1923", color: "#fff",
@@ -205,7 +205,7 @@ export default function DemoDashboard() {
             border: "1px solid rgba(24,166,109,0.4)",
           }}>
             <span style={{ width: 6, height: 6, background: "#18A66D", borderRadius: "50%", display: "inline-block" }} />
-            Buchungs-Add-on
+            Buchungsseite Demo
           </a>
           <a href="/lead" style={{ fontSize: 13, color: "#fff", background: "#18A66D", padding: "7px 16px", borderRadius: 9, fontWeight: 700, textDecoration: "none" }}>
             Jetzt testen →
@@ -274,7 +274,7 @@ export default function DemoDashboard() {
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
               <span style={{ fontSize: 18 }}>🔗</span>
               <div>
-                <div style={{ fontSize: 13, fontWeight: 800, color: "#92400E" }}>Buchungs-Add-on Demo</div>
+                <div style={{ fontSize: 13, fontWeight: 800, color: "#92400E" }}>Buchungsseite Demo</div>
                 <div style={{ fontSize: 12, color: "#B45309" }}>So buchen Ihre Kunden rund um die Uhr — interaktive Demo ansehen</div>
               </div>
             </div>

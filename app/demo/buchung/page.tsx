@@ -357,7 +357,7 @@ export default function BuchungDemo() {
           {/* Active page label */}
           <div className="hidden md:flex" style={{ alignItems: "center", gap: 7, background: G.dark, border: "1px solid rgba(24,166,109,0.35)", borderRadius: 8, padding: "5px 12px" }}>
             <span style={{ width: 6, height: 6, background: G.green, borderRadius: "50%", display: "inline-block", animation: "pulse 2s infinite" }} />
-            <span style={{ fontSize: 12, fontWeight: 700, color: "#fff" }}>Buchungs-Add-on Demo</span>
+            <span style={{ fontSize: 12, fontWeight: 700, color: "#fff" }}>Buchungsseite Demo</span>
           </div>
           <a href="/lead" style={{ fontSize: 13, color: "#fff", background: G.green, padding: "7px 16px", borderRadius: 9, fontWeight: 700, textDecoration: "none" }}>
             Jetzt testen →
@@ -375,24 +375,24 @@ export default function BuchungDemo() {
           <div style={{ maxWidth: 640 }}>
             <div style={{ display: "inline-flex", alignItems: "center", gap: 7, background: "rgba(24,166,109,.15)", border: "1px solid rgba(24,166,109,.3)", borderRadius: 100, padding: "5px 14px", marginBottom: 24 }}>
               <span style={{ width: 6, height: 6, background: G.green, borderRadius: "50%", display: "inline-block", animation: "pulse 2s infinite" }} />
-              <span style={{ fontSize: 11, fontWeight: 800, color: "#4ade80", textTransform: "uppercase" as const, letterSpacing: 1 }}>Add-on · 229 €/Monat</span>
+              <span style={{ fontSize: 11, fontWeight: 800, color: "#4ade80", textTransform: "uppercase" as const, letterSpacing: 1 }}>In allen Paketen inklusive</span>
             </div>
             <h1 style={{ fontSize: "clamp(32px,5vw,58px)", fontWeight: 900, color: "#fff", letterSpacing: "-2.5px", lineHeight: 1.0, margin: "0 0 18px" }}>
               Ihre Kunden buchen<br /><span style={{ color: G.green }}>rund um die Uhr.</span>
             </h1>
             <p style={{ fontSize: 17, color: "rgba(255,255,255,.6)", lineHeight: 1.7, margin: "0 0 32px", maxWidth: 480 }}>
-              Mit dem Buchungs-Add-on bekommt Ihr Betrieb eine eigene Buchungsseite — inklusive QR-Code, automatischer SMS-Bestätigung und direkter Übersicht in Ihrem Dashboard.
+              Jeder TerminStop-Plan enthält eine eigene Buchungsseite — inklusive QR-Code, automatischer SMS-Bestätigung und direkter Übersicht in Ihrem Dashboard. Kein Extra-Abo, kein Aufpreis.
             </p>
             <div style={{ display: "flex", gap: 12, flexWrap: "wrap" as const }}>
               <a href="#demo" style={{ background: `linear-gradient(135deg,${G.green},${G.greenDeep})`, color: "#fff", fontWeight: 800, fontSize: 15, padding: "14px 26px", borderRadius: 11, textDecoration: "none", boxShadow: "0 4px 20px rgba(24,166,109,.4)" }}>
                 Demo ausprobieren ↓
               </a>
-              <a href="/lead" style={{ background: "rgba(255,255,255,.1)", color: "#fff", fontWeight: 600, fontSize: 15, padding: "14px 22px", borderRadius: 11, textDecoration: "none", border: "1px solid rgba(255,255,255,.2)" }}>
-                Jetzt anfragen
+              <a href="/#preise" style={{ background: "rgba(255,255,255,.1)", color: "#fff", fontWeight: 600, fontSize: 15, padding: "14px 22px", borderRadius: 11, textDecoration: "none", border: "1px solid rgba(255,255,255,.2)" }}>
+                Zu den Preisen
               </a>
             </div>
             <div style={{ display: "flex", gap: 20, marginTop: 24, flexWrap: "wrap" as const }}>
-              {["✓ Monatlich kündbar", "✓ Einrichtung inklusive", "✓ Sofort einsatzbereit"].map(t => (
+              {["✓ In jedem Paket inklusive", "✓ Kein Aufpreis", "✓ Sofort einsatzbereit"].map(t => (
                 <span key={t} style={{ fontSize: 13, color: "rgba(255,255,255,.5)", fontWeight: 500 }}>{t}</span>
               ))}
             </div>
@@ -793,7 +793,7 @@ export default function BuchungDemo() {
         <div style={{ maxWidth: 1080, margin: "0 auto" }}>
           <div style={{ textAlign: "center", marginBottom: 48 }}>
             <div style={{ fontSize: 11, fontWeight: 800, color: G.green, textTransform: "uppercase" as const, letterSpacing: 1.2, marginBottom: 10 }}>Alles dabei</div>
-            <h2 style={{ fontSize: "clamp(22px,3vw,38px)", fontWeight: 900, color: G.ink, letterSpacing: "-1.2px", margin: 0 }}>Im Add-on enthalten.</h2>
+            <h2 style={{ fontSize: "clamp(22px,3vw,38px)", fontWeight: 900, color: G.ink, letterSpacing: "-1.2px", margin: 0 }}>Alles inklusive — in jedem Paket.</h2>
           </div>
           <div className="demo-features-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 14 }}>
             {features.map((f, i) => (
@@ -816,16 +816,16 @@ export default function BuchungDemo() {
           <div style={{ textAlign: "center", marginBottom: 40 }}>
             <div style={{ fontSize: 11, fontWeight: 800, color: "rgba(74,222,128,1)", textTransform: "uppercase" as const, letterSpacing: 1.2, marginBottom: 12 }}>Preise</div>
             <h2 style={{ fontSize: "clamp(26px,4vw,46px)", fontWeight: 900, color: "#fff", letterSpacing: "-1.8px", margin: "0 0 14px" }}>
-              229 € im Monat — das wars.
+              Buchungsseite inklusive.<br />Ab 39 € im Monat.
             </h2>
             <p style={{ fontSize: 16, color: "rgba(255,255,255,.55)", maxWidth: 460, margin: "0 auto", lineHeight: 1.65 }}>
-              Kein Einrichtungspreis, keine versteckten Kosten, keine Mindestlaufzeit. Monatlich kündbar — zu jedem Paket hinzubuchbar.
+              Die Buchungsseite ist in jedem TerminStop-Paket von Anfang an dabei — kein Extra-Abo, kein Aufpreis, monatlich kündbar.
             </p>
           </div>
 
           <div className="demo-price-row" style={{ display: "flex", gap: 16, justifyContent: "center", marginBottom: 32, flexWrap: "wrap" as const }}>
             {[
-              { label: "Buchungsseite", value: "Sofort aktiv" },
+              { label: "Buchungsseite", value: "Inklusive" },
               { label: "QR-Code", value: "Inklusive" },
               { label: "SMS-Bestätigung", value: "Automatisch" },
               { label: "Laufzeit", value: "Monatlich" },
@@ -838,11 +838,11 @@ export default function BuchungDemo() {
           </div>
 
           <div style={{ textAlign: "center" }}>
-            <a href="/lead" style={{ display: "inline-block", background: `linear-gradient(135deg,${G.green},${G.greenDeep})`, color: "#fff", fontWeight: 800, fontSize: 16, padding: "16px 40px", borderRadius: 13, textDecoration: "none", boxShadow: "0 4px 24px rgba(24,166,109,.4)", letterSpacing: "-0.2px", marginBottom: 14 }}>
-              Add-on anfragen →
+            <a href="/#preise" style={{ display: "inline-block", background: `linear-gradient(135deg,${G.green},${G.greenDeep})`, color: "#fff", fontWeight: 800, fontSize: 16, padding: "16px 40px", borderRadius: 13, textDecoration: "none", boxShadow: "0 4px 24px rgba(24,166,109,.4)", letterSpacing: "-0.2px", marginBottom: 14 }}>
+              Alle Pakete ansehen →
             </a>
             <div style={{ fontSize: 13, color: "rgba(255,255,255,.35)" }}>
-              Einfach anfragen — wir richten alles für Sie ein.
+              14 Tage kostenlos testen — ohne Kreditkarte, jederzeit kündbar.
             </div>
           </div>
         </div>
