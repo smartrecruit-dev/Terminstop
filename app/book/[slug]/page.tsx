@@ -1,13 +1,14 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback } from "react"
 import { useParams } from "next/navigation"
 import { supabase } from "../../lib/supabaseClient"
 
 type Service     = { id: string; name: string; duration: number; price: number | null }
 type Company     = { id: string; name: string; booking_note: string | null }
 type BookingType = "service" | "open" | "callback"
-type Step        = "type" | "service" | "datetime" | "contact" | "confirm" | "done"
+type Step        = "type" | "datetime" | "service" | "contact" | "confirm" | "done"
+type Avail       = "idle" | "checking" | "available" | "full"
 
 function formatDur(m: number) {
   if (m < 60) return `${m} Min.`
@@ -24,8 +25,9 @@ function formatDT(date: string, time: string) {
   }) + " Uhr"
 }
 
+// Step order: date+time first, THEN service selection
 const STEP_ORDER: Record<BookingType, Step[]> = {
-  service:  ["type", "service", "datetime", "contact", "confirm"],
+  service:  ["type", "datetime", "service", "contact", "confirm"],
   open:     ["type", "datetime", "contact", "confirm"],
   callback: ["type", "contact", "confirm"],
 }
@@ -50,6 +52,8 @@ export default function BookingPage() {
   const [note,            setNote]            = useState("")
   const [submitting,      setSubmitting]      = useState(false)
   const [error,           setError]           = useState("")
+  const [avail,           setAvail]           = useState<Avail>("idle")
+  const [confirmed,       setConfirmed]       = useState(false) // was auto-confirmed?
 
   useEffect(() => { if (slug) loadCompany() }, [slug])
 
@@ -70,6 +74,19 @@ export default function BookingPage() {
     setLoading(false)
   }
 
+  // Check availability whenever date+time changes
+  const checkAvailability = useCallback(async (d: string, t: string) => {
+    if (!company || !d || !t) { setAvail("idle"); return }
+    setAvail("checking")
+    try {
+      const res = await fetch(`/api/availability?company_id=${company.id}&date=${d}&time=${t}`)
+      const json = await res.json()
+      setAvail(json.available ? "available" : "full")
+    } catch {
+      setAvail("idle")
+    }
+  }, [company])
+
   function goNext() {
     const steps = STEP_ORDER[bookingType]
     const idx   = steps.indexOf(step)
@@ -82,43 +99,43 @@ export default function BookingPage() {
     else setStep("type")
   }
   function progressPct() {
-    const steps = STEP_ORDER[bookingType]
-    const idx   = steps.indexOf(step)
-    return idx < 0 ? 0 : Math.round((idx / (steps.length - 1)) * 100)
+    const steps = STEP_ORDER[bookingType].filter(s => s !== "type")
+    const idx   = (steps as Step[]).indexOf(step)
+    return idx < 0 ? 0 : Math.round(((idx + 1) / steps.length) * 100)
   }
 
   async function submitBooking() {
     if (!company) return
     setSubmitting(true); setError("")
-    let appointmentName = name.trim()
-    if (bookingType === "service" && selectedService)
-      appointmentName = `${name.trim()} [Online: ${selectedService.name}]`
-    else if (bookingType === "open")
-      appointmentName = `${name.trim()} [Online: Termin]`
-    else
-      appointmentName = `${name.trim()} [Rückruf]`
 
-    const { error: insertErr } = await supabase.from("appointments").insert({
-      company_id:     company.id,
-      name:           appointmentName,
-      phone:          phone.trim(),
-      note:           note.trim() || null,
-      date:           bookingType === "callback" ? null : date || null,
-      time:           bookingType === "callback" ? null : time || null,
-      status:         "pending",
-      online_booking: true,
-      request_text:   requestText.trim() || null,
+    const res = await fetch("/api/book", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        company_id:   company.id,
+        name:         name.trim(),
+        phone:        phone.trim(),
+        date:         bookingType === "callback" ? null : date || null,
+        time:         bookingType === "callback" ? null : time || null,
+        service_name: selectedService?.name || null,
+        note:         note.trim() || null,
+        request_text: requestText.trim() || null,
+        booking_type: bookingType,
+      }),
     })
-    if (insertErr) {
-      setError(insertErr.message?.includes("RATE_LIMIT")
-        ? "Du hast heute bereits 3 Anfragen gesendet. Bitte morgen erneut versuchen."
-        : "Etwas ist schiefgelaufen. Bitte versuche es erneut.")
+    const json = await res.json()
+
+    if (!res.ok || json.error) {
+      setError(json.error || "Etwas ist schiefgelaufen.")
       setSubmitting(false); return
     }
-    setStep("done"); setSubmitting(false)
+
+    setConfirmed(json.confirmed === true)
+    setStep("done")
+    setSubmitting(false)
   }
 
-  const today = new Date().toISOString().split("T")[0]
+  const today    = new Date().toISOString().split("T")[0]
   const initials = company?.name
     ? company.name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase()
     : "?"
@@ -204,32 +221,42 @@ export default function BookingPage() {
         </div>
 
         <h2 style={{ fontSize:28, fontWeight:900, color:"#111827", margin:"0 0 10px", letterSpacing:"-.6px" }}>
-          {bookingType === "callback" ? "Rückruf angefragt!" : "Anfrage gesendet!"}
+          {bookingType === "callback"
+            ? "Rückruf angefragt!"
+            : confirmed
+              ? "Termin bestätigt! ✓"
+              : "Anfrage gesendet!"}
         </h2>
         <p style={{ color:"#6B7280", lineHeight:1.7, fontSize:15, margin:"0 0 8px", maxWidth:360 }}>
-          Deine Anfrage bei <strong style={{ color:"#111827" }}>{company?.name}</strong> ist eingegangen.
+          {confirmed
+            ? <>Dein Termin bei <strong style={{ color:"#111827" }}>{company?.name}</strong> ist fest gebucht.</>
+            : <>Deine Anfrage bei <strong style={{ color:"#111827" }}>{company?.name}</strong> ist eingegangen.</>
+          }
         </p>
         <p style={{ color:"#9CA3AF", fontSize:13, margin:"0 0 36px", maxWidth:320, lineHeight:1.6 }}>
-          {bookingType === "callback"
-            ? "Du wirst so bald wie möglich zurückgerufen."
-            : "Der Betrieb wird sich mit einer Bestätigung bei dir melden."}
+          {confirmed
+            ? "Du hast soeben eine SMS-Bestätigung erhalten. Wir freuen uns auf deinen Besuch!"
+            : bookingType === "callback"
+              ? "Du wirst so bald wie möglich zurückgerufen."
+              : "Der Betrieb meldet sich kurz bei dir zur Bestätigung."}
         </p>
 
         {/* Summary */}
         <div style={{ width:"100%", maxWidth:420, background:"#fff", border:"1.5px solid #E5E7EB", borderRadius:18, overflow:"hidden", marginBottom:24, boxShadow:"0 4px 20px rgba(0,0,0,0.04)", textAlign:"left" }}>
-          <div style={{ background:"#F0FBF6", borderBottom:"1px solid #D1F5E3", padding:"12px 18px" }}>
-            <span style={{ fontSize:12, fontWeight:700, color:"#18A66D", textTransform:"uppercase", letterSpacing:.8 }}>Zusammenfassung</span>
+          <div style={{ background: confirmed ? "#F0FBF6" : "#FFFBEB", borderBottom:`1px solid ${confirmed ? "#D1F5E3" : "#FDE68A"}`, padding:"12px 18px" }}>
+            <span style={{ fontSize:12, fontWeight:700, color: confirmed ? "#18A66D" : "#92400E", textTransform:"uppercase", letterSpacing:.8 }}>
+              {confirmed ? "✓ Automatisch bestätigt" : "⏳ Anfrage eingegangen"}
+            </span>
           </div>
-          {bookingType !== "callback" && date && <DRow label="Wunschtermin" value={formatDT(date, time)} />}
-          {bookingType === "callback" && <DRow label="Art" value="Rückruf" />}
-          {selectedService && <DRow label="Leistung" value={selectedService.name} />}
-          {requestText && <DRow label="Anliegen" value={requestText} />}
+          {bookingType !== "callback" && date && <DRow label="Termin"   value={formatDT(date, time)} />}
+          {bookingType === "callback"           && <DRow label="Art"     value="Rückruf" />}
+          {selectedService                      && <DRow label="Leistung" value={selectedService.name} />}
+          {requestText                          && <DRow label="Anliegen" value={requestText} />}
           <DRow label="Name"    value={name} />
           <DRow label="Telefon" value={phone} last />
         </div>
 
         <p style={{ fontSize:13, color:"#9CA3AF", marginBottom:32 }}>Du kannst dieses Fenster jetzt schließen.</p>
-
         <PoweredBy />
       </div>
     </Shell>
@@ -247,11 +274,8 @@ export default function BookingPage() {
 
       {/* ══ HERO HEADER ══ */}
       <div style={{ background:"linear-gradient(170deg, #0A0F0D 0%, #0D1F15 40%, #0F2318 100%)", padding:"env(safe-area-inset-top,0) 0 0", position:"relative", overflow:"hidden" }}>
-
-        {/* Background orbs */}
         <div style={{ position:"absolute", top:-80, right:-80, width:340, height:340, borderRadius:"50%", background:"radial-gradient(circle, rgba(24,166,109,0.22) 0%, transparent 65%)", pointerEvents:"none" }} />
         <div style={{ position:"absolute", bottom:-60, left:-60, width:260, height:260, borderRadius:"50%", background:"radial-gradient(circle, rgba(24,166,109,0.12) 0%, transparent 65%)", pointerEvents:"none" }} />
-        <div style={{ position:"absolute", top:"50%", left:"50%", transform:"translate(-50%,-50%)", width:500, height:500, borderRadius:"50%", background:"radial-gradient(circle, rgba(24,166,109,0.06) 0%, transparent 60%)", pointerEvents:"none" }} />
 
         <div style={{ maxWidth:560, margin:"0 auto", padding:"20px 22px 28px", position:"relative" }}>
 
@@ -285,7 +309,7 @@ export default function BookingPage() {
             </div>
           </div>
 
-          {/* Progress */}
+          {/* Progress bar */}
           {showBack && (
             <div style={{ marginTop:24 }}>
               <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:10 }}>
@@ -314,11 +338,11 @@ export default function BookingPage() {
             <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
               {services.length > 0 && (
                 <button className="type-card"
-                  onClick={() => { setBookingType("service"); setSelectedService(null); setStep("service") }}>
+                  onClick={() => { setBookingType("service"); setSelectedService(null); setStep("datetime") }}>
                   <div style={{ width:56, height:56, background:"linear-gradient(135deg, #18A66D, #0F8F63)", borderRadius:18, display:"flex", alignItems:"center", justifyContent:"center", fontSize:24, flexShrink:0, boxShadow:"0 6px 20px rgba(24,166,109,0.35)" }}>✂️</div>
                   <div style={{ flex:1, minWidth:0 }}>
                     <p style={{ fontWeight:800, color:"#111827", margin:"0 0 5px", fontSize:16 }}>Leistung buchen</p>
-                    <p style={{ color:"#9CA3AF", margin:0, fontSize:13, fontWeight:500 }}>{services.length} Leistung{services.length > 1 ? "en" : ""} verfügbar · direkt buchen</p>
+                    <p style={{ color:"#9CA3AF", margin:0, fontSize:13, fontWeight:500 }}>{services.length} Leistung{services.length > 1 ? "en" : ""} verfügbar · Datum zuerst wählen</p>
                   </div>
                   <div style={{ width:36, height:36, background:"#F0FBF6", borderRadius:11, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#18A66D" strokeWidth="2.5" strokeLinecap="round"><path d="M9 18l6-6-6-6"/></svg>
@@ -355,9 +379,9 @@ export default function BookingPage() {
             <div style={{ marginTop:32, background:"#fff", border:"1.5px solid #F0F0F0", borderRadius:16, padding:"16px 20px" }}>
               <div style={{ display:"flex", justifyContent:"space-around", gap:12 }}>
                 {[
-                  { icon:"🔒", label:"Datenschutz", sub:"DSGVO-konform" },
-                  { icon:"⚡", label:"Schnell", sub:"In 2 Minuten fertig" },
-                  { icon:"✉️", label:"Kostenlos", sub:"Keine Kosten für dich" },
+                  { icon:"🔒", label:"Datenschutz",   sub:"DSGVO-konform" },
+                  { icon:"⚡", label:"Schnell",        sub:"In 2 Minuten fertig" },
+                  { icon:"✉️", label:"Kostenlos",      sub:"Keine Kosten für dich" },
                 ].map(t => (
                   <div key={t.label} style={{ textAlign:"center" }}>
                     <div style={{ fontSize:20, marginBottom:4 }}>{t.icon}</div>
@@ -370,13 +394,98 @@ export default function BookingPage() {
           </div>
         )}
 
-        {/* ── STEP: service ── */}
+        {/* ── STEP: datetime (NOW FIRST) ── */}
+        {step === "datetime" && (
+          <div className="step-enter">
+            <div style={{ marginBottom:22 }}>
+              <h2 style={{ fontSize:21, fontWeight:800, color:"#111827", margin:"0 0 6px", letterSpacing:"-.4px" }}>Wann passt es dir?</h2>
+              <p style={{ color:"#6B7280", fontSize:14, margin:0 }}>Wähle Datum und Uhrzeit für deinen Termin.</p>
+            </div>
+
+            {bookingType === "open" && (
+              <div style={{ marginBottom:20 }}>
+                <label style={{ display:"block", fontSize:13, fontWeight:700, color:"#374151", marginBottom:8 }}>
+                  Dein Anliegen <span style={{ fontWeight:400, color:"#9CA3AF" }}>(optional)</span>
+                </label>
+                <LimitedTextarea value={requestText} onChange={setRequestText}
+                  placeholder="z.B. Haarschnitt, Inspektion, Beratung …" rows={2} />
+              </div>
+            )}
+
+            <div style={{ display:"flex", flexDirection:"column", gap:16, marginBottom:20 }}>
+              <div>
+                <label style={{ display:"block", fontSize:13, fontWeight:700, color:"#374151", marginBottom:8 }}>Datum</label>
+                <input type="date" value={date} min={today}
+                  onChange={e => {
+                    setDate(e.target.value)
+                    setAvail("idle")
+                    if (e.target.value && time) checkAvailability(e.target.value, time)
+                  }}
+                  className="ts-input" />
+              </div>
+              <div>
+                <label style={{ display:"block", fontSize:13, fontWeight:700, color:"#374151", marginBottom:8 }}>Uhrzeit</label>
+                <input type="time" value={time}
+                  onChange={e => {
+                    setTime(e.target.value)
+                    setAvail("idle")
+                    if (date && e.target.value) checkAvailability(date, e.target.value)
+                  }}
+                  step={900} className="ts-input" />
+              </div>
+            </div>
+
+            {/* Availability indicator */}
+            {avail === "checking" && (
+              <div style={{ display:"flex", alignItems:"center", gap:8, background:"#F9FAFB", border:"1px solid #E5E7EB", borderRadius:12, padding:"12px 16px", marginBottom:16 }}>
+                <Spin small /> <span style={{ fontSize:13, color:"#6B7280" }}>Verfügbarkeit wird geprüft …</span>
+              </div>
+            )}
+            {avail === "available" && (
+              <div style={{ display:"flex", alignItems:"center", gap:10, background:"#F0FBF6", border:"1px solid #D1F5E3", borderRadius:12, padding:"12px 16px", marginBottom:16 }}>
+                <div style={{ width:28, height:28, background:"#18A66D", borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round"><path d="M5 13l4 4L19 7"/></svg>
+                </div>
+                <div>
+                  <div style={{ fontSize:13, fontWeight:800, color:"#18A66D" }}>Zeitfenster verfügbar</div>
+                  <div style={{ fontSize:12, color:"#15955F" }}>Dein Termin wird nach dem Absenden sofort bestätigt</div>
+                </div>
+              </div>
+            )}
+            {avail === "full" && (
+              <div style={{ display:"flex", alignItems:"center", gap:10, background:"#FFFBEB", border:"1px solid #FDE68A", borderRadius:12, padding:"12px 16px", marginBottom:16 }}>
+                <div style={{ width:28, height:28, background:"#F59E0B", borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, fontSize:14 }}>⏳</div>
+                <div>
+                  <div style={{ fontSize:13, fontWeight:800, color:"#92400E" }}>Alle Mitarbeiter belegt</div>
+                  <div style={{ fontSize:12, color:"#B45309" }}>Deine Anfrage wird weitergeleitet — der Betrieb meldet sich bei dir</div>
+                </div>
+              </div>
+            )}
+
+            <button className="primary-btn" onClick={goNext} disabled={!date || !time}>
+              Weiter →
+            </button>
+          </div>
+        )}
+
+        {/* ── STEP: service (AFTER DATETIME) ── */}
         {step === "service" && (
           <div className="step-enter">
             <div style={{ marginBottom:22 }}>
               <h2 style={{ fontSize:21, fontWeight:800, color:"#111827", margin:"0 0 6px", letterSpacing:"-.4px" }}>Leistung auswählen</h2>
               <p style={{ color:"#6B7280", fontSize:14, margin:0 }}>Was soll für dich gemacht werden?</p>
             </div>
+
+            {/* Selected date/time reminder */}
+            {date && time && (
+              <div style={{ display:"inline-flex", alignItems:"center", gap:8, background:"#F0FBF6", border:"1.5px solid #D1F5E3", borderRadius:12, padding:"8px 16px", marginBottom:22 }}>
+                <span style={{ fontSize:14 }}>📅</span>
+                <span style={{ fontSize:13, fontWeight:700, color:"#18A66D" }}>{formatDT(date, time)}</span>
+                {avail === "available" && (
+                  <span style={{ fontSize:11, fontWeight:700, color:"#15955F", background:"#D1F5E3", borderRadius:99, padding:"2px 8px" }}>✓ frei</span>
+                )}
+              </div>
+            )}
 
             <div style={{ display:"flex", flexDirection:"column", gap:10, marginBottom:20 }}>
               {services.map(svc => (
@@ -416,50 +525,6 @@ export default function BookingPage() {
           </div>
         )}
 
-        {/* ── STEP: datetime ── */}
-        {step === "datetime" && (
-          <div className="step-enter">
-            <div style={{ marginBottom:22 }}>
-              <h2 style={{ fontSize:21, fontWeight:800, color:"#111827", margin:"0 0 6px", letterSpacing:"-.4px" }}>Wann passt es dir?</h2>
-              <p style={{ color:"#6B7280", fontSize:14, margin:0 }}>Wähle deinen Wunschtermin.</p>
-            </div>
-
-            {selectedService && (
-              <div style={{ display:"inline-flex", alignItems:"center", gap:8, background:"#F0FBF6", border:"1.5px solid #D1F5E3", borderRadius:12, padding:"8px 16px", marginBottom:22 }}>
-                <div style={{ width:8, height:8, background:"#18A66D", borderRadius:"50%" }} />
-                <span style={{ fontSize:13, fontWeight:700, color:"#18A66D" }}>{selectedService.name}</span>
-                <span style={{ fontSize:13, color:"#9CA3AF" }}>·</span>
-                <span style={{ fontSize:13, color:"#6B7280" }}>{formatDur(selectedService.duration)}</span>
-              </div>
-            )}
-
-            {bookingType === "open" && (
-              <div style={{ marginBottom:20 }}>
-                <label style={{ display:"block", fontSize:13, fontWeight:700, color:"#374151", marginBottom:8 }}>
-                  Dein Anliegen <span style={{ fontWeight:400, color:"#9CA3AF" }}>(optional)</span>
-                </label>
-                <LimitedTextarea value={requestText} onChange={setRequestText}
-                  placeholder="z.B. Haarschnitt, Inspektion, Beratung …" rows={2} />
-              </div>
-            )}
-
-            <div style={{ display:"flex", flexDirection:"column", gap:16, marginBottom:24 }}>
-              <div>
-                <label style={{ display:"block", fontSize:13, fontWeight:700, color:"#374151", marginBottom:8 }}>Datum</label>
-                <input type="date" value={date} min={today} onChange={e => setDate(e.target.value)} className="ts-input" />
-              </div>
-              <div>
-                <label style={{ display:"block", fontSize:13, fontWeight:700, color:"#374151", marginBottom:8 }}>Uhrzeit</label>
-                <input type="time" value={time} onChange={e => setTime(e.target.value)} step={900} className="ts-input" />
-              </div>
-            </div>
-
-            <button className="primary-btn" onClick={goNext} disabled={!date || !time}>
-              Weiter →
-            </button>
-          </div>
-        )}
-
         {/* ── STEP: contact ── */}
         {step === "contact" && (
           <div className="step-enter">
@@ -468,7 +533,7 @@ export default function BookingPage() {
               <p style={{ color:"#6B7280", fontSize:14, margin:0, lineHeight:1.6 }}>
                 {bookingType === "callback"
                   ? "Hinterlasse deine Nummer — der Betrieb ruft dich zurück."
-                  : "Damit der Betrieb deinen Termin bestätigen kann."}
+                  : "Damit wir deinen Termin bestätigen können."}
               </p>
             </div>
 
@@ -522,27 +587,39 @@ export default function BookingPage() {
                 <div style={{ width:30, height:30, background:"#18A66D", borderRadius:9, display:"flex", alignItems:"center", justifyContent:"center" }}>
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
                 </div>
-                <span style={{ fontSize:13, fontWeight:800, color:"#18A66D" }}>Deine Anfrage</span>
+                <span style={{ fontSize:13, fontWeight:800, color:"#18A66D" }}>Deine Buchung</span>
               </div>
-              {bookingType !== "callback" && date && <DRow label="Wunschtermin" value={formatDT(date, time)} />}
-              {bookingType === "callback" && <DRow label="Art" value="Rückruf" />}
-              {selectedService && <DRow label="Leistung" value={`${selectedService.name} · ${formatDur(selectedService.duration)}`} />}
-              {selectedService?.price != null && <DRow label="Preis" value={formatPrice(selectedService.price) || ""} />}
-              {requestText && <DRow label="Anliegen" value={requestText} />}
+              {bookingType !== "callback" && date && <DRow label="Termin"    value={formatDT(date, time)} />}
+              {bookingType === "callback"           && <DRow label="Art"      value="Rückruf" />}
+              {selectedService                      && <DRow label="Leistung" value={`${selectedService.name} · ${formatDur(selectedService.duration)}`} />}
+              {selectedService?.price != null       && <DRow label="Preis"    value={formatPrice(selectedService.price) || ""} />}
+              {requestText                          && <DRow label="Anliegen" value={requestText} />}
               <DRow label="Name"    value={name} />
               <DRow label="Telefon" value={phone} last={!note} />
               {note && <DRow label="Anmerkung" value={note} last />}
             </div>
 
-            {/* Info */}
-            <div style={{ background:"#FFFBEB", border:"1px solid #FDE68A", borderRadius:14, padding:"14px 18px", marginBottom:20, display:"flex", gap:12, alignItems:"flex-start" }}>
-              <span style={{ fontSize:18, flexShrink:0, lineHeight:1 }}>ℹ️</span>
-              <p style={{ fontSize:13, color:"#92400E", lineHeight:1.65, margin:0 }}>
-                {bookingType === "callback"
-                  ? `${company?.name} ruft dich so bald wie möglich zurück.`
-                  : `Dies ist eine Anfrage. ${company?.name} bestätigt deinen Termin und meldet sich bei dir.`}
-              </p>
-            </div>
+            {/* Availability info banner */}
+            {bookingType !== "callback" && (
+              <div style={{
+                background: avail === "available" ? "#F0FBF6" : "#FFFBEB",
+                border:     `1px solid ${avail === "available" ? "#D1F5E3" : "#FDE68A"}`,
+                borderRadius:14, padding:"14px 18px", marginBottom:20,
+                display:"flex", gap:12, alignItems:"flex-start",
+              }}>
+                <span style={{ fontSize:18, flexShrink:0, lineHeight:1 }}>
+                  {avail === "available" ? "✅" : "⏳"}
+                </span>
+                <p style={{ fontSize:13, color: avail === "available" ? "#166534" : "#92400E", lineHeight:1.65, margin:0 }}>
+                  {avail === "available"
+                    ? "Super! Dieser Termin ist frei — deine Buchung wird nach dem Absenden sofort bestätigt und du bekommst eine SMS."
+                    : avail === "full"
+                      ? `Zu diesem Zeitpunkt sind alle Mitarbeiter belegt. ${company?.name} prüft deinen Wunschtermin und meldet sich bei dir.`
+                      : `${company?.name} wird deinen Termin prüfen und sich kurz bei dir melden.`
+                  }
+                </p>
+              </div>
+            )}
 
             {error && (
               <div style={{ background:"#FEF2F2", border:"1px solid #FECACA", borderRadius:14, padding:"14px 18px", marginBottom:16, display:"flex", gap:10, alignItems:"flex-start" }}>
@@ -554,11 +631,15 @@ export default function BookingPage() {
             <button className="primary-btn" onClick={submitBooking} disabled={submitting}>
               {submitting
                 ? <><Spin /><span>Wird gesendet …</span></>
-                : bookingType === "callback" ? "Rückruf anfragen →" : "Anfrage jetzt absenden →"}
+                : bookingType === "callback"
+                  ? "Rückruf anfragen →"
+                  : avail === "available"
+                    ? "Termin jetzt buchen →"
+                    : "Anfrage absenden →"}
             </button>
 
             <p style={{ textAlign:"center", fontSize:12, color:"#9CA3AF", marginTop:14, lineHeight:1.6 }}>
-              🔒 Deine Daten werden sicher übertragen und nur für diese Anfrage verwendet.
+              🔒 Deine Daten werden sicher übertragen und nur für diese Buchung verwendet.
             </p>
           </div>
         )}
@@ -572,7 +653,7 @@ export default function BookingPage() {
   )
 }
 
-/* ── Shell ─────────────────────────────────────────────────────── */
+/* ── Shell ── */
 function Shell({ children, css }: { children: React.ReactNode; css?: string }) {
   return (
     <div style={{ minHeight:"100dvh", background:"#F4F6F8", fontFamily:"'Inter',-apple-system,BlinkMacSystemFont,'SF Pro Display',sans-serif", display:"flex", flexDirection:"column" }}>
@@ -582,7 +663,6 @@ function Shell({ children, css }: { children: React.ReactNode; css?: string }) {
   )
 }
 
-/* ── Powered By ─────────────────────────────────────────────────── */
 function PoweredBy() {
   return (
     <div style={{ display:"inline-flex", alignItems:"center", gap:8, background:"#F9FAFB", border:"1px solid #EAECEF", borderRadius:20, padding:"6px 14px 6px 8px" }}>
@@ -594,12 +674,11 @@ function PoweredBy() {
   )
 }
 
-/* ── Spinner ───────────────────────────────────────────────────── */
-function Spin() {
-  return <div style={{ width:16, height:16, border:"2.5px solid rgba(255,255,255,0.35)", borderTopColor:"#fff", borderRadius:"50%", animation:"spin .7s linear infinite", flexShrink:0 }} />
+function Spin({ small }: { small?: boolean }) {
+  const s = small ? 14 : 16
+  return <div style={{ width:s, height:s, border:`2.5px solid ${small ? "rgba(100,100,100,0.3)" : "rgba(255,255,255,0.35)"}`, borderTopColor: small ? "#6B7280" : "#fff", borderRadius:"50%", animation:"spin .7s linear infinite", flexShrink:0 }} />
 }
 
-/* ── Limited Textarea ──────────────────────────────────────────── */
 const MAX = 160
 function LimitedTextarea({ value, onChange, placeholder, rows = 2 }: {
   value: string; onChange: (v: string) => void; placeholder?: string; rows?: number
@@ -618,7 +697,6 @@ function LimitedTextarea({ value, onChange, placeholder, rows = 2 }: {
   )
 }
 
-/* ── Detail Row ────────────────────────────────────────────────── */
 function DRow({ label, value, last }: { label:string; value:string; last?:boolean }) {
   return (
     <div style={{ display:"flex", justifyContent:"space-between", gap:16, padding:"13px 20px", borderBottom: last ? "none" : "1px solid #F3F4F6" }}>

@@ -6,7 +6,13 @@ import DashNav from "../components/DashNav"
 import QRCode from "../components/QRCode"
 import { useToast } from "../components/Toast"
 
-type Section = "buchungsseite" | "konto" | "sms" | "abo"
+type Section = "buchungsseite" | "mitarbeiter" | "konto" | "sms" | "abo"
+
+type Employee = {
+  id: string
+  name: string
+  active: boolean
+}
 
 export default function SettingsPage() {
   const toast = useToast()
@@ -28,6 +34,13 @@ export default function SettingsPage() {
   const [slug,          setSlug]          = useState("")
   const [bookingSaving, setBookingSaving] = useState(false)
   const [bookingMsg,    setBookingMsg]    = useState("")
+
+  // Mitarbeiter
+  const [employees,     setEmployees]     = useState<Employee[]>([])
+  const [empLoading,    setEmpLoading]    = useState(false)
+  const [empName,       setEmpName]       = useState("")
+  const [empAdding,     setEmpAdding]     = useState(false)
+  const [empError,      setEmpError]      = useState("")
 
   // Passwort
   const [pwOld,     setPwOld]     = useState("")
@@ -56,6 +69,7 @@ export default function SettingsPage() {
   }, [])
 
   useEffect(() => { if (companyId) loadSettings() }, [companyId])
+  useEffect(() => { if (companyId && section === "mitarbeiter") loadEmployees() }, [companyId, section])
 
   async function loadSettings() {
     setLoading(true)
@@ -69,13 +83,59 @@ export default function SettingsPage() {
       setSlug(co.slug || "")
       setBookingAddon(!!co.booking_addon)
       setPlan(co.plan || "trial")
-      if (co.booking_addon) setSection("buchungsseite")
+      setSection("buchungsseite")
     }
     if (user) {
       setUserEmail(user.email || "")
       setMemberSince(user.created_at ? new Date(user.created_at).toLocaleDateString("de-DE", { day: "numeric", month: "long", year: "numeric" }) : "")
     }
     setLoading(false)
+  }
+
+  async function loadEmployees() {
+    if (!companyId) return
+    setEmpLoading(true)
+    const { data } = await supabase
+      .from("employees")
+      .select("id, name, active")
+      .eq("company_id", companyId)
+      .order("created_at", { ascending: true })
+    setEmployees(data || [])
+    setEmpLoading(false)
+  }
+
+  async function addEmployee() {
+    const trimmed = empName.trim()
+    if (!trimmed) return
+    if (employees.length >= 5) { setEmpError("Maximal 5 Mitarbeiter möglich."); return }
+    setEmpAdding(true); setEmpError("")
+    const { error } = await supabase
+      .from("employees")
+      .insert({ company_id: companyId, name: trimmed, active: true })
+    setEmpAdding(false)
+    if (error) {
+      setEmpError("Fehler beim Hinzufügen.")
+    } else {
+      setEmpName("")
+      toast.success("Mitarbeiter hinzugefügt!", `${trimmed} wurde angelegt.`)
+      loadEmployees()
+    }
+  }
+
+  async function toggleEmployee(emp: Employee) {
+    await supabase.from("employees").update({ active: !emp.active }).eq("id", emp.id)
+    setEmployees(prev => prev.map(e => e.id === emp.id ? { ...e, active: !e.active } : e))
+  }
+
+  async function deleteEmployee(emp: Employee) {
+    if (!confirm(`Mitarbeiter „${emp.name}" wirklich löschen?`)) return
+    const { error } = await supabase.from("employees").delete().eq("id", emp.id)
+    if (error) {
+      toast.error("Fehler", "Mitarbeiter konnte nicht gelöscht werden.")
+    } else {
+      toast.success("Gelöscht", `${emp.name} wurde entfernt.`)
+      setEmployees(prev => prev.filter(e => e.id !== emp.id))
+    }
   }
 
   async function saveBookingSettings() {
@@ -152,10 +212,11 @@ export default function SettingsPage() {
   const smsPreview = `Hallo [Kundenname], Ihr Termin bei ${companyName || "Ihrem Betrieb"} ist morgen um [Uhrzeit] Uhr. Wir freuen uns auf Sie!`
 
   const sections: { id: Section; label: string }[] = [
-    ...(bookingAddon ? [{ id: "buchungsseite" as Section, label: "🔗 Buchungsseite" }] : []),
-    { id: "konto",  label: "🔐 Passwort & Konto" },
-    { id: "sms",    label: "📱 SMS-Vorschau"      },
-    { id: "abo",    label: "💳 Abo & Zahlung"     },
+    { id: "buchungsseite", label: "🔗 Buchungsseite"   },
+    { id: "mitarbeiter",   label: "👥 Mitarbeiter"     },
+    { id: "konto",         label: "🔐 Passwort & Konto"},
+    { id: "sms",           label: "📱 SMS-Vorschau"    },
+    { id: "abo",           label: "💳 Abo & Zahlung"   },
   ]
 
   async function openPortal() {
@@ -230,7 +291,7 @@ export default function SettingsPage() {
         </div>
 
         {/* ── BUCHUNGSSEITE ── */}
-        {section === "buchungsseite" && bookingAddon && (
+        {section === "buchungsseite" && (
           <div style={card}>
             <h2 style={{ fontSize: 17, fontWeight: 800, color: T, margin: "0 0 6px" }}>🔗 Buchungsseite</h2>
             <p style={{ fontSize: 14, color: M, margin: "0 0 24px", lineHeight: 1.6 }}>
@@ -307,6 +368,132 @@ export default function SettingsPage() {
           </div>
         )}
 
+        {/* ── MITARBEITER ── */}
+        {section === "mitarbeiter" && (
+          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+
+            <div style={card}>
+              <h2 style={{ fontSize: 17, fontWeight: 800, color: T, margin: "0 0 6px" }}>👥 Mitarbeiter</h2>
+              <p style={{ fontSize: 14, color: M, margin: "0 0 24px", lineHeight: 1.6 }}>
+                Lege bis zu 5 Mitarbeiter an. Das System prüft automatisch, ob ein Mitarbeiter zum gewünschten Termin verfügbar ist.
+                Hast du keine Mitarbeiter angelegt, gilt dein Betrieb als Einzelperson (Kapazität = 1).
+              </p>
+
+              {/* Mitarbeiter-Liste */}
+              {empLoading ? (
+                <div style={{ display: "flex", justifyContent: "center", padding: "24px 0" }}>
+                  <div style={{ width: 28, height: 28, border: `3px solid ${GL}`, borderTopColor: G, borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
+                </div>
+              ) : employees.length === 0 ? (
+                <div style={{ background: "#F9FAFB", borderRadius: 14, padding: "20px 24px", textAlign: "center", marginBottom: 24 }}>
+                  <div style={{ fontSize: 28, marginBottom: 8 }}>👤</div>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: T, marginBottom: 4 }}>Noch keine Mitarbeiter</div>
+                  <div style={{ fontSize: 13, color: M }}>Füge deinen ersten Mitarbeiter hinzu — oder lass es leer für Einzelbetrieb.</div>
+                </div>
+              ) : (
+                <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 24 }}>
+                  {employees.map(emp => (
+                    <div key={emp.id} style={{
+                      display: "flex", alignItems: "center", justifyContent: "space-between",
+                      padding: "12px 16px", borderRadius: 14,
+                      border: `1.5px solid ${emp.active ? GB : BD}`,
+                      background: emp.active ? GL : "#F9FAFB",
+                      gap: 12,
+                    }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 10, flex: 1, minWidth: 0 }}>
+                        <div style={{
+                          width: 36, height: 36, borderRadius: "50%", flexShrink: 0,
+                          background: emp.active ? G : "#D1D5DB",
+                          display: "flex", alignItems: "center", justifyContent: "center",
+                          fontSize: 14, fontWeight: 800, color: "#fff",
+                        }}>
+                          {emp.name.charAt(0).toUpperCase()}
+                        </div>
+                        <div>
+                          <div style={{ fontSize: 14, fontWeight: 700, color: T }}>{emp.name}</div>
+                          <div style={{ fontSize: 12, color: emp.active ? G : M, fontWeight: 600 }}>
+                            {emp.active ? "✓ Aktiv" : "Inaktiv"}
+                          </div>
+                        </div>
+                      </div>
+                      <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
+                        {/* Toggle aktiv/inaktiv */}
+                        <button
+                          onClick={() => toggleEmployee(emp)}
+                          title={emp.active ? "Deaktivieren" : "Aktivieren"}
+                          style={{
+                            padding: "7px 13px", borderRadius: 9, border: `1px solid ${emp.active ? BD : GB}`,
+                            cursor: "pointer", fontSize: 12, fontWeight: 700,
+                            background: emp.active ? "#fff" : GL,
+                            color: emp.active ? M : G,
+                          }}
+                        >
+                          {emp.active ? "Pausieren" : "Aktivieren"}
+                        </button>
+                        {/* Löschen */}
+                        <button
+                          onClick={() => deleteEmployee(emp)}
+                          title="Mitarbeiter löschen"
+                          style={{
+                            padding: "7px 10px", borderRadius: 9, border: "1px solid #FEE2E2",
+                            cursor: "pointer", fontSize: 14, background: "#FEF2F2", color: RED,
+                          }}
+                        >
+                          🗑
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Neuen Mitarbeiter hinzufügen */}
+              {employees.length < 5 ? (
+                <div>
+                  <label style={{ display: "block", fontSize: 12, fontWeight: 700, color: M, textTransform: "uppercase", letterSpacing: .5, marginBottom: 7 }}>
+                    Mitarbeiter hinzufügen
+                  </label>
+                  <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
+                    <input
+                      type="text"
+                      value={empName}
+                      onChange={e => { setEmpName(e.target.value); setEmpError("") }}
+                      onKeyDown={e => { if (e.key === "Enter") addEmployee() }}
+                      placeholder="Name des Mitarbeiters"
+                      style={{ ...inp, flex: 1, minWidth: 180, maxWidth: 300 }}
+                    />
+                    <button
+                      onClick={addEmployee}
+                      disabled={empAdding || !empName.trim()}
+                      style={saveBtn(empAdding || !empName.trim())}
+                    >
+                      {empAdding ? "Wird hinzugefügt …" : "+ Hinzufügen"}
+                    </button>
+                  </div>
+                  {empError && (
+                    <p style={{ fontSize: 13, color: RED, margin: "8px 0 0", fontWeight: 600 }}>⚠️ {empError}</p>
+                  )}
+                </div>
+              ) : (
+                <div style={{ background: "#FFF7ED", border: "1px solid #FED7AA", borderRadius: 12, padding: "12px 16px", fontSize: 13, color: "#92400E" }}>
+                  ⚠️ Maximale Anzahl von 5 Mitarbeitern erreicht. Lösche einen Mitarbeiter, um einen neuen hinzuzufügen.
+                </div>
+              )}
+
+              {/* Info-Box */}
+              <div style={{ marginTop: 24, background: GL, border: `1px solid ${GB}`, borderRadius: 14, padding: "14px 18px" }}>
+                <div style={{ fontSize: 13, fontWeight: 800, color: T, marginBottom: 8 }}>💡 Wie funktioniert das?</div>
+                <div style={{ fontSize: 13, color: M, lineHeight: 1.7 }}>
+                  Wenn ein Kunde einen Termin bucht, prüft das System wie viele aktive Mitarbeiter du hast.
+                  Sind noch freie Plätze → <strong style={{ color: G }}>automatisch bestätigt</strong> + SMS-Bestätigung an den Kunden.
+                  Sind alle Mitarbeiter belegt → Anfrage landet als <strong style={{ color: T }}>Ausstehend</strong> in deinem Dashboard.
+                </div>
+              </div>
+            </div>
+
+          </div>
+        )}
+
         {/* ── KONTO & PASSWORT ── */}
         {section === "konto" && (
           <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
@@ -319,7 +506,7 @@ export default function SettingsPage() {
                   { label: "Betriebsname",   value: companyName  },
                   { label: "E-Mail-Adresse", value: userEmail    },
                   { label: "Mitglied seit",  value: memberSince  },
-                  { label: "Buchungs-Add-on",value: bookingAddon ? "✅ Aktiv" : "—" },
+                  { label: "Aktueller Plan", value: planLabel[plan] || plan },
                 ].map(row => (
                   <div key={row.label} style={{ display: "flex", gap: 16, padding: "12px 16px", background: "#F9FAFB", borderRadius: 12, alignItems: "center" }}>
                     <span style={{ fontSize: 12, fontWeight: 700, color: M, textTransform: "uppercase", letterSpacing: .4, minWidth: 130, flexShrink: 0 }}>{row.label}</span>
