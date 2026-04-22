@@ -21,19 +21,18 @@ export default function QRCode({ url, size = 180, label }: QRCodeProps) {
     })
   }
 
-  async function downloadQR() {
-    try {
-      const res = await fetch(qrSrc)
-      const blob = await res.blob()
-      const a = document.createElement("a")
-      a.href = URL.createObjectURL(blob)
-      a.download = "buchungslink-qr.png"
-      a.click()
-      setDownloaded(true)
-      setTimeout(() => setDownloaded(false), 2000)
-    } catch {
-      window.open(qrSrc, "_blank")
-    }
+  function downloadQR() {
+    // Direct anchor download — no async, no popup blocker
+    const a = document.createElement("a")
+    a.href = qrSrc
+    a.target = "_blank"
+    a.rel = "noopener"
+    a.download = "buchungslink-qr.png"
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    setDownloaded(true)
+    setTimeout(() => setDownloaded(false), 2000)
   }
 
   const G = "#18A66D"

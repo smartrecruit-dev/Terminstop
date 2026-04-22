@@ -5,9 +5,10 @@ import { useParams } from "next/navigation"
 import { supabase } from "../../lib/supabaseClient"
 
 type Service     = { id: string; name: string; duration: number; price: number | null }
+type Employee    = { id: string; name: string }
 type Company     = { id: string; name: string; booking_note: string | null }
 type BookingType = "service" | "open" | "callback"
-type Step        = "type" | "datetime" | "service" | "contact" | "confirm" | "done"
+type Step        = "type" | "employee" | "datetime" | "service" | "contact" | "confirm" | "done"
 type Avail       = "idle" | "checking" | "available" | "full"
 
 function formatDur(m: number) {
@@ -25,10 +26,11 @@ function formatDT(date: string, time: string) {
   }) + " Uhr"
 }
 
-// Step order: date+time first, THEN service selection
+// Step order: employee (if any) → date+time → service
+// "employee" step is auto-skipped when no employees are configured
 const STEP_ORDER: Record<BookingType, Step[]> = {
-  service:  ["type", "datetime", "service", "contact", "confirm"],
-  open:     ["type", "datetime", "contact", "confirm"],
+  service:  ["type", "employee", "datetime", "service", "contact", "confirm"],
+  open:     ["type", "employee", "datetime", "contact", "confirm"],
   callback: ["type", "contact", "confirm"],
 }
 
@@ -36,24 +38,26 @@ export default function BookingPage() {
   const params = useParams()
   const slug   = params?.slug as string
 
-  const [company,  setCompany]  = useState<Company | null>(null)
-  const [services, setServices] = useState<Service[]>([])
-  const [loading,  setLoading]  = useState(true)
-  const [notFound, setNotFound] = useState(false)
+  const [company,           setCompany]          = useState<Company | null>(null)
+  const [services,          setServices]         = useState<Service[]>([])
+  const [employees,         setEmployees]        = useState<Employee[]>([])
+  const [loading,           setLoading]          = useState(true)
+  const [notFound,          setNotFound]         = useState(false)
 
-  const [step,            setStep]            = useState<Step>("type")
-  const [bookingType,     setBookingType]     = useState<BookingType>("service")
-  const [selectedService, setSelectedService] = useState<Service | null>(null)
-  const [requestText,     setRequestText]     = useState("")
-  const [date,            setDate]            = useState("")
-  const [time,            setTime]            = useState("")
-  const [name,            setName]            = useState("")
-  const [phone,           setPhone]           = useState("")
-  const [note,            setNote]            = useState("")
-  const [submitting,      setSubmitting]      = useState(false)
-  const [error,           setError]           = useState("")
-  const [avail,           setAvail]           = useState<Avail>("idle")
-  const [confirmed,       setConfirmed]       = useState(false) // was auto-confirmed?
+  const [step,              setStep]             = useState<Step>("type")
+  const [bookingType,       setBookingType]      = useState<BookingType>("service")
+  const [selectedService,   setSelectedService]  = useState<Service | null>(null)
+  const [selectedEmployee,  setSelectedEmployee] = useState<Employee | null>(null)
+  const [requestText,       setRequestText]      = useState("")
+  const [date,              setDate]             = useState("")
+  const [time,              setTime]             = useState("")
+  const [name,              setName]             = useState("")
+  const [phone,             setPhone]            = useState("")
+  const [note,              setNote]             = useState("")
+  const [submitting,        setSubmitting]       = useState(false)
+  const [error,             setError]            = useState("")
+  const [avail,             setAvail]            = useState<Avail>("idle")
+  const [confirmed,         setConfirmed]        = useState(false)
 
   useEffect(() => { if (slug) loadCompany() }, [slug])
 
@@ -61,43 +65,64 @@ export default function BookingPage() {
     setLoading(true)
     const { data: co, error: coErr } = await supabase
       .from("companies")
-      .select("id, name, booking_note, booking_active, booking_addon")
+      .select("id, name, booking_note, booking_active, slug")
       .eq("slug", slug).single()
-    if (coErr || !co || co.booking_active === false || co.booking_addon === false) {
+    if (coErr || !co || co.booking_active === false) {
       setNotFound(true); setLoading(false); return
     }
     setCompany({ id: co.id, name: co.name, booking_note: co.booking_note })
-    const { data: svcs } = await supabase
-      .from("services").select("id, name, duration, price")
-      .eq("company_id", co.id).eq("active", true).order("name")
+    const [{ data: svcs }, { data: emps }] = await Promise.all([
+      supabase.from("services").select("id, name, duration, price")
+        .eq("company_id", co.id).eq("active", true).order("name"),
+      supabase.from("employees").select("id, name")
+        .eq("company_id", co.id).eq("active", true).order("created_at", { ascending: true }),
+    ])
     setServices(svcs || [])
+    setEmployees(emps || [])
     setLoading(false)
   }
 
-  // Check availability whenever date+time changes
-  const checkAvailability = useCallback(async (d: string, t: string) => {
+  // Check availability — pass employee_id if one is selected
+  const checkAvailability = useCallback(async (d: string, t: string, empId?: string | null) => {
     if (!company || !d || !t) { setAvail("idle"); return }
     setAvail("checking")
     try {
-      const res = await fetch(`/api/availability?company_id=${company.id}&date=${d}&time=${t}`)
+      const eid = empId !== undefined ? empId : selectedEmployee?.id
+      const params = new URLSearchParams({ company_id: company.id, date: d, time: t })
+      if (eid) params.set("employee_id", eid)
+      const res  = await fetch(`/api/availability?${params}`)
       const json = await res.json()
       setAvail(json.available ? "available" : "full")
     } catch {
       setAvail("idle")
     }
-  }, [company])
+  }, [company, selectedEmployee])
 
-  function goNext() {
-    const steps = STEP_ORDER[bookingType]
-    const idx   = steps.indexOf(step)
-    if (idx < steps.length - 1) setStep(steps[idx + 1])
+  // Skip "employee" step if no employees are configured
+  function nextStep(current: Step, type: BookingType): Step {
+    const steps = STEP_ORDER[type]
+    let idx = steps.indexOf(current) + 1
+    while (idx < steps.length) {
+      const s = steps[idx]
+      if (s === "employee" && employees.length === 0) { idx++; continue }
+      return s
+    }
+    return current
   }
-  function goBack() {
-    const steps = STEP_ORDER[bookingType]
-    const idx   = steps.indexOf(step)
-    if (idx > 0) setStep(steps[idx - 1])
-    else setStep("type")
+  function prevStep(current: Step, type: BookingType): Step {
+    const steps = STEP_ORDER[type]
+    let idx = steps.indexOf(current) - 1
+    while (idx >= 0) {
+      const s = steps[idx]
+      if (s === "employee" && employees.length === 0) { idx--; continue }
+      return s
+    }
+    return "type"
   }
+
+  function goNext() { setStep(s => nextStep(s, bookingType)) }
+  function goBack() { setStep(s => prevStep(s, bookingType)) }
+
   function progressPct() {
     const steps = STEP_ORDER[bookingType].filter(s => s !== "type")
     const idx   = (steps as Step[]).indexOf(step)
@@ -121,6 +146,7 @@ export default function BookingPage() {
         note:         note.trim() || null,
         request_text: requestText.trim() || null,
         booking_type: bookingType,
+        employee_id:  selectedEmployee?.id || null,
       }),
     })
     const json = await res.json()
@@ -160,9 +186,16 @@ export default function BookingPage() {
     .svc-hover:hover { border-color: #18A66D !important; background: #F0FBF6 !important; box-shadow: 0 6px 20px rgba(24,166,109,0.1) !important; }
     input[type="date"]::-webkit-calendar-picker-indicator { opacity: .5; cursor: pointer; }
     input:focus, textarea:focus { border-color: #18A66D !important; box-shadow: 0 0 0 4px rgba(24,166,109,0.12) !important; outline: none !important; }
-    .ts-input { width:100%; padding:15px 18px; border:1.5px solid #E5E7EB; border-radius:14px; font-size:15px; color:#111827; background:#fff; font-family:inherit; transition:border-color .15s, box-shadow .15s; }
+    /* font-size 16px prevents iOS auto-zoom on focus */
+    .ts-input { width:100%; padding:16px 18px; border:1.5px solid #E5E7EB; border-radius:14px; font-size:16px; color:#111827; background:#fff; font-family:inherit; transition:border-color .15s, box-shadow .15s; -webkit-appearance:none; appearance:none; }
     .ts-input::placeholder { color: #C4C9D4; }
     textarea.ts-input { resize:none; line-height:1.6; }
+    input[type="date"].ts-input, input[type="time"].ts-input { cursor:pointer; }
+    @media (max-width: 390px) {
+      .ts-input { font-size:16px; padding:14px 16px; }
+      .primary-btn { font-size:14px; padding:15px; }
+      .type-card { padding:18px; gap:14px; }
+    }
     .primary-btn { width:100%; padding:17px; background:linear-gradient(135deg,#18A66D,#15955F); color:#fff; border:none; border-radius:15px; font-size:15px; font-weight:800; cursor:pointer; letter-spacing:.2px; box-shadow:0 8px 28px rgba(24,166,109,0.35); transition:all .22s; display:flex; align-items:center; justify-content:center; gap:8px; }
     .primary-btn:hover { transform:translateY(-2px); box-shadow:0 12px 36px rgba(24,166,109,0.45); }
     .primary-btn:active { transform:translateY(0); }
@@ -248,10 +281,11 @@ export default function BookingPage() {
               {confirmed ? "✓ Automatisch bestätigt" : "⏳ Anfrage eingegangen"}
             </span>
           </div>
-          {bookingType !== "callback" && date && <DRow label="Termin"   value={formatDT(date, time)} />}
-          {bookingType === "callback"           && <DRow label="Art"     value="Rückruf" />}
-          {selectedService                      && <DRow label="Leistung" value={selectedService.name} />}
-          {requestText                          && <DRow label="Anliegen" value={requestText} />}
+          {bookingType !== "callback" && date && <DRow label="Termin"      value={formatDT(date, time)} />}
+          {bookingType === "callback"           && <DRow label="Art"        value="Rückruf" />}
+          {selectedEmployee                     && <DRow label="Mitarbeiter" value={selectedEmployee.name} />}
+          {selectedService                      && <DRow label="Leistung"   value={selectedService.name} />}
+          {requestText                          && <DRow label="Anliegen"   value={requestText} />}
           <DRow label="Name"    value={name} />
           <DRow label="Telefon" value={phone} last />
         </div>
@@ -265,8 +299,8 @@ export default function BookingPage() {
   /* ── Main ── */
   const showBack = step !== "type"
   const stepLabel: Record<Step, string> = {
-    type: "", service: "Leistung wählen", datetime: "Datum & Uhrzeit",
-    contact: "Kontakt", confirm: "Bestätigung", done: "",
+    type: "", employee: "Mitarbeiter wählen", service: "Leistung wählen",
+    datetime: "Datum & Uhrzeit", contact: "Kontakt", confirm: "Bestätigung", done: "",
   }
 
   return (
@@ -394,6 +428,51 @@ export default function BookingPage() {
           </div>
         )}
 
+        {/* ── STEP: employee ── */}
+        {step === "employee" && employees.length > 0 && (
+          <div className="step-enter">
+            <div style={{ marginBottom:24 }}>
+              <h2 style={{ fontSize:21, fontWeight:800, color:"#111827", margin:"0 0 6px", letterSpacing:"-.4px" }}>Bei wem möchtest du buchen?</h2>
+              <p style={{ color:"#6B7280", fontSize:14, margin:0, lineHeight:1.6 }}>Wähle einen Mitarbeiter oder buche bei dem nächsten Verfügbaren.</p>
+            </div>
+
+            <div style={{ display:"flex", flexDirection:"column", gap:12, marginBottom:20 }}>
+              {employees.map(emp => (
+                <button key={emp.id} className="type-card"
+                  onClick={() => { setSelectedEmployee(emp); goNext() }}
+                  style={{ background:"#fff", border:`1.5px solid ${selectedEmployee?.id === emp.id ? "#18A66D" : "#F0F0F0"}` }}>
+                  <div style={{ width:52, height:52, background:"linear-gradient(135deg, #18A66D, #0F8F63)", borderRadius:17, display:"flex", alignItems:"center", justifyContent:"center", fontSize:20, fontWeight:900, color:"#fff", flexShrink:0, letterSpacing:"-1px", boxShadow:"0 6px 18px rgba(24,166,109,0.3)" }}>
+                    {emp.name.charAt(0).toUpperCase()}
+                  </div>
+                  <div style={{ flex:1, minWidth:0, textAlign:"left" }}>
+                    <p style={{ fontWeight:800, color:"#111827", margin:"0 0 4px", fontSize:16 }}>{emp.name}</p>
+                    <p style={{ color:"#9CA3AF", margin:0, fontSize:13, fontWeight:500 }}>Verfügbarkeit wird geprüft nach Datumswahl</p>
+                  </div>
+                  <div style={{ width:36, height:36, background:"#F0FBF6", borderRadius:11, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#18A66D" strokeWidth="2.5" strokeLinecap="round"><path d="M9 18l6-6-6-6"/></svg>
+                  </div>
+                </button>
+              ))}
+
+              {/* Option: beliebiger Mitarbeiter */}
+              <button className="type-card"
+                onClick={() => { setSelectedEmployee(null); goNext() }}
+                style={{ background: selectedEmployee === null ? "#F0FBF6" : "#fff", border:`1.5px solid ${selectedEmployee === null ? "#18A66D" : "#E5E7EB"}`, opacity:.85 }}>
+                <div style={{ width:52, height:52, background:"linear-gradient(135deg, #6B7280, #374151)", borderRadius:17, display:"flex", alignItems:"center", justifyContent:"center", fontSize:22, flexShrink:0, boxShadow:"0 6px 18px rgba(0,0,0,0.15)" }}>
+                  👥
+                </div>
+                <div style={{ flex:1, minWidth:0, textAlign:"left" }}>
+                  <p style={{ fontWeight:800, color:"#111827", margin:"0 0 4px", fontSize:16 }}>Egal — nächster Verfügbarer</p>
+                  <p style={{ color:"#9CA3AF", margin:0, fontSize:13, fontWeight:500 }}>Automatisch dem freien Mitarbeiter zugeteilt</p>
+                </div>
+                <div style={{ width:36, height:36, background:"#F3F4F6", borderRadius:11, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="2.5" strokeLinecap="round"><path d="M9 18l6-6-6-6"/></svg>
+                </div>
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* ── STEP: datetime (NOW FIRST) ── */}
         {step === "datetime" && (
           <div className="step-enter">
@@ -401,6 +480,18 @@ export default function BookingPage() {
               <h2 style={{ fontSize:21, fontWeight:800, color:"#111827", margin:"0 0 6px", letterSpacing:"-.4px" }}>Wann passt es dir?</h2>
               <p style={{ color:"#6B7280", fontSize:14, margin:0 }}>Wähle Datum und Uhrzeit für deinen Termin.</p>
             </div>
+
+            {/* Zeige gewählten Mitarbeiter als Info-Badge */}
+            {selectedEmployee && (
+              <div style={{ display:"inline-flex", alignItems:"center", gap:8, background:"#F0FBF6", border:"1.5px solid #D1F5E3", borderRadius:12, padding:"8px 14px", marginBottom:18 }}>
+                <div style={{ width:26, height:26, background:"#18A66D", borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center", fontSize:11, fontWeight:900, color:"#fff", flexShrink:0 }}>
+                  {selectedEmployee.name.charAt(0).toUpperCase()}
+                </div>
+                <span style={{ fontSize:13, fontWeight:700, color:"#18A66D" }}>{selectedEmployee.name}</span>
+                <button onClick={() => { setSelectedEmployee(null); setAvail("idle") }}
+                  style={{ background:"none", border:"none", cursor:"pointer", color:"#9CA3AF", fontSize:16, padding:"0 0 0 4px", lineHeight:1 }}>✕</button>
+              </div>
+            )}
 
             {bookingType === "open" && (
               <div style={{ marginBottom:20 }}>
@@ -419,7 +510,7 @@ export default function BookingPage() {
                   onChange={e => {
                     setDate(e.target.value)
                     setAvail("idle")
-                    if (e.target.value && time) checkAvailability(e.target.value, time)
+                    if (e.target.value && time) checkAvailability(e.target.value, time, selectedEmployee?.id)
                   }}
                   className="ts-input" />
               </div>
@@ -429,7 +520,7 @@ export default function BookingPage() {
                   onChange={e => {
                     setTime(e.target.value)
                     setAvail("idle")
-                    if (date && e.target.value) checkAvailability(date, e.target.value)
+                    if (date && e.target.value) checkAvailability(date, e.target.value, selectedEmployee?.id)
                   }}
                   step={900} className="ts-input" />
               </div>
@@ -589,11 +680,12 @@ export default function BookingPage() {
                 </div>
                 <span style={{ fontSize:13, fontWeight:800, color:"#18A66D" }}>Deine Buchung</span>
               </div>
-              {bookingType !== "callback" && date && <DRow label="Termin"    value={formatDT(date, time)} />}
-              {bookingType === "callback"           && <DRow label="Art"      value="Rückruf" />}
-              {selectedService                      && <DRow label="Leistung" value={`${selectedService.name} · ${formatDur(selectedService.duration)}`} />}
-              {selectedService?.price != null       && <DRow label="Preis"    value={formatPrice(selectedService.price) || ""} />}
-              {requestText                          && <DRow label="Anliegen" value={requestText} />}
+              {bookingType !== "callback" && date && <DRow label="Termin"      value={formatDT(date, time)} />}
+              {bookingType === "callback"           && <DRow label="Art"        value="Rückruf" />}
+              {selectedEmployee                     && <DRow label="Mitarbeiter" value={selectedEmployee.name} />}
+              {selectedService                      && <DRow label="Leistung"   value={`${selectedService.name} · ${formatDur(selectedService.duration)}`} />}
+              {selectedService?.price != null       && <DRow label="Preis"      value={formatPrice(selectedService.price) || ""} />}
+              {requestText                          && <DRow label="Anliegen"   value={requestText} />}
               <DRow label="Name"    value={name} />
               <DRow label="Telefon" value={phone} last={!note} />
               {note && <DRow label="Anmerkung" value={note} last />}
@@ -656,7 +748,7 @@ export default function BookingPage() {
 /* ── Shell ── */
 function Shell({ children, css }: { children: React.ReactNode; css?: string }) {
   return (
-    <div style={{ minHeight:"100dvh", background:"#F4F6F8", fontFamily:"'Inter',-apple-system,BlinkMacSystemFont,'SF Pro Display',sans-serif", display:"flex", flexDirection:"column" }}>
+    <div style={{ minHeight:"100dvh", background:"#F4F6F8", fontFamily:"'Inter',-apple-system,BlinkMacSystemFont,'SF Pro Display',sans-serif", display:"flex", flexDirection:"column", paddingBottom:"env(safe-area-inset-bottom,0px)" }}>
       {css && <style dangerouslySetInnerHTML={{ __html: css }} />}
       {children}
     </div>

@@ -53,6 +53,7 @@ export async function POST(req: NextRequest) {
       note,
       request_text,
       booking_type, // "service" | "open" | "callback"
+      employee_id,  // optional: assigned employee
     } = body
 
     if (!company_id || !name || !phone) {
@@ -63,24 +64,34 @@ export async function POST(req: NextRequest) {
     let autoConfirm = false
 
     if (date && time && booking_type !== "callback") {
-      const { count: empCount } = await supabase
-        .from("employees")
-        .select("id", { count: "exact", head: true })
-        .eq("company_id", company_id)
-        .eq("active", true)
-
-      const capacity = Math.max(empCount ?? 0, 1)
-
-      const { count: bookedCount } = await supabase
-        .from("appointments")
-        .select("id", { count: "exact", head: true })
-        .eq("company_id", company_id)
-        .eq("date", date)
-        .eq("time", time)
-        .in("status", ["pending", "confirmed"])
-
-      const booked = bookedCount ?? 0
-      autoConfirm = booked < capacity
+      if (employee_id) {
+        // Mitarbeiter-spezifisch: ist dieser Mitarbeiter frei?
+        const { count: bookedCount } = await supabase
+          .from("appointments")
+          .select("id", { count: "exact", head: true })
+          .eq("company_id", company_id)
+          .eq("employee_id", employee_id)
+          .eq("date", date)
+          .eq("time", time)
+          .in("status", ["pending", "confirmed"])
+        autoConfirm = (bookedCount ?? 0) === 0
+      } else {
+        // Allgemeine Kapazitätsprüfung
+        const { count: empCount } = await supabase
+          .from("employees")
+          .select("id", { count: "exact", head: true })
+          .eq("company_id", company_id)
+          .eq("active", true)
+        const capacity = Math.max(empCount ?? 0, 1)
+        const { count: bookedCount } = await supabase
+          .from("appointments")
+          .select("id", { count: "exact", head: true })
+          .eq("company_id", company_id)
+          .eq("date", date)
+          .eq("time", time)
+          .in("status", ["pending", "confirmed"])
+        autoConfirm = (bookedCount ?? 0) < capacity
+      }
     }
 
     // ── Terminnamen zusammenstellen ────────────────────────────────────────────
@@ -107,6 +118,7 @@ export async function POST(req: NextRequest) {
         status:         newStatus,
         online_booking: true,
         request_text:   request_text?.trim() || null,
+        employee_id:    employee_id || null,
         reminded:       false,
       })
       .select("id")
