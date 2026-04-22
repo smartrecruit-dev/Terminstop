@@ -5,6 +5,7 @@ import { supabase } from "../lib/supabaseClient"
 import DashNav from "../components/DashNav"
 
 type View = "day" | "week" | "month"
+type Employee = { id: string; name: string; active: boolean }
 
 function toStr(d: Date) {
   return d.toISOString().split("T")[0]
@@ -38,9 +39,11 @@ export default function CalendarPage() {
   const [appointments, setAppointments] = useState<any[]>([])
   const [companyId, setCompanyId]       = useState<string | null>(null)
   const [view, setView]                 = useState<View>("week")
-  const [cursor, setCursor]             = useState(new Date())   // "where are we navigating"
+  const [cursor, setCursor]             = useState(new Date())
   const [selected, setSelected]         = useState<any>(null)
   const [confirmDelete, setConfirmDelete] = useState(false)
+  const [employees, setEmployees]       = useState<Employee[]>([])
+  const [filterEmp, setFilterEmp]       = useState<string>("all") // "all" | employee.id
 
   const today    = useMemo(() => new Date(), [])
   const todayStr = useMemo(() => toStr(today), [today])
@@ -65,7 +68,15 @@ export default function CalendarPage() {
       .order("time", { ascending: true })
     if (data) setAppointments(data)
   }
-  useEffect(() => { loadAppointments() }, [companyId])
+  async function loadEmployees() {
+    if (!companyId) return
+    const { data } = await supabase
+      .from("employees").select("id, name, active")
+      .eq("company_id", companyId)
+      .order("created_at", { ascending: true })
+    if (data) setEmployees(data)
+  }
+  useEffect(() => { loadAppointments(); loadEmployees() }, [companyId])
 
   /* ── Actions ── */
   async function toggleDone(a: any) {
@@ -120,8 +131,21 @@ export default function CalendarPage() {
     return days
   }, [cursor])
 
+  // Employee filter
+  const visibleAppointments = filterEmp === "all"
+    ? appointments
+    : filterEmp === "none"
+      ? appointments.filter(a => !a.employee_id)
+      : appointments.filter(a => a.employee_id === filterEmp)
+
+  // Helper to get employee name by id
+  const empName = (id: string | null) => {
+    if (!id) return null
+    return employees.find(e => e.id === id)?.name || null
+  }
+
   // Day stats
-  const dayAppts  = appointments.filter(a => a.date === cursorStr)
+  const dayAppts  = visibleAppointments.filter(a => a.date === cursorStr)
   const doneToday = dayAppts.filter(a => a.status === "done").length
 
   // Period label
@@ -195,6 +219,28 @@ export default function CalendarPage() {
           </div>
         </div>
 
+        {/* ── MITARBEITER FILTER ── */}
+        {employees.length > 0 && (
+          <div style={{ display: "flex", gap: 6, marginBottom: 20, flexWrap: "wrap", alignItems: "center" }}>
+            <span style={{ fontSize: 11, fontWeight: 700, color: "#9CA3AF", textTransform: "uppercase", letterSpacing: .6, marginRight: 4 }}>Mitarbeiter:</span>
+            {[
+              { id: "all",  label: "Alle" },
+              ...employees.map(e => ({ id: e.id, label: e.name })),
+            ].map(opt => (
+              <button key={opt.id} onClick={() => setFilterEmp(opt.id)} style={{
+                padding: "6px 14px", borderRadius: 20, cursor: "pointer",
+                fontSize: 12, fontWeight: 700, transition: "all .15s",
+                background: filterEmp === opt.id ? "#18A66D" : "#fff",
+                color: filterEmp === opt.id ? "#fff" : "#6B7280",
+                border: `1.5px solid ${filterEmp === opt.id ? "#18A66D" : "#E5E7EB"}`,
+                boxShadow: filterEmp === opt.id ? "0 2px 8px rgba(24,166,109,0.25)" : "none",
+              }}>
+                {opt.label}
+              </button>
+            ))}
+          </div>
+        )}
+
         {/* ── DAY STATS ── */}
         {view === "day" && (
           <div className="cal-day-stats" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12, marginBottom: 20 }}>
@@ -267,7 +313,7 @@ export default function CalendarPage() {
           <div className="cal-week-scroll"><div className="cal-week-grid" style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 10 }}>
             {weekDays.map((day, i) => {
               const dStr   = toStr(day)
-              const items  = appointments.filter(a => a.date === dStr)
+              const items  = visibleAppointments.filter(a => a.date === dStr)
               const isT    = dStr === todayStr
               const isPast = dStr < todayStr
               const done   = items.filter(a => a.status === "done").length
@@ -334,7 +380,7 @@ export default function CalendarPage() {
               {monthDays.map((day, i) => {
                 if (!day) return <div key={i} style={{ minHeight: 90, borderRight: "1px solid #F9FAFB", borderBottom: "1px solid #F9FAFB", background: "#FAFAFA" }} />
                 const dStr   = toStr(day)
-                const items  = appointments.filter(a => a.date === dStr)
+                const items  = visibleAppointments.filter(a => a.date === dStr)
                 const isT    = dStr === todayStr
                 const isPast = dStr < todayStr
                 const isCurM = day.getMonth() === cursor.getMonth()
@@ -383,7 +429,7 @@ export default function CalendarPage() {
 
         {/* ── Upcoming (nächste Termine) ── */}
         {view === "month" && (() => {
-          const upcoming = appointments
+          const upcoming = visibleAppointments
             .filter(a => a.date && a.date >= todayStr && a.status !== "done")
             .slice(0, 5)
           if (!upcoming.length) return null
@@ -458,6 +504,15 @@ export default function CalendarPage() {
                   <div>
                     <div style={{ fontSize: 11, color: "#9CA3AF", fontWeight: 600 }}>Notiz</div>
                     <div style={{ fontSize: 14, color: "#111827" }}>{selected.note}</div>
+                  </div>
+                </div>
+              )}
+              {empName(selected.employee_id) && (
+                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                  <div style={{ width: 36, height: 36, background: "#F0FBF6", border: "1px solid #D1F5E3", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, flexShrink: 0 }}>👤</div>
+                  <div>
+                    <div style={{ fontSize: 11, color: "#9CA3AF", fontWeight: 600 }}>Mitarbeiter</div>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: "#18A66D" }}>{empName(selected.employee_id)}</div>
                   </div>
                 </div>
               )}

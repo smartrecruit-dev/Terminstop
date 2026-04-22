@@ -6,12 +6,16 @@ import DashNav from "../components/DashNav"
 import SetupChecklist from "../components/SetupChecklist"
 
 // ─────────────────────────────────────────────────────────────────────────────
+type Employee = { id: string; name: string; active: boolean }
+
 interface FormProps {
   name: string; setName: (v: string) => void
   phone: string; setPhone: (v: string) => void
   date: string; setDate: (v: string) => void
   time: string; setTime: (v: string) => void
   note: string; setNote: (v: string) => void
+  employeeId: string; setEmployeeId: (v: string) => void
+  employees: Employee[]
   isSubmitting: boolean
   formSuccess: boolean
   customers: any[]
@@ -23,7 +27,8 @@ interface FormProps {
 
 function AppointmentForm({
   name, setName, phone, setPhone, date, setDate, time, setTime,
-  note, setNote, isSubmitting, formSuccess, customers,
+  note, setNote, employeeId, setEmployeeId, employees,
+  isSubmitting, formSuccess, customers,
   customerSearch, setCustomerSearch, showSuggestions, setShowSuggestions,
   onSubmit, closeForm,
 }: FormProps) {
@@ -83,6 +88,23 @@ function AppointmentForm({
         <input className={inp} placeholder="z.B. Erstbesuch, Farbe" value={note}
           onChange={e => setNote(e.target.value)} />
       </div>
+      {employees.length > 0 && (
+        <div>
+          <label className="block text-xs font-bold text-[#6B7280] uppercase tracking-wide mb-1.5">
+            Mitarbeiter <span className="font-normal normal-case text-[#9CA3AF]">(optional)</span>
+          </label>
+          <select
+            className={inp}
+            value={employeeId}
+            onChange={e => setEmployeeId(e.target.value)}
+          >
+            <option value="">— Kein Mitarbeiter zugewiesen</option>
+            {employees.filter(e => e.active).map(e => (
+              <option key={e.id} value={e.id}>{e.name}</option>
+            ))}
+          </select>
+        </div>
+      )}
       <button type="submit" disabled={isSubmitting}
         className={`w-full py-3.5 rounded-xl font-bold text-sm transition-all shadow-sm ${
           formSuccess ? "bg-[#E8FBF3] text-[#18A66D] border border-[#B6F0D5]"
@@ -203,6 +225,8 @@ export default function Dashboard() {
   const [date, setDate]   = useState("")
   const [time, setTime]   = useState("")
   const [note, setNote]   = useState("")
+  const [employeeId, setEmployeeId] = useState("")
+  const [employees, setEmployees]   = useState<Employee[]>([])
 
   const [appointments, setAppointments] = useState<any[]>([])
   const [justAddedId, setJustAddedId]   = useState<string | null>(null)
@@ -230,7 +254,8 @@ export default function Dashboard() {
       supabase.from("appointments").select("*").eq("company_id", storedId)
         .order("date", { ascending: true }).order("time", { ascending: true }),
       supabase.from("customers").select("*").eq("company_id", storedId).order("name", { ascending: true }),
-    ]).then(([coRes, apptRes, custRes]) => {
+      supabase.from("employees").select("id, name, active").eq("company_id", storedId).order("created_at", { ascending: true }),
+    ]).then(([coRes, apptRes, custRes, empRes]) => {
       if (coRes.data?.paused) {
         localStorage.removeItem("company_id"); localStorage.removeItem("company_name")
         window.location.href = "/login"; return
@@ -244,6 +269,7 @@ export default function Dashboard() {
       }
       if (apptRes.data) setAppointments(apptRes.data)
       if (custRes.data) setCustomers(custRes.data)
+      if (empRes.data)  setEmployees(empRes.data)
     }).finally(() => setLoading(false))
   }, [])
 
@@ -265,10 +291,10 @@ export default function Dashboard() {
     if (!companyId || !name || !phone || !date || !time) return
     setIsSubmitting(true)
     const { data, error } = await supabase.from("appointments")
-      .insert([{ name, phone, date, time, note, status: "pending", company_id: companyId }]).select()
+      .insert([{ name, phone, date, time, note, status: "pending", company_id: companyId, employee_id: employeeId || null }]).select()
     if (error) { alert("Fehler beim Speichern"); setIsSubmitting(false); return }
     if (data) { setJustAddedId(data[0].id); setTimeout(() => setJustAddedId(null), 1200) }
-    setName(""); setPhone(""); setDate(""); setTime(""); setNote("")
+    setName(""); setPhone(""); setDate(""); setTime(""); setNote(""); setEmployeeId("")
     setCustomerSearch(""); setShowSuggestions(false)
     setIsSubmitting(false); setFormSuccess(true)
     setTimeout(() => { setFormSuccess(false); if (closeAfter) setShowForm(false) }, 1800)
@@ -293,7 +319,8 @@ export default function Dashboard() {
 
   const formProps: FormProps = {
     name, setName, phone, setPhone, date, setDate, time, setTime,
-    note, setNote, isSubmitting, formSuccess, customers,
+    note, setNote, employeeId, setEmployeeId, employees,
+    isSubmitting, formSuccess, customers,
     customerSearch, setCustomerSearch, showSuggestions, setShowSuggestions,
     onSubmit: handleSubmit,
   }
