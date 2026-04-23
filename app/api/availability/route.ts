@@ -6,6 +6,10 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
 
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+const DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/
+const TIME_REGEX = /^\d{2}:\d{2}$/
+
 /**
  * GET /api/availability?company_id=xxx&date=2026-04-22&time=10:00[&employee_id=yyy]
  *
@@ -14,13 +18,27 @@ const supabase = createClient(
  */
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl
-  const company_id  = searchParams.get("company_id")
-  const date        = searchParams.get("date")
-  const time        = searchParams.get("time")
-  const employee_id = searchParams.get("employee_id") // optional
+  const company_id  = searchParams.get("company_id")?.trim()
+  const date        = searchParams.get("date")?.trim()
+  const time        = searchParams.get("time")?.trim()
+  const employee_id = searchParams.get("employee_id")?.trim() // optional
 
   if (!company_id || !date || !time) {
     return NextResponse.json({ error: "company_id, date und time sind Pflichtfelder" }, { status: 400 })
+  }
+
+  // ── Format-Validierung ──────────────────────────────────────────────────────
+  if (!UUID_REGEX.test(company_id)) {
+    return NextResponse.json({ error: "Ungültige company_id" }, { status: 400 })
+  }
+  if (employee_id && !UUID_REGEX.test(employee_id)) {
+    return NextResponse.json({ error: "Ungültige employee_id" }, { status: 400 })
+  }
+  if (!DATE_REGEX.test(date)) {
+    return NextResponse.json({ error: "Ungültiges Datumsformat (YYYY-MM-DD)" }, { status: 400 })
+  }
+  if (!TIME_REGEX.test(time)) {
+    return NextResponse.json({ error: "Ungültiges Zeitformat (HH:MM)" }, { status: 400 })
   }
 
   try {

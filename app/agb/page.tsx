@@ -133,8 +133,7 @@ export default function AGB() {
               Umsatzsteuer ausgewiesen und erhoben.
             </p>
             <p className="mb-3">
-              Die Rechnungsstellung erfolgt monatlich im Voraus. Zahlungen sind innerhalb
-              von 14 Tagen nach Rechnungsstellung fällig. Bei Zahlungsverzug ist der
+              Die Rechnungsstellung erfolgt monatlich im Voraus. Bei Zahlungsverzug ist der
               Anbieter berechtigt, den Zugang zur Plattform zu sperren, bis der ausstehende
               Betrag beglichen ist.
             </p>
@@ -150,11 +149,14 @@ export default function AGB() {
               Volumen und Zielland variieren und sind, sofern nicht ausdrücklich im Preis
               enthalten, gesondert zu entrichten.
             </p>
+            <p className="mb-3 font-semibold text-[#1F2A37]">Zahlungsabwicklung:</p>
             <p className="mb-3">
-              Die Zahlung erfolgt per Dauerauftrag des Kunden. Der Kunde verpflichtet sich,
-              einen Dauerauftrag über den vereinbarten Monatsbetrag einzurichten, der jeweils
-              zum 1. eines Kalendermonats auf das Konto des Anbieters überwiesen wird.
-              Die Bankverbindung des Anbieters wird dem Kunden gesondert mitgeteilt.
+              Die Zahlungsabwicklung erfolgt über den Zahlungsdienstleister <strong>Stripe</strong>
+              (Stripe Payments Europe, Ltd., Dublin, Irland). Der Kunde ermächtigt den Anbieter,
+              monatliche Zahlungen über das bei Stripe hinterlegte Zahlungsmittel einzuziehen.
+              Zahlungsdaten werden ausschließlich durch Stripe verarbeitet und nicht auf den
+              Servern des Anbieters gespeichert. Für die Datenschutzpraktiken von Stripe gelten
+              die Datenschutzrichtlinien von Stripe (stripe.com/de/privacy).
             </p>
             <p className="mb-3 font-semibold text-[#1F2A37]">Online-Buchungs-Add-on:</p>
             <p className="mb-3">

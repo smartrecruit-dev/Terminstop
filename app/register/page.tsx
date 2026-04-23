@@ -70,6 +70,7 @@ export default function RegisterPage() {
   const [loading,     setLoading]     = useState(false)
   const [error,       setError]       = useState("")
   const [step,        setStep]        = useState<"form" | "success">("form")
+  const [agbOk,       setAgbOk]       = useState(false)
 
   const slugTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -470,11 +471,43 @@ export default function RegisterPage() {
                   )}
                 </div>
 
+                {/* AGB + Datenschutz Checkbox */}
+                <label style={{ display: "flex", alignItems: "flex-start", gap: 12, cursor: "pointer", marginTop: 8 }}>
+                  <div style={{ position: "relative", flexShrink: 0, marginTop: 2 }}>
+                    <input
+                      type="checkbox"
+                      checked={agbOk}
+                      onChange={e => setAgbOk(e.target.checked)}
+                      style={{ position: "absolute", opacity: 0, width: 20, height: 20, cursor: "pointer", margin: 0 }}
+                    />
+                    <div style={{
+                      width: 20, height: 20, borderRadius: 6,
+                      border: `2px solid ${agbOk ? "#18A66D" : C.border}`,
+                      background: agbOk ? "#18A66D" : C.bg2,
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      transition: "all .15s",
+                    }}>
+                      {agbOk && (
+                        <svg width="11" height="9" viewBox="0 0 11 9" fill="none">
+                          <path d="M1 4.5L4 7.5L10 1.5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      )}
+                    </div>
+                  </div>
+                  <span style={{ fontSize: 13, color: C.muted, lineHeight: 1.6 }}>
+                    Ich habe die{" "}
+                    <a href="/agb" target="_blank" rel="noreferrer" style={{ color: "#18A66D", textDecoration: "underline" }}>AGB</a>
+                    {" "}und den{" "}
+                    <a href="/avv" target="_blank" rel="noreferrer" style={{ color: "#18A66D", textDecoration: "underline" }}>Auftragsverarbeitungsvertrag (AVV)</a>
+                    {" "}gelesen und akzeptiere diese.
+                  </span>
+                </label>
+
                 {/* Submit */}
                 <button
                   type="submit"
                   className="btn-primary"
-                  disabled={loading || slugState === "taken" || slugState === "checking" || slugState === "invalid"}
+                  disabled={loading || !agbOk || slugState === "taken" || slugState === "checking" || slugState === "invalid"}
                   style={{ marginTop: 6 }}
                 >
                   {loading ? (

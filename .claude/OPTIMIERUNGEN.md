@@ -12,13 +12,13 @@
 
 [x] 4. **Datenschutz-Frage klären** — Willigt der Kunde automatisch ein wenn er über das Online-Tool bucht? Rechtliche Einschätzung + ggf. Checkbox einbauen.
 
-[ ] 5. **Sicherheit vollständig prüfen** — Alles durchleuchten: API-Routes, RLS, Auth, Rate-Limiting, Input-Sanitization.
+[x] 5. **Sicherheit vollständig prüfen** — Alles durchleuchten: API-Routes, RLS, Auth, Rate-Limiting, Input-Sanitization.
 
 [x] 6. **SMS-Limit: Was passiert wenn überschritten?** — Werden SMS automatisch geblockt? Was sieht der Betrieb? Verhalten dokumentieren und ggf. fixen.
 
 [x] 7. **Landingpage Emojis raus** — Emoji ohne/mit TerminStop entfernen. Geschenk-Emoji beim Add-on raus. Alle störenden Emojis entfernen.
 
-[ ] 8. **Rechtstexte anpassen und einfügen** — AGB, Datenschutz, Impressum prüfen und auf den aktuellen Stand bringen.
+[x] 8. **Rechtstexte anpassen und einfügen** — AGB, Datenschutz, Impressum prüfen und auf den aktuellen Stand bringen.
 
 [ ] 9. **Onboarding für neue Kunden** — Nach der Registrierung einen geführten Onboarding-Flow zeigen.
 

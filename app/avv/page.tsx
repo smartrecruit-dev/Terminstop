@@ -31,14 +31,11 @@ export default function AVV() {
 
         {/* Intro Box */}
         <div className="bg-[#E8FBF3] border border-[#6EE7B7]/50 rounded-2xl px-6 py-5 mb-8">
-          <div className="flex items-start gap-3">
-            <span className="text-[#18A66D] text-lg shrink-0">ℹ️</span>
-            <div className="text-sm text-[#1F2A37] leading-relaxed">
-              Dieser Auftragsverarbeitungsvertrag (AVV) wird zwischen dem Kunden (nachfolgend
-              „Verantwortlicher") und TerminStop / Marvin Passe (nachfolgend „Auftragsverarbeiter")
-              als Bestandteil der Hauptvereinbarung (AGB) geschlossen. Er regelt die Verarbeitung
-              personenbezogener Daten gemäß Art. 28 der EU-Datenschutz-Grundverordnung (DSGVO).
-            </div>
+          <div className="text-sm text-[#1F2A37] leading-relaxed">
+            Dieser Auftragsverarbeitungsvertrag (AVV) wird zwischen dem Kunden (nachfolgend
+            „Verantwortlicher") und TerminStop / Marvin Passe (nachfolgend „Auftragsverarbeiter")
+            als Bestandteil der Hauptvereinbarung (AGB) geschlossen. Er regelt die Verarbeitung
+            personenbezogener Daten gemäß Art. 28 der EU-Datenschutz-Grundverordnung (DSGVO).
           </div>
         </div>
 
@@ -234,7 +231,9 @@ export default function AVV() {
                   {[
                     { name: "Supabase Inc.", purpose: "Datenbankdienst, Authentifizierung", location: "USA · SCCs" },
                     { name: "Vercel Inc.", purpose: "Hosting, Webanwendung", location: "USA · SCCs" },
-                   { name: "seven communications GmbH & Co. KG", purpose: "SMS-Versand", location: "Deutschland · DSGVO (EU)" },
+                    { name: "seven communications GmbH & Co. KG", purpose: "SMS-Versand", location: "Deutschland · DSGVO (EU)" },
+                    { name: "Stripe Payments Europe, Ltd.", purpose: "Zahlungsabwicklung", location: "Irland · DSGVO (EU)" },
+                    { name: "Resend Inc.", purpose: "Transaktionale E-Mails", location: "USA · SCCs" },
                     { name: "GitHub Inc.", purpose: "Code-Hosting, Versionsverwaltung", location: "USA · SCCs" },
                   ].map((row, i) => (
                     <tr key={i} className="bg-white hover:bg-[#FAFAFA] transition">

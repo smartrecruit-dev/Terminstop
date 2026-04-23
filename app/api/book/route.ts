@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@supabase/supabase-js"
 import { createHash } from "crypto"
+import { sanitize, isValidPhone } from "@/app/lib/security"
+
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+const DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/
+const TIME_REGEX = /^\d{2}:\d{2}$/
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -87,21 +92,43 @@ async function sendSMS(to: string, message: string) {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
-    const {
-      company_id,
-      name,
-      phone,
-      date,
-      time,
-      service_name,
-      note,
-      request_text,
-      booking_type, // "service" | "open" | "callback"
-      employee_id,  // optional: assigned employee
-    } = body
 
+    // ── Input-Sanitization ─────────────────────────────────────────────────────
+    const company_id   = sanitize(body.company_id, 36)
+    const name         = sanitize(body.name, 100)
+    const phone        = sanitize(body.phone, 30)
+    const date         = sanitize(body.date, 10)
+    const time         = sanitize(body.time, 5)
+    const service_name = sanitize(body.service_name, 100)
+    const note         = sanitize(body.note, 500)
+    const request_text = sanitize(body.request_text, 1000)
+    const booking_type = sanitize(body.booking_type, 20) // "service" | "open" | "callback"
+    const employee_id  = typeof body.employee_id === "string" ? sanitize(body.employee_id, 36) : null
+
+    // ── Pflichtfeld-Validierung ────────────────────────────────────────────────
     if (!company_id || !name || !phone) {
       return NextResponse.json({ error: "company_id, name und phone sind Pflichtfelder" }, { status: 400 })
+    }
+
+    // ── Format-Validierung ─────────────────────────────────────────────────────
+    if (!UUID_REGEX.test(company_id)) {
+      return NextResponse.json({ error: "Ungültige company_id" }, { status: 400 })
+    }
+    if (employee_id && !UUID_REGEX.test(employee_id)) {
+      return NextResponse.json({ error: "Ungültige employee_id" }, { status: 400 })
+    }
+    if (!isValidPhone(phone)) {
+      return NextResponse.json({ error: "Ungültige Telefonnummer" }, { status: 400 })
+    }
+    if (date && !DATE_REGEX.test(date)) {
+      return NextResponse.json({ error: "Ungültiges Datumsformat (YYYY-MM-DD)" }, { status: 400 })
+    }
+    if (time && !TIME_REGEX.test(time)) {
+      return NextResponse.json({ error: "Ungültiges Zeitformat (HH:MM)" }, { status: 400 })
+    }
+    const VALID_BOOKING_TYPES = ["service", "open", "callback"]
+    if (booking_type && !VALID_BOOKING_TYPES.includes(booking_type)) {
+      return NextResponse.json({ error: "Ungültiger booking_type" }, { status: 400 })
     }
 
     // ── IP-Rate-Limiting ───────────────────────────────────────────────────────

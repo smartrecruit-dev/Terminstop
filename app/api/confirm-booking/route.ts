@@ -70,7 +70,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Ungültige Sitzung" }, { status: 401 })
     }
 
-    const { appointmentId, action, companyName, skipSms } = await req.json()
+    const { appointmentId, action, skipSms } = await req.json()
     if (!appointmentId || !action) {
       return NextResponse.json({ error: "appointmentId und action erforderlich" }, { status: 400 })
     }
@@ -87,7 +87,7 @@ export async function POST(req: NextRequest) {
       // Company des eingeloggten Users laden (über user_id, nicht über company.id = user.id)
       const { data: company } = await supabaseAdmin
         .from("companies")
-        .select("id")
+        .select("id, name")
         .eq("user_id", user.id)
         .single()
 
@@ -125,7 +125,8 @@ export async function POST(req: NextRequest) {
 
       if (appt?.phone) {
         try {
-          const name = companyName || "Ihrem Betrieb"
+          // companyName wird aus der DB geladen — nicht vom Client übernehmen
+          const name = company?.name || "Ihrem Betrieb"
           const smsResult = await sendConfirmationSMS(appt.phone, appt.name, appt.date, appt.time, name)
 
           // SMS-Zähler erhöhen

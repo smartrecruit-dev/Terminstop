@@ -273,19 +273,52 @@ export default function Datenschutz() {
             </p>
           </section>
 
-          {/* § 9 Zahlungsabwicklung */}
+          {/* § 8a E-Mail-Versand */}
           <section>
-            <h2 className="text-base font-bold text-[#1F2A37] mb-3">9. Zahlungsabwicklung</h2>
+            <h2 className="text-base font-bold text-[#1F2A37] mb-3">8a. Transaktionale E-Mails (Resend)</h2>
             <p className="mb-3">
-              Die Abrechnung der Nutzungsgebühren erfolgt auf Basis individueller
-              Vereinbarungen per Dauerauftrag / Überweisung. Es werden keine
-              Zahlungsdaten (Kreditkartennummern, Bankdaten) auf unseren Servern
-              gespeichert.
+              Für den Versand transaktionaler E-Mails (z. B. Willkommens-E-Mail nach Registrierung,
+              Zahlungsbestätigungen) nutzen wir den Dienst <strong>Resend Inc.</strong>, 2261 Market
+              Street #5014, San Francisco, CA 94114, USA.
+            </p>
+            <p className="mb-3">
+              Dabei wird die E-Mail-Adresse des Empfängers sowie der Inhalt der jeweiligen
+              E-Mail an Resend übermittelt. Die Übermittlung in die USA erfolgt auf Basis von
+              EU-Standardvertragsklauseln (SCCs) gemäß Art. 46 Abs. 2 lit. c DSGVO.
+              Weitere Informationen:{" "}
+              <a href="https://resend.com/legal/privacy-policy" target="_blank" rel="noopener noreferrer" className="text-[#18A66D] hover:underline">resend.com/legal/privacy-policy</a>
             </p>
             <p>
-              Bankdaten werden ausschließlich im Rahmen des Zahlungsverkehrs zwischen
-              dem Kunden und seiner Bank verarbeitet. TerminStop hat keinen Zugriff
-              auf diese Daten.
+              Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO (Vertragserfüllung).
+              E-Mail-Adressen werden ausschließlich für den Versand der jeweiligen
+              transaktionalen Nachricht verwendet und nicht für Werbezwecke genutzt.
+            </p>
+          </section>
+
+          {/* § 9 Zahlungsabwicklung */}
+          <section>
+            <h2 className="text-base font-bold text-[#1F2A37] mb-3">9. Zahlungsabwicklung (Stripe)</h2>
+            <p className="mb-3">
+              Die Abrechnung der Nutzungsgebühren erfolgt über den Zahlungsdienstleister
+              <strong> Stripe Inc.</strong>, 354 Oyster Point Blvd, South San Francisco, CA 94080, USA
+              (für europäische Kunden: Stripe Payments Europe, Ltd., 1 Grand Canal Street Lower,
+              Grand Canal Dock, Dublin, D02 H210, Irland).
+            </p>
+            <p className="mb-3">
+              Im Rahmen des Checkout-Prozesses werden Zahlungsdaten (z. B. Kreditkartennummer,
+              Rechnungsadresse) direkt an Stripe übermittelt und dort verarbeitet. Auf unseren
+              Servern werden keine vollständigen Zahlungsdaten gespeichert. Stripe speichert
+              eine Kunden-ID (Stripe Customer ID) und Abonnement-ID, die in unserer Datenbank
+              hinterlegt werden, um den Abo-Status verwalten zu können.
+            </p>
+            <p className="mb-3">
+              Die Verarbeitung durch Stripe in den USA erfolgt auf Basis von
+              EU-Standardvertragsklauseln (SCCs) gemäß Art. 46 Abs. 2 lit. c DSGVO.
+              Weitere Informationen:{" "}
+              <a href="https://stripe.com/de/privacy" target="_blank" rel="noopener noreferrer" className="text-[#18A66D] hover:underline">stripe.com/de/privacy</a>
+            </p>
+            <p>
+              Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO (Vertragserfüllung).
             </p>
           </section>
 
@@ -382,8 +415,10 @@ export default function Datenschutz() {
                 <tbody className="divide-y divide-[#F3F4F6]">
                   {[
                     { name: "Vercel Inc.", purpose: "Hosting", location: "USA", basis: "SCCs" },
-                    { name: "Supabase Inc.", purpose: "Datenbank", location: "USA/EU", basis: "DPA + SCCs" },
+                    { name: "Supabase Inc.", purpose: "Datenbank, Authentifizierung", location: "USA/EU", basis: "DPA + SCCs" },
                     { name: "seven communications GmbH & Co. KG", purpose: "SMS-Versand", location: "Deutschland (EU)", basis: "Auftragsverarbeitungsvertrag" },
+                    { name: "Stripe Inc. / Stripe Payments Europe", purpose: "Zahlungsabwicklung", location: "USA / Irland (EU)", basis: "SCCs / DSGVO" },
+                    { name: "Resend Inc.", purpose: "Transaktionale E-Mails", location: "USA", basis: "SCCs" },
                     { name: "GitHub Inc.", purpose: "Code-Hosting", location: "USA", basis: "SCCs" },
                   ].map((row, i) => (
                     <tr key={i} className="bg-white">
