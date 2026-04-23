@@ -12,8 +12,8 @@ function DemoBanner() {
       fontSize: "13px", fontWeight: 600, gap: 12, flexWrap: "wrap",
     }}>
       <span>🎭 Demo-Modus – Alle Daten sind fiktiv · Keine SMS werden versendet</span>
-      <a href="/lead" style={{ background: "white", color: "#7C3AED", padding: "6px 16px", borderRadius: 8, fontWeight: 700, textDecoration: "none", fontSize: "12px", whiteSpace: "nowrap" }}>
-        Jetzt kostenlos testen →
+      <a href="/register" style={{ background: "white", color: "#7C3AED", padding: "6px 16px", borderRadius: 8, fontWeight: 700, textDecoration: "none", fontSize: "12px", whiteSpace: "nowrap" }}>
+        Kostenlos registrieren →
       </a>
     </div>
   )
@@ -97,8 +97,8 @@ export default function DemoCalendarPage() {
             <span style={{ width: 6, height: 6, background: "#18A66D", borderRadius: "50%", display: "inline-block" }} />
             Buchungs-Add-on
           </a>
-          <a href="/lead" style={{ fontSize: 13, color: "#fff", background: "#18A66D", padding: "7px 16px", borderRadius: 9, fontWeight: 700, textDecoration: "none" }}>
-            Jetzt testen →
+          <a href="/register" style={{ fontSize: 13, color: "#fff", background: "#18A66D", padding: "7px 16px", borderRadius: 9, fontWeight: 700, textDecoration: "none" }}>
+            Kostenlos registrieren →
           </a>
         </div>
       </nav>

@@ -328,8 +328,8 @@ export default function BuchungDemo() {
       {/* ── Demo Banner ── */}
       <div style={{ background: "linear-gradient(90deg,#7C3AED,#9333EA)", color: "#fff", padding: "10px 24px", display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: 13, fontWeight: 600, gap: 12, flexWrap: "wrap" }}>
         <span>🎭 Demo-Modus – Alle Daten sind fiktiv</span>
-        <a href="/lead" style={{ background: "#fff", color: "#7C3AED", padding: "6px 16px", borderRadius: 8, fontWeight: 700, textDecoration: "none", fontSize: 12 }}>
-          Jetzt kostenlos testen →
+        <a href="/register" style={{ background: "#fff", color: "#7C3AED", padding: "6px 16px", borderRadius: 8, fontWeight: 700, textDecoration: "none", fontSize: 12 }}>
+          Kostenlos registrieren →
         </a>
       </div>
 
@@ -359,8 +359,8 @@ export default function BuchungDemo() {
             <span style={{ width: 6, height: 6, background: G.green, borderRadius: "50%", display: "inline-block", animation: "pulse 2s infinite" }} />
             <span style={{ fontSize: 12, fontWeight: 700, color: "#fff" }}>Buchungsseite Demo</span>
           </div>
-          <a href="/lead" style={{ fontSize: 13, color: "#fff", background: G.green, padding: "7px 16px", borderRadius: 9, fontWeight: 700, textDecoration: "none" }}>
-            Jetzt testen →
+          <a href="/register" style={{ fontSize: 13, color: "#fff", background: G.green, padding: "7px 16px", borderRadius: 9, fontWeight: 700, textDecoration: "none" }}>
+            Kostenlos registrieren →
           </a>
         </div>
       </nav>

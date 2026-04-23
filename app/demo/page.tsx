@@ -156,8 +156,8 @@ export default function DemoDashboard() {
       {/* Demo Banner */}
       <div style={{ background: "linear-gradient(90deg,#7C3AED,#9333EA)", color: "#fff", padding: "10px 24px", display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: 13, fontWeight: 600, gap: 12, flexWrap: "wrap" }}>
         <span>🎭 Demo-Modus – Alle Daten sind fiktiv · Keine SMS werden versendet</span>
-        <a href="/lead" style={{ background: "#fff", color: "#7C3AED", padding: "6px 16px", borderRadius: 8, fontWeight: 700, textDecoration: "none", fontSize: 12, whiteSpace: "nowrap" }}>
-          Jetzt kostenlos testen →
+        <a href="/register" style={{ background: "#fff", color: "#7C3AED", padding: "6px 16px", borderRadius: 8, fontWeight: 700, textDecoration: "none", fontSize: 12, whiteSpace: "nowrap" }}>
+          Kostenlos registrieren →
         </a>
       </div>
 
@@ -207,8 +207,8 @@ export default function DemoDashboard() {
             <span style={{ width: 6, height: 6, background: "#18A66D", borderRadius: "50%", display: "inline-block" }} />
             Buchungsseite Demo
           </a>
-          <a href="/lead" style={{ fontSize: 13, color: "#fff", background: "#18A66D", padding: "7px 16px", borderRadius: 9, fontWeight: 700, textDecoration: "none" }}>
-            Jetzt testen →
+          <a href="/register" style={{ fontSize: 13, color: "#fff", background: "#18A66D", padding: "7px 16px", borderRadius: 9, fontWeight: 700, textDecoration: "none" }}>
+            Kostenlos registrieren →
           </a>
         </div>
       </nav>
@@ -354,9 +354,9 @@ export default function DemoDashboard() {
             <span style={{ fontSize: 10, fontWeight: item.active ? 700 : 500, letterSpacing: .2 }}>{item.label}</span>
           </a>
         ))}
-        <a href="/lead" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3, padding: "4px 12px", textDecoration: "none", color: "#18A66D", minWidth: 52 }}>
+        <a href="/register" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3, padding: "4px 12px", textDecoration: "none", color: "#18A66D", minWidth: 52 }}>
           <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
-          <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: .2 }}>Testen</span>
+          <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: .2 }}>Registrieren</span>
         </a>
       </div>
     </div>

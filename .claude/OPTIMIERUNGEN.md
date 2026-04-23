@@ -30,7 +30,7 @@
 
 [ ] 13. **Logo ändern** — Vercel-Dreieck-Favicon durch TerminStop-Logo ersetzen.
 
-[ ] 14. **"Jetzt testen" raus auf Demo** — Da man sich direkt registrieren kann. Wo landen Registrierungsdaten? Marvin braucht Zugriff darauf.
+[x] 14. **"Jetzt testen" raus auf Demo** — Da man sich direkt registrieren kann. Wo landen Registrierungsdaten? Marvin braucht Zugriff darauf.
 
 [ ] 15. **E-Mail + Passwort von Kunden ändern** — Admin-Tool zum Ändern ohne Datenverlust.
 
