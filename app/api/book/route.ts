@@ -1,10 +1,53 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@supabase/supabase-js"
+import { createHash } from "crypto"
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
+
+// ── IP-Rate-Limiting ───────────────────────────────────────────────────────
+// Max. 2 Buchungen pro IP-Hash pro Betrieb innerhalb von 6 Stunden.
+const IP_RATE_LIMIT  = 2
+const IP_WINDOW_HOURS = 6
+
+function hashIP(ip: string): string {
+  return createHash("sha256").update(ip + (process.env.IP_HASH_SALT || "terminstop")).digest("hex")
+}
+
+function getClientIP(req: NextRequest): string {
+  // Vercel / CDN forwarded headers (Vercel setzt x-forwarded-for)
+  const forwarded = req.headers.get("x-forwarded-for")
+  if (forwarded) return forwarded.split(",")[0].trim()
+  const realIP = req.headers.get("x-real-ip")
+  if (realIP) return realIP.trim()
+  return "unknown"
+}
+
+async function checkIPRateLimit(ipHash: string, company_id: string): Promise<boolean> {
+  // true = erlaubt, false = blockiert
+  const windowStart = new Date(Date.now() - IP_WINDOW_HOURS * 60 * 60 * 1000).toISOString()
+  const { count } = await supabase
+    .from("ip_bookings")
+    .select("id", { count: "exact", head: true })
+    .eq("ip_hash", ipHash)
+    .eq("company_id", company_id)
+    .gte("created_at", windowStart)
+  return (count ?? 0) < IP_RATE_LIMIT
+}
+
+async function recordIPBooking(ipHash: string, company_id: string): Promise<void> {
+  // Booking eintragen
+  await supabase.from("ip_bookings").insert({ ip_hash: ipHash, company_id })
+  // Alte Einträge (>24h) für diese IP bereinigen um Tabellenaufblähung zu verhindern
+  const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
+  await supabase.from("ip_bookings").delete()
+    .eq("ip_hash", ipHash)
+    .lt("created_at", cutoff)
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 
 function formatPhone(phone: string) {
   let cleaned = phone.replace(/\s+/g, "")
@@ -33,6 +76,7 @@ async function sendSMS(to: string, message: string) {
  * POST /api/book
  *
  * Submission from the public booking page /book/[slug].
+ * - IP-Rate-Limiting: max 2 bookings per IP per company per 6 hours
  * - Checks availability (employees vs. booked slots at same date/time)
  * - If slot is free  → status = "confirmed", sends confirmation SMS immediately
  * - If slot is full  → status = "pending",   owner must confirm manually
@@ -58,6 +102,17 @@ export async function POST(req: NextRequest) {
 
     if (!company_id || !name || !phone) {
       return NextResponse.json({ error: "company_id, name und phone sind Pflichtfelder" }, { status: 400 })
+    }
+
+    // ── IP-Rate-Limiting ───────────────────────────────────────────────────────
+    const clientIP = getClientIP(req)
+    const ipHash   = hashIP(clientIP)
+
+    const allowed = await checkIPRateLimit(ipHash, company_id)
+    if (!allowed) {
+      return NextResponse.json({
+        error: `Du hast in den letzten ${IP_WINDOW_HOURS} Stunden bereits ${IP_RATE_LIMIT} Buchungen abgesendet. Bitte warte etwas oder ruf uns direkt an.`,
+      }, { status: 429 })
     }
 
     // ── Kapazitätsprüfung (nur wenn Datum+Zeit vorhanden) ──────────────────────
@@ -130,6 +185,9 @@ export async function POST(req: NextRequest) {
         : "Etwas ist schiefgelaufen. Bitte versuche es erneut."
       return NextResponse.json({ error: msg }, { status: 400 })
     }
+
+    // ── IP-Buchung verzeichnen (erst nach erfolgreichem Insert) ───────────────
+    await recordIPBooking(ipHash, company_id)
 
     // ── Automatische Bestätigung: SMS sofort senden ────────────────────────────
     if (autoConfirm && date && time) {

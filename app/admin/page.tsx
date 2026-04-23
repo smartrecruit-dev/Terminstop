@@ -1249,6 +1249,70 @@ export default function AdminPage() {
                               </div>
                             )
                           })()}
+
+                          {/* ── Gefahrenzone ── */}
+                          <div style={{ marginTop: 16, background: "#FFF8F8", border: "1.5px solid #FECACA", borderRadius: 14, padding: "16px 20px" }}>
+                            <div style={{ fontSize: 12, fontWeight: 800, color: "#991B1B", marginBottom: 12, textTransform: "uppercase", letterSpacing: .5 }}>
+                              Gefahrenzone
+                            </div>
+                            <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
+                              {/* Sofort pausieren / reaktivieren */}
+                              <button
+                                onClick={async () => {
+                                  const newPaused = !c.paused
+                                  if (!newPaused || confirm(`Betrieb „${c.name}" ${newPaused ? "pausieren" : "reaktivieren"}?`)) {
+                                    const r = await fetch("/api/admin/toggle-pause", {
+                                      method: "POST",
+                                      headers: { "Content-Type": "application/json", "x-admin-secret": secret },
+                                      body: JSON.stringify({ companyId: c.id, paused: newPaused }),
+                                    })
+                                    if (r.ok) setCompanies(prev => prev.map(x => x.id === c.id ? { ...x, paused: newPaused } : x))
+                                  }
+                                }}
+                                style={{
+                                  padding: "8px 16px", borderRadius: 9, border: "none", cursor: "pointer",
+                                  fontSize: 12, fontWeight: 700,
+                                  background: c.paused ? GL : "#FEF2F2",
+                                  color: c.paused ? G : RED,
+                                }}
+                              >
+                                {c.paused ? "✓ Reaktivieren" : "⏸ Sofort pausieren"}
+                              </button>
+
+                              {/* Konto löschen */}
+                              <button
+                                onClick={async () => {
+                                  if (!confirm(`ACHTUNG: Betrieb „${c.name}" und ALLE zugehörigen Daten unwiderruflich löschen?\n\nDies kann nicht rückgängig gemacht werden.`)) return
+                                  if (!confirm(`Nochmals bestätigen: „${c.name}" endgültig löschen?`)) return
+                                  const r = await fetch("/api/admin/delete-company", {
+                                    method: "POST",
+                                    headers: { "Content-Type": "application/json", "x-admin-secret": secret },
+                                    body: JSON.stringify({ companyId: c.id }),
+                                  })
+                                  const j = await r.json()
+                                  if (r.ok) {
+                                    setCompanies(prev => prev.filter(x => x.id !== c.id))
+                                    setExpanded(null)
+                                    alert(`„${j.deleted}" wurde gelöscht.`)
+                                  } else {
+                                    alert("Fehler: " + j.error)
+                                  }
+                                }}
+                                style={{
+                                  padding: "8px 16px", borderRadius: 9, border: "1px solid #FECACA",
+                                  cursor: "pointer", fontSize: 12, fontWeight: 700,
+                                  background: "#FEF2F2", color: RED,
+                                }}
+                              >
+                                Konto löschen
+                              </button>
+
+                              <span style={{ fontSize: 11, color: "#9CA3AF", flex: 1 }}>
+                                Löschen entfernt alle Daten unwiderruflich.
+                              </span>
+                            </div>
+                          </div>
+
                         </div>
                       )}
                     </div>

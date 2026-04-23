@@ -982,7 +982,7 @@ export default function LandingPage() {
                   padding: "32px", height: "100%", boxSizing: "border-box",
                 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 22 }}>
-                    <div style={{ width: 36, height: 36, background: "#FEE2E2", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>😤</div>
+                    <div style={{ width: 36, height: 36, background: "#FEE2E2", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, fontWeight: 800, color: "#DC2626" }}>×</div>
                     <span style={{ fontWeight: 800, fontSize: 16, color: "#991B1B", letterSpacing: "-0.3px" }}>Ohne TerminStop</span>
                   </div>
                   <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
@@ -1395,7 +1395,6 @@ export default function LandingPage() {
                     <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.45)", textTransform: "uppercase", letterSpacing: 1, marginBottom: 6 }}>Kein Aufpreis</div>
                     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                       <span style={{ fontSize: 28, fontWeight: 900, color: "#4ade80", letterSpacing: "-1px", lineHeight: 1 }}>inklusive</span>
-                      <span style={{ fontSize: 20 }}>🎁</span>
                     </div>
                     <div style={{ fontSize: 12, color: "rgba(255,255,255,0.35)", marginTop: 4 }}>in jedem Paket ab dem 1. Tag</div>
                   </div>
@@ -1703,7 +1702,7 @@ export default function LandingPage() {
                     borderRadius: 980, letterSpacing: 0.4,
                     boxShadow: "0 2px 8px -2px rgba(0,0,0,0.15)",
                   }}>
-                    ⭐ Beliebtestes Paket
+                    Beliebtestes Paket
                   </div>
                   <div style={{ marginBottom: 8 }}>
                     <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.5)", letterSpacing: 1.4, textTransform: "uppercase", marginBottom: 14 }}>Pro</div>

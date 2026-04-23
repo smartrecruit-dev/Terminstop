@@ -212,11 +212,11 @@ export default function SettingsPage() {
   const smsPreview = `Hallo [Kundenname], Ihr Termin bei ${companyName || "Ihrem Betrieb"} ist morgen um [Uhrzeit] Uhr. Wir freuen uns auf Sie!`
 
   const sections: { id: Section; label: string }[] = [
-    { id: "buchungsseite", label: "🔗 Buchungsseite"   },
-    { id: "mitarbeiter",   label: "👥 Mitarbeiter"     },
-    { id: "konto",         label: "🔐 Passwort & Konto"},
-    { id: "sms",           label: "📱 SMS-Vorschau"    },
-    { id: "abo",           label: "💳 Abo & Zahlung"   },
+    { id: "buchungsseite", label: "Buchungsseite" },
+    { id: "mitarbeiter",   label: "Mitarbeiter"   },
+    { id: "konto",         label: "Konto"         },
+    { id: "sms",           label: "SMS-Vorschau"  },
+    { id: "abo",           label: "Abo & Zahlung" },
   ]
 
   async function openPortal() {
@@ -276,14 +276,15 @@ export default function SettingsPage() {
         </div>
 
         {/* Tabs */}
-        <div style={{ display: "flex", gap: 4, marginBottom: 24, background: "#fff", border: `1px solid ${BD}`, borderRadius: 14, padding: 5, width: "fit-content", flexWrap: "wrap" }}>
+        <div style={{ display: "flex", gap: 2, marginBottom: 24, background: "#fff", border: `1px solid ${BD}`, borderRadius: 12, padding: 4, width: "fit-content", flexWrap: "wrap" }}>
           {sections.map(s => (
             <button key={s.id} onClick={() => setSection(s.id)} style={{
-              padding: "9px 18px", borderRadius: 10, border: "none", cursor: "pointer",
-              fontSize: 13, fontWeight: section === s.id ? 700 : 500,
+              padding: "7px 14px", borderRadius: 8, border: "none", cursor: "pointer",
+              fontSize: 12.5, fontWeight: section === s.id ? 700 : 500,
               background: section === s.id ? GL : "transparent",
               color: section === s.id ? G : M,
               transition: "all .15s",
+              whiteSpace: "nowrap",
             }}>
               {s.label}
             </button>
@@ -293,7 +294,7 @@ export default function SettingsPage() {
         {/* ── BUCHUNGSSEITE ── */}
         {section === "buchungsseite" && (
           <div style={card}>
-            <h2 style={{ fontSize: 17, fontWeight: 800, color: T, margin: "0 0 6px" }}>🔗 Buchungsseite</h2>
+            <h2 style={{ fontSize: 17, fontWeight: 800, color: T, margin: "0 0 6px" }}>Buchungsseite</h2>
             <p style={{ fontSize: 14, color: M, margin: "0 0 24px", lineHeight: 1.6 }}>
               Deine öffentliche Buchungsseite, die Kunden per Link oder QR-Code aufrufen.
             </p>
@@ -373,7 +374,7 @@ export default function SettingsPage() {
           <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
 
             <div style={card}>
-              <h2 style={{ fontSize: 17, fontWeight: 800, color: T, margin: "0 0 6px" }}>👥 Mitarbeiter</h2>
+              <h2 style={{ fontSize: 17, fontWeight: 800, color: T, margin: "0 0 6px" }}>Mitarbeiter</h2>
               <p style={{ fontSize: 14, color: M, margin: "0 0 24px", lineHeight: 1.6 }}>
                 Lege bis zu 5 Mitarbeiter an. Das System prüft automatisch, ob ein Mitarbeiter zum gewünschten Termin verfügbar ist.
                 Hast du keine Mitarbeiter angelegt, gilt dein Betrieb als Einzelperson (Kapazität = 1).
@@ -482,7 +483,7 @@ export default function SettingsPage() {
 
               {/* Info-Box */}
               <div style={{ marginTop: 24, background: GL, border: `1px solid ${GB}`, borderRadius: 14, padding: "14px 18px" }}>
-                <div style={{ fontSize: 13, fontWeight: 800, color: T, marginBottom: 8 }}>💡 Wie funktioniert das?</div>
+                <div style={{ fontSize: 13, fontWeight: 800, color: T, marginBottom: 8 }}>Wie funktioniert das?</div>
                 <div style={{ fontSize: 13, color: M, lineHeight: 1.7 }}>
                   Wenn ein Kunde einen Termin bucht, prüft das System wie viele aktive Mitarbeiter du hast.
                   Sind noch freie Plätze → <strong style={{ color: G }}>automatisch bestätigt</strong> + SMS-Bestätigung an den Kunden.
@@ -500,7 +501,7 @@ export default function SettingsPage() {
 
             {/* Konto-Info */}
             <div style={card}>
-              <h2 style={{ fontSize: 16, fontWeight: 800, color: T, margin: "0 0 18px" }}>👤 Konto-Informationen</h2>
+              <h2 style={{ fontSize: 16, fontWeight: 800, color: T, margin: "0 0 18px" }}>Konto-Informationen</h2>
               <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                 {[
                   { label: "Betriebsname",   value: companyName  },
@@ -521,7 +522,7 @@ export default function SettingsPage() {
 
             {/* Passwort ändern */}
             <div style={card}>
-              <h2 style={{ fontSize: 16, fontWeight: 800, color: T, margin: "0 0 6px" }}>🔐 Passwort ändern</h2>
+              <h2 style={{ fontSize: 16, fontWeight: 800, color: T, margin: "0 0 6px" }}>Passwort ändern</h2>
               <p style={{ fontSize: 14, color: M, margin: "0 0 22px", lineHeight: 1.6 }}>
                 Gib zuerst dein aktuelles Passwort ein, dann das neue.
               </p>
@@ -642,7 +643,7 @@ export default function SettingsPage() {
 
             {/* SMS-Vorschau */}
             <div style={card}>
-              <h2 style={{ fontSize: 16, fontWeight: 800, color: T, margin: "0 0 6px" }}>📱 So sieht deine SMS-Erinnerung aus</h2>
+              <h2 style={{ fontSize: 16, fontWeight: 800, color: T, margin: "0 0 6px" }}>So sieht deine SMS-Erinnerung aus</h2>
               <p style={{ fontSize: 14, color: M, margin: "0 0 24px", lineHeight: 1.6 }}>
                 Diese Nachricht erhalten deine Kunden automatisch 24 Stunden vor ihrem Termin.
               </p>
@@ -687,7 +688,7 @@ export default function SettingsPage() {
 
             {/* Statistik */}
             <div style={card}>
-              <h2 style={{ fontSize: 16, fontWeight: 800, color: T, margin: "0 0 18px" }}>📊 SMS-Versand</h2>
+              <h2 style={{ fontSize: 16, fontWeight: 800, color: T, margin: "0 0 18px" }}>SMS-Versand</h2>
               <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
                 {[
                   { icon: "📱", label: "Automatisch versandt",     value: "Täglich, 24h vorher" },
@@ -713,7 +714,7 @@ export default function SettingsPage() {
 
             {/* Aktueller Plan */}
             <div style={card}>
-              <h2 style={{ fontSize: 16, fontWeight: 800, color: T, margin: "0 0 6px" }}>💳 Dein aktuelles Paket</h2>
+              <h2 style={{ fontSize: 16, fontWeight: 800, color: T, margin: "0 0 6px" }}>Dein aktuelles Paket</h2>
               <p style={{ fontSize: 14, color: M, margin: "0 0 20px", lineHeight: 1.6 }}>
                 Hier siehst du dein aktives Paket und kannst es jederzeit ändern oder kündigen.
               </p>
@@ -741,7 +742,7 @@ export default function SettingsPage() {
                   disabled={portalLoading}
                   style={{ ...saveBtn(portalLoading), display: "flex", alignItems: "center", gap: 8 }}
                 >
-                  {portalLoading ? "Weiterleitung…" : "🔧 Abo verwalten / kündigen →"}
+                  {portalLoading ? "Weiterleitung…" : "Abo verwalten / kündigen →"}
                 </button>
               )}
             </div>

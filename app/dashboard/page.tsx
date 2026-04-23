@@ -195,98 +195,6 @@ function TrialBanner() {
   )
 }
 
-function BookingLinkCard({ slug, companyName }: { slug: string; companyName: string }) {
-  const [copied, setCopied] = useState(false)
-  const [showQR, setShowQR] = useState(false)
-  const url = `https://terminstop.de/book/${slug}`
-  const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(url)}&margin=8&color=1F2A37&bgcolor=FFFFFF`
-
-  function copyLink() {
-    navigator.clipboard.writeText(url).then(() => {
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
-    })
-  }
-
-  return (
-    <>
-      <div style={{ background: "#fff", border: "1px solid #E5E7EB", borderRadius: 16, overflow: "hidden", boxShadow: "0 1px 6px rgba(0,0,0,0.05)" }}>
-        {/* Header */}
-        <div style={{ background: "linear-gradient(135deg, #0A0F0D, #0D1F15)", padding: "14px 18px", display: "flex", alignItems: "center", gap: 10 }}>
-          <div style={{ width: 28, height: 28, background: "rgba(24,166,109,0.3)", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14 }}>🔗</div>
-          <div>
-            <div style={{ fontSize: 12, fontWeight: 800, color: "#fff" }}>Buchungsseite</div>
-            <div style={{ fontSize: 10, color: "rgba(255,255,255,0.45)" }}>Teile diesen Link mit Kunden</div>
-          </div>
-        </div>
-        {/* Link + Actions */}
-        <div style={{ padding: "14px 16px", display: "flex", flexDirection: "column", gap: 10 }}>
-          <div style={{ background: "#F9FAFB", border: "1px solid #E5E7EB", borderRadius: 10, padding: "8px 12px" }}>
-            <div style={{ fontSize: 11, color: "#9CA3AF", marginBottom: 2 }}>terminstop.de/book/</div>
-            <div style={{ fontSize: 13, fontWeight: 700, color: "#111827" }}>{slug}</div>
-          </div>
-          <div style={{ display: "flex", gap: 8 }}>
-            <button onClick={copyLink} style={{
-              flex: 1, padding: "9px 0", borderRadius: 10, border: `1px solid ${copied ? "#D1F5E3" : "#E5E7EB"}`,
-              background: copied ? "#F0FBF6" : "#fff", color: copied ? "#18A66D" : "#6B7280",
-              fontSize: 12, fontWeight: 700, cursor: "pointer", transition: "all .15s",
-            }}>
-              {copied ? "✓ Kopiert!" : "🔗 Kopieren"}
-            </button>
-            <button onClick={() => setShowQR(true)} style={{
-              flex: 1, padding: "9px 0", borderRadius: 10, border: "1px solid #E5E7EB",
-              background: "#fff", color: "#374151", fontSize: 12, fontWeight: 700, cursor: "pointer",
-            }}>
-              📱 QR-Code
-            </button>
-          </div>
-          <a href={`/book/${slug}`} target="_blank" rel="noreferrer" style={{
-            display: "block", textAlign: "center", padding: "9px 0", borderRadius: 10,
-            background: "#18A66D", color: "#fff", fontSize: 12, fontWeight: 700,
-            textDecoration: "none", transition: "all .15s",
-          }}>
-            Buchungsseite öffnen ↗
-          </a>
-        </div>
-      </div>
-
-      {/* QR-Code Modal */}
-      {showQR && (
-        <div
-          style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.55)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100, padding: "0 20px" }}
-          onClick={() => setShowQR(false)}
-        >
-          <div
-            style={{ background: "#fff", borderRadius: 24, padding: "28px 24px", maxWidth: 320, width: "100%", boxShadow: "0 24px 80px rgba(0,0,0,0.25)", textAlign: "center" }}
-            onClick={e => e.stopPropagation()}
-          >
-            <div style={{ fontSize: 15, fontWeight: 800, color: "#111827", marginBottom: 4 }}>QR-Code</div>
-            <div style={{ fontSize: 13, color: "#6B7280", marginBottom: 20 }}>{companyName}</div>
-            <div style={{ background: "#fff", border: "2px solid #E5E7EB", borderRadius: 16, padding: 12, display: "inline-block", marginBottom: 20, boxShadow: "0 2px 12px rgba(0,0,0,0.06)" }}>
-              <img src={qrSrc} alt="QR-Code" width={200} height={200} style={{ display: "block", borderRadius: 4 }} />
-            </div>
-            <div style={{ fontSize: 12, color: "#9CA3AF", marginBottom: 20, wordBreak: "break-all" }}>{url}</div>
-            <div style={{ display: "flex", gap: 10 }}>
-              {/* Direct link — no popup blocker */}
-              <a
-                href={qrSrc}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{ flex: 1, padding: "11px 0", borderRadius: 11, background: "#18A66D", color: "#fff", fontSize: 13, fontWeight: 700, textDecoration: "none", display: "block", textAlign: "center" }}
-              >
-                ⬇ Bild öffnen
-              </a>
-              <button onClick={() => setShowQR(false)} style={{ flex: 1, padding: "11px 0", borderRadius: 11, border: "1px solid #E5E7EB", background: "#fff", color: "#6B7280", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
-                Schließen
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </>
-  )
-}
-
 function getGreeting() {
   const h = new Date().getHours()
   if (h < 12) return "Guten Morgen"
@@ -328,7 +236,6 @@ export default function Dashboard() {
 
   const [companyId, setCompanyId]     = useState<string | null>(null)
   const [companyName, setCompanyName] = useState("")
-  const [slug, setSlug]               = useState<string | null>(null)
   const [customers, setCustomers]     = useState<any[]>([])
   const [customerSearch, setCustomerSearch]   = useState("")
   const [showSuggestions, setShowSuggestions] = useState(false)
@@ -343,7 +250,7 @@ export default function Dashboard() {
     if (!storedId) { window.location.href = "/login"; return }
     setCompanyName(storedName || "")
     Promise.all([
-      supabase.from("companies").select("paused, sms_count_month, sms_limit, plan, name, slug").eq("id", storedId).single(),
+      supabase.from("companies").select("paused, sms_count_month, sms_limit, plan, name").eq("id", storedId).single(),
       supabase.from("appointments").select("*").eq("company_id", storedId)
         .order("date", { ascending: true }).order("time", { ascending: true }),
       supabase.from("customers").select("*").eq("company_id", storedId).order("name", { ascending: true }),
@@ -359,7 +266,6 @@ export default function Dashboard() {
         setSmsLimit(coRes.data.sms_limit || 100)
         setPlan(coRes.data.plan || "trial")
         if (coRes.data.name) setCompanyName(coRes.data.name)
-        if (coRes.data.slug) setSlug(coRes.data.slug)
       }
       if (apptRes.data) setAppointments(apptRes.data)
       if (custRes.data) setCustomers(custRes.data)
@@ -775,32 +681,10 @@ export default function Dashboard() {
               <AppointmentForm {...formProps} />
             </div>
 
-            {/* Buchungsseite-Karte */}
-            {slug && (
-              <BookingLinkCard slug={slug} companyName={companyName} />
-            )}
-            {!slug && (
-              <a href="/settings" style={{ textDecoration: "none" }}>
-                <div style={{ background: "#F9FAFB", border: "1.5px dashed #D1D5DB", borderRadius: 16, padding: "16px 18px", display: "flex", alignItems: "center", gap: 12, cursor: "pointer" }}>
-                  <div style={{ width: 36, height: 36, borderRadius: 10, background: "#fff", border: "1px solid #E5E7EB", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>🔗</div>
-                  <div>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: "#374151" }}>Buchungsseite einrichten</div>
-                    <div style={{ fontSize: 11, color: "#9CA3AF", marginTop: 2 }}>Slug in Einstellungen festlegen →</div>
-                  </div>
-                </div>
-              </a>
-            )}
           </div>
 
         </div>
       </div>
-
-      {/* ── Mobile: Buchungsseite-Karte ── */}
-      {slug && (
-        <div className="md:hidden px-4 pb-4">
-          <BookingLinkCard slug={slug} companyName={companyName} />
-        </div>
-      )}
 
       {/* ── Mobiler FAB ── */}
       <button onClick={() => setShowForm(true)}

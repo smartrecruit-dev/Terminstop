@@ -43,6 +43,7 @@ export default function BookingPage() {
   const [employees,         setEmployees]        = useState<Employee[]>([])
   const [loading,           setLoading]          = useState(true)
   const [notFound,          setNotFound]         = useState(false)
+  const [smsLimited,        setSmsLimited]       = useState(false)
 
   const [step,              setStep]             = useState<Step>("type")
   const [bookingType,       setBookingType]      = useState<BookingType>("service")
@@ -58,6 +59,7 @@ export default function BookingPage() {
   const [error,             setError]            = useState("")
   const [avail,             setAvail]            = useState<Avail>("idle")
   const [confirmed,         setConfirmed]        = useState(false)
+  const [privacyOk,         setPrivacyOk]        = useState(false)
 
   useEffect(() => { if (slug) loadCompany() }, [slug])
 
@@ -65,11 +67,21 @@ export default function BookingPage() {
     setLoading(true)
     const { data: co, error: coErr } = await supabase
       .from("companies")
-      .select("id, name, booking_note, booking_active, slug")
+      .select("id, name, booking_note, booking_active, slug, sms_count_month, sms_limit, paused")
       .eq("slug", slug).single()
-    if (coErr || !co || co.booking_active === false) {
+    if (coErr || !co || co.booking_active === false || co.paused) {
       setNotFound(true); setLoading(false); return
     }
+
+    // SMS-Limit-Check: Wenn Limit überschritten → Buchungstool sperren
+    const smsUsed  = co.sms_count_month ?? 0
+    const smsLimit = co.sms_limit ?? 100
+    if (smsUsed >= smsLimit) {
+      setSmsLimited(true)
+      setCompany({ id: co.id, name: co.name, booking_note: co.booking_note })
+      setLoading(false); return
+    }
+
     setCompany({ id: co.id, name: co.name, booking_note: co.booking_note })
     const [{ data: svcs }, { data: emps }] = await Promise.all([
       supabase.from("services").select("id, name, duration, price")
@@ -233,6 +245,38 @@ export default function BookingPage() {
         <div style={{ width:80, height:80, background:"#F9FAFB", border:"1.5px solid #E5E7EB", borderRadius:24, display:"flex", alignItems:"center", justifyContent:"center", fontSize:36, marginBottom:20 }}>🔍</div>
         <h1 style={{ fontSize:22, fontWeight:800, color:"#111827", margin:"0 0 10px" }}>Buchungsseite nicht gefunden</h1>
         <p style={{ color:"#6B7280", lineHeight:1.65, fontSize:15, margin:0, maxWidth:300 }}>Dieser Link ist nicht aktiv. Bitte wende dich direkt an den Betrieb.</p>
+      </div>
+    </Shell>
+  )
+
+  /* ── SMS-Limit erreicht ── */
+  if (smsLimited) return (
+    <Shell css={css}>
+      <div style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", padding:"60px 24px", textAlign:"center" }}>
+        <div style={{
+          width: 80, height: 80, background: "#FFF7ED", border: "1.5px solid #FED7AA",
+          borderRadius: 24, display: "flex", alignItems: "center", justifyContent: "center",
+          fontSize: 36, marginBottom: 20,
+        }}>📞</div>
+        <h1 style={{ fontSize: 22, fontWeight: 800, color: "#111827", margin: "0 0 10px", lineHeight: 1.3 }}>
+          Online-Buchung momentan nicht verfügbar
+        </h1>
+        <p style={{ color: "#6B7280", lineHeight: 1.7, fontSize: 15, margin: "0 0 28px", maxWidth: 320 }}>
+          {company?.name
+            ? `${company.name} nimmt aktuell keine Online-Buchungen an.`
+            : "Dieser Betrieb nimmt aktuell keine Online-Buchungen an."}{" "}
+          Bitte kontaktiere den Betrieb direkt, um einen Termin zu vereinbaren.
+        </p>
+        <div style={{
+          background: "#F9FAFB", border: "1px solid #E5E7EB", borderRadius: 16,
+          padding: "18px 24px", maxWidth: 320, width: "100%",
+          fontSize: 14, color: "#374151", lineHeight: 1.6,
+        }}>
+          Ruf direkt an oder schreib eine Nachricht — der Betrieb hilft dir gerne weiter.
+        </div>
+      </div>
+      <div style={{ borderTop: "1px solid #EAECEF", padding: "18px 20px", background: "#fff", textAlign: "center" }}>
+        <PoweredBy />
       </div>
     </Shell>
   )
@@ -658,7 +702,43 @@ export default function BookingPage() {
               </div>
             </div>
 
-            <button className="primary-btn" onClick={goNext} disabled={!name.trim() || !phone.trim()}>
+            {/* DSGVO-Einwilligung */}
+            <label style={{
+              display: "flex", alignItems: "flex-start", gap: 12, marginBottom: 20,
+              cursor: "pointer", userSelect: "none",
+            }}>
+              <div style={{ position: "relative", flexShrink: 0, marginTop: 2 }}>
+                <input
+                  type="checkbox"
+                  checked={privacyOk}
+                  onChange={e => setPrivacyOk(e.target.checked)}
+                  style={{ position: "absolute", opacity: 0, width: 20, height: 20, cursor: "pointer", margin: 0 }}
+                />
+                <div style={{
+                  width: 20, height: 20, borderRadius: 6,
+                  border: `2px solid ${privacyOk ? "#18A66D" : "#D1D5DB"}`,
+                  background: privacyOk ? "#18A66D" : "#fff",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  transition: "all .15s",
+                }}>
+                  {privacyOk && (
+                    <svg width="11" height="9" viewBox="0 0 11 9" fill="none">
+                      <path d="M1 4.5L4 7.5L10 1.5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  )}
+                </div>
+              </div>
+              <span style={{ fontSize: 13, color: "#4B5563", lineHeight: 1.6 }}>
+                Ich habe die{" "}
+                <a href="/datenschutz" target="_blank" rel="noreferrer"
+                  style={{ color: "#18A66D", fontWeight: 600, textDecoration: "underline" }}>
+                  Datenschutzerklärung
+                </a>{" "}
+                gelesen und willige ein, dass meine Angaben zur Terminbuchung verarbeitet werden. *
+              </span>
+            </label>
+
+            <button className="primary-btn" onClick={goNext} disabled={!name.trim() || !phone.trim() || !privacyOk}>
               Weiter →
             </button>
           </div>
@@ -731,7 +811,8 @@ export default function BookingPage() {
             </button>
 
             <p style={{ textAlign:"center", fontSize:12, color:"#9CA3AF", marginTop:14, lineHeight:1.6 }}>
-              🔒 Deine Daten werden sicher übertragen und nur für diese Buchung verwendet.
+              Deine Daten werden sicher übertragen und nur zur Terminabwicklung verwendet.{" "}
+              <a href="/datenschutz" target="_blank" rel="noreferrer" style={{ color:"#6B7280", textDecoration:"underline" }}>Datenschutzerklärung</a>
             </p>
           </div>
         )}
