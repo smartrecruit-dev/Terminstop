@@ -20,27 +20,40 @@ function currentMonth() {
   return d.getFullYear() * 100 + (d.getMonth() + 1)
 }
 
-async function sendSMS(to: string, message: string) {
+async function sendSMS(to: string, message: string): Promise<void> {
+  if (!process.env.SEVEN_API_KEY) {
+    throw new Error("SEVEN_API_KEY ist nicht gesetzt")
+  }
+
   const response = await fetch("https://gateway.seven.io/api/sms", {
     method: "POST",
     headers: {
-      "X-Api-Key": process.env.SEVEN_API_KEY!,
-      "Content-Type": "application/json"
+      "X-Api-Key": process.env.SEVEN_API_KEY,
+      "Content-Type": "application/json",
     },
     body: JSON.stringify({
       to,
       text: message,
       from: "TerminStop",
-    })
+      // Kein Mitarbeitername im SMS — der Mitarbeiter ist nur intern im Kalender sichtbar
+    }),
   })
 
-  const result = await response.json()
+  // seven.io gibt HTTP 200 auch bei Fehlern zurück
+  // Erfolg = success "100", Fehler = "900", "902" etc.
+  const raw = await response.text()
+  let result: Record<string, unknown> = {}
+  try { result = JSON.parse(raw) } catch { /* raw response, not JSON */ }
 
-  if (!response.ok || result.success === "false") {
-    throw new Error(`Seven.io Fehler: ${JSON.stringify(result)}`)
+  if (!response.ok) {
+    throw new Error(`Seven.io HTTP ${response.status}: ${raw}`)
   }
 
-  return result
+  // success "100" = OK; alles andere = Fehler
+  const success = String(result.success ?? "")
+  if (success !== "100") {
+    throw new Error(`Seven.io Fehlercode ${success}: ${raw}`)
+  }
 }
 
 function cleanName(raw: string) {
@@ -102,79 +115,70 @@ export async function GET(req: NextRequest) {
 
     for (const a of data || []) {
       const appointmentDate = parseLocalDate(a.date, a.time)
-      const diffMs = appointmentDate.getTime() - now.getTime()
+      const diffMs    = appointmentDate.getTime() - now.getTime()
       const diffHours = diffMs / (1000 * 60 * 60)
 
-      console.log("DEBUG:", {
-        id: a.id,
-        appointment: appointmentDate.toString(),
-        diffHours
-      })
+      if (!(diffHours <= 24 && diffHours > 0)) continue
 
-      if (diffHours <= 24 && diffHours > 0) {
-        try {
-          const { data: company } = await supabase
-            .from("companies")
-            .select("name, sms_limit, sms_count_month, sms_month, sms_extra_month, paused, plan")
-            .eq("id", a.company_id)
-            .single()
+      try {
+        const { data: company, error: compErr } = await supabase
+          .from("companies")
+          .select("name, sms_limit, sms_count_month, sms_month, sms_extra_month, paused, plan")
+          .eq("id", a.company_id)
+          .single()
 
-          // ── Skip if company is paused ──
-          if (company?.paused) {
-            console.log(`⏭️ SKIPPED (paused): company ${a.company_id}`)
-            continue
-          }
-
-          // ── Monthly reset: if new month, reset counter + extra ──
-          const month = currentMonth()
-          if (company && (company.sms_month || 0) !== month) {
-            await supabase.from("companies").update({
-              sms_count_month: 0,
-              sms_extra_month: 0,
-              sms_month: month,
-            }).eq("id", a.company_id)
-            company.sms_count_month = 0
-            company.sms_extra_month = 0
-          }
-
-          // ── SMS-Limit check (inkl. dazugekaufte Extra-SMS) ──
-          const smsUsed  = company?.sms_count_month ?? 0
-          const smsExtra = company?.sms_extra_month ?? 0
-          const smsLimit = (company?.sms_limit ?? 100) + smsExtra
-          if (smsUsed >= smsLimit) {
-            console.log(`⛔ SMS LIMIT REACHED: company ${a.company_id} (${smsUsed}/${smsLimit})`)
-            // Mark appointment so we don't try again
-            await supabase.from("appointments").update({ reminded: true, sms_sent_at: null }).eq("id", a.id)
-            continue
-          }
-
-          const companyName = company?.name || "unserem Unternehmen"
-          const customerName = cleanName(a.name || "Kunde")
-          const message = `Hallo ${customerName}, Ihr Termin bei ${companyName} ist morgen um ${a.time} Uhr. Wir freuen uns auf Sie!`
-
-          const result = await sendSMS(formatPhone(a.phone), message)
-          console.log("SEVEN.IO RESULT:", result)
-
-          await supabase
-            .from("appointments")
-            .update({
-              reminded: true,
-              sms_sent_at: new Date().toISOString()
-            })
-            .eq("id", a.id)
-
-          await supabase.rpc("increment_sms_count", {
-            company_id_input: a.company_id
-          })
-
-          sentCount++
-          console.log("✅ SMS SENT:", a.phone)
-
-        } catch (smsError) {
-          console.log("❌ SEVEN.IO ERROR:", smsError)
+        if (compErr) {
+          console.error(`[reminder] company fetch failed for ${a.company_id}:`, compErr.message)
+          continue
         }
-      } else {
-        console.log("⏭️ SKIPPED:", a.id)
+
+        // ── Skip if company is paused ──
+        if (company?.paused) continue
+
+        // ── Monthly reset: if new month, reset counter + extra ──
+        const month = currentMonth()
+        if (company && (company.sms_month || 0) !== month) {
+          await supabase.from("companies").update({
+            sms_count_month: 0,
+            sms_extra_month: 0,
+            sms_month: month,
+          }).eq("id", a.company_id)
+          company.sms_count_month = 0
+          company.sms_extra_month = 0
+        }
+
+        // ── SMS-Limit check (inkl. dazugekaufte Extra-SMS) ──
+        const smsUsed  = company?.sms_count_month ?? 0
+        const smsExtra = company?.sms_extra_month ?? 0
+        const smsLimit = (company?.sms_limit ?? 100) + smsExtra
+
+        if (smsUsed >= smsLimit) {
+          console.log(`[reminder] SMS-Limit erreicht für ${a.company_id} (${smsUsed}/${smsLimit}) — markiere als erledigt`)
+          await supabase.from("appointments").update({ reminded: true, sms_sent_at: null }).eq("id", a.id)
+          continue
+        }
+
+        // ── SMS-Text: NUR Kundenname + Betriebsname + Uhrzeit ──
+        // Mitarbeitername ist NICHT im SMS — er ist nur intern im Kalender sichtbar
+        const companyName  = company?.name || "unserem Unternehmen"
+        const customerName = cleanName(a.name || "Kunde")  // entfernt [Online: ...] etc.
+        const message = `Hallo ${customerName}, Ihr Termin bei ${companyName} ist morgen um ${a.time} Uhr. Wir freuen uns auf Sie!`
+
+        await sendSMS(formatPhone(a.phone), message)
+
+        await supabase
+          .from("appointments")
+          .update({ reminded: true, sms_sent_at: new Date().toISOString() })
+          .eq("id", a.id)
+
+        await supabase.rpc("increment_sms_count", { company_id_input: a.company_id })
+
+        sentCount++
+        console.log(`[reminder] ✅ SMS gesendet an ${a.phone} (Termin ${a.id})`)
+
+      } catch (smsError: any) {
+        console.error(`[reminder] ❌ SMS fehlgeschlagen (Termin ${a.id}):`, smsError.message)
+        // Nicht als "reminded" markieren — nächster Cron-Lauf versucht es erneut
       }
     }
 

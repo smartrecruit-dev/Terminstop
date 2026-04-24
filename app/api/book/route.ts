@@ -68,13 +68,40 @@ function formatDT(date: string, time: string): string {
   }) + " Uhr"
 }
 
-async function sendSMS(to: string, message: string) {
-  const res = await fetch("https://gateway.seven.io/api/sms", {
-    method: "POST",
-    headers: { "X-Api-Key": process.env.SEVEN_API_KEY!, "Content-Type": "application/json" },
-    body: JSON.stringify({ to, text: message, from: "TerminStop" }),
-  })
-  return res.ok
+async function sendSMS(to: string, message: string): Promise<boolean> {
+  if (!process.env.SEVEN_API_KEY) {
+    console.error("[book/sms] SEVEN_API_KEY ist nicht gesetzt")
+    return false
+  }
+  try {
+    const res = await fetch("https://gateway.seven.io/api/sms", {
+      method: "POST",
+      headers: { "X-Api-Key": process.env.SEVEN_API_KEY, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        to,
+        text: message,
+        from: "TerminStop",
+        // Kein Mitarbeitername im SMS — nur für den internen Kalender
+      }),
+    })
+    const raw = await res.text()
+    let result: Record<string, unknown> = {}
+    try { result = JSON.parse(raw) } catch { /* nicht-JSON */ }
+
+    if (!res.ok) {
+      console.error(`[book/sms] HTTP ${res.status}:`, raw)
+      return false
+    }
+    const success = String(result.success ?? "")
+    if (success !== "100") {
+      console.error(`[book/sms] Seven.io Fehlercode ${success}:`, raw)
+      return false
+    }
+    return true
+  } catch (e: any) {
+    console.error("[book/sms] Netzwerkfehler:", e.message)
+    return false
+  }
 }
 
 /**
