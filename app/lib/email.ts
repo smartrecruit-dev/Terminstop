@@ -149,6 +149,121 @@ export async function sendPaymentConfirmationEmail(to: string, companyName: stri
   await sendEmail(to, `Zahlung bestätigt – ${planName}-Paket aktiv ✅`, html)
 }
 
+// ── SMS Topup Confirmation Email ──────────────────────────────────────────────
+export async function sendSmsTopupEmail(to: string, companyName: string, smsAmount: number, priceLabel: string) {
+  const html = baseTemplate(`
+    <div style="text-align:center;margin-bottom:28px;">
+      <div style="font-size:48px;margin-bottom:12px;">📦</div>
+      <h1 style="font-size:24px;font-weight:900;color:#0F1B2D;margin:0 0 10px;">SMS-Paket aktiviert!</h1>
+      <p style="font-size:15px;color:#5B6779;line-height:1.6;margin:0;">
+        Hallo ${companyName},<br>dein Extra-Paket wurde erfolgreich gebucht und sofort gutgeschrieben.
+      </p>
+    </div>
+
+    <div style="background:#F0FBF6;border:1px solid #D1F5E3;border-radius:14px;padding:20px 20px;margin-bottom:28px;">
+      <table width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td style="font-size:13px;color:#5B6779;padding:6px 0;">Extra-SMS</td>
+          <td style="font-size:16px;font-weight:900;color:#18A66D;text-align:right;padding:6px 0;">+${smsAmount} SMS</td>
+        </tr>
+        <tr>
+          <td style="font-size:13px;color:#5B6779;padding:6px 0;">Betrag</td>
+          <td style="font-size:14px;font-weight:700;color:#0F1B2D;text-align:right;padding:6px 0;">${priceLabel}</td>
+        </tr>
+        <tr>
+          <td style="font-size:13px;color:#5B6779;padding:6px 0;">Status</td>
+          <td style="text-align:right;padding:6px 0;"><span style="background:#D1FAE5;color:#059669;font-size:12px;font-weight:700;padding:3px 10px;border-radius:980px;">Sofort verfügbar</span></td>
+        </tr>
+      </table>
+    </div>
+
+    <p style="font-size:13px;color:#5B6779;text-align:center;line-height:1.6;margin:0 0 24px;">
+      Die SMS-Erinnerungen laufen ab sofort wieder. Die Extra-SMS werden am Ende des Monats zurückgesetzt.
+    </p>
+
+    <div style="text-align:center;">
+      <a href="https://terminstop.de/dashboard" style="display:inline-block;background:linear-gradient(135deg,#18A66D,#0F8A57);color:#fff;text-decoration:none;padding:14px 32px;border-radius:12px;font-size:15px;font-weight:700;">
+        Zum Dashboard →
+      </a>
+    </div>
+  `)
+  await sendEmail(to, `📦 ${smsAmount} Extra-SMS gutgeschrieben`, html)
+}
+
+// ── Payment Failed Email ───────────────────────────────────────────────────────
+export async function sendPaymentFailedEmail(to: string, companyName: string) {
+  const html = baseTemplate(`
+    <div style="text-align:center;margin-bottom:28px;">
+      <div style="font-size:48px;margin-bottom:12px;">💳</div>
+      <h1 style="font-size:24px;font-weight:900;color:#0F1B2D;margin:0 0 10px;">Zahlung fehlgeschlagen</h1>
+      <p style="font-size:15px;color:#5B6779;line-height:1.6;margin:0;">
+        Hallo ${companyName},<br>
+        wir konnten deine Zahlung leider nicht einziehen. Dein Konto wurde vorübergehend gesperrt.
+      </p>
+    </div>
+
+    <div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:14px;padding:20px 20px;margin-bottom:28px;">
+      <p style="font-size:14px;font-weight:700;color:#DC2626;margin:0 0 8px;">Was jetzt zu tun ist:</p>
+      <p style="font-size:13px;color:#5B6779;line-height:1.7;margin:0;">
+        Bitte aktualisiere deine Zahlungsmethode im Kundenportal. Deine SMS-Erinnerungen werden danach automatisch wieder aktiviert. Deine Daten bleiben vollständig erhalten.
+      </p>
+    </div>
+
+    <div style="text-align:center;margin-bottom:16px;">
+      <a href="https://terminstop.de/blocked?reason=payment" style="display:inline-block;background:linear-gradient(135deg,#18A66D,#0F8A57);color:#fff;text-decoration:none;padding:14px 32px;border-radius:12px;font-size:15px;font-weight:700;box-shadow:0 4px 16px rgba(10,107,67,0.3);">
+        Zahlungsmethode aktualisieren →
+      </a>
+    </div>
+
+    <p style="font-size:12px;color:#9CA3AF;text-align:center;margin:0;">
+      Fragen? Schreib uns: <a href="mailto:terminstop.business@gmail.com" style="color:#18A66D;">terminstop.business@gmail.com</a>
+    </p>
+  `)
+  await sendEmail(to, "⚠️ Zahlung fehlgeschlagen – Bitte Zahlungsmethode aktualisieren", html)
+}
+
+// ── Subscription Cancelled Email ──────────────────────────────────────────────
+export async function sendSubscriptionCancelledEmail(to: string, companyName: string) {
+  const html = baseTemplate(`
+    <div style="text-align:center;margin-bottom:28px;">
+      <div style="font-size:48px;margin-bottom:12px;">👋</div>
+      <h1 style="font-size:24px;font-weight:900;color:#0F1B2D;margin:0 0 10px;">Dein Abo wurde beendet</h1>
+      <p style="font-size:15px;color:#5B6779;line-height:1.6;margin:0;">
+        Hallo ${companyName},<br>
+        dein TerminStop-Abo wurde gekündigt. Wir hoffen, du warst zufrieden!
+      </p>
+    </div>
+
+    <div style="background:#F9FAFB;border:1px solid #E8ECF1;border-radius:14px;padding:20px 20px;margin-bottom:28px;">
+      <p style="font-size:13px;color:#5B6779;line-height:1.7;margin:0;">
+        <strong style="color:#0F1B2D;">Deine Daten sind sicher.</strong> Alle Termine und Kundendaten bleiben gespeichert.
+        Du kannst jederzeit mit einem neuen Paket weitermachen — alles ist noch da.
+      </p>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:28px;">
+      ${[
+        ["⚡", "Starter", "39 €/Monat", "100 SMS"],
+        ["🚀", "Pro",     "109 €/Monat", "400 SMS · Empfohlen"],
+        ["🏢", "Business","229 €/Monat", "1.000 SMS"],
+      ].map(([icon, name, price, desc]) => `
+        <div style="display:flex;align-items:center;gap:12px;border:1px solid #E8ECF1;border-radius:10px;padding:12px 14px;background:#fff;">
+          <span style="font-size:18px;">${icon}</span>
+          <div style="flex:1;"><div style="font-size:13px;font-weight:700;color:#0F1B2D;">${name}</div><div style="font-size:12px;color:#5B6779;">${desc}</div></div>
+          <div style="font-size:13px;font-weight:700;color:#18A66D;">${price}</div>
+        </div>
+      `).join("")}
+    </div>
+
+    <div style="text-align:center;">
+      <a href="https://terminstop.de/blocked?reason=cancelled" style="display:inline-block;background:linear-gradient(135deg,#18A66D,#0F8A57);color:#fff;text-decoration:none;padding:14px 32px;border-radius:12px;font-size:15px;font-weight:700;">
+        Jetzt neu starten →
+      </a>
+    </div>
+  `)
+  await sendEmail(to, "Dein TerminStop-Abo wurde beendet", html)
+}
+
 // ── Trial Reminder Email ──────────────────────────────────────────────────────
 export async function sendTrialReminderEmail(to: string, companyName: string, daysLeft: number) {
   const isUrgent = daysLeft <= 3

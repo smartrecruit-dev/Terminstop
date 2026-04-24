@@ -1,8 +1,15 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@supabase/supabase-js"
 import { sendTrialReminderEmail } from "@/app/lib/email"
+import { createClient as createAdminClient } from "@supabase/supabase-js"
 
 const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+)
+
+// Admin client (service role) for auth.admin calls
+const supabaseAdmin = createAdminClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
@@ -169,6 +176,42 @@ export async function GET(req: NextRequest) {
       } else {
         console.log("⏭️ SKIPPED:", a.id)
       }
+    }
+
+    // ── Trial Reminder E-Mails ────────────────────────────────────────────────
+    // Sende Erinnerungen an Firmen die noch im Trial sind (Tag 7, 11, 13)
+    try {
+      const TRIAL_DAYS = 14
+      const REMINDER_DAYS = [7, 3, 1] // Tage VOR Ablauf (= Tage nach Start: 7, 11, 13)
+
+      const { data: trialCompanies } = await supabase
+        .from("companies")
+        .select("id, user_id, name, created_at")
+        .eq("plan", "trial")
+        .eq("paused", false)
+
+      for (const co of trialCompanies || []) {
+        if (!co.created_at) continue
+        const daysSinceStart = Math.floor(
+          (now.getTime() - new Date(co.created_at).getTime()) / (1000 * 60 * 60 * 24)
+        )
+        const daysLeft = TRIAL_DAYS - daysSinceStart
+
+        // Send only on specific days to avoid spam
+        if (!REMINDER_DAYS.includes(daysLeft)) continue
+
+        try {
+          const { data: userData } = await supabaseAdmin.auth.admin.getUserById(co.user_id)
+          if (userData?.user?.email) {
+            await sendTrialReminderEmail(userData.user.email, co.name, daysLeft)
+            console.log(`[reminder] Trial reminder sent (${daysLeft} days left) to company ${co.id}`)
+          }
+        } catch (e) {
+          console.error("[reminder] Trial email error:", e)
+        }
+      }
+    } catch (e) {
+      console.error("[reminder] Trial reminder block error:", e)
     }
 
     return NextResponse.json({ success: true, sent: sentCount })

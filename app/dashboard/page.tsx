@@ -255,7 +255,7 @@ export default function Dashboard() {
         .order("date", { ascending: true }).order("time", { ascending: true }),
       supabase.from("customers").select("*").eq("company_id", storedId).order("name", { ascending: true }),
       supabase.from("employees").select("id, name, active").eq("company_id", storedId).order("created_at", { ascending: true }),
-    ]).then(([coRes, apptRes, custRes, empRes]) => {
+    ]).then(async ([coRes, apptRes, custRes, empRes]) => {
       const co = coRes.data
       if (co) {
         const plan = co.plan || "trial"

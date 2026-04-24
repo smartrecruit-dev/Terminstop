@@ -1,7 +1,12 @@
 import { NextRequest, NextResponse } from "next/server"
 import Stripe from "stripe"
 import { createClient } from "@supabase/supabase-js"
-import { sendPaymentConfirmationEmail } from "@/app/lib/email"
+import {
+  sendPaymentConfirmationEmail,
+  sendPaymentFailedEmail,
+  sendSubscriptionCancelledEmail,
+  sendSmsTopupEmail,
+} from "@/app/lib/email"
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2026-03-25.dahlia",
@@ -59,10 +64,9 @@ export async function POST(req: NextRequest) {
           const companyId = session.metadata?.company_id
           const smsAmount = parseInt(session.metadata?.sms_amount || "0", 10)
           if (companyId && smsAmount > 0) {
-            // sms_extra_month addieren (Spalte muss in companies existieren)
             const { data: co } = await supabaseAdmin
               .from("companies")
-              .select("sms_extra_month")
+              .select("sms_extra_month, user_id, name")
               .eq("id", companyId)
               .single()
             const current = (co?.sms_extra_month as number) || 0
@@ -71,6 +75,16 @@ export async function POST(req: NextRequest) {
               .update({ sms_extra_month: current + smsAmount })
               .eq("id", companyId)
             console.log(`[webhook] SMS-Topup +${smsAmount} for company ${companyId}`)
+
+            // Send topup confirmation email
+            if (co?.user_id && co?.name) {
+              const { data: userData } = await supabaseAdmin.auth.admin.getUserById(co.user_id)
+              if (userData?.user?.email) {
+                const priceLabel = smsAmount === 50 ? "9,90 €" : smsAmount === 100 ? "17,90 €" : "29,90 €"
+                sendSmsTopupEmail(userData.user.email, co.name, smsAmount, priceLabel)
+                  .catch(e => console.error("[webhook] sms topup email failed:", e))
+              }
+            }
           }
           break
         }
@@ -150,6 +164,20 @@ export async function POST(req: NextRequest) {
           .eq("id", companyId)
 
         console.log(`[webhook] Payment failed — paused company ${companyId}`)
+
+        // Send payment failed email
+        const { data: pfData } = await supabaseAdmin
+          .from("companies")
+          .select("user_id, name")
+          .eq("id", companyId)
+          .single()
+        if (pfData?.user_id) {
+          const { data: pfUser } = await supabaseAdmin.auth.admin.getUserById(pfData.user_id)
+          if (pfUser?.user?.email) {
+            sendPaymentFailedEmail(pfUser.user.email, pfData.name || "")
+              .catch(e => console.error("[webhook] payment failed email error:", e))
+          }
+        }
         break
       }
 
@@ -165,6 +193,20 @@ export async function POST(req: NextRequest) {
           .eq("id", companyId)
 
         console.log(`[webhook] Subscription cancelled for company ${companyId}`)
+
+        // Send cancellation email
+        const { data: cancelData } = await supabaseAdmin
+          .from("companies")
+          .select("user_id, name")
+          .eq("id", companyId)
+          .single()
+        if (cancelData?.user_id) {
+          const { data: cancelUser } = await supabaseAdmin.auth.admin.getUserById(cancelData.user_id)
+          if (cancelUser?.user?.email) {
+            sendSubscriptionCancelledEmail(cancelUser.user.email, cancelData.name || "")
+              .catch(e => console.error("[webhook] cancellation email error:", e))
+          }
+        }
         break
       }
 
