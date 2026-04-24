@@ -96,8 +96,9 @@ export async function POST(req: NextRequest) {
         name:          companyName,
         slug:          slug,
         booking_addon: true,
-        paused:        false,
-        sms_limit:     100,
+        paused:          false,
+        plan:            "trial",
+        sms_limit:       50,   // Testzeitraum: max. 50 SMS
         sms_count_month: 0,
       })
 

@@ -250,15 +250,35 @@ export default function Dashboard() {
     if (!storedId) { window.location.href = "/login"; return }
     setCompanyName(storedName || "")
     Promise.all([
-      supabase.from("companies").select("paused, sms_count_month, sms_limit, plan, name").eq("id", storedId).single(),
+      supabase.from("companies").select("paused, sms_count_month, sms_limit, plan, name, created_at").eq("id", storedId).single(),
       supabase.from("appointments").select("*").eq("company_id", storedId)
         .order("date", { ascending: true }).order("time", { ascending: true }),
       supabase.from("customers").select("*").eq("company_id", storedId).order("name", { ascending: true }),
       supabase.from("employees").select("id, name, active").eq("company_id", storedId).order("created_at", { ascending: true }),
     ]).then(([coRes, apptRes, custRes, empRes]) => {
-      if (coRes.data?.paused) {
-        localStorage.removeItem("company_id"); localStorage.removeItem("company_name")
-        window.location.href = "/login"; return
+      const co = coRes.data
+      if (co) {
+        const plan = co.plan || "trial"
+
+        // Gesperrt durch Admin oder Zahlung
+        if (co.paused) {
+          const reason = plan === "cancelled" ? "cancelled" : plan === "trial" ? "trial" : "payment"
+          window.location.href = `/blocked?reason=${reason}&plan=${plan}`
+          return
+        }
+
+        // Trial abgelaufen? (plan=trial + created_at älter als 14 Tage)
+        if (plan === "trial" && co.created_at) {
+          const createdAt = new Date(co.created_at).getTime()
+          const trialDays = 14
+          const expired   = Date.now() - createdAt > trialDays * 24 * 60 * 60 * 1000
+          if (expired) {
+            // Account automatisch pausieren
+            await supabase.from("companies").update({ paused: true }).eq("id", storedId)
+            window.location.href = "/blocked?reason=trial&plan=trial"
+            return
+          }
+        }
       }
       setCompanyId(storedId)
       if (coRes.data) {

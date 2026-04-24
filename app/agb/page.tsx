@@ -119,6 +119,32 @@ export default function AGB() {
             </p>
           </section>
 
+          {/* § 3a */}
+          <section>
+            <h2 className="text-base font-bold text-[#1F2A37] mb-3">§ 3a Kostenloser Testzeitraum</h2>
+            <p className="mb-3">
+              Nach der Registrierung steht dem Kunden ein kostenloser Testzeitraum von <strong>14 Tagen</strong> zur
+              Verfügung. In dieser Zeit kann die Plattform uneingeschränkt genutzt werden, soweit die
+              nachfolgenden Einschränkungen nichts anderes bestimmen.
+            </p>
+            <p className="mb-3">
+              Während des Testzeitraums ist der automatische SMS-Versand auf <strong>maximal 50 SMS</strong> begrenzt.
+              Nach Erschöpfung dieses Kontingents oder nach Ablauf der 14 Tage wird der SMS-Versand
+              automatisch deaktiviert, bis der Kunde ein kostenpflichtiges Paket gebucht hat.
+            </p>
+            <p className="mb-3">
+              Mit Ablauf des 14-tägigen Testzeitraums ohne Buchung eines kostenpflichtigen Pakets wird
+              der Zugang zur Plattform automatisch gesperrt. Der Kunde wird rechtzeitig darauf hingewiesen.
+              Alle erfassten Daten bleiben erhalten und werden nicht gelöscht; sie stehen dem Kunden
+              nach Buchung eines Pakets wieder vollständig zur Verfügung.
+            </p>
+            <p>
+              Es besteht kein Anspruch auf eine Verlängerung des Testzeitraums. Der Anbieter ist
+              berechtigt, den Testzeitraum im Einzelfall ohne Angabe von Gründen zu verkürzen oder
+              zu beenden, sofern ein wichtiger Grund vorliegt (z.B. Missbrauchsverdacht).
+            </p>
+          </section>
+
           {/* § 4 */}
           <section>
             <h2 className="text-base font-bold text-[#1F2A37] mb-3">§ 4 Preise, Abrechnung und Zahlung</h2>

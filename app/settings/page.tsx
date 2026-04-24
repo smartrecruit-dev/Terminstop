@@ -90,15 +90,33 @@ export default function SettingsPage() {
   async function loadSettings() {
     setLoading(true)
     const [{ data: co }, { data: { user } }] = await Promise.all([
-      supabase.from("companies").select("name, booking_note, slug, booking_addon, plan, stripe_customer_id, sms_count_month, sms_limit, sms_extra_month").eq("id", companyId!).single(),
+      supabase.from("companies").select("name, booking_note, slug, booking_addon, plan, stripe_customer_id, sms_count_month, sms_limit, sms_extra_month, created_at, paused").eq("id", companyId!).single(),
       supabase.auth.getUser(),
     ])
     if (co) {
+      const plan = co.plan || "trial"
+
+      // Gesperrt prüfen
+      if (co.paused) {
+        const reason = plan === "cancelled" ? "cancelled" : plan === "trial" ? "trial" : "payment"
+        window.location.href = `/blocked?reason=${reason}&plan=${plan}`
+        return
+      }
+      // Trial abgelaufen?
+      if (plan === "trial" && co.created_at) {
+        const expired = Date.now() - new Date(co.created_at).getTime() > 14 * 24 * 60 * 60 * 1000
+        if (expired) {
+          await supabase.from("companies").update({ paused: true }).eq("id", companyId!)
+          window.location.href = "/blocked?reason=trial&plan=trial"
+          return
+        }
+      }
+
       setCompanyName(co.name || "")
       setBookingNote(co.booking_note || "")
       setSlug(co.slug || "")
       setBookingAddon(!!co.booking_addon)
-      setPlan(co.plan || "trial")
+      setPlan(plan)
       setSmsUsed(co.sms_count_month || 0)
       setSmsLimit(co.sms_limit || 0)
       setSmsExtra(co.sms_extra_month || 0)
