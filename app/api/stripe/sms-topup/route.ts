@@ -77,16 +77,24 @@ export async function POST(req: NextRequest) {
 
     // Einmalige Checkout-Session (mode: "payment")
     const session = await stripe.checkout.sessions.create({
-      customer: customerId,
-      mode: "payment",
+      customer:  customerId,
+      mode:      "payment",
+      locale:    "de",
       line_items: [{ price: priceId, quantity: 1 }],
       success_url: `${process.env.NEXT_PUBLIC_APP_URL}/settings?tab=sms&topup=success`,
       cancel_url:  `${process.env.NEXT_PUBLIC_APP_URL}/settings?tab=sms`,
+      billing_address_collection: "auto",
+      payment_method_types: ["card", "sepa_debit"],
       metadata: {
         company_id:  company.id,
         type:        "sms_topup",
         sms_amount:  String(pkg.smsAmount),
         label:       pkg.label,
+      },
+      custom_text: {
+        submit: {
+          message: `${pkg.label} für ${company.name} — werden sofort nach der Zahlung gutgeschrieben.`,
+        },
       },
     })
 

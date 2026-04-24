@@ -77,25 +77,43 @@ export async function POST(req: NextRequest) {
       [process.env.NEXT_PUBLIC_STRIPE_BUSINESS_PRICE_ID!]:"business",
     }
 
+    const planName: Record<string, string> = {
+      starter: "Starter (100 SMS/Monat)",
+      pro:     "Pro (400 SMS/Monat)",
+      business:"Business (1.000 SMS/Monat)",
+    }
+    const chosenPlan = planMap[priceId] || "starter"
+
     // Create Checkout Session
     const session = await stripe.checkout.sessions.create({
-      customer: customerId,
-      mode: "subscription",
+      customer:  customerId,
+      mode:      "subscription",
+      locale:    "de",
       line_items: [{ price: priceId, quantity: 1 }],
       success_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard?payment=success`,
-      cancel_url:  `${process.env.NEXT_PUBLIC_APP_URL}/#preise`,
+      cancel_url:  `${process.env.NEXT_PUBLIC_APP_URL}/blocked?reason=trial`,
       metadata: {
         company_id: company.id,
-        plan: planMap[priceId] || "starter",
+        plan: chosenPlan,
       },
       subscription_data: {
         metadata: {
           company_id: company.id,
-          plan: planMap[priceId] || "starter",
+          plan: chosenPlan,
         },
-        trial_period_days: 14,
+        // Kein trial_period_days — Trial läuft bereits in TerminStop (created_at + 14 Tage)
       },
+      billing_address_collection: "auto",
       allow_promotion_codes: true,
+      custom_text: {
+        submit: {
+          message: `Du buchst das ${planName[chosenPlan]}-Paket für ${company.name}. Monatlich kündbar, keine Mindestlaufzeit.`,
+        },
+        after_submit: {
+          message: "Deine SMS-Erinnerungen starten sofort nach der Zahlung.",
+        },
+      },
+      payment_method_types: ["card", "sepa_debit"],
     })
 
     return NextResponse.json({ url: session.url })
