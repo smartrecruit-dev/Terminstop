@@ -60,6 +60,8 @@ export default function BookingPage() {
   const [avail,             setAvail]            = useState<Avail>("idle")
   const [confirmed,         setConfirmed]        = useState(false)
   const [privacyOk,         setPrivacyOk]        = useState(false)
+  const [nextSlotLoading,   setNextSlotLoading]  = useState(false)
+  const [nextSlotResult,    setNextSlotResult]   = useState<{ date: string; time: string } | null>(null)
 
   useEffect(() => { if (slug) loadCompany() }, [slug])
 
@@ -109,6 +111,36 @@ export default function BookingPage() {
       setAvail("idle")
     }
   }, [company, selectedEmployee])
+
+  // Find next available slot (called when avail === "full")
+  const findNextSlot = useCallback(async () => {
+    if (!company || !date || !time) return
+    setNextSlotLoading(true)
+    setNextSlotResult(null)
+    try {
+      const params = new URLSearchParams({ company_id: company.id, date, time })
+      if (selectedEmployee?.id) params.set("employee_id", selectedEmployee.id)
+      const res  = await fetch(`/api/availability/next-free?${params}`)
+      const json = await res.json()
+      if (json.found) {
+        setNextSlotResult({ date: json.date, time: json.time })
+      } else {
+        setNextSlotResult(null)
+      }
+    } catch {
+      setNextSlotResult(null)
+    } finally {
+      setNextSlotLoading(false)
+    }
+  }, [company, date, time, selectedEmployee])
+
+  // Apply a suggested next slot
+  function applyNextSlot(d: string, t: string) {
+    setDate(d)
+    setTime(t)
+    setNextSlotResult(null)
+    checkAvailability(d, t, selectedEmployee?.id)
+  }
 
   // Skip "employee" step if no employees are configured
   function nextStep(current: Step, type: BookingType): Step {
@@ -554,6 +586,7 @@ export default function BookingPage() {
                   onChange={e => {
                     setDate(e.target.value)
                     setAvail("idle")
+                    setNextSlotResult(null)
                     if (e.target.value && time) checkAvailability(e.target.value, time, selectedEmployee?.id)
                   }}
                   className="ts-input" />
@@ -564,6 +597,7 @@ export default function BookingPage() {
                   onChange={e => {
                     setTime(e.target.value)
                     setAvail("idle")
+                    setNextSlotResult(null)
                     if (date && e.target.value) checkAvailability(date, e.target.value, selectedEmployee?.id)
                   }}
                   step={900} className="ts-input" />
@@ -588,12 +622,58 @@ export default function BookingPage() {
               </div>
             )}
             {avail === "full" && (
-              <div style={{ display:"flex", alignItems:"center", gap:10, background:"#FFFBEB", border:"1px solid #FDE68A", borderRadius:12, padding:"12px 16px", marginBottom:16 }}>
-                <div style={{ width:28, height:28, background:"#F59E0B", borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, fontSize:14 }}>⏳</div>
-                <div>
-                  <div style={{ fontSize:13, fontWeight:800, color:"#92400E" }}>Alle Mitarbeiter belegt</div>
-                  <div style={{ fontSize:12, color:"#B45309" }}>Deine Anfrage wird weitergeleitet — der Betrieb meldet sich bei dir</div>
+              <div style={{ marginBottom:16 }}>
+                <div style={{ display:"flex", alignItems:"center", gap:10, background:"#FFFBEB", border:"1px solid #FDE68A", borderRadius:12, padding:"12px 16px", marginBottom:10 }}>
+                  <div style={{ width:28, height:28, background:"#F59E0B", borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, fontSize:14 }}>⏳</div>
+                  <div style={{ flex:1 }}>
+                    <div style={{ fontSize:13, fontWeight:800, color:"#92400E" }}>Alle Mitarbeiter belegt</div>
+                    <div style={{ fontSize:12, color:"#B45309" }}>Deine Anfrage wird weitergeleitet — der Betrieb meldet sich bei dir</div>
+                  </div>
                 </div>
+
+                {/* Suggest next slot */}
+                {!nextSlotResult && (
+                  <button
+                    onClick={findNextSlot}
+                    disabled={nextSlotLoading}
+                    style={{
+                      width:"100%", padding:"11px 16px", background:"#fff",
+                      border:"1.5px solid #18A66D", borderRadius:12, cursor: nextSlotLoading ? "not-allowed" : "pointer",
+                      fontSize:13, fontWeight:700, color:"#18A66D",
+                      display:"flex", alignItems:"center", justifyContent:"center", gap:8,
+                      transition:"all .18s", opacity: nextSlotLoading ? 0.7 : 1,
+                    }}
+                  >
+                    {nextSlotLoading
+                      ? <><Spin small /><span>Suche freien Termin …</span></>
+                      : <><span>🔍</span><span>Nächsten freien Termin finden</span></>}
+                  </button>
+                )}
+
+                {/* Found slot suggestion */}
+                {nextSlotResult && (
+                  <div style={{ background:"#F0FBF6", border:"1.5px solid #18A66D", borderRadius:12, padding:"14px 16px", display:"flex", alignItems:"center", gap:12 }}>
+                    <div style={{ width:32, height:32, background:"#18A66D", borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, fontSize:16 }}>✓</div>
+                    <div style={{ flex:1 }}>
+                      <div style={{ fontSize:13, fontWeight:800, color:"#18A66D" }}>Freier Termin gefunden!</div>
+                      <div style={{ fontSize:12, color:"#15955F", marginTop:2 }}>
+                        {new Date(`${nextSlotResult.date}T${nextSlotResult.time}`).toLocaleString("de-DE", {
+                          weekday:"long", day:"numeric", month:"long",
+                        })} · {nextSlotResult.time} Uhr
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => applyNextSlot(nextSlotResult.date, nextSlotResult.time)}
+                      style={{
+                        padding:"9px 16px", background:"#18A66D", color:"#fff",
+                        border:"none", borderRadius:10, cursor:"pointer",
+                        fontSize:13, fontWeight:800, whiteSpace:"nowrap",
+                      }}
+                    >
+                      Übernehmen →
+                    </button>
+                  </div>
+                )}
               </div>
             )}
 
