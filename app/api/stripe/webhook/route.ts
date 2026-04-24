@@ -50,9 +50,31 @@ export async function POST(req: NextRequest) {
   try {
     switch (event.type) {
 
-      // ── Zahlung erfolgreich: Abo aktivieren ──
+      // ── Zahlung erfolgreich: Abo aktivieren oder SMS-Paket gutschreiben ──
       case "checkout.session.completed": {
         const session = event.data.object as Stripe.Checkout.Session
+
+        // ── SMS-Einmalkauf ──
+        if (session.mode === "payment" && session.metadata?.type === "sms_topup") {
+          const companyId = session.metadata?.company_id
+          const smsAmount = parseInt(session.metadata?.sms_amount || "0", 10)
+          if (companyId && smsAmount > 0) {
+            // sms_extra_month addieren (Spalte muss in companies existieren)
+            const { data: co } = await supabaseAdmin
+              .from("companies")
+              .select("sms_extra_month")
+              .eq("id", companyId)
+              .single()
+            const current = (co?.sms_extra_month as number) || 0
+            await supabaseAdmin
+              .from("companies")
+              .update({ sms_extra_month: current + smsAmount })
+              .eq("id", companyId)
+            console.log(`[webhook] SMS-Topup +${smsAmount} for company ${companyId}`)
+          }
+          break
+        }
+
         if (session.mode !== "subscription") break
 
         const companyId      = session.metadata?.company_id

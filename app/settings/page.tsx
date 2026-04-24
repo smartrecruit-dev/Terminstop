@@ -29,6 +29,12 @@ export default function SettingsPage() {
   const [portalLoading, setPortalLoading] = useState(false)
   const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null)
 
+  // SMS-Verbrauch
+  const [smsUsed,       setSmsUsed]       = useState(0)
+  const [smsLimit,      setSmsLimit]      = useState(0)
+  const [smsExtra,      setSmsExtra]      = useState(0)
+  const [topupLoading,  setTopupLoading]  = useState<string | null>(null)
+
   // Buchungsseite
   const [bookingNote,   setBookingNote]   = useState("")
   const [slug,          setSlug]          = useState("")
@@ -66,6 +72,16 @@ export default function SettingsPage() {
     if (!id) { window.location.href = "/login"; return }
     setCompanyId(id)
     setCompanyName(name || "")
+
+    // Nach Stripe-Rücksprung direkt auf richtigen Tab springen
+    const params = new URLSearchParams(window.location.search)
+    const tab = params.get("tab") as Section | null
+    if (tab && ["buchungsseite","mitarbeiter","konto","sms","abo"].includes(tab)) {
+      setSection(tab)
+    }
+    if (params.get("topup") === "success") {
+      setTimeout(() => toast.success("Extra-SMS gutgeschrieben!", "Deine zusätzlichen SMS sind sofort verfügbar."), 500)
+    }
   }, [])
 
   useEffect(() => { if (companyId) loadSettings() }, [companyId])
@@ -74,7 +90,7 @@ export default function SettingsPage() {
   async function loadSettings() {
     setLoading(true)
     const [{ data: co }, { data: { user } }] = await Promise.all([
-      supabase.from("companies").select("name, booking_note, slug, booking_addon, plan, stripe_customer_id").eq("id", companyId!).single(),
+      supabase.from("companies").select("name, booking_note, slug, booking_addon, plan, stripe_customer_id, sms_count_month, sms_limit, sms_extra_month").eq("id", companyId!).single(),
       supabase.auth.getUser(),
     ])
     if (co) {
@@ -83,6 +99,9 @@ export default function SettingsPage() {
       setSlug(co.slug || "")
       setBookingAddon(!!co.booking_addon)
       setPlan(co.plan || "trial")
+      setSmsUsed(co.sms_count_month || 0)
+      setSmsLimit(co.sms_limit || 0)
+      setSmsExtra(co.sms_extra_month || 0)
       setSection("buchungsseite")
     }
     if (user) {
@@ -243,6 +262,26 @@ export default function SettingsPage() {
     setCheckoutLoading(null)
     if (json.url) window.location.href = json.url
   }
+
+  async function startTopup(priceId: string, key: string) {
+    setTopupLoading(key)
+    const { data: { session } } = await supabase.auth.getSession()
+    const res = await fetch("/api/stripe/sms-topup", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${session?.access_token}` },
+      body: JSON.stringify({ priceId }),
+    })
+    const json = await res.json()
+    setTopupLoading(null)
+    if (json.url) window.location.href = json.url
+    else toast.error("Fehler", json.error || "Unbekannter Fehler")
+  }
+
+  const SMS_PACKAGES = [
+    { key: "sms50",  label: "50 Extra-SMS",  price: "9,90 €",  priceId: process.env.NEXT_PUBLIC_STRIPE_SMS_50_PRICE_ID!  },
+    { key: "sms100", label: "100 Extra-SMS", price: "17,90 €", priceId: process.env.NEXT_PUBLIC_STRIPE_SMS_100_PRICE_ID! },
+    { key: "sms200", label: "200 Extra-SMS", price: "29,90 €", priceId: process.env.NEXT_PUBLIC_STRIPE_SMS_200_PRICE_ID! },
+  ]
 
   const PLANS = [
     { key: "starter",  label: "Starter",  price: "39 €",  sms: "100 SMS",  priceId: process.env.NEXT_PUBLIC_STRIPE_STARTER_PRICE_ID! },
@@ -640,6 +679,79 @@ export default function SettingsPage() {
         {/* ── SMS-VORSCHAU ── */}
         {section === "sms" && (
           <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+
+            {/* SMS-Verbrauch & Extra kaufen */}
+            <div style={card}>
+              <h2 style={{ fontSize: 16, fontWeight: 800, color: T, margin: "0 0 6px" }}>SMS-Verbrauch diesen Monat</h2>
+              <p style={{ fontSize: 14, color: M, margin: "0 0 20px", lineHeight: 1.6 }}>
+                Dein aktuelles Kontingent und optionale Extra-SMS, die nur für diesen Monat gelten.
+              </p>
+
+              {/* Fortschrittsbalken */}
+              {(() => {
+                const total = smsLimit + smsExtra
+                const pct   = total > 0 ? Math.min(100, Math.round((smsUsed / total) * 100)) : 0
+                const barColor = pct >= 90 ? "#EF4444" : pct >= 70 ? "#F59E0B" : G
+                return (
+                  <div style={{ marginBottom: 20 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 8 }}>
+                      <div>
+                        <span style={{ fontSize: 28, fontWeight: 900, color: T }}>{smsUsed}</span>
+                        <span style={{ fontSize: 15, color: M, marginLeft: 4 }}>/ {total} SMS</span>
+                      </div>
+                      <span style={{ fontSize: 12, fontWeight: 700, color: barColor }}>{pct}% verbraucht</span>
+                    </div>
+                    <div style={{ height: 10, background: "#F3F4F6", borderRadius: 99, overflow: "hidden" }}>
+                      <div style={{ height: "100%", width: `${pct}%`, background: barColor, borderRadius: 99, transition: "width .4s" }} />
+                    </div>
+                    {smsExtra > 0 && (
+                      <div style={{ fontSize: 12, color: G, marginTop: 6, fontWeight: 600 }}>
+                        + {smsExtra} dazugekaufte Extra-SMS diesen Monat
+                      </div>
+                    )}
+                    {pct >= 80 && (
+                      <div style={{ marginTop: 10, background: "#FFF7ED", border: "1px solid #FED7AA", borderRadius: 10, padding: "9px 14px", fontSize: 13, color: "#92400E", fontWeight: 600 }}>
+                        ⚠️ Du hast {100 - pct}% deines SMS-Kontingents übrig — kaufe jetzt nach, um lückenlos weiter zu senden.
+                      </div>
+                    )}
+                  </div>
+                )
+              })()}
+
+              {/* Extra-SMS kaufen */}
+              <div style={{ borderTop: `1px solid ${BD}`, paddingTop: 20 }}>
+                <div style={{ fontSize: 13, fontWeight: 800, color: T, marginBottom: 4 }}>Extra-SMS dazukaufen</div>
+                <div style={{ fontSize: 13, color: M, marginBottom: 16, lineHeight: 1.6 }}>
+                  Einmalige Zahlung — die SMS gelten nur für den laufenden Monat und verfallen danach.
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                  {SMS_PACKAGES.map(pkg => (
+                    <div key={pkg.key} style={{
+                      display: "flex", alignItems: "center", justifyContent: "space-between",
+                      border: `1.5px solid ${BD}`, borderRadius: 12, padding: "13px 16px",
+                      background: "#FAFAFA", gap: 12, flexWrap: "wrap",
+                    }}>
+                      <div>
+                        <div style={{ fontSize: 14, fontWeight: 700, color: T }}>{pkg.label}</div>
+                        <div style={{ fontSize: 12, color: M, marginTop: 2 }}>Einmalig · {pkg.price} · nur diesen Monat</div>
+                      </div>
+                      <button
+                        onClick={() => startTopup(pkg.priceId, pkg.key)}
+                        disabled={topupLoading === pkg.key}
+                        style={{
+                          padding: "9px 18px", borderRadius: 9, border: "none",
+                          cursor: topupLoading === pkg.key ? "not-allowed" : "pointer",
+                          fontSize: 13, fontWeight: 700, background: G, color: "#fff",
+                          opacity: topupLoading === pkg.key ? 0.6 : 1, whiteSpace: "nowrap",
+                        }}
+                      >
+                        {topupLoading === pkg.key ? "Weiterleitung…" : `Kaufen ${pkg.price} →`}
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
 
             {/* SMS-Vorschau */}
             <div style={card}>

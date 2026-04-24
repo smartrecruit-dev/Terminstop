@@ -108,7 +108,7 @@ export async function GET(req: NextRequest) {
         try {
           const { data: company } = await supabase
             .from("companies")
-            .select("name, sms_limit, sms_count_month, sms_month, paused, plan")
+            .select("name, sms_limit, sms_count_month, sms_month, sms_extra_month, paused, plan")
             .eq("id", a.company_id)
             .single()
 
@@ -118,19 +118,22 @@ export async function GET(req: NextRequest) {
             continue
           }
 
-          // ── Monthly reset: if new month, reset counter ──
+          // ── Monthly reset: if new month, reset counter + extra ──
           const month = currentMonth()
           if (company && (company.sms_month || 0) !== month) {
             await supabase.from("companies").update({
               sms_count_month: 0,
+              sms_extra_month: 0,
               sms_month: month,
             }).eq("id", a.company_id)
             company.sms_count_month = 0
+            company.sms_extra_month = 0
           }
 
-          // ── SMS-Limit check ──
+          // ── SMS-Limit check (inkl. dazugekaufte Extra-SMS) ──
           const smsUsed  = company?.sms_count_month ?? 0
-          const smsLimit = company?.sms_limit ?? 100
+          const smsExtra = company?.sms_extra_month ?? 0
+          const smsLimit = (company?.sms_limit ?? 100) + smsExtra
           if (smsUsed >= smsLimit) {
             console.log(`⛔ SMS LIMIT REACHED: company ${a.company_id} (${smsUsed}/${smsLimit})`)
             // Mark appointment so we don't try again
