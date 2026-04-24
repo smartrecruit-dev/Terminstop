@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { DEMO_EMPLOYEES } from "@/app/demo/demoData"
 
 // ── Farben ────────────────────────────────────────────────────────────────────
 const G = {
@@ -15,20 +16,21 @@ const G = {
 function PhoneDemo({ onComplete }: { onComplete?: (name: string, phone: string, date: string, time: string) => void }) {
   const [step, setStep] = useState(0)
   const [type, setType] = useState<string | null>(null)
+  const [selectedEmp, setSelectedEmp] = useState<typeof DEMO_EMPLOYEES[0] | null>(null)
   const [bName, setBName] = useState("")
   const [bPhone, setBPhone] = useState("")
   const [bDate, setBDate] = useState("")
   const [bTime, setBTime] = useState("")
   const [sending, setSending] = useState(false)
 
-  function reset() { setStep(0); setType(null); setBName(""); setBPhone(""); setBDate(""); setBTime("") }
+  function reset() { setStep(0); setType(null); setSelectedEmp(null); setBName(""); setBPhone(""); setBDate(""); setBTime("") }
 
   function handleSend(e: React.FormEvent) {
     e.preventDefault()
     setSending(true)
     setTimeout(() => {
       setSending(false)
-      setStep(3)
+      setStep(4)
       onComplete?.(bName || "Max Mustermann", bPhone || "0151 12345678", bDate || "Heute", bTime || "10:00")
     }, 800)
   }
@@ -46,6 +48,10 @@ function PhoneDemo({ onComplete }: { onComplete?: (name: string, phone: string, 
     borderRadius: 7, padding: "7px 9px", fontSize: 10.5, color: "#fff",
     outline: "none", boxSizing: "border-box",
   }
+
+  // Steps: 0=welcome, 1=service, 2=employee, 3=contact form, 4=success
+  const totalSteps = 3
+  const currentProgressStep = step <= 1 ? 1 : step === 2 ? 2 : step === 3 ? 3 : 3
 
   return (
     <div style={{ width: 260, margin: "0 auto", position: "relative" }}>
@@ -72,21 +78,21 @@ function PhoneDemo({ onComplete }: { onComplete?: (name: string, phone: string, 
           {/* Dark booking header */}
           <div style={{ background: "linear-gradient(160deg, #0F1923 0%, #1a2e20 100%)", padding: "14px 14px 12px" }}>
             <div style={{ fontSize: 7, fontWeight: 700, color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: .8, marginBottom: 5 }}>Online-Buchung</div>
-            <div style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: step > 0 && step < 3 ? 10 : 0 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: step > 0 && step < 4 ? 10 : 0 }}>
               <div style={{ width: 26, height: 26, background: "linear-gradient(135deg,#18A66D,#15955F)", borderRadius: 7, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 900, color: "#fff", flexShrink: 0 }}>FM</div>
               <div>
                 <div style={{ fontSize: 11.5, fontWeight: 900, color: "#fff" }}>Friseur Müller</div>
                 <div style={{ fontSize: 7, color: "rgba(255,255,255,0.4)" }}>terminstop.de/friseur-mueller</div>
               </div>
             </div>
-            {step > 0 && step < 3 && (
+            {step > 0 && step < 4 && (
               <div>
                 <div style={{ display: "flex", gap: 4 }}>
                   {[1,2,3].map(n => (
-                    <div key={n} style={{ flex:1, height:3, borderRadius:99, background: n <= step ? G.green : "rgba(255,255,255,0.15)", transition:"background .3s" }} />
+                    <div key={n} style={{ flex:1, height:3, borderRadius:99, background: n <= currentProgressStep ? G.green : "rgba(255,255,255,0.15)", transition:"background .3s" }} />
                   ))}
                 </div>
-                <div style={{ fontSize:7, color:"rgba(255,255,255,0.4)", marginTop:3 }}>Schritt {step} von 3</div>
+                <div style={{ fontSize:7, color:"rgba(255,255,255,0.4)", marginTop:3 }}>Schritt {currentProgressStep} von {totalSteps}</div>
               </div>
             )}
           </div>
@@ -140,10 +146,47 @@ function PhoneDemo({ onComplete }: { onComplete?: (name: string, phone: string, 
               </div>
             )}
 
-            {/* Step 2: Contact form */}
+            {/* Step 2: Employee selection */}
             {step === 2 && (
               <div style={{ animation: "fadeUp .3s ease" }}>
-                <div style={{ fontSize: 9.5, fontWeight: 700, color: G.muted, textTransform: "uppercase", letterSpacing: .5, marginBottom: 10 }}>Ihre Angaben</div>
+                <div style={{ fontSize: 9.5, fontWeight: 700, color: G.muted, textTransform: "uppercase", letterSpacing: .5, marginBottom: 10 }}>Mitarbeiter wählen</div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 7, marginBottom: 10 }}>
+                  {/* "Keine Präferenz" option */}
+                  <button onClick={() => { setSelectedEmp(null); setStep(3) }} style={{ display: "flex", alignItems: "center", gap: 9, background: "#fff", border: `1.5px solid ${G.border}`, borderRadius: 9, padding: "8px 10px", cursor: "pointer", textAlign: "left", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}>
+                    <div style={{ width: 30, height: 30, background: "#F3F4F6", border: `1px solid ${G.border}`, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, flexShrink: 0 }}>✦</div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: 10.5, fontWeight: 700, color: G.ink }}>Keine Präferenz</div>
+                      <div style={{ fontSize: 8.5, color: G.muted }}>Nächster freier Mitarbeiter</div>
+                    </div>
+                    <span style={{ fontSize: 12, color: G.muted2 }}>›</span>
+                  </button>
+                  {/* Employee cards */}
+                  {DEMO_EMPLOYEES.map(emp => (
+                    <button key={emp.id} onClick={() => { setSelectedEmp(emp); setStep(3) }} style={{ display: "flex", alignItems: "center", gap: 9, background: "#fff", border: `1.5px solid ${G.border}`, borderRadius: 9, padding: "8px 10px", cursor: "pointer", textAlign: "left", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}>
+                      <div style={{ width: 30, height: 30, background: emp.color, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 9.5, fontWeight: 800, color: "#fff", flexShrink: 0 }}>{emp.initials}</div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontSize: 10.5, fontWeight: 700, color: G.ink }}>{emp.name}</div>
+                        <div style={{ display: "flex", gap: 2 }}>{"★★★★★".split("").map((s,i) => <span key={i} style={{ fontSize: 7.5, color: "#F59E0B" }}>{s}</span>)}</div>
+                      </div>
+                      <span style={{ fontSize: 12, color: G.muted2 }}>›</span>
+                    </button>
+                  ))}
+                </div>
+                <button type="button" onClick={() => setStep(1)} style={{ fontSize: 8.5, color: G.muted, background: "none", border: "none", cursor: "pointer", textDecoration: "underline" }}>← Zurück</button>
+              </div>
+            )}
+
+            {/* Step 3: Contact form */}
+            {step === 3 && (
+              <div style={{ animation: "fadeUp .3s ease" }}>
+                {selectedEmp && (
+                  <div style={{ display: "flex", alignItems: "center", gap: 6, background: "#fff", border: `1px solid ${G.border}`, borderRadius: 8, padding: "5px 8px", marginBottom: 8 }}>
+                    <div style={{ width: 18, height: 18, background: selectedEmp.color, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 7, fontWeight: 800, color: "#fff", flexShrink: 0 }}>{selectedEmp.initials}</div>
+                    <span style={{ fontSize: 8.5, fontWeight: 600, color: G.text }}>{selectedEmp.name}</span>
+                    <span style={{ fontSize: 7.5, color: G.muted2, marginLeft: "auto" }}>ausgewählt</span>
+                  </div>
+                )}
+                <div style={{ fontSize: 9.5, fontWeight: 700, color: G.muted, textTransform: "uppercase", letterSpacing: .5, marginBottom: 8 }}>Ihre Angaben</div>
                 <form onSubmit={handleSend} style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                   <div>
                     <div style={{ fontSize: 8.5, fontWeight: 700, color: G.muted, marginBottom: 3 }}>Name</div>
@@ -170,13 +213,13 @@ function PhoneDemo({ onComplete }: { onComplete?: (name: string, phone: string, 
                   <button type="submit" disabled={sending} style={{ background: sending ? "rgba(255,255,255,0.2)" : `linear-gradient(135deg,${G.green},${G.greenDeep})`, color: "#fff", fontWeight: 800, fontSize: 10.5, border: "none", borderRadius: 9, padding: "9px", cursor: sending ? "not-allowed" : "pointer", boxShadow: sending ? "none" : "0 4px 12px rgba(24,166,109,0.3)" }}>
                     {sending ? "Wird gesendet …" : "Anfrage absenden →"}
                   </button>
-                  <button type="button" onClick={() => setStep(1)} style={{ fontSize: 8.5, color: G.muted, background: "none", border: "none", cursor: "pointer", textDecoration: "underline" }}>← Zurück</button>
+                  <button type="button" onClick={() => setStep(2)} style={{ fontSize: 8.5, color: G.muted, background: "none", border: "none", cursor: "pointer", textDecoration: "underline" }}>← Zurück</button>
                 </form>
               </div>
             )}
 
-            {/* Step 3: Success */}
-            {step === 3 && (
+            {/* Step 4: Success */}
+            {step === 4 && (
               <div style={{ animation: "fadeUp .4s ease", textAlign: "center", padding: "20px 8px 0" }}>
                 <div style={{ animation: "checkPop .5s ease", width: 54, height: 54, background: G.greenSoft, border: `2px solid ${G.greenBorder}`, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 12px", fontSize: 22 }}>✓</div>
                 <div style={{ fontSize: 14, fontWeight: 900, color: G.ink, marginBottom: 6, letterSpacing: "-.3px" }}>Anfrage eingegangen!</div>
@@ -854,7 +897,7 @@ export default function BuchungDemo() {
           { href: "/demo", label: "Dashboard", icon: <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5Z"/><path d="M9 21V12h6v9"/></svg> },
           { href: "/demo/calendar", label: "Kalender", icon: <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg> },
           { href: "/demo/buchung", label: "Buchung", icon: <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>, active: true },
-          { href: "/lead", label: "Testen", icon: <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> },
+          { href: "/demo/customers", label: "Kunden", icon: <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> },
         ].map(item => (
           <a key={item.href} href={item.href} style={{ position: "relative", display: "flex", flexDirection: "column", alignItems: "center", gap: 3, padding: "4px 12px", textDecoration: "none", color: item.active ? G.green : G.muted2, minWidth: 52 }}>
             {item.active && <span style={{ position: "absolute", top: -8, left: "50%", transform: "translateX(-50%)", width: 28, height: 3, borderRadius: 99, background: G.green }} />}

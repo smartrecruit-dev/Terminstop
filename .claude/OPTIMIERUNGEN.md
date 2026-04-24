@@ -20,19 +20,19 @@
 
 [x] 8. **Rechtstexte anpassen und einfügen** — AGB, Datenschutz, Impressum prüfen und auf den aktuellen Stand bringen.
 
-[ ] 9. **Onboarding für neue Kunden** — Nach der Registrierung einen geführten Onboarding-Flow zeigen.
+[x] 9. **Onboarding für neue Kunden** — Nach der Registrierung einen geführten Onboarding-Flow zeigen.
 
 [x] 10. **Admin-Tool: Kunden pausieren/stoppen/löschen** — Sofortiges Pausieren, Stoppen oder Löschen ohne Datenverlust. Für Sicherheitsfälle.
 
 [x] 11. **Stripe-Kündigung → Zugang sperren** — Wenn Kunde über Stripe kündigt, muss Zugang automatisch gesperrt/pausiert werden.
 
-[ ] 12. **Live-Demo anpassen** — Demo-Seiten auf aktuellen Programmstand bringen. Buchungsseiten-Demo ebenfalls.
+[x] 12. **Live-Demo anpassen** — Demo-Seiten auf aktuellen Programmstand bringen. Buchungsseiten-Demo ebenfalls.
 
-[ ] 13. **Logo ändern** — Vercel-Dreieck-Favicon durch TerminStop-Logo ersetzen.
+[x] 13. **Logo ändern** — Vercel-Dreieck-Favicon durch TerminStop-Logo ersetzen.
 
 [x] 14. **"Jetzt testen" raus auf Demo** — Da man sich direkt registrieren kann. Wo landen Registrierungsdaten? Marvin braucht Zugriff darauf.
 
-[ ] 15. **E-Mail + Passwort von Kunden ändern** — Admin-Tool zum Ändern ohne Datenverlust.
+[x] 15. **E-Mail + Passwort von Kunden ändern** — Admin-Tool zum Ändern ohne Datenverlust.
 
 [x] 16. **Buchungstool stoppen bei SMS-Limit** — Wenn Limit erreicht: Kunden können nicht buchen, zeige Seite "Bitte direkt an den Betrieb wenden".
 

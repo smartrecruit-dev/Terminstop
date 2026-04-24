@@ -307,7 +307,15 @@ export default function DemoDashboard() {
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className={`text-sm font-semibold truncate ${isDone ? "line-through text-[#9CA3AF]" : "text-[#111827]"}`}>{a.name}</div>
-                          {a.note && <div className="text-xs text-[#9CA3AF] truncate mt-0.5">{a.note}</div>}
+                          <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                            {a.employee_name && (
+                              <span style={{ fontSize: 11, color: a.employee_color, fontWeight: 600, display: "flex", alignItems: "center", gap: 3 }}>
+                                <span style={{ display: "inline-block", width: 6, height: 6, borderRadius: "50%", background: a.employee_color }} />
+                                {a.employee_name}
+                              </span>
+                            )}
+                            {a.service_name && <span className="text-xs text-[#9CA3AF]">{a.service_name}</span>}
+                          </div>
                         </div>
                         <div className="hidden sm:flex items-center gap-1.5 text-xs text-[#18A66D] bg-[#F0FBF6] px-2.5 py-1 rounded-full font-medium shrink-0">
                           <span className="w-1 h-1 bg-[#18A66D] rounded-full" />SMS ✓

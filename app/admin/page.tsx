@@ -192,6 +192,9 @@ export default function AdminPage() {
   const [pwResetResult, setPwResetResult]   = useState<Record<string, string>>({})
   const [pwResetting, setPwResetting]       = useState<string | null>(null)
   const [detailTab, setDetailTab]           = useState<Record<string, "heute" | "monat" | "kunden" | "einstellungen">>({})
+  const [emailInput, setEmailInput]         = useState<Record<string, string>>({})
+  const [emailSaving, setEmailSaving]       = useState<string | null>(null)
+  const [emailResult, setEmailResult]       = useState<Record<string, string>>({})
 
   const [toast, setToast] = useState<{ msg: string; ok: boolean } | null>(null)
 
@@ -487,6 +490,28 @@ export default function AdminPage() {
     if (json.success) { setPwResetResult(prev => ({ ...prev, [companyId]: json.password })); showToast("Neues Passwort generiert ✓") }
     else showToast(json.error || "Fehler beim Zurücksetzen", false)
     setPwResetting(null)
+  }
+
+  async function doChangeEmail(userId: string, companyId: string) {
+    const newEmail = emailInput[companyId]?.trim()
+    if (!newEmail) return
+    setEmailSaving(companyId)
+    const res = await fetch("/api/admin/change-email", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "x-admin-secret": secret },
+      body: JSON.stringify({ userId, newEmail }),
+    })
+    const json = await res.json()
+    if (json.success) {
+      setEmailResult(prev => ({ ...prev, [companyId]: json.email }))
+      setEmailInput(prev => ({ ...prev, [companyId]: "" }))
+      // Update email in the companies list immediately
+      setCompanies(prev => prev.map(c => c.id === companyId ? { ...c, email: json.email } : c))
+      showToast("E-Mail-Adresse geändert ✓")
+    } else {
+      showToast(json.error || "Fehler beim Ändern der E-Mail", false)
+    }
+    setEmailSaving(null)
   }
 
   // ── Stats ──────────────────────────────────────────────────────────────────
@@ -1109,7 +1134,7 @@ export default function AdminPage() {
 
                             {/* Passwort Reset */}
                             <div style={{ background: "#fff", border: `1px solid ${BD}`, borderRadius: 12, padding: "14px 16px" }}>
-                              <div style={{ fontSize: 12, fontWeight: 800, color: T, marginBottom: 4 }}>🔑 Passwort zurücksetzen</div>
+                              <div style={{ fontSize: 12, fontWeight: 800, color: T, marginBottom: 4 }}>Passwort zurücksetzen</div>
                               <div style={{ fontSize: 11, color: M, marginBottom: 10 }}>
                                 Generiert ein neues zufälliges Passwort für den Betrieb.
                               </div>
@@ -1122,9 +1147,39 @@ export default function AdminPage() {
                               ) : (
                                 <button onClick={() => doResetPassword(c.id, c.id)} disabled={pwResetting === c.id}
                                   style={{ ...btnStyle("yellow"), fontSize: 11, opacity: pwResetting === c.id ? .7 : 1 }}>
-                                  {pwResetting === c.id ? "Setzt zurück …" : "🔑 Neues Passwort generieren"}
+                                  {pwResetting === c.id ? "Setzt zurück …" : "Neues Passwort generieren"}
                                 </button>
                               )}
+                            </div>
+                          </div>
+
+                          {/* ── E-Mail ändern ── */}
+                          <div style={{ background: "#fff", border: `1px solid ${BD}`, borderRadius: 12, padding: "14px 16px", marginBottom: 16 }}>
+                            <div style={{ fontSize: 12, fontWeight: 800, color: T, marginBottom: 4 }}>E-Mail-Adresse ändern</div>
+                            <div style={{ fontSize: 11, color: M, marginBottom: 10 }}>
+                              Aktuell: <strong style={{ color: T }}>{c.email}</strong>
+                            </div>
+                            {emailResult[c.id] && (
+                              <div style={{ background: GL, border: `1px solid ${GB}`, borderRadius: 8, padding: "7px 12px", marginBottom: 10, fontSize: 12, color: G, fontWeight: 700 }}>
+                                Geändert zu: {emailResult[c.id]}
+                                <button onClick={() => setEmailResult(p => { const n = { ...p }; delete n[c.id]; return n })} style={{ marginLeft: 8, background: "none", border: "none", cursor: "pointer", fontSize: 11, color: M }}>✕</button>
+                              </div>
+                            )}
+                            <div style={{ display: "flex", gap: 6 }}>
+                              <input
+                                type="email"
+                                placeholder="Neue E-Mail-Adresse"
+                                value={emailInput[c.id] ?? ""}
+                                onChange={ev => setEmailInput(p => ({ ...p, [c.id]: ev.target.value }))}
+                                style={{ ...inp, fontSize: 12, flex: 1 }}
+                              />
+                              <button
+                                onClick={() => doChangeEmail(c.id, c.id)}
+                                disabled={emailSaving === c.id || !emailInput[c.id]?.trim()}
+                                style={{ ...btnStyle("blue"), opacity: !emailInput[c.id]?.trim() ? .5 : 1, fontSize: 11, whiteSpace: "nowrap" }}
+                              >
+                                {emailSaving === c.id ? "…" : "E-Mail setzen"}
+                              </button>
                             </div>
                           </div>
 

@@ -4,6 +4,19 @@
 
 export const DEMO_COMPANY = "Friseursalon Mustermann"
 
+export const DEMO_EMPLOYEES = [
+  { id: "e01", name: "Sarah K.",   color: "#18A66D", initials: "SK" },
+  { id: "e02", name: "Tom B.",     color: "#3B82F6", initials: "TB" },
+  { id: "e03", name: "Nina W.",    color: "#8B5CF6", initials: "NW" },
+]
+
+export const DEMO_SERVICES = [
+  { id: "s01", name: "Haarschnitt",    duration: 45,  price: 35  },
+  { id: "s02", name: "Färben",         duration: 90,  price: 65  },
+  { id: "s03", name: "Pflege-Ritual",  duration: 60,  price: 45  },
+  { id: "s04", name: "Bartpflege",     duration: 30,  price: 20  },
+]
+
 export const DEMO_CUSTOMERS = [
   { id: "c01", name: "Anna Köhler",    phone: "+49 151 2847 0011", note: "Stammkundin · Farbe: Dunkelbraun" },
   { id: "c02", name: "Thomas Becker",  phone: "+49 152 3948 0022", note: "Monatlicher Besuch" },
@@ -69,6 +82,8 @@ export function generateDemoAppointments() {
       }
 
       const cust = DEMO_CUSTOMERS[counter % DEMO_CUSTOMERS.length]
+      const emp  = DEMO_EMPLOYEES[counter % DEMO_EMPLOYEES.length]
+      const svc  = DEMO_SERVICES[counter % DEMO_SERVICES.length]
 
       appointments.push({
         id: `demo-${counter + 1}`,
@@ -79,6 +94,11 @@ export function generateDemoAppointments() {
         note: NOTES[(counter + tIdx) % NOTES.length],
         status,
         company_id: "demo",
+        employee_id:   emp.id,
+        employee_name: emp.name,
+        employee_color: emp.color,
+        employee_initials: emp.initials,
+        service_name: svc.name,
       })
       counter++
     })

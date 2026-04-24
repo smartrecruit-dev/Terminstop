@@ -1,5 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <!-- Rounded background -->
   <rect width="32" height="32" rx="7" fill="#18A66D"/>
-  <rect x="6" y="6" width="20" height="5" rx="1" fill="white"/>
-  <rect x="13.5" y="6" width="5" height="20" rx="1" fill="white"/>
+  <!-- Calendar body -->
+  <rect x="6" y="10" width="20" height="16" rx="2.5" fill="none" stroke="white" stroke-width="1.8"/>
+  <!-- Calendar header tint -->
+  <rect x="6" y="10" width="20" height="5.5" rx="2.5" fill="white" opacity="0.22"/>
+  <!-- Hanger pegs -->
+  <line x1="11" y1="7.5" x2="11" y2="12.5" stroke="white" stroke-width="2" stroke-linecap="round"/>
+  <line x1="21" y1="7.5" x2="21" y2="12.5" stroke="white" stroke-width="2" stroke-linecap="round"/>
+  <!-- Checkmark -->
+  <polyline points="11,19.5 14.5,23 21,16" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>
