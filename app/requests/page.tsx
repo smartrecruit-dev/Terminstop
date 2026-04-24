@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { supabase } from "../lib/supabaseClient"
+import { useAccessGuard } from "../lib/useAccessGuard"
 import DashNav from "../components/DashNav"
 
 type Request = {
@@ -36,6 +37,7 @@ export default function RequestsPage() {
     useEffect(() => { document.title = "Anfragen | TerminStop" }, [])
 
 const [companyId,    setCompanyId]    = useState<string | null>(null)
+  useAccessGuard(companyId) // → redirect to /blocked if locked
   const [companyName,  setCompanyName]  = useState("")
   const [bookingAddon, setBookingAddon] = useState<boolean | null>(null)
   const [requests,     setRequests]     = useState<Request[]>([])

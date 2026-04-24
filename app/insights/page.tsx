@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { supabase } from "../lib/supabaseClient"
+import { useAccessGuard } from "../lib/useAccessGuard"
 import DashNav from "../components/DashNav"
 
 export default function Insights() {
@@ -10,6 +11,7 @@ export default function Insights() {
 
 const [appointments, setAppointments] = useState<any[]>([])
   const [companyId, setCompanyId] = useState<string | null>(null)
+  useAccessGuard(companyId) // → redirect to /blocked if locked
   const [companyName, setCompanyName] = useState("")
   const [smsCount, setSmsCount] = useState<number>(0)
   const [smsLimit, setSmsLimit] = useState<number>(200)

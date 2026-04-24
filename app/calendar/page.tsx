@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useMemo } from "react"
 import { supabase } from "../lib/supabaseClient"
+import { useAccessGuard } from "../lib/useAccessGuard"
 import DashNav from "../components/DashNav"
 
 type View = "day" | "week" | "month"
@@ -38,6 +39,7 @@ export default function CalendarPage() {
 
   const [appointments, setAppointments] = useState<any[]>([])
   const [companyId, setCompanyId]       = useState<string | null>(null)
+  const { locked: isReadOnly } = useAccessGuard(companyId, false) // read-only, no redirect
   const [view, setView]                 = useState<View>("week")
   const [cursor, setCursor]             = useState(new Date())
   const [selected, setSelected]         = useState<any>(null)
@@ -169,6 +171,30 @@ export default function CalendarPage() {
       <DashNav active="/calendar" companyId={companyId} onLogout={handleLogout} />
 
       <div style={{ maxWidth: 1200, margin: "0 auto", padding: "28px 16px 100px" }}>
+
+        {/* ── READ-ONLY BANNER ── */}
+        {isReadOnly && (
+          <div style={{
+            background: "linear-gradient(135deg, #FFFBEB, #FEF3C7)",
+            border: "1.5px solid #FDE68A",
+            borderRadius: 14, padding: "14px 20px",
+            marginBottom: 20,
+            display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap",
+          }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+              <span style={{ fontSize: 22 }}>🔒</span>
+              <div>
+                <div style={{ fontSize: 14, fontWeight: 800, color: "#92400E" }}>Kalender im Lesemodus</div>
+                <div style={{ fontSize: 13, color: "#B45309" }}>Termine können nur angezeigt, nicht bearbeitet werden. Wähle ein Paket, um fortzufahren.</div>
+              </div>
+            </div>
+            <a href="/blocked?reason=trial" style={{
+              padding: "9px 18px", background: "#18A66D", color: "#fff",
+              borderRadius: 10, fontSize: 13, fontWeight: 700,
+              textDecoration: "none", whiteSpace: "nowrap",
+            }}>Paket wählen →</a>
+          </div>
+        )}
 
         {/* ── HEADER ── */}
         <div className="cal-header" style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: 16, marginBottom: 24 }}>
@@ -524,24 +550,35 @@ export default function CalendarPage() {
             </div>
             {/* Footer */}
             <div style={{ padding: "0 24px 24px", display: "flex", flexDirection: "column", gap: 8 }}>
-              <button onClick={() => toggleDone(selected)} style={{ width: "100%", padding: "14px", borderRadius: 13, border: "none", cursor: "pointer", fontSize: 14, fontWeight: 700, transition: "all .15s",
-                background: selected.status === "done" ? "#F3F4F6" : "#18A66D",
-                color: selected.status === "done" ? "#6B7280" : "#fff",
-                boxShadow: selected.status === "done" ? "none" : "0 4px 16px rgba(24,166,109,0.25)" }}>
-                {selected.status === "done" ? "Als offen markieren" : "Als erledigt markieren ✓"}
-              </button>
-              {!confirmDelete
-                ? <button onClick={() => setConfirmDelete(true)} style={{ width: "100%", padding: "12px", borderRadius: 13, border: "1.5px solid #FECACA", cursor: "pointer", fontSize: 13, fontWeight: 700, color: "#EF4444", background: "transparent", transition: "all .15s" }}>
-                    Termin löschen
+              {isReadOnly ? (
+                <div style={{ background: "#FFFBEB", border: "1.5px solid #FDE68A", borderRadius: 13, padding: "14px 16px", textAlign: "center" }}>
+                  <p style={{ fontSize: 13, color: "#92400E", fontWeight: 700, margin: "0 0 10px" }}>🔒 Lesemodus — keine Änderungen möglich</p>
+                  <a href="/blocked?reason=trial" style={{ display: "inline-block", padding: "9px 20px", background: "#18A66D", color: "#fff", borderRadius: 10, fontSize: 13, fontWeight: 700, textDecoration: "none" }}>
+                    Paket wählen →
+                  </a>
+                </div>
+              ) : (
+                <>
+                  <button onClick={() => toggleDone(selected)} style={{ width: "100%", padding: "14px", borderRadius: 13, border: "none", cursor: "pointer", fontSize: 14, fontWeight: 700, transition: "all .15s",
+                    background: selected.status === "done" ? "#F3F4F6" : "#18A66D",
+                    color: selected.status === "done" ? "#6B7280" : "#fff",
+                    boxShadow: selected.status === "done" ? "none" : "0 4px 16px rgba(24,166,109,0.25)" }}>
+                    {selected.status === "done" ? "Als offen markieren" : "Als erledigt markieren ✓"}
                   </button>
-                : <div style={{ background: "#FEF2F2", border: "1px solid #FECACA", borderRadius: 12, padding: "14px 16px" }}>
-                    <p style={{ fontSize: 12, color: "#EF4444", fontWeight: 600, textAlign: "center", margin: "0 0 12px" }}>Wirklich löschen? Kann nicht rückgängig gemacht werden.</p>
-                    <div style={{ display: "flex", gap: 8 }}>
-                      <button onClick={() => setConfirmDelete(false)} style={{ flex: 1, padding: "10px", borderRadius: 10, border: "1px solid #E5E7EB", background: "#fff", color: "#6B7280", cursor: "pointer", fontSize: 13, fontWeight: 700 }}>Abbrechen</button>
-                      <button onClick={() => deleteAppointment(selected.id)} style={{ flex: 1, padding: "10px", borderRadius: 10, border: "none", background: "#EF4444", color: "#fff", cursor: "pointer", fontSize: 13, fontWeight: 700 }}>Löschen</button>
-                    </div>
-                  </div>
-              }
+                  {!confirmDelete
+                    ? <button onClick={() => setConfirmDelete(true)} style={{ width: "100%", padding: "12px", borderRadius: 13, border: "1.5px solid #FECACA", cursor: "pointer", fontSize: 13, fontWeight: 700, color: "#EF4444", background: "transparent", transition: "all .15s" }}>
+                        Termin löschen
+                      </button>
+                    : <div style={{ background: "#FEF2F2", border: "1px solid #FECACA", borderRadius: 12, padding: "14px 16px" }}>
+                        <p style={{ fontSize: 12, color: "#EF4444", fontWeight: 600, textAlign: "center", margin: "0 0 12px" }}>Wirklich löschen? Kann nicht rückgängig gemacht werden.</p>
+                        <div style={{ display: "flex", gap: 8 }}>
+                          <button onClick={() => setConfirmDelete(false)} style={{ flex: 1, padding: "10px", borderRadius: 10, border: "1px solid #E5E7EB", background: "#fff", color: "#6B7280", cursor: "pointer", fontSize: 13, fontWeight: 700 }}>Abbrechen</button>
+                          <button onClick={() => deleteAppointment(selected.id)} style={{ flex: 1, padding: "10px", borderRadius: 10, border: "none", background: "#EF4444", color: "#fff", cursor: "pointer", fontSize: 13, fontWeight: 700 }}>Löschen</button>
+                        </div>
+                      </div>
+                  }
+                </>
+              )}
             </div>
           </div>
         </div>

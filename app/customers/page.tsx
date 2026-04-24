@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { supabase } from "../lib/supabaseClient"
+import { useAccessGuard } from "../lib/useAccessGuard"
 import DashNav from "../components/DashNav"
 import PageSkeleton from "../components/PageSkeleton"
 
@@ -10,6 +11,7 @@ export default function CustomersPage() {
     useEffect(() => { document.title = "Kunden | TerminStop" }, [])
 
 const [companyId, setCompanyId] = useState<string | null>(null)
+  useAccessGuard(companyId) // → redirect to /blocked if locked
   const [companyName, setCompanyName] = useState("")
   const [customers, setCustomers] = useState<any[]>([])
   const [appointments, setAppointments] = useState<any[]>([])
