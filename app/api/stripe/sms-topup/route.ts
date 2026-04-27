@@ -12,20 +12,20 @@ const supabaseAdmin = createClient(
 )
 
 // SMS-Pakete: { priceId, smsAmount, label }
-// Stripe Price IDs für Einmalkauf (im Stripe-Dashboard anlegen, dann in .env setzen)
+// NEXT_PUBLIC_ Prefix damit Frontend + Backend dieselben Env-Vars nutzen
 const SMS_PACKAGES = [
   {
-    priceId: process.env.STRIPE_SMS_50_PRICE_ID!,
+    priceId: process.env.NEXT_PUBLIC_STRIPE_SMS_50_PRICE_ID!,
     smsAmount: 50,
     label: "50 Extra-SMS",
   },
   {
-    priceId: process.env.STRIPE_SMS_100_PRICE_ID!,
+    priceId: process.env.NEXT_PUBLIC_STRIPE_SMS_100_PRICE_ID!,
     smsAmount: 100,
     label: "100 Extra-SMS",
   },
   {
-    priceId: process.env.STRIPE_SMS_200_PRICE_ID!,
+    priceId: process.env.NEXT_PUBLIC_STRIPE_SMS_200_PRICE_ID!,
     smsAmount: 200,
     label: "200 Extra-SMS",
   },
