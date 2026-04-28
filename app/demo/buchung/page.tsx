@@ -36,11 +36,11 @@ function PhoneDemo({ onComplete }: { onComplete?: (name: string, phone: string, 
   }
 
   const types = [
-    { id: "schnitt",  icon: "", label: "Haarschnitt",    price: "ab 25 €", dur: "45 Min" },
-    { id: "farbe",    icon: "", label: "Färben",          price: "ab 55 €", dur: "90 Min" },
-    { id: "pflege",   icon: "", label: "Pflege-Ritual",   price: "ab 40 €", dur: "60 Min" },
-    { id: "termin",   icon: "", label: "Freier Termin",   price: "kostenlos", dur: "frei" },
-    { id: "rueckruf", icon: "", label: "Rückruf anfragen", price: "kostenlos", dur: "–" },
+    { id: "schnitt",  icon: (<svg width="14" height="14" fill="none" stroke={G.green} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg>), label: "Haarschnitt",    price: "ab 25 €", dur: "45 Min" },
+    { id: "farbe",    icon: (<svg width="14" height="14" fill="none" stroke={G.green} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>), label: "Färben",          price: "ab 55 €", dur: "90 Min" },
+    { id: "pflege",   icon: (<svg width="14" height="14" fill="none" stroke={G.green} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>), label: "Pflege-Ritual",   price: "ab 40 €", dur: "60 Min" },
+    { id: "termin",   icon: (<svg width="14" height="14" fill="none" stroke={G.green} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>), label: "Freier Termin",   price: "kostenlos", dur: "frei" },
+    { id: "rueckruf", icon: (<svg width="14" height="14" fill="none" stroke={G.green} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9.91a16 16 0 0 0 6.08 6.08l1.97-1.97a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>), label: "Rückruf anfragen", price: "kostenlos", dur: "–" },
   ]
 
   const inp: React.CSSProperties = {
@@ -104,7 +104,9 @@ function PhoneDemo({ onComplete }: { onComplete?: (name: string, phone: string, 
             {step === 0 && (
               <div style={{ animation: "fadeUp .3s ease" }}>
                 <div style={{ textAlign: "center", padding: "12px 0 16px" }}>
-                  <div style={{ width: 52, height: 52, background: G.greenSoft, border: `2px solid ${G.greenBorder}`, borderRadius: 16, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, margin: "0 auto 10px" }}></div>
+                  <div style={{ width: 52, height: 52, background: G.greenSoft, border: `2px solid ${G.greenBorder}`, borderRadius: 16, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 10px" }}>
+                    <svg width="24" height="24" fill="none" stroke={G.green} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/></svg>
+                  </div>
                   <div style={{ fontSize: 14, fontWeight: 900, color: G.ink, marginBottom: 4, letterSpacing: "-.3px" }}>Termin anfragen</div>
                   <div style={{ fontSize: 9.5, color: G.muted, lineHeight: 1.5, marginBottom: 16 }}>In 2 Minuten — kein Account, keine App</div>
                   <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 5, marginBottom: 18 }}>
@@ -153,7 +155,9 @@ function PhoneDemo({ onComplete }: { onComplete?: (name: string, phone: string, 
                 <div style={{ display: "flex", flexDirection: "column", gap: 7, marginBottom: 10 }}>
                   {/* "Keine Präferenz" option */}
                   <button onClick={() => { setSelectedEmp(null); setStep(3) }} style={{ display: "flex", alignItems: "center", gap: 9, background: "#fff", border: `1.5px solid ${G.border}`, borderRadius: 9, padding: "8px 10px", cursor: "pointer", textAlign: "left", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}>
-                    <div style={{ width: 30, height: 30, background: "#F3F4F6", border: `1px solid ${G.border}`, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, flexShrink: 0 }}></div>
+                    <div style={{ width: 30, height: 30, background: "#F3F4F6", border: `1px solid ${G.border}`, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                    <svg width="14" height="14" fill="none" stroke={G.muted} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                  </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ fontSize: 10.5, fontWeight: 700, color: G.ink }}>Keine Präferenz</div>
                       <div style={{ fontSize: 8.5, color: G.muted }}>Nächster freier Mitarbeiter</div>
@@ -207,7 +211,7 @@ function PhoneDemo({ onComplete }: { onComplete?: (name: string, phone: string, 
                     </div>
                   </div>
                   <div style={{ background: "rgba(24,166,109,0.12)", border: "1px solid rgba(24,166,109,0.25)", borderRadius: 7, padding: "6px 9px", display: "flex", gap: 6, alignItems: "center" }}>
-                    <span style={{ fontSize: 10 }}></span>
+                    <svg width="10" height="10" fill="none" stroke={G.green} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
                     <span style={{ fontSize: 8, color: "rgba(255,255,255,0.8)", fontWeight: 600 }}>SMS-Bestätigung nach Freigabe</span>
                   </div>
                   <button type="submit" disabled={sending} style={{ background: sending ? "rgba(255,255,255,0.2)" : `linear-gradient(135deg,${G.green},${G.greenDeep})`, color: "#fff", fontWeight: 800, fontSize: 10.5, border: "none", borderRadius: 9, padding: "9px", cursor: sending ? "not-allowed" : "pointer", boxShadow: sending ? "none" : "0 4px 12px rgba(24,166,109,0.3)" }}>

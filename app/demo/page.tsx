@@ -155,7 +155,14 @@ export default function DemoDashboard() {
 
       {/* Demo Banner */}
       <div style={{ background: "linear-gradient(90deg,#7C3AED,#9333EA)", color: "#fff", padding: "10px 24px", display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: 13, fontWeight: 600, gap: 12, flexWrap: "wrap" }}>
-        <span> Demo-Modus – Alle Daten sind fiktiv · Keine SMS werden versendet</span>
+        <div style={{ display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap" }}>
+          <a href="/" style={{ color: "rgba(255,255,255,0.75)", textDecoration: "none", fontSize: 12, display: "flex", alignItems: "center", gap: 5, fontWeight: 600 }}>
+            <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+            Zurück zur Website
+          </a>
+          <span style={{ opacity: 0.4 }}>|</span>
+          <span>Demo-Modus – Alle Daten sind fiktiv · Keine SMS werden versendet</span>
+        </div>
         <a href="/register" style={{ background: "#fff", color: "#7C3AED", padding: "6px 16px", borderRadius: 8, fontWeight: 700, textDecoration: "none", fontSize: 12, whiteSpace: "nowrap" }}>
           Kostenlos registrieren →
         </a>
@@ -272,7 +279,9 @@ export default function DemoDashboard() {
         <a href="/demo/buchung" style={{ display: "block", textDecoration: "none", background: "#FFFBEB", border: "1px solid #FDE68A", borderRadius: 12, padding: "14px 16px", marginBottom: 16 }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <span style={{ fontSize: 18 }}></span>
+              <div style={{ width: 32, height: 32, background: "#FEF3C7", border: "1px solid #FDE68A", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                <svg width="16" height="16" fill="none" stroke="#92400E" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+              </div>
               <div>
                 <div style={{ fontSize: 13, fontWeight: 800, color: "#92400E" }}>Buchungsseite Demo</div>
                 <div style={{ fontSize: 12, color: "#B45309" }}>So buchen Ihre Kunden rund um die Uhr — interaktive Demo ansehen</div>
@@ -290,7 +299,9 @@ export default function DemoDashboard() {
             <div className="bg-white border border-[#E5E7EB] rounded-2xl overflow-hidden">
               {allToday.length === 0 ? (
                 <div className="py-16 text-center">
-                  <div className="text-5xl mb-3"></div>
+                  <div className="flex justify-center mb-3">
+                    <svg width="48" height="48" fill="none" stroke="#D1D5DB" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/></svg>
+                  </div>
                   <div className="text-sm font-semibold text-[#374151] mb-1">Noch keine Termine für heute</div>
                   <div className="text-xs text-[#9CA3AF]">Tippe auf + um einen Termin hinzuzufügen</div>
                 </div>

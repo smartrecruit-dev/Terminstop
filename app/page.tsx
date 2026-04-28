@@ -408,7 +408,7 @@ export default function LandingPage() {
 
   const features = [
     {
-      icon: "",
+      icon: (<svg width="24" height="24" fill="none" stroke="#10B981" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>),
       accent: "#10B981",
       label: "Vollautomatisch",
       title: "SMS-Erinnerungen",
@@ -416,7 +416,7 @@ export default function LandingPage() {
       proof: "Ihre Kunden werden zuverlässig erinnert. Sie tun nichts.",
     },
     {
-      icon: "",
+      icon: (<svg width="24" height="24" fill="none" stroke="#6366F1" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>),
       accent: "#6366F1",
       label: "Voller Überblick",
       title: "Kundenkartei",
@@ -424,7 +424,7 @@ export default function LandingPage() {
       proof: "Alle Kundendaten griffbereit, auf jedem Gerät.",
     },
     {
-      icon: "",
+      icon: (<svg width="24" height="24" fill="none" stroke="#F59E0B" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>),
       accent: "#F59E0B",
       label: "Immer aktuell",
       title: "Digitaler Kalender",
@@ -432,7 +432,7 @@ export default function LandingPage() {
       proof: "Von unterwegs erreichbar — jederzeit, überall.",
     },
     {
-      icon: "",
+      icon: (<svg width="24" height="24" fill="none" stroke="#EC4899" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/></svg>),
       accent: "#EC4899",
       label: "Datengestützt",
       title: "Auswertungen & Einblicke",
@@ -442,12 +442,12 @@ export default function LandingPage() {
   ]
 
   const bookingFeatures = [
-    { icon: "", title: "Eigene Buchungsseite",         desc: "Ihre persönliche URL — Kunden buchen direkt, ohne Telefonanruf." },
-    { icon: "", title: "QR-Code zum Aufstellen",       desc: "An der Kasse oder im Schaufenster — Kunden scannen und buchen sofort." },
-    { icon: "", title: "Anfragen im Dashboard",        desc: "Alle Online-Buchungen landen direkt bei Ihnen. Sie bestätigen mit einem Klick." },
-    { icon: "", title: "Automatische Bestätigungs-SMS", desc: "Sobald Sie bestätigen, bekommt der Kunde sofort eine SMS — ohne Ihr Zutun." },
-    { icon: "", title: "Leistungen wählbar",           desc: "Kunden wählen Ihre Leistungen oder fragen einen offenen Termin an." },
-    { icon: "", title: "Rückruf-Funktion",             desc: "Kunden können auch einen Rückruf anfragen — Sie werden benachrichtigt." },
+    { icon: (<svg width="18" height="18" fill="none" stroke="#4ade80" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>), title: "Eigene Buchungsseite", desc: "Ihre persönliche URL — Kunden buchen direkt, ohne Telefonanruf." },
+    { icon: (<svg width="18" height="18" fill="none" stroke="#4ade80" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="17" y="17" width="4" height="4" rx="1"/><path d="M14 17h3M17 14v3"/></svg>), title: "QR-Code zum Aufstellen", desc: "An der Kasse oder im Schaufenster — Kunden scannen und buchen sofort." },
+    { icon: (<svg width="18" height="18" fill="none" stroke="#4ade80" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>), title: "Anfragen im Dashboard", desc: "Alle Online-Buchungen landen direkt bei Ihnen. Sie bestätigen mit einem Klick." },
+    { icon: (<svg width="18" height="18" fill="none" stroke="#4ade80" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>), title: "Automatische Bestätigungs-SMS", desc: "Sobald Sie bestätigen, bekommt der Kunde sofort eine SMS — ohne Ihr Zutun." },
+    { icon: (<svg width="18" height="18" fill="none" stroke="#4ade80" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>), title: "Leistungen wählbar", desc: "Kunden wählen Ihre Leistungen oder fragen einen offenen Termin an." },
+    { icon: (<svg width="18" height="18" fill="none" stroke="#4ade80" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9.91a16 16 0 0 0 6.08 6.08l1.97-1.97a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>), title: "Rückruf-Funktion", desc: "Kunden können auch einen Rückruf anfragen — Sie werden benachrichtigt." },
   ]
 
   return (
@@ -1105,13 +1105,13 @@ export default function LandingPage() {
 
             <div style={{ display: "grid", gap: 18, gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))" }}>
               {[
-                { num: "01", icon: "", tag: "Persönliche Begleitung", title: "Einmalig einrichten — in unter 10 Minuten",
+                { num: "01", icon: (<svg width="22" height="22" fill="none" stroke={C.green} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07M8.46 8.46a5 5 0 0 0 0 7.07"/></svg>), tag: "Persönliche Begleitung", title: "Einmalig einrichten — in unter 10 Minuten",
                   desc: "Wir richten TerminStop gemeinsam mit Ihnen ein. Kalender, Kundenkartei und SMS-Erinnerungen. Persönliches Onboarding inklusive.",
                   detail: "Sie brauchen nur Ihren Browser." },
-                { num: "02", icon: "", tag: "Vollautomatisch", title: "Ihr digitales Büro läuft — sofort und automatisch",
+                { num: "02", icon: (<svg width="22" height="22" fill="none" stroke={C.green} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>), tag: "Vollautomatisch", title: "Ihr digitales Büro läuft — sofort und automatisch",
                   desc: "Termine im Kalender, Kunden in der Kartei, SMS-Erinnerungen gehen 24h vor jedem Termin automatisch raus — mit Ihrem Namen.",
                   detail: "Ohne Ihr Zutun. Tag und Nacht." },
-                { num: "03", icon: "", tag: "95% Erfolgsquote", title: "Ihr Betrieb läuft planbarer. Jeden Tag.",
+                { num: "03", icon: (<svg width="22" height="22" fill="none" stroke={C.green} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>), tag: "95% Erfolgsquote", title: "Ihr Betrieb läuft planbarer. Jeden Tag.",
                   desc: "Weniger Ausfälle, mehr Überblick, mehr Umsatz. TerminStop arbeitet dauerhaft für Sie im Hintergrund.",
                   detail: "Kunden, die kommen. Umsatz, der bleibt." },
               ].map((s, i) => (
