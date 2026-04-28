@@ -117,79 +117,58 @@ function AppointmentForm({
   )
 }
 
-function TrialBanner() {
-  const [visible, setVisible] = useState(false)
-  const [daysLeft, setDaysLeft] = useState(14)
+// TrialBanner: DB-basiert (created_at), zeigt sich für alle Trial-Nutzer
+function TrialBanner({ plan, createdAt }: { plan: string; createdAt: string | null }) {
+  const [dismissed, setDismissed] = useState(false)
 
-  useEffect(() => {
-    const isNew = localStorage.getItem("is_new_user") === "1"
-    if (!isNew) return
+  if (plan !== "trial" || dismissed) return null
 
-    // Check plan from DB — hide banner if paid plan is active
-    const companyId = localStorage.getItem("company_id")
-    if (companyId) {
-      supabase.from("companies").select("plan").eq("id", companyId).single().then(({ data }) => {
-        if (data?.plan && data.plan !== "trial") {
-          localStorage.removeItem("is_new_user")
-          setVisible(false)
-          return
-        }
-        // Calculate days left (14 from first visit)
-        const firstVisit = localStorage.getItem("trial_start")
-        if (!firstVisit) {
-          localStorage.setItem("trial_start", Date.now().toString())
-          setDaysLeft(14)
-        } else {
-          const elapsed = Date.now() - parseInt(firstVisit)
-          const days = Math.max(0, 14 - Math.floor(elapsed / (1000 * 60 * 60 * 24)))
-          setDaysLeft(days)
-        }
-        setVisible(true)
-      })
-    }
-  }, [])
+  const daysLeft = createdAt
+    ? Math.max(0, 14 - Math.floor((Date.now() - new Date(createdAt).getTime()) / (1000 * 60 * 60 * 24)))
+    : 14
 
-  if (!visible) return null
+  const isUrgent = daysLeft <= 3
+  const bg = isUrgent
+    ? "linear-gradient(135deg, #B91C1C 0%, #991B1B 100%)"
+    : "linear-gradient(135deg, #0F8A57 0%, #0A6B43 100%)"
 
   return (
     <div style={{
-      background: "linear-gradient(135deg, #0F8A57 0%, #0A6B43 100%)",
-      borderRadius: 16, padding: "16px 20px", marginBottom: 20,
+      background: bg, borderRadius: 16, padding: "16px 20px", marginBottom: 20,
       display: "flex", alignItems: "center", justifyContent: "space-between",
       gap: 16, flexWrap: "wrap",
-      boxShadow: "0 4px 20px -6px rgba(10,107,67,0.35)",
+      boxShadow: isUrgent ? "0 4px 20px -6px rgba(185,28,28,0.4)" : "0 4px 20px -6px rgba(10,107,67,0.35)",
     }}>
       <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-        <div style={{
-          width: 40, height: 40, borderRadius: 12, flexShrink: 0,
-          background: "rgba(255,255,255,0.15)",
-          display: "flex", alignItems: "center", justifyContent: "center",
-          fontSize: 20,
-        }}></div>
+        <div style={{ width: 40, height: 40, borderRadius: 12, flexShrink: 0, background: "rgba(255,255,255,0.15)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <svg width="18" height="18" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+            {isUrgent
+              ? <><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></>
+              : <><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></>}
+          </svg>
+        </div>
         <div>
           <div style={{ fontSize: 14, fontWeight: 800, color: "#fff", marginBottom: 2 }}>
-            Willkommen bei TerminStop! Dein Test läuft.
+            {isUrgent ? `Nur noch ${daysLeft} Tag${daysLeft !== 1 ? "e" : ""} — Testzeitraum endet bald!` : `Testzeitraum: noch ${daysLeft} Tag${daysLeft !== 1 ? "e" : ""} kostenlos`}
           </div>
-          <div style={{ fontSize: 13, color: "rgba(255,255,255,0.75)" }}>
-            {daysLeft > 0
-              ? `Noch ${daysLeft} Tag${daysLeft !== 1 ? "e" : ""} kostenlos — danach einfach ein Paket wählen.`
-              : "Dein Testzeitraum ist abgelaufen — wähle jetzt dein Paket."}
+          <div style={{ fontSize: 13, color: "rgba(255,255,255,0.8)" }}>
+            {isUrgent
+              ? "Wähle jetzt ein Paket, damit deine SMS-Erinnerungen nicht stoppen."
+              : "Danach einfach ein Paket wählen — deine Daten bleiben erhalten."}
           </div>
         </div>
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-        <a href="/#preise" style={{
+        <a href="/settings" style={{
           fontSize: 13, fontWeight: 700, padding: "9px 18px", borderRadius: 10,
-          background: "#fff", color: "#0A6B43", textDecoration: "none",
-          boxShadow: "0 2px 8px rgba(0,0,0,0.12)", whiteSpace: "nowrap",
+          background: "#fff", color: isUrgent ? "#B91C1C" : "#0A6B43",
+          textDecoration: "none", boxShadow: "0 2px 8px rgba(0,0,0,0.12)", whiteSpace: "nowrap",
         }}>
-          Pakete ansehen →
+          Paket wählen →
         </a>
-        <button
-          onClick={() => { localStorage.removeItem("is_new_user"); setVisible(false) }}
+        <button onClick={() => setDismissed(true)}
           style={{ background: "none", border: "none", cursor: "pointer", color: "rgba(255,255,255,0.6)", fontSize: 18, padding: 4, lineHeight: 1 }}
-          aria-label="Schließen"
-        >×</button>
+          aria-label="Schließen">×</button>
       </div>
     </div>
   )
@@ -240,9 +219,10 @@ export default function Dashboard() {
   const [customerSearch, setCustomerSearch]   = useState("")
   const [showSuggestions, setShowSuggestions] = useState(false)
   const [loading, setLoading] = useState(true)
-  const [smsUsed, setSmsUsed]   = useState(0)
-  const [smsLimit, setSmsLimit] = useState(100)
-  const [plan, setPlan]         = useState("trial")
+  const [smsUsed, setSmsUsed]     = useState(0)
+  const [smsLimit, setSmsLimit]   = useState(100)
+  const [plan, setPlan]           = useState("trial")
+  const [createdAt, setCreatedAt] = useState<string | null>(null)
 
   useEffect(() => {
     const storedId   = localStorage.getItem("company_id")
@@ -285,6 +265,7 @@ export default function Dashboard() {
         setSmsUsed(coRes.data.sms_count_month || 0)
         setSmsLimit(coRes.data.sms_limit || 100)
         setPlan(coRes.data.plan || "trial")
+        setCreatedAt(coRes.data.created_at || null)
         if (coRes.data.name) setCompanyName(coRes.data.name)
       }
       if (apptRes.data) setAppointments(apptRes.data)
@@ -404,53 +385,48 @@ export default function Dashboard() {
 
       <div className="max-w-4xl mx-auto px-4 py-7 pb-28 md:pb-10">
 
-        {/* Trial-Banner für neue Nutzer */}
-        <TrialBanner />
+        {/* Trial-Banner — DB-basiert */}
+        <TrialBanner plan={plan} createdAt={createdAt} />
 
-        {/* SMS-Limit Banner */}
-        {smsUsed >= smsLimit && (
-          <div style={{
-            background: "linear-gradient(135deg, #DC2626 0%, #B91C1C 100%)",
-            borderRadius: 16, padding: "16px 20px", marginBottom: 20,
-            display: "flex", alignItems: "center", justifyContent: "space-between",
-            gap: 16, flexWrap: "wrap",
-            boxShadow: "0 4px 20px -6px rgba(220,38,38,0.35)",
-          }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-              <div style={{ width: 40, height: 40, borderRadius: 12, background: "rgba(255,255,255,0.15)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>–</div>
-              <div>
-                <div style={{ fontSize: 14, fontWeight: 800, color: "#fff", marginBottom: 2 }}>SMS-Limit erreicht</div>
-                <div style={{ fontSize: 13, color: "rgba(255,255,255,0.8)" }}>
-                  Du hast {smsUsed} von {smsLimit} SMS verbraucht. Keine weiteren SMS bis zum nächsten Monat — oder upgrade dein Paket.
+        {/* SMS-Balken — immer sichtbar, Farbe je nach Auslastung */}
+        {(() => {
+          const pct      = smsLimit > 0 ? Math.round((smsUsed / smsLimit) * 100) : 0
+          const isOver   = smsUsed >= smsLimit
+          const isWarn   = !isOver && pct >= 80
+          const barColor = isOver ? "#DC2626" : isWarn ? "#D97706" : "#18A66D"
+          const bgColor  = isOver ? "#FEF2F2" : isWarn ? "#FFFBEB" : "#F0FBF6"
+          const bdColor  = isOver ? "#FECACA" : isWarn ? "#FDE68A" : "#D1F5E3"
+          return (
+            <div style={{ background: bgColor, border: `1px solid ${bdColor}`, borderRadius: 16, padding: "14px 18px", marginBottom: 20 }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8, gap: 12, flexWrap: "wrap" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <svg width="15" height="15" fill="none" stroke={barColor} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                  </svg>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: barColor }}>
+                    {isOver ? "SMS-Limit erreicht" : isWarn ? "SMS-Kontingent fast voll" : "SMS diesen Monat"}
+                  </span>
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                  <span style={{ fontSize: 12, color: barColor, fontWeight: 700 }}>{smsUsed} / {smsLimit} SMS</span>
+                  {(isOver || isWarn) && (
+                    <a href="/settings" style={{ fontSize: 12, fontWeight: 700, padding: "5px 12px", borderRadius: 8, background: barColor, color: "#fff", textDecoration: "none", whiteSpace: "nowrap" }}>
+                      {isOver ? "Jetzt upgraden →" : "Upgrade →"}
+                    </a>
+                  )}
                 </div>
               </div>
-            </div>
-            <a href="/settings" style={{ fontSize: 13, fontWeight: 700, padding: "9px 18px", borderRadius: 10, background: "#fff", color: "#DC2626", textDecoration: "none", whiteSpace: "nowrap" }}>
-              Paket upgraden →
-            </a>
-          </div>
-        )}
-
-        {/* SMS-Limit Warnung bei 80% */}
-        {smsUsed < smsLimit && smsUsed / smsLimit >= 0.8 && (
-          <div style={{
-            background: "linear-gradient(135deg, #D97706 0%, #B45309 100%)",
-            borderRadius: 16, padding: "14px 20px", marginBottom: 20,
-            display: "flex", alignItems: "center", justifyContent: "space-between",
-            gap: 16, flexWrap: "wrap",
-            boxShadow: "0 4px 20px -6px rgba(217,119,6,0.3)",
-          }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-              <span style={{ fontSize: 20 }}>!</span>
-              <div style={{ fontSize: 13, color: "#fff", fontWeight: 600 }}>
-                Noch {smsLimit - smsUsed} SMS übrig diesen Monat ({smsUsed}/{smsLimit} verbraucht)
+              <div style={{ height: 7, background: isOver ? "#FECACA" : isWarn ? "#FDE68A" : "#D1F5E3", borderRadius: 99, overflow: "hidden" }}>
+                <div style={{ height: "100%", width: `${Math.min(pct, 100)}%`, background: barColor, borderRadius: 99, transition: "width 0.6s ease" }} />
               </div>
+              {isOver && (
+                <div style={{ fontSize: 12, color: "#DC2626", marginTop: 6, fontWeight: 500 }}>
+                  Keine weiteren SMS bis zum nächsten Monat oder nach einem Upgrade.
+                </div>
+              )}
             </div>
-            <a href="/settings" style={{ fontSize: 13, fontWeight: 700, padding: "8px 16px", borderRadius: 10, background: "rgba(255,255,255,0.2)", color: "#fff", textDecoration: "none", whiteSpace: "nowrap" }}>
-              Upgrade →
-            </a>
-          </div>
-        )}
+          )
+        })()}
 
         {/* Onboarding */}
         {companyId && <SetupChecklist companyId={companyId} appointmentCount={appointments.length} />}

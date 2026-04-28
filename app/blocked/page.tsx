@@ -62,30 +62,38 @@ export default function BlockedPage() {
     { key: "business", label: "Business",  price: "229 €/Monat", sms: "1.000 SMS", priceId: process.env.NEXT_PUBLIC_STRIPE_BUSINESS_PRICE_ID!  },
   ]
 
+  const IconSVG = ({ path, color }: { path: string; color: string }) => (
+    <div style={{ width: 64, height: 64, background: `${color}15`, border: `2px solid ${color}25`, borderRadius: 20, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px" }}>
+      <svg width="28" height="28" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+        <path d={path} />
+      </svg>
+    </div>
+  )
+
   const info = {
     trial: {
-      icon: "",
+      icon: <IconSVG color="#F59E0B" path="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />,
       title: "Dein Testzeitraum ist abgelaufen",
       desc:  "Du hast TerminStop 14 Tage kostenlos getestet — wähle jetzt ein Paket, um weiterzumachen. Deine Daten bleiben vollständig erhalten.",
       showPlans: true,
       showPortal: false,
     },
     payment: {
-      icon: "",
+      icon: <IconSVG color="#DC2626" path="M12 9v4M12 17h.01M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />,
       title: "Zahlung fehlgeschlagen",
       desc:  "Wir konnten deine letzte Zahlung nicht einziehen. Bitte aktualisiere deine Zahlungsmethode im Kundenportal, um deinen Zugang wiederherzustellen.",
       showPlans: false,
       showPortal: true,
     },
     cancelled: {
-      icon: "✗",
+      icon: <IconSVG color="#6B7280" path="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />,
       title: "Dein Abo wurde gekündigt",
       desc:  "Du hast dein Abo gekündigt oder es wurde beendet. Wähle ein neues Paket, um TerminStop wieder zu nutzen. Deine Daten sind sicher.",
       showPlans: true,
       showPortal: false,
     },
     paused: {
-      icon: "",
+      icon: <IconSVG color="#6B7280" path="M18.36 6.64a9 9 0 1 1-12.73 0M12 2v10" />,
       title: "Konto vorübergehend gesperrt",
       desc:  "Dein Konto wurde gesperrt. Bitte wende dich an den Administrator unter terminstop.business@gmail.com.",
       showPlans: false,
@@ -114,7 +122,7 @@ export default function BlockedPage() {
 
           {/* Icon + Heading */}
           <div style={{ textAlign: "center", marginBottom: 24 }}>
-            <div style={{ fontSize: 52, marginBottom: 16, lineHeight: 1 }}>{info.icon}</div>
+            {info.icon}
             <h1 style={{ fontSize: 22, fontWeight: 900, color: INK, margin: "0 0 12px", letterSpacing: "-.4px" }}>
               {info.title}
             </h1>
