@@ -108,7 +108,7 @@ export default function LoginPage() {
           <div className="h-6 w-px bg-[#E5E7EB]" />
           <div><div className="text-lg font-black text-[#18A66D]">95%</div><div className="text-xs text-[#6B7280]">Weniger Ausfälle</div></div>
           <div className="h-6 w-px bg-[#E5E7EB]" />
-          <div><div className="text-lg font-black text-[#18A66D]">4.9★</div><div className="text-xs text-[#6B7280]">Bewertung</div></div>
+          <div><div className="text-lg font-black text-[#18A66D]">4.9</div><div className="text-xs text-[#6B7280]">Bewertung</div></div>
         </div>
       </div>
 
@@ -134,7 +134,7 @@ export default function LoginPage() {
 
         {error && (
           <div className="flex items-center gap-3 bg-[#FEF2F2] border border-[#FECACA] rounded-xl px-4 py-3 mb-5">
-            <span className="text-[#EF4444] text-sm flex-shrink-0">⚠</span>
+            <span className="text-[#EF4444] text-sm flex-shrink-0">!</span>
             <span className="text-sm text-[#EF4444]">{error}</span>
           </div>
         )}
@@ -167,7 +167,7 @@ export default function LoginPage() {
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-[#9CA3AF] hover:text-[#6B7280] transition text-sm px-1"
               >
-                {showPassword ? "🙈" : "👁"}
+                {showPassword ? "" : ""}
               </button>
             </div>
           </div>
@@ -194,7 +194,7 @@ export default function LoginPage() {
 
         <div className="mt-6 pt-6 border-t border-[#F3F4F6]">
           <div className="flex items-center justify-center gap-2 text-xs text-[#9CA3AF]">
-            <span className="text-[#18A66D]">🔒</span>
+            <span className="text-[#18A66D]"></span>
             <span>Sicherer Zugriff für Ihr Unternehmen</span>
           </div>
           <div className="flex items-center justify-center gap-4 mt-3 text-xs text-[#9CA3AF]">

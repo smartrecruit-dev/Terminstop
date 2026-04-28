@@ -11,7 +11,7 @@ function DemoBanner() {
       display: "flex", alignItems: "center", justifyContent: "space-between",
       fontSize: "13px", fontWeight: 600, gap: 12, flexWrap: "wrap",
     }}>
-      <span>🎭 Demo-Modus – Alle Daten sind fiktiv · Keine SMS werden versendet</span>
+      <span> Demo-Modus – Alle Daten sind fiktiv · Keine SMS werden versendet</span>
       <a href="/register" style={{ background: "white", color: "#7C3AED", padding: "6px 16px", borderRadius: 8, fontWeight: 700, textDecoration: "none", fontSize: "12px", whiteSpace: "nowrap" }}>
         Kostenlos registrieren →
       </a>
@@ -162,7 +162,7 @@ export default function DemoCustomersPage() {
             <div className="divide-y divide-[#F3F4F6] overflow-y-auto max-h-[520px]">
               {filtered.length === 0 ? (
                 <div className="px-6 py-16 text-center">
-                  <div className="text-4xl mb-3">👥</div>
+                  <div className="text-4xl mb-3"></div>
                   <div className="text-sm font-semibold text-[#1F2A37] mb-1">Kein Treffer</div>
                   <div className="text-xs text-[#6B7280]">Andere Suche versuchen.</div>
                 </div>
@@ -220,7 +220,7 @@ export default function DemoCustomersPage() {
 
                 <div className="px-6 py-5 space-y-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-[#F7FAFC] border border-[#E5E7EB] rounded-lg flex items-center justify-center text-sm shrink-0">📞</div>
+                    <div className="w-8 h-8 bg-[#F7FAFC] border border-[#E5E7EB] rounded-lg flex items-center justify-center text-sm shrink-0"></div>
                     <div>
                       <div className="text-xs text-[#9CA3AF]">Telefon</div>
                       <div className="text-sm font-semibold text-[#1F2A37]">{selected.phone}</div>
@@ -228,7 +228,7 @@ export default function DemoCustomersPage() {
                   </div>
                   {selected.note && (
                     <div className="flex items-start gap-3">
-                      <div className="w-8 h-8 bg-[#F7FAFC] border border-[#E5E7EB] rounded-lg flex items-center justify-center text-sm shrink-0">📝</div>
+                      <div className="w-8 h-8 bg-[#F7FAFC] border border-[#E5E7EB] rounded-lg flex items-center justify-center text-sm shrink-0"></div>
                       <div>
                         <div className="text-xs text-[#9CA3AF]">Notiz</div>
                         <div className="text-sm text-[#1F2A37]">{selected.note}</div>
@@ -236,7 +236,7 @@ export default function DemoCustomersPage() {
                     </div>
                   )}
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-[#F7FAFC] border border-[#E5E7EB] rounded-lg flex items-center justify-center text-sm shrink-0">📅</div>
+                    <div className="w-8 h-8 bg-[#F7FAFC] border border-[#E5E7EB] rounded-lg flex items-center justify-center text-sm shrink-0"></div>
                     <div>
                       <div className="text-xs text-[#9CA3AF]">Termine insgesamt</div>
                       <div className="text-sm font-semibold text-[#1F2A37]">{customerAppointments.length} Termin{customerAppointments.length !== 1 ? "e" : ""}</div>

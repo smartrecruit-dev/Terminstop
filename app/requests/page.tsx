@@ -136,7 +136,7 @@ const [companyId,    setCompanyId]    = useState<string | null>(null)
           fontWeight: 600, boxShadow: "0 6px 28px rgba(0,0,0,0.25)", whiteSpace: "nowrap",
           display: "flex", alignItems: "center", gap: 8
         }}>
-          {toast.ok ? "📱" : "⚠️"} {toast.msg}
+          {toast.ok ? "" : "!"} {toast.msg}
         </div>
       )}
 
@@ -158,7 +158,7 @@ const [companyId,    setCompanyId]    = useState<string | null>(null)
             background:"#fff", border:"2px dashed #E5E7EB", borderRadius:20,
             padding:"40px 28px", textAlign:"center"
           }}>
-            <div style={{ fontSize:48, marginBottom:16 }}>🔔</div>
+            <div style={{ fontSize:48, marginBottom:16 }}></div>
             <h2 style={{ fontSize:18, fontWeight:800, color:"#1F2A37", marginBottom:8 }}>
               Online-Buchung ist noch nicht freigeschaltet
             </h2>
@@ -217,7 +217,7 @@ const [companyId,    setCompanyId]    = useState<string | null>(null)
           </div>
         ) : bookingAddon === true && requests.length === 0 ? (
           <div className="bg-white rounded-2xl border border-[#E5E7EB] p-12 text-center">
-            <div className="text-5xl mb-4">🔔</div>
+            <div className="text-5xl mb-4"></div>
             <p className="text-sm font-semibold text-[#374151]">Noch keine Anfragen</p>
             <p className="text-xs text-[#9CA3AF] mt-1 leading-relaxed">
               Sobald Kunden über Ihren Buchungslink buchen,<br />erscheinen sie hier.
@@ -351,7 +351,7 @@ function RequestCard({ r, acting, onConfirm, onReject, done }: {
               fontSize: 13, color: "#4F6EF7", fontWeight: 600, marginTop: 3,
               display: "inline-flex", alignItems: "center", gap: 4, textDecoration: "none"
             }}>
-              📞 {r.phone}
+               {r.phone}
             </a>
           </div>
 
@@ -368,7 +368,7 @@ function RequestCard({ r, acting, onConfirm, onReject, done }: {
         <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
           {isCallback ? (
             <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, color: "#6B7280" }}>
-              <span>📞</span><span>Möchte zurückgerufen werden</span>
+              <span></span><span>Möchte zurückgerufen werden</span>
             </div>
           ) : dt ? (
             <div style={{
@@ -377,7 +377,7 @@ function RequestCard({ r, acting, onConfirm, onReject, done }: {
               borderRadius: 10, padding: "5px 10px", fontSize: 13,
               fontWeight: 700, color: "#065F46", width: "fit-content"
             }}>
-              🗓 {dt}
+               {dt}
             </div>
           ) : null}
 
@@ -387,7 +387,7 @@ function RequestCard({ r, acting, onConfirm, onReject, done }: {
               fontSize: 13, color: "#374151", lineHeight: 1.5,
               borderLeft: "3px solid #E5E7EB"
             }}>
-              💬 {r.request_text}
+               {r.request_text}
             </div>
           )}
 
@@ -448,7 +448,7 @@ function RequestCard({ r, acting, onConfirm, onReject, done }: {
           borderRadius: 10, padding: "8px 12px",
           fontSize: 12, color: "#065F46", fontWeight: 500
         }}>
-          📱 SMS-Bestätigung wurde an den Kunden gesendet
+           SMS-Bestätigung wurde an den Kunden gesendet
         </div>
       )}
       {isConfirmed && isCallback && (

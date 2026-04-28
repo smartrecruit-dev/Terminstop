@@ -88,7 +88,7 @@ export default function ResetPasswordPage() {
   if (!ready) return (
     <div style={wrap}>
       <div style={{ ...cardStyle, textAlign:"center" }}>
-        <div style={{ width:64, height:64, background:"#FEF2F2", border:"1px solid #FECACA", borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", fontSize:28, margin:"0 auto 20px" }}>🔒</div>
+        <div style={{ width:64, height:64, background:"#FEF2F2", border:"1px solid #FECACA", borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", fontSize:28, margin:"0 auto 20px" }}></div>
         <h1 style={{ fontSize:20, fontWeight:800, color:"#111827", margin:"0 0 10px" }}>Link ungültig oder abgelaufen</h1>
         <p style={{ fontSize:14, color:"#6B7280", lineHeight:1.65, margin:"0 0 24px" }}>
           Bitte fordere einen neuen Passwort-Link an.
@@ -117,7 +117,7 @@ export default function ResetPasswordPage() {
 
         {error && (
           <div style={{ background:"#FEF2F2", border:"1px solid #FECACA", borderRadius:12, padding:"12px 16px", marginBottom:20, fontSize:14, color:"#DC2626", lineHeight:1.5 }}>
-            ⚠️ {error}
+            ! {error}
           </div>
         )}
 
@@ -137,7 +137,7 @@ export default function ResetPasswordPage() {
               />
               <button type="button" onClick={() => setShowPw(v => !v)}
                 style={{ position:"absolute", right:12, top:"50%", transform:"translateY(-50%)", background:"none", border:"none", cursor:"pointer", fontSize:14, color:"#9CA3AF", padding:"4px" }}>
-                {showPw ? "🙈" : "👁"}
+                {showPw ? "" : ""}
               </button>
             </div>
           </div>

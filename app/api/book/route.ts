@@ -84,17 +84,19 @@ async function sendSMS(to: string, message: string): Promise<boolean> {
         // Kein Mitarbeitername im SMS — nur für den internen Kalender
       }),
     })
-    const raw = await res.text()
-    let result: Record<string, unknown> = {}
-    try { result = JSON.parse(raw) } catch { /* nicht-JSON */ }
-
     if (!res.ok) {
+      const raw = await res.text()
       console.error(`[book/sms] HTTP ${res.status}:`, raw)
       return false
     }
-    const success = String(result.success ?? "")
-    if (success !== "100") {
-      console.error(`[book/sms] Seven.io Fehlercode ${success}:`, raw)
+
+    const raw = await res.text()
+    const code = raw.trim().startsWith("{")
+      ? (() => { try { return String((JSON.parse(raw) as any).success ?? raw.trim()) } catch { return raw.trim() } })()
+      : raw.trim()
+
+    if (code !== "100") {
+      console.error(`[book/sms] Seven.io Fehlercode ${code}:`, raw)
       return false
     }
     return true

@@ -437,7 +437,7 @@ export default function LeadPage() {
                 <div className="form-inner">
                   {formError && (
                     <div className="form-error">
-                      <span>⚠</span> {formError}
+                      <span>!</span> {formError}
                     </div>
                   )}
 

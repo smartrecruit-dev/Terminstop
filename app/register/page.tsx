@@ -46,7 +46,7 @@ export default function RegisterPage() {
     return (
       <div style={{ minHeight: "100dvh", display: "flex", alignItems: "center", justifyContent: "center", background: "#F4F6F9", fontFamily: FONT, padding: 24 }}>
         <div style={{ textAlign: "center", maxWidth: 420 }}>
-          <div style={{ fontSize: 48, marginBottom: 16 }}>🔒</div>
+          <div style={{ fontSize: 48, marginBottom: 16 }}></div>
           <h1 style={{ fontSize: 24, fontWeight: 900, color: C.text, marginBottom: 12 }}>Bald verfügbar</h1>
           <p style={{ fontSize: 15, color: C.muted, lineHeight: 1.6, marginBottom: 28 }}>
             Wir arbeiten noch an ein paar letzten Details.<br />Die Registrierung öffnet in Kürze.
@@ -449,7 +449,7 @@ export default function RegisterPage() {
                       }}
                       aria-label={showPw ? "Passwort verstecken" : "Passwort anzeigen"}
                     >
-                      {showPw ? "🙈" : "👁"}
+                      {showPw ? "" : ""}
                     </button>
                   </div>
                   {/* Strength bar */}
@@ -567,10 +567,10 @@ export default function RegisterPage() {
 
             {/* Feature list */}
             {[
-              { icon: "📅", title: "Eigene Buchungsseite", desc: "Kunden buchen rund um die Uhr — du schläfst, das System arbeitet." },
-              { icon: "✉️", title: "Automatische SMS", desc: "Erinnerungen gehen 24h vorher raus. Nie wieder hinterhertelefonieren." },
-              { icon: "👥", title: "Kundenkartei", desc: "Alle Kunden an einem Ort. Verlauf, Notizen, Nummern." },
-              { icon: "📊", title: "Auswertungen", desc: "Sieh genau, wie dein Betrieb läuft — Zahlen statt Bauchgefühl." },
+              { icon: "", title: "Eigene Buchungsseite", desc: "Kunden buchen rund um die Uhr — du schläfst, das System arbeitet." },
+              { icon: "", title: "Automatische SMS", desc: "Erinnerungen gehen 24h vorher raus. Nie wieder hinterhertelefonieren." },
+              { icon: "", title: "Kundenkartei", desc: "Alle Kunden an einem Ort. Verlauf, Notizen, Nummern." },
+              { icon: "", title: "Auswertungen", desc: "Sieh genau, wie dein Betrieb läuft — Zahlen statt Bauchgefühl." },
             ].map((f, i) => (
               <div key={i} style={{
                 display: "flex", gap: 16, alignItems: "flex-start",

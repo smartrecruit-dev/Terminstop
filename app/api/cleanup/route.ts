@@ -24,7 +24,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ success: false, error })
     }
 
-    console.log(`✅ CLEANUP: ${count} alte Termine gelöscht`)
+    console.log(`✓ CLEANUP: ${count} alte Termine gelöscht`)
     return NextResponse.json({ success: true, deleted: count })
 
   } catch (err) {

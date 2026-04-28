@@ -165,7 +165,7 @@ function TrialBanner() {
           background: "rgba(255,255,255,0.15)",
           display: "flex", alignItems: "center", justifyContent: "center",
           fontSize: 20,
-        }}>🎉</div>
+        }}></div>
         <div>
           <div style={{ fontSize: 14, fontWeight: 800, color: "#fff", marginBottom: 2 }}>
             Willkommen bei TerminStop! Dein Test läuft.
@@ -417,7 +417,7 @@ export default function Dashboard() {
             boxShadow: "0 4px 20px -6px rgba(220,38,38,0.35)",
           }}>
             <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-              <div style={{ width: 40, height: 40, borderRadius: 12, background: "rgba(255,255,255,0.15)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>⛔</div>
+              <div style={{ width: 40, height: 40, borderRadius: 12, background: "rgba(255,255,255,0.15)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>–</div>
               <div>
                 <div style={{ fontSize: 14, fontWeight: 800, color: "#fff", marginBottom: 2 }}>SMS-Limit erreicht</div>
                 <div style={{ fontSize: 13, color: "rgba(255,255,255,0.8)" }}>
@@ -441,7 +441,7 @@ export default function Dashboard() {
             boxShadow: "0 4px 20px -6px rgba(217,119,6,0.3)",
           }}>
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-              <span style={{ fontSize: 20 }}>⚠️</span>
+              <span style={{ fontSize: 20 }}>!</span>
               <div style={{ fontSize: 13, color: "#fff", fontWeight: 600 }}>
                 Noch {smsLimit - smsUsed} SMS übrig diesen Monat ({smsUsed}/{smsLimit} verbraucht)
               </div>
@@ -508,7 +508,7 @@ export default function Dashboard() {
             {
               label: "SMS diesen Monat",
               value: `${smsUsed}/${smsLimit}`,
-              sub: smsUsed >= smsLimit ? "⛔ Limit erreicht" : `${smsLimit - smsUsed} übrig`,
+              sub: smsUsed >= smsLimit ? "– Limit erreicht" : `${smsLimit - smsUsed} übrig`,
               color: smsUsed >= smsLimit ? "#DC2626" : smsUsed / smsLimit >= 0.8 ? "#D97706" : "#18A66D",
               bg: smsUsed >= smsLimit ? "#FEF2F2" : "#fff",
               accent: smsUsed >= smsLimit ? "#FECACA" : "#E5E7EB",
@@ -575,7 +575,7 @@ export default function Dashboard() {
                     width: 64, height: 64, borderRadius: "50%", background: "#F0FDF6",
                     display: "flex", alignItems: "center", justifyContent: "center",
                     margin: "0 auto 16px", fontSize: 28
-                  }}>📅</div>
+                  }}></div>
                   <div style={{ fontSize: 15, fontWeight: 700, color: "#374151", marginBottom: 4 }}>Noch keine Termine heute</div>
                   <div style={{ fontSize: 13, color: "#9CA3AF" }}>Tippe auf + um den ersten Termin einzutragen</div>
                 </div>

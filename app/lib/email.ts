@@ -70,7 +70,7 @@ function baseTemplate(content: string) {
 export async function sendWelcomeEmail(to: string, companyName: string) {
   const html = baseTemplate(`
     <div style="text-align:center;margin-bottom:28px;">
-      <div style="font-size:48px;margin-bottom:12px;">🎉</div>
+      <div style="font-size:48px;margin-bottom:12px;"></div>
       <h1 style="font-size:24px;font-weight:900;color:#0F1B2D;margin:0 0 10px;">Willkommen bei TerminStop!</h1>
       <p style="font-size:15px;color:#5B6779;line-height:1.6;margin:0;">
         Hallo ${companyName},<br>dein Konto ist eingerichtet und bereit. Dein 14-tägiger Testzeitraum läuft.
@@ -80,9 +80,9 @@ export async function sendWelcomeEmail(to: string, companyName: string) {
     <div style="background:#F0FBF6;border:1px solid #D1F5E3;border-radius:14px;padding:20px 20px;margin-bottom:28px;">
       <p style="font-size:13px;font-weight:700;color:#0A6B43;margin:0 0 12px;text-transform:uppercase;letter-spacing:0.5px;">Deine nächsten Schritte</p>
       ${[
-        ["📅", "Ersten Termin eintragen", "Trage deinen ersten Kunden ein"],
-        ["🔗", "Buchungsseite aktivieren", "Teile deinen Link mit Kunden"],
-        ["📱", "SMS testen", "Schick dir selbst eine Test-SMS"],
+        ["", "Ersten Termin eintragen", "Trage deinen ersten Kunden ein"],
+        ["", "Buchungsseite aktivieren", "Teile deinen Link mit Kunden"],
+        ["", "SMS testen", "Schick dir selbst eine Test-SMS"],
       ].map(([icon, title, desc]) => `
         <div style="display:flex;gap:12px;align-items:flex-start;margin-bottom:10px;">
           <span style="font-size:18px;flex-shrink:0;">${icon}</span>
@@ -100,7 +100,7 @@ export async function sendWelcomeEmail(to: string, companyName: string) {
       </a>
     </div>
   `)
-  await sendEmail(to, "Willkommen bei TerminStop! 🎉", html)
+  await sendEmail(to, "Willkommen bei TerminStop! ", html)
 }
 
 // ── Payment Confirmation Email ────────────────────────────────────────────────
@@ -112,7 +112,7 @@ export async function sendPaymentConfirmationEmail(to: string, companyName: stri
 
   const html = baseTemplate(`
     <div style="text-align:center;margin-bottom:28px;">
-      <div style="font-size:48px;margin-bottom:12px;">✅</div>
+      <div style="font-size:48px;margin-bottom:12px;">✓</div>
       <h1 style="font-size:24px;font-weight:900;color:#0F1B2D;margin:0 0 10px;">Zahlung bestätigt!</h1>
       <p style="font-size:15px;color:#5B6779;line-height:1.6;margin:0;">
         Danke, ${companyName}! Dein <strong>${planName}-Paket</strong> ist jetzt aktiv.
@@ -146,14 +146,14 @@ export async function sendPaymentConfirmationEmail(to: string, companyName: stri
       </a>
     </div>
   `)
-  await sendEmail(to, `Zahlung bestätigt – ${planName}-Paket aktiv ✅`, html)
+  await sendEmail(to, `Zahlung bestätigt – ${planName}-Paket aktiv ✓`, html)
 }
 
 // ── SMS Topup Confirmation Email ──────────────────────────────────────────────
 export async function sendSmsTopupEmail(to: string, companyName: string, smsAmount: number, priceLabel: string) {
   const html = baseTemplate(`
     <div style="text-align:center;margin-bottom:28px;">
-      <div style="font-size:48px;margin-bottom:12px;">📦</div>
+      <div style="font-size:48px;margin-bottom:12px;"></div>
       <h1 style="font-size:24px;font-weight:900;color:#0F1B2D;margin:0 0 10px;">SMS-Paket aktiviert!</h1>
       <p style="font-size:15px;color:#5B6779;line-height:1.6;margin:0;">
         Hallo ${companyName},<br>dein Extra-Paket wurde erfolgreich gebucht und sofort gutgeschrieben.
@@ -187,14 +187,14 @@ export async function sendSmsTopupEmail(to: string, companyName: string, smsAmou
       </a>
     </div>
   `)
-  await sendEmail(to, `📦 ${smsAmount} Extra-SMS gutgeschrieben`, html)
+  await sendEmail(to, ` ${smsAmount} Extra-SMS gutgeschrieben`, html)
 }
 
 // ── Payment Failed Email ───────────────────────────────────────────────────────
 export async function sendPaymentFailedEmail(to: string, companyName: string) {
   const html = baseTemplate(`
     <div style="text-align:center;margin-bottom:28px;">
-      <div style="font-size:48px;margin-bottom:12px;">💳</div>
+      <div style="font-size:48px;margin-bottom:12px;"></div>
       <h1 style="font-size:24px;font-weight:900;color:#0F1B2D;margin:0 0 10px;">Zahlung fehlgeschlagen</h1>
       <p style="font-size:15px;color:#5B6779;line-height:1.6;margin:0;">
         Hallo ${companyName},<br>
@@ -219,14 +219,14 @@ export async function sendPaymentFailedEmail(to: string, companyName: string) {
       Fragen? Schreib uns: <a href="mailto:terminstop.business@gmail.com" style="color:#18A66D;">terminstop.business@gmail.com</a>
     </p>
   `)
-  await sendEmail(to, "⚠️ Zahlung fehlgeschlagen – Bitte Zahlungsmethode aktualisieren", html)
+  await sendEmail(to, "! Zahlung fehlgeschlagen – Bitte Zahlungsmethode aktualisieren", html)
 }
 
 // ── Subscription Cancelled Email ──────────────────────────────────────────────
 export async function sendSubscriptionCancelledEmail(to: string, companyName: string) {
   const html = baseTemplate(`
     <div style="text-align:center;margin-bottom:28px;">
-      <div style="font-size:48px;margin-bottom:12px;">👋</div>
+      <div style="font-size:48px;margin-bottom:12px;"></div>
       <h1 style="font-size:24px;font-weight:900;color:#0F1B2D;margin:0 0 10px;">Dein Abo wurde beendet</h1>
       <p style="font-size:15px;color:#5B6779;line-height:1.6;margin:0;">
         Hallo ${companyName},<br>
@@ -243,9 +243,9 @@ export async function sendSubscriptionCancelledEmail(to: string, companyName: st
 
     <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:28px;">
       ${[
-        ["⚡", "Starter", "39 €/Monat", "100 SMS"],
-        ["🚀", "Pro",     "109 €/Monat", "400 SMS · Empfohlen"],
-        ["🏢", "Business","229 €/Monat", "1.000 SMS"],
+        ["", "Starter", "39 €/Monat", "100 SMS"],
+        ["", "Pro",     "109 €/Monat", "400 SMS · Empfohlen"],
+        ["", "Business","229 €/Monat", "1.000 SMS"],
       ].map(([icon, name, price, desc]) => `
         <div style="display:flex;align-items:center;gap:12px;border:1px solid #E8ECF1;border-radius:10px;padding:12px 14px;background:#fff;">
           <span style="font-size:18px;">${icon}</span>
@@ -269,7 +269,7 @@ export async function sendTrialReminderEmail(to: string, companyName: string, da
   const isUrgent = daysLeft <= 3
   const html = baseTemplate(`
     <div style="text-align:center;margin-bottom:28px;">
-      <div style="font-size:48px;margin-bottom:12px;">${isUrgent ? "⏰" : "📅"}</div>
+      <div style="font-size:48px;margin-bottom:12px;">${isUrgent ? "" : ""}</div>
       <h1 style="font-size:24px;font-weight:900;color:#0F1B2D;margin:0 0 10px;">
         Noch ${daysLeft} Tag${daysLeft !== 1 ? "e" : ""} im Testzeitraum
       </h1>
@@ -283,9 +283,9 @@ export async function sendTrialReminderEmail(to: string, companyName: string, da
 
     <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:28px;">
       ${[
-        ["⚡", "Starter", "39 €/Monat", "Bis 100 SMS monatlich"],
-        ["🚀", "Pro",     "109 €/Monat", "Bis 400 SMS · Empfohlen"],
-        ["🏢", "Business","229 €/Monat", "Bis 1.000 SMS monatlich"],
+        ["", "Starter", "39 €/Monat", "Bis 100 SMS monatlich"],
+        ["", "Pro",     "109 €/Monat", "Bis 400 SMS · Empfohlen"],
+        ["", "Business","229 €/Monat", "Bis 1.000 SMS monatlich"],
       ].map(([icon, name, price, desc]) => `
         <div style="display:flex;align-items:center;gap:14px;border:1px solid #E8ECF1;border-radius:12px;padding:14px 16px;background:#fff;">
           <span style="font-size:20px;">${icon}</span>
@@ -305,7 +305,7 @@ export async function sendTrialReminderEmail(to: string, companyName: string, da
     </div>
   `)
   const subject = isUrgent
-    ? `⏰ Noch ${daysLeft} Tag${daysLeft !== 1 ? "e" : ""} – Testzeitraum endet bald`
-    : `📅 Dein TerminStop-Test läuft noch ${daysLeft} Tage`
+    ? ` Noch ${daysLeft} Tag${daysLeft !== 1 ? "e" : ""} – Testzeitraum endet bald`
+    : ` Dein TerminStop-Test läuft noch ${daysLeft} Tage`
   await sendEmail(to, subject, html)
 }

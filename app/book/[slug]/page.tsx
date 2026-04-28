@@ -274,7 +274,7 @@ export default function BookingPage() {
   if (notFound) return (
     <Shell css={css}>
       <div style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", padding:"60px 24px", textAlign:"center" }}>
-        <div style={{ width:80, height:80, background:"#F9FAFB", border:"1.5px solid #E5E7EB", borderRadius:24, display:"flex", alignItems:"center", justifyContent:"center", fontSize:36, marginBottom:20 }}>🔍</div>
+        <div style={{ width:80, height:80, background:"#F9FAFB", border:"1.5px solid #E5E7EB", borderRadius:24, display:"flex", alignItems:"center", justifyContent:"center", fontSize:36, marginBottom:20 }}></div>
         <h1 style={{ fontSize:22, fontWeight:800, color:"#111827", margin:"0 0 10px" }}>Buchungsseite nicht gefunden</h1>
         <p style={{ color:"#6B7280", lineHeight:1.65, fontSize:15, margin:0, maxWidth:300 }}>Dieser Link ist nicht aktiv. Bitte wende dich direkt an den Betrieb.</p>
       </div>
@@ -289,7 +289,7 @@ export default function BookingPage() {
           width: 80, height: 80, background: "#FFF7ED", border: "1.5px solid #FED7AA",
           borderRadius: 24, display: "flex", alignItems: "center", justifyContent: "center",
           fontSize: 36, marginBottom: 20,
-        }}>📞</div>
+        }}></div>
         <h1 style={{ fontSize: 22, fontWeight: 800, color: "#111827", margin: "0 0 10px", lineHeight: 1.3 }}>
           Online-Buchung momentan nicht verfügbar
         </h1>
@@ -354,7 +354,7 @@ export default function BookingPage() {
         <div style={{ width:"100%", maxWidth:420, background:"#fff", border:"1.5px solid #E5E7EB", borderRadius:18, overflow:"hidden", marginBottom:24, boxShadow:"0 4px 20px rgba(0,0,0,0.04)", textAlign:"left" }}>
           <div style={{ background: confirmed ? "#F0FBF6" : "#FFFBEB", borderBottom:`1px solid ${confirmed ? "#D1F5E3" : "#FDE68A"}`, padding:"12px 18px" }}>
             <span style={{ fontSize:12, fontWeight:700, color: confirmed ? "#18A66D" : "#92400E", textTransform:"uppercase", letterSpacing:.8 }}>
-              {confirmed ? "✓ Automatisch bestätigt" : "⏳ Anfrage eingegangen"}
+              {confirmed ? "✓ Automatisch bestätigt" : " Anfrage eingegangen"}
             </span>
           </div>
           {bookingType !== "callback" && date && <DRow label="Termin"      value={formatDT(date, time)} />}
@@ -449,7 +449,7 @@ export default function BookingPage() {
               {services.length > 0 && (
                 <button className="type-card"
                   onClick={() => { setBookingType("service"); setSelectedService(null); setStep("datetime") }}>
-                  <div style={{ width:56, height:56, background:"linear-gradient(135deg, #18A66D, #0F8F63)", borderRadius:18, display:"flex", alignItems:"center", justifyContent:"center", fontSize:24, flexShrink:0, boxShadow:"0 6px 20px rgba(24,166,109,0.35)" }}>✂️</div>
+                  <div style={{ width:56, height:56, background:"linear-gradient(135deg, #18A66D, #0F8F63)", borderRadius:18, display:"flex", alignItems:"center", justifyContent:"center", fontSize:24, flexShrink:0, boxShadow:"0 6px 20px rgba(24,166,109,0.35)" }}></div>
                   <div style={{ flex:1, minWidth:0 }}>
                     <p style={{ fontWeight:800, color:"#111827", margin:"0 0 5px", fontSize:16 }}>Leistung buchen</p>
                     <p style={{ color:"#9CA3AF", margin:0, fontSize:13, fontWeight:500 }}>{services.length} Leistung{services.length > 1 ? "en" : ""} verfügbar · Datum zuerst wählen</p>
@@ -462,7 +462,7 @@ export default function BookingPage() {
 
               <button className="type-card"
                 onClick={() => { setBookingType("open"); setStep("datetime") }}>
-                <div style={{ width:56, height:56, background:"linear-gradient(135deg, #4F46E5, #7C3AED)", borderRadius:18, display:"flex", alignItems:"center", justifyContent:"center", fontSize:24, flexShrink:0, boxShadow:"0 6px 20px rgba(79,70,229,0.35)" }}>🗓️</div>
+                <div style={{ width:56, height:56, background:"linear-gradient(135deg, #4F46E5, #7C3AED)", borderRadius:18, display:"flex", alignItems:"center", justifyContent:"center", fontSize:24, flexShrink:0, boxShadow:"0 6px 20px rgba(79,70,229,0.35)" }}></div>
                 <div style={{ flex:1, minWidth:0 }}>
                   <p style={{ fontWeight:800, color:"#111827", margin:"0 0 5px", fontSize:16 }}>Termin anfragen</p>
                   <p style={{ color:"#9CA3AF", margin:0, fontSize:13, fontWeight:500 }}>Wunschtermin wählen & anfragen</p>
@@ -474,7 +474,7 @@ export default function BookingPage() {
 
               <button className="type-card"
                 onClick={() => { setBookingType("callback"); setStep("contact") }}>
-                <div style={{ width:56, height:56, background:"linear-gradient(135deg, #F59E0B, #D97706)", borderRadius:18, display:"flex", alignItems:"center", justifyContent:"center", fontSize:24, flexShrink:0, boxShadow:"0 6px 20px rgba(245,158,11,0.35)" }}>📞</div>
+                <div style={{ width:56, height:56, background:"linear-gradient(135deg, #F59E0B, #D97706)", borderRadius:18, display:"flex", alignItems:"center", justifyContent:"center", fontSize:24, flexShrink:0, boxShadow:"0 6px 20px rgba(245,158,11,0.35)" }}></div>
                 <div style={{ flex:1, minWidth:0 }}>
                   <p style={{ fontWeight:800, color:"#111827", margin:"0 0 5px", fontSize:16 }}>Rückruf anfragen</p>
                   <p style={{ color:"#9CA3AF", margin:0, fontSize:13, fontWeight:500 }}>Nummer hinterlassen · ich rufe zurück</p>
@@ -489,9 +489,9 @@ export default function BookingPage() {
             <div style={{ marginTop:32, background:"#fff", border:"1.5px solid #F0F0F0", borderRadius:16, padding:"16px 20px" }}>
               <div style={{ display:"flex", justifyContent:"space-around", gap:12 }}>
                 {[
-                  { icon:"🔒", label:"Datenschutz",   sub:"DSGVO-konform" },
-                  { icon:"⚡", label:"Schnell",        sub:"In 2 Minuten fertig" },
-                  { icon:"✉️", label:"Kostenlos",      sub:"Keine Kosten für dich" },
+                  { icon:"", label:"Datenschutz",   sub:"DSGVO-konform" },
+                  { icon:"", label:"Schnell",        sub:"In 2 Minuten fertig" },
+                  { icon:"", label:"Kostenlos",      sub:"Keine Kosten für dich" },
                 ].map(t => (
                   <div key={t.label} style={{ textAlign:"center" }}>
                     <div style={{ fontSize:20, marginBottom:4 }}>{t.icon}</div>
@@ -535,7 +535,7 @@ export default function BookingPage() {
                 onClick={() => { setSelectedEmployee(null); goNext() }}
                 style={{ background: selectedEmployee === null ? "#F0FBF6" : "#fff", border:`1.5px solid ${selectedEmployee === null ? "#18A66D" : "#E5E7EB"}`, opacity:.85 }}>
                 <div style={{ width:52, height:52, background:"linear-gradient(135deg, #6B7280, #374151)", borderRadius:17, display:"flex", alignItems:"center", justifyContent:"center", fontSize:22, flexShrink:0, boxShadow:"0 6px 18px rgba(0,0,0,0.15)" }}>
-                  👥
+                  
                 </div>
                 <div style={{ flex:1, minWidth:0, textAlign:"left" }}>
                   <p style={{ fontWeight:800, color:"#111827", margin:"0 0 4px", fontSize:16 }}>Egal — nächster Verfügbarer</p>
@@ -624,7 +624,7 @@ export default function BookingPage() {
             {avail === "full" && (
               <div style={{ marginBottom:16 }}>
                 <div style={{ display:"flex", alignItems:"center", gap:10, background:"#FFFBEB", border:"1px solid #FDE68A", borderRadius:12, padding:"12px 16px", marginBottom:10 }}>
-                  <div style={{ width:28, height:28, background:"#F59E0B", borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, fontSize:14 }}>⏳</div>
+                  <div style={{ width:28, height:28, background:"#F59E0B", borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, fontSize:14 }}></div>
                   <div style={{ flex:1 }}>
                     <div style={{ fontSize:13, fontWeight:800, color:"#92400E" }}>Alle Mitarbeiter belegt</div>
                     <div style={{ fontSize:12, color:"#B45309" }}>Deine Anfrage wird weitergeleitet — der Betrieb meldet sich bei dir</div>
@@ -646,7 +646,7 @@ export default function BookingPage() {
                   >
                     {nextSlotLoading
                       ? <><Spin small /><span>Suche freien Termin …</span></>
-                      : <><span>🔍</span><span>Nächsten freien Termin finden</span></>}
+                      : <><span></span><span>Nächsten freien Termin finden</span></>}
                   </button>
                 )}
 
@@ -694,7 +694,7 @@ export default function BookingPage() {
             {/* Selected date/time reminder */}
             {date && time && (
               <div style={{ display:"inline-flex", alignItems:"center", gap:8, background:"#F0FBF6", border:"1.5px solid #D1F5E3", borderRadius:12, padding:"8px 16px", marginBottom:22 }}>
-                <span style={{ fontSize:14 }}>📅</span>
+                <span style={{ fontSize:14 }}></span>
                 <span style={{ fontSize:13, fontWeight:700, color:"#18A66D" }}>{formatDT(date, time)}</span>
                 {avail === "available" && (
                   <span style={{ fontSize:11, fontWeight:700, color:"#15955F", background:"#D1F5E3", borderRadius:99, padding:"2px 8px" }}>✓ frei</span>
@@ -860,7 +860,7 @@ export default function BookingPage() {
                 display:"flex", gap:12, alignItems:"flex-start",
               }}>
                 <span style={{ fontSize:18, flexShrink:0, lineHeight:1 }}>
-                  {avail === "available" ? "✅" : "⏳"}
+                  {avail === "available" ? "✓" : ""}
                 </span>
                 <p style={{ fontSize:13, color: avail === "available" ? "#166534" : "#92400E", lineHeight:1.65, margin:0 }}>
                   {avail === "available"
@@ -875,7 +875,7 @@ export default function BookingPage() {
 
             {error && (
               <div style={{ background:"#FEF2F2", border:"1px solid #FECACA", borderRadius:14, padding:"14px 18px", marginBottom:16, display:"flex", gap:10, alignItems:"flex-start" }}>
-                <span>⚠️</span>
+                <span>!</span>
                 <p style={{ fontSize:13, color:"#DC2626", lineHeight:1.6, margin:0 }}>{error}</p>
               </div>
             )}

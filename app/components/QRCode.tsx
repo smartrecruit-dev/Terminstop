@@ -100,7 +100,7 @@ export default function QRCode({ url, size = 180, label }: QRCodeProps) {
             color: copied ? G : "#6B7280",
             cursor: "pointer", transition: "all .15s",
           }}>
-          {copied ? "✓ Kopiert!" : "🔗 Link kopieren"}
+          {copied ? "✓ Kopiert!" : " Link kopieren"}
         </button>
         <button
           onClick={downloadQR}
@@ -112,7 +112,7 @@ export default function QRCode({ url, size = 180, label }: QRCodeProps) {
             color: downloaded ? G : "#fff",
             cursor: "pointer", transition: "all .15s",
           }}>
-          {downloaded ? "✓ Gespeichert!" : "⬇ QR laden"}
+          {downloaded ? "✓ Gespeichert!" : " QR laden"}
         </button>
       </div>
     </div>

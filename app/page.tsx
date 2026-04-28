@@ -158,9 +158,9 @@ function DashboardMock() {
       <div style={{ padding: "18px 22px 22px" }}>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 10, marginBottom: 18 }}>
           {[
-            { label: "Heute",        val: "5",  icon: "📅" },
-            { label: "SMS gesendet", val: "4",  icon: "✉️" },
-            { label: "Online-Anfr.", val: "2",  icon: "🔔", highlight: true },
+            { label: "Heute",        val: "5",  icon: "" },
+            { label: "SMS gesendet", val: "4",  icon: "" },
+            { label: "Online-Anfr.", val: "2",  icon: "", highlight: true },
           ].map((s, i) => (
             <div key={i} style={{ background: s.highlight ? "#FFFBEB" : C.bg2, border: `1px solid ${s.highlight ? "#FDE68A" : C.borderSoft}`, borderRadius: 11, padding: "11px 12px", textAlign: "center" }}>
               <div style={{ fontSize: 16 }}>{s.icon}</div>
@@ -172,7 +172,7 @@ function DashboardMock() {
 
         {/* Online-Buchung Anfragen */}
         <div style={{ background: "#FFFBEB", border: "1px solid #FDE68A", borderRadius: 12, padding: "12px 14px", marginBottom: 14, animation: `slideUp 0.5s ${EASE} 0.2s both` }}>
-          <div style={{ fontSize: 10, fontWeight: 800, color: "#92400E", textTransform: "uppercase", letterSpacing: .8, marginBottom: 8 }}>🔔 Neue Online-Anfragen</div>
+          <div style={{ fontSize: 10, fontWeight: 800, color: "#92400E", textTransform: "uppercase", letterSpacing: .8, marginBottom: 8 }}> Neue Online-Anfragen</div>
           {[
             { name: "Julia M.", service: "Haarschnitt", time: "Fr, 14:00" },
             { name: "David K.", service: "Coloring",    time: "Sa, 10:30" },
@@ -236,9 +236,9 @@ function BookingMock() {
             <div style={{ fontSize: 11, fontWeight: 800, color: "#111827", marginBottom: 10 }}>Wie kann ich dir helfen?</div>
             {/* Option cards */}
             {[
-              { icon: "✂️", label: "Leistung buchen", sub: "3 Leistungen verfügbar", bg: "#F0FBF6", border: "#D1F5E3", active: true },
-              { icon: "🗓️", label: "Termin anfragen", sub: "Wunschtermin wählen", bg: "#EEF2FF", border: "#C7D2FE", active: false },
-              { icon: "📞", label: "Rückruf anfragen", sub: "Ich werde zurückgerufen", bg: "#FFF7ED", border: "#FED7AA", active: false },
+              { icon: "", label: "Leistung buchen", sub: "3 Leistungen verfügbar", bg: "#F0FBF6", border: "#D1F5E3", active: true },
+              { icon: "", label: "Termin anfragen", sub: "Wunschtermin wählen", bg: "#EEF2FF", border: "#C7D2FE", active: false },
+              { icon: "", label: "Rückruf anfragen", sub: "Ich werde zurückgerufen", bg: "#FFF7ED", border: "#FED7AA", active: false },
             ].map((opt, i) => (
               <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 10px", borderRadius: 10, border: `1.5px solid ${opt.active ? "#18A66D" : opt.border}`, background: opt.active ? opt.bg : "#fff", marginBottom: 6, transition: "all .15s" }}>
                 <div style={{ width: 28, height: 28, borderRadius: 8, background: opt.bg, border: `1px solid ${opt.border}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, flexShrink: 0 }}>{opt.icon}</div>
@@ -253,7 +253,7 @@ function BookingMock() {
             ))}
             {/* Trust signals */}
             <div style={{ display: "flex", justifyContent: "center", gap: 10, marginTop: 10, padding: "8px 0", borderTop: "1px solid #F3F4F6" }}>
-              {["🔒 Sicher", "⚡ 2 Min.", "✓ Kostenlos"].map((t, i) => (
+              {[" Sicher", " 2 Min.", "✓ Kostenlos"].map((t, i) => (
                 <span key={i} style={{ fontSize: 8, color: "#9CA3AF", fontWeight: 600 }}>{t}</span>
               ))}
             </div>
@@ -268,7 +268,7 @@ function BookingMock() {
       <div style={{ position: "absolute", bottom: -10, right: -24, background: "#fff", border: "1px solid #E5E7EB", borderRadius: 12, padding: "8px 10px", boxShadow: "0 8px 24px -6px rgba(15,27,45,0.16)", animation: `popIn 0.6s ${EASE} 0.9s both` }}>
         <div style={{ fontSize: 8, fontWeight: 700, color: "#6B7280", marginBottom: 4 }}>QR-Code</div>
         {/* Mini QR placeholder */}
-        <div style={{ width: 44, height: 44, background: "#F3F4F6", borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>⬛</div>
+        <div style={{ width: 44, height: 44, background: "#F3F4F6", borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}></div>
         <div style={{ fontSize: 7, color: "#9CA3AF", marginTop: 3, textAlign: "center" }}>Scannen & buchen</div>
       </div>
     </div>
@@ -304,7 +304,7 @@ function SmsMock() {
             border: `1px solid ${C.greenBorder}`,
             borderRadius: "50%", margin: "0 auto 7px",
             display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20,
-          }}>💈</div>
+          }}></div>
           <div style={{ fontSize: 12, fontWeight: 700, color: "#111" }}>Friseur Müller</div>
           <div style={{ fontSize: 10, color: "#8E8E93" }}>SMS-Nachricht</div>
         </div>
@@ -313,7 +313,7 @@ function SmsMock() {
           padding: "11px 14px", fontSize: 12.5, color: "#111", lineHeight: 1.5, marginBottom: 8,
           animation: `popIn 0.6s ${EASE} 0.3s both`,
         }}>
-          Hallo Michael, zur Erinnerung: Ihr Termin bei <strong>Friseur Müller</strong> ist morgen um <strong>10:00 Uhr</strong>. Bis dann! 👋
+          Hallo Michael, zur Erinnerung: Ihr Termin bei <strong>Friseur Müller</strong> ist morgen um <strong>10:00 Uhr</strong>. Bis dann! 
         </div>
         <div style={{ fontSize: 10, color: "#8E8E93", marginLeft: 4, marginBottom: 16 }}>Heute, 14:00 Uhr · automatisch</div>
         <div style={{
@@ -408,7 +408,7 @@ export default function LandingPage() {
 
   const features = [
     {
-      icon: "📅",
+      icon: "",
       accent: "#10B981",
       label: "Vollautomatisch",
       title: "SMS-Erinnerungen",
@@ -416,7 +416,7 @@ export default function LandingPage() {
       proof: "Ihre Kunden werden zuverlässig erinnert. Sie tun nichts.",
     },
     {
-      icon: "👥",
+      icon: "",
       accent: "#6366F1",
       label: "Voller Überblick",
       title: "Kundenkartei",
@@ -424,7 +424,7 @@ export default function LandingPage() {
       proof: "Alle Kundendaten griffbereit, auf jedem Gerät.",
     },
     {
-      icon: "🗓️",
+      icon: "",
       accent: "#F59E0B",
       label: "Immer aktuell",
       title: "Digitaler Kalender",
@@ -432,7 +432,7 @@ export default function LandingPage() {
       proof: "Von unterwegs erreichbar — jederzeit, überall.",
     },
     {
-      icon: "📊",
+      icon: "",
       accent: "#EC4899",
       label: "Datengestützt",
       title: "Auswertungen & Einblicke",
@@ -442,12 +442,12 @@ export default function LandingPage() {
   ]
 
   const bookingFeatures = [
-    { icon: "🔗", title: "Eigene Buchungsseite",         desc: "Ihre persönliche URL — Kunden buchen direkt, ohne Telefonanruf." },
-    { icon: "📲", title: "QR-Code zum Aufstellen",       desc: "An der Kasse oder im Schaufenster — Kunden scannen und buchen sofort." },
-    { icon: "📥", title: "Anfragen im Dashboard",        desc: "Alle Online-Buchungen landen direkt bei Ihnen. Sie bestätigen mit einem Klick." },
-    { icon: "✉️", title: "Automatische Bestätigungs-SMS", desc: "Sobald Sie bestätigen, bekommt der Kunde sofort eine SMS — ohne Ihr Zutun." },
-    { icon: "🗂️", title: "Leistungen wählbar",           desc: "Kunden wählen Ihre Leistungen oder fragen einen offenen Termin an." },
-    { icon: "📞", title: "Rückruf-Funktion",             desc: "Kunden können auch einen Rückruf anfragen — Sie werden benachrichtigt." },
+    { icon: "", title: "Eigene Buchungsseite",         desc: "Ihre persönliche URL — Kunden buchen direkt, ohne Telefonanruf." },
+    { icon: "", title: "QR-Code zum Aufstellen",       desc: "An der Kasse oder im Schaufenster — Kunden scannen und buchen sofort." },
+    { icon: "", title: "Anfragen im Dashboard",        desc: "Alle Online-Buchungen landen direkt bei Ihnen. Sie bestätigen mit einem Klick." },
+    { icon: "", title: "Automatische Bestätigungs-SMS", desc: "Sobald Sie bestätigen, bekommt der Kunde sofort eine SMS — ohne Ihr Zutun." },
+    { icon: "", title: "Leistungen wählbar",           desc: "Kunden wählen Ihre Leistungen oder fragen einen offenen Termin an." },
+    { icon: "", title: "Rückruf-Funktion",             desc: "Kunden können auch einen Rückruf anfragen — Sie werden benachrichtigt." },
   ]
 
   return (
@@ -698,7 +698,7 @@ export default function LandingPage() {
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             {REG_OPEN
               ? <a href="/register" className="btn btn-primary hide-mobile" style={{ fontSize: 14, padding: "11px 20px" }}>Kostenlos starten <span style={{ marginLeft: 2 }}>→</span></a>
-              : <span className="btn btn-primary hide-mobile" style={{ fontSize: 14, padding: "11px 20px", opacity: 0.7, cursor: "default" }}>🔒 Bald verfügbar</span>
+              : <span className="btn btn-primary hide-mobile" style={{ fontSize: 14, padding: "11px 20px", opacity: 0.7, cursor: "default" }}> Bald verfügbar</span>
             }
 
             {/* Mobile hamburger */}
@@ -747,7 +747,7 @@ export default function LandingPage() {
           </a>
           {REG_OPEN
             ? <a href="/register" className="btn btn-primary" onClick={() => setNavOpen(false)} style={{ fontSize: 15, padding: "14px 20px", justifyContent: "center" }}>Kostenlos starten →</a>
-            : <span className="btn btn-primary" style={{ fontSize: 15, padding: "14px 20px", justifyContent: "center", opacity: 0.7, cursor: "default" }}>🔒 Bald verfügbar</span>
+            : <span className="btn btn-primary" style={{ fontSize: 15, padding: "14px 20px", justifyContent: "center", opacity: 0.7, cursor: "default" }}> Bald verfügbar</span>
           }
         </aside>
 
@@ -827,7 +827,7 @@ export default function LandingPage() {
                 <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap", marginBottom: 18 }}>
                   {REG_OPEN
                     ? <a href="/register" className="btn btn-primary" style={{ fontSize: 16, padding: "16px 30px" }}>14 Tage gratis starten <span>→</span></a>
-                    : <span className="btn btn-primary" style={{ fontSize: 16, padding: "16px 30px", opacity: 0.7, cursor: "default" }}>🔒 Bald verfügbar</span>
+                    : <span className="btn btn-primary" style={{ fontSize: 16, padding: "16px 30px", opacity: 0.7, cursor: "default" }}> Bald verfügbar</span>
                   }
                   <a href="/demo" className="btn btn-outline" style={{ fontSize: 16, padding: "16px 26px", display: "inline-flex", alignItems: "center", gap: 8 }}>
                     <span style={{ width: 8, height: 8, background: "#18A66D", borderRadius: "50%", display: "inline-block", animation: "pulse 2s infinite" }} />
@@ -875,7 +875,7 @@ export default function LandingPage() {
                         alignItems: "center", justifyContent: "center",
                         fontSize: 16, flexShrink: 0,
                         boxShadow: `0 4px 12px -2px ${C.greenGlow}`,
-                      }}>✉️</div>
+                      }}></div>
                       <div>
                         <div style={{ fontSize: 12, fontWeight: 800, color: C.text, marginBottom: 3 }}>SMS verschickt</div>
                         <div style={{ fontSize: 11, color: C.muted, lineHeight: 1.5 }}>
@@ -1105,13 +1105,13 @@ export default function LandingPage() {
 
             <div style={{ display: "grid", gap: 18, gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))" }}>
               {[
-                { num: "01", icon: "🤝", tag: "Persönliche Begleitung", title: "Einmalig einrichten — in unter 10 Minuten",
+                { num: "01", icon: "", tag: "Persönliche Begleitung", title: "Einmalig einrichten — in unter 10 Minuten",
                   desc: "Wir richten TerminStop gemeinsam mit Ihnen ein. Kalender, Kundenkartei und SMS-Erinnerungen. Persönliches Onboarding inklusive.",
                   detail: "Sie brauchen nur Ihren Browser." },
-                { num: "02", icon: "⚡", tag: "Vollautomatisch", title: "Ihr digitales Büro läuft — sofort und automatisch",
+                { num: "02", icon: "", tag: "Vollautomatisch", title: "Ihr digitales Büro läuft — sofort und automatisch",
                   desc: "Termine im Kalender, Kunden in der Kartei, SMS-Erinnerungen gehen 24h vor jedem Termin automatisch raus — mit Ihrem Namen.",
                   detail: "Ohne Ihr Zutun. Tag und Nacht." },
-                { num: "03", icon: "📈", tag: "95% Erfolgsquote", title: "Ihr Betrieb läuft planbarer. Jeden Tag.",
+                { num: "03", icon: "", tag: "95% Erfolgsquote", title: "Ihr Betrieb läuft planbarer. Jeden Tag.",
                   desc: "Weniger Ausfälle, mehr Überblick, mehr Umsatz. TerminStop arbeitet dauerhaft für Sie im Hintergrund.",
                   detail: "Kunden, die kommen. Umsatz, der bleibt." },
               ].map((s, i) => (
@@ -1324,7 +1324,7 @@ export default function LandingPage() {
                     height: "100%", boxSizing: "border-box",
                     boxShadow: "0 1px 4px rgba(15,27,45,0.04)",
                   }}>
-                    <div style={{ color: "#F59E0B", fontSize: 14, letterSpacing: 3, marginBottom: 18 }}>★★★★★</div>
+                    <div style={{ color: "#F59E0B", fontSize: 14, letterSpacing: 3, marginBottom: 18 }}>5 Sterne</div>
                     <p style={{ fontSize: 15, color: C.text2, lineHeight: 1.75, flex: 1, marginBottom: 22, fontWeight: 400 }}>
                       „{r.text}"
                     </p>
@@ -1425,7 +1425,7 @@ export default function LandingPage() {
                         color: "#fff", fontWeight: 800, fontSize: 15,
                         padding: "15px 28px", borderRadius: 12,
                         opacity: 0.7, cursor: "default",
-                      }}>🔒 Bald verfügbar</span>
+                      }}> Bald verfügbar</span>
                   }
                   <a href="/demo/buchung" style={{
                     display: "inline-flex", alignItems: "center", gap: 8,
@@ -1489,7 +1489,7 @@ export default function LandingPage() {
                 {[
                   { value: "50+",    label: "Betriebe vertrauen uns" },
                   { value: "94%",    label: "weniger Terminausfälle" },
-                  { value: "4,9 ★",  label: "Kundenbewertung" },
+                  { value: "4,9 ",  label: "Kundenbewertung" },
                   { value: "10 Min", label: "bis zur ersten SMS" },
                 ].map((stat, i) => (
                   <div key={i} style={{ flex: "1 1 180px", textAlign: "center", padding: "24px 20px", borderRight: i < 3 ? `1px solid ${C.border}` : "none" }}>
@@ -1549,7 +1549,7 @@ export default function LandingPage() {
                   }}>
                     {/* Stars */}
                     <div style={{ display: "flex", gap: 2 }}>
-                      {"★★★★★".split("").map((s, j) => (
+                      {"5 Sterne".split("").map((s, j) => (
                         <span key={j} style={{ color: "#F59E0B", fontSize: 16 }}>{s}</span>
                       ))}
                     </div>
@@ -1581,11 +1581,11 @@ export default function LandingPage() {
             <Reveal delay={100}>
               <div style={{ display: "flex", justifyContent: "center", gap: 24, marginTop: 64, flexWrap: "wrap" }}>
                 {[
-                  { icon: "🔒", label: "SSL verschlüsselt" },
-                  { icon: "🇩🇪", label: "Made in Germany" },
-                  { icon: "📋", label: "DSGVO-konform" },
-                  { icon: "⚡", label: "Keine Einrichtungsgebühr" },
-                  { icon: "❌", label: "Jederzeit kündbar" },
+                  { icon: "", label: "SSL verschlüsselt" },
+                  { icon: "DE", label: "Made in Germany" },
+                  { icon: "", label: "DSGVO-konform" },
+                  { icon: "", label: "Keine Einrichtungsgebühr" },
+                  { icon: "✗", label: "Jederzeit kündbar" },
                 ].map((b, i) => (
                   <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, background: C.bg3, border: `1px solid ${C.border}`, borderRadius: 980, padding: "8px 16px" }}>
                     <span style={{ fontSize: 14 }}>{b.icon}</span>
@@ -1624,11 +1624,11 @@ export default function LandingPage() {
                 marginBottom: 48,
               }}>
                 {[
-                  "🗓️ Online-Kalender",
-                  "📲 Buchungsseite + QR-Code",
-                  "👥 Kundenkartei",
-                  "💬 SMS-Erinnerungen",
-                  "📊 Auswertungen",
+                  " Online-Kalender",
+                  " Buchungsseite + QR-Code",
+                  " Kundenkartei",
+                  " SMS-Erinnerungen",
+                  " Auswertungen",
                 ].map((item, i) => (
                   <div key={i} style={{
                     display: "flex", alignItems: "center", gap: 6,
@@ -1678,7 +1678,7 @@ export default function LandingPage() {
                   </div>
                   {REG_OPEN
                     ? <a href="/register" className="btn btn-outline" style={{ fontSize: 15, padding: "14px 20px", justifyContent: "center" }}>14 Tage kostenlos testen →</a>
-                    : <span className="btn btn-outline" style={{ fontSize: 15, padding: "14px 20px", justifyContent: "center", opacity: 0.7, cursor: "default" }}>🔒 Bald verfügbar</span>
+                    : <span className="btn btn-outline" style={{ fontSize: 15, padding: "14px 20px", justifyContent: "center", opacity: 0.7, cursor: "default" }}> Bald verfügbar</span>
                   }
                 </div>
               </Reveal>
@@ -1731,7 +1731,7 @@ export default function LandingPage() {
                   </div>
                   {REG_OPEN
                     ? <a href="/register" className="btn btn-white" style={{ fontSize: 15, padding: "14px 20px", justifyContent: "center", position: "relative", zIndex: 1 }}>14 Tage kostenlos testen →</a>
-                    : <span className="btn btn-white" style={{ fontSize: 15, padding: "14px 20px", justifyContent: "center", opacity: 0.7, cursor: "default", position: "relative", zIndex: 1 }}>🔒 Bald verfügbar</span>
+                    : <span className="btn btn-white" style={{ fontSize: 15, padding: "14px 20px", justifyContent: "center", opacity: 0.7, cursor: "default", position: "relative", zIndex: 1 }}> Bald verfügbar</span>
                   }
                 </div>
               </Reveal>
@@ -1770,7 +1770,7 @@ export default function LandingPage() {
                   </div>
                   {REG_OPEN
                     ? <a href="/register" className="btn btn-outline" style={{ fontSize: 15, padding: "14px 20px", justifyContent: "center" }}>14 Tage kostenlos testen →</a>
-                    : <span className="btn btn-outline" style={{ fontSize: 15, padding: "14px 20px", justifyContent: "center", opacity: 0.7, cursor: "default" }}>🔒 Bald verfügbar</span>
+                    : <span className="btn btn-outline" style={{ fontSize: 15, padding: "14px 20px", justifyContent: "center", opacity: 0.7, cursor: "default" }}> Bald verfügbar</span>
                   }
                 </div>
               </Reveal>
@@ -1785,10 +1785,10 @@ export default function LandingPage() {
                   marginBottom: 24,
                 }}>
                   {[
-                    { icon: "🔒", text: "Keine Kreditkarte für den Test" },
-                    { icon: "❌", text: "Jederzeit kündbar" },
-                    { icon: "⚡", text: "In 10 Minuten startklar" },
-                    { icon: "🇩🇪", text: "DSGVO-konform" },
+                    { icon: "", text: "Keine Kreditkarte für den Test" },
+                    { icon: "✗", text: "Jederzeit kündbar" },
+                    { icon: "", text: "In 10 Minuten startklar" },
+                    { icon: "DE", text: "DSGVO-konform" },
                   ].map((b, i) => (
                     <div key={i} style={{ display: "flex", alignItems: "center", gap: 7, fontSize: 13, color: C.muted, fontWeight: 500 }}>
                       <span>{b.icon}</span> {b.text}
@@ -1898,7 +1898,7 @@ export default function LandingPage() {
               <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap", marginBottom: 28 }}>
                 {REG_OPEN
                   ? <a href="/register" className="btn btn-white" style={{ fontSize: 16, padding: "16px 34px" }}>Jetzt kostenlos starten <span>→</span></a>
-                  : <span className="btn btn-white" style={{ fontSize: 16, padding: "16px 34px", opacity: 0.7, cursor: "default" }}>🔒 Bald verfügbar</span>
+                  : <span className="btn btn-white" style={{ fontSize: 16, padding: "16px 34px", opacity: 0.7, cursor: "default" }}> Bald verfügbar</span>
                 }
                 <a href="/login" className="btn btn-ghost-light" style={{ fontSize: 16, padding: "16px 28px" }}>
                   Bereits Kunde? Login

@@ -39,20 +39,22 @@ async function sendSMS(to: string, message: string): Promise<void> {
     }),
   })
 
-  // seven.io gibt HTTP 200 auch bei Fehlern zurück
-  // Erfolg = success "100", Fehler = "900", "902" etc.
-  const raw = await response.text()
-  let result: Record<string, unknown> = {}
-  try { result = JSON.parse(raw) } catch { /* raw response, not JSON */ }
-
   if (!response.ok) {
+    const raw = await response.text()
     throw new Error(`Seven.io HTTP ${response.status}: ${raw}`)
   }
 
-  // success "100" = OK; alles andere = Fehler
-  const success = String(result.success ?? "")
-  if (success !== "100") {
-    throw new Error(`Seven.io Fehlercode ${success}: ${raw}`)
+  // seven.io antwortet entweder:
+  //   - Plain text "100" (Erfolg) oder "900" (Fehler)
+  //   - JSON {"success":"100",...} wenn json=1 gesetzt (bei uns nicht)
+  // Wir prüfen den raw-Text direkt.
+  const raw = await response.text()
+  const code = raw.trim().startsWith("{")
+    ? (() => { try { return String((JSON.parse(raw) as any).success ?? raw.trim()) } catch { return raw.trim() } })()
+    : raw.trim()
+
+  if (code !== "100") {
+    throw new Error(`Seven.io Fehlercode ${code}: ${raw}`)
   }
 }
 
@@ -174,10 +176,10 @@ export async function GET(req: NextRequest) {
         await supabase.rpc("increment_sms_count", { company_id_input: a.company_id })
 
         sentCount++
-        console.log(`[reminder] ✅ SMS gesendet an ${a.phone} (Termin ${a.id})`)
+        console.log(`[reminder] ✓ SMS gesendet an ${a.phone} (Termin ${a.id})`)
 
       } catch (smsError: any) {
-        console.error(`[reminder] ❌ SMS fehlgeschlagen (Termin ${a.id}):`, smsError.message)
+        console.error(`[reminder] ✗ SMS fehlgeschlagen (Termin ${a.id}):`, smsError.message)
         // Nicht als "reminded" markieren — nächster Cron-Lauf versucht es erneut
       }
     }

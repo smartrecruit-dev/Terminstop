@@ -180,7 +180,7 @@ const [companyId, setCompanyId]     = useState<string | null>(null)
             </div>
             <a href="/settings"
               style={{ flexShrink:0, fontSize:13, fontWeight:700, color:"#18A66D", textDecoration:"none", background:"#F0FBF6", border:"1px solid #D1F5E3", borderRadius:10, padding:"7px 14px", whiteSpace:"nowrap" }}>
-              ⚙️ Buchungsseite einrichten →
+               Buchungsseite einrichten →
             </a>
           </div>
           <p className="text-sm text-[#6B7280] mt-1">
@@ -194,7 +194,7 @@ const [companyId, setCompanyId]     = useState<string | null>(null)
             background:"#fff", border:"2px dashed #E5E7EB", borderRadius:20,
             padding:"40px 28px", textAlign:"center", marginBottom:24
           }}>
-            <div style={{ fontSize:48, marginBottom:16 }}>🔗</div>
+            <div style={{ fontSize:48, marginBottom:16 }}></div>
             <h2 style={{ fontSize:18, fontWeight:800, color:"#1F2A37", marginBottom:8 }}>
               Online-Buchung ist noch nicht freigeschaltet
             </h2>
@@ -400,7 +400,7 @@ const [companyId, setCompanyId]     = useState<string | null>(null)
             </div>
           ) : services.length === 0 ? (
             <div className="px-5 py-12 text-center">
-              <div className="w-12 h-12 bg-[#F3F4F6] rounded-full flex items-center justify-center mx-auto mb-3 text-xl">✂️</div>
+              <div className="w-12 h-12 bg-[#F3F4F6] rounded-full flex items-center justify-center mx-auto mb-3 text-xl"></div>
               <p className="text-sm font-medium text-[#374151]">Noch keine Leistungen</p>
               <p className="text-xs text-[#9CA3AF] mt-1">Fügen Sie Ihre erste Leistung oben hinzu.</p>
             </div>
@@ -450,7 +450,7 @@ const [companyId, setCompanyId]     = useState<string | null>(null)
 
         {/* Sicherheitshinweis */}
         <div className="mt-5 bg-[#F0F9FF] border border-[#BAE6FD] rounded-xl px-4 py-3.5 flex gap-3">
-          <span className="text-lg shrink-0">🔒</span>
+          <span className="text-lg shrink-0"></span>
           <div>
             <p className="text-xs font-semibold text-[#0369A1] mb-0.5">Spam-Schutz aktiv</p>
             <p className="text-xs text-[#0369A1]/80 leading-relaxed">

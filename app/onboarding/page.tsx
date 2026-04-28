@@ -15,10 +15,10 @@ const BD = "#E8ECF1"
 const FONT = "-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', sans-serif"
 
 const STEPS = [
-  { id: 1, title: "Willkommen 👋",        sub: "Lass uns deinen Betrieb einrichten" },
+  { id: 1, title: "Willkommen ",        sub: "Lass uns deinen Betrieb einrichten" },
   { id: 2, title: "Erste Leistung",        sub: "Was bietest du an?" },
   { id: 3, title: "Buchungsseite",         sub: "Dein Link für Kunden" },
-  { id: 4, title: "Fertig! 🎉",            sub: "Alles bereit" },
+  { id: 4, title: "Fertig! ",            sub: "Alles bereit" },
 ]
 
 export default function OnboardingPage() {
@@ -165,7 +165,7 @@ export default function OnboardingPage() {
         {/* ── Step 1: Betrieb ── */}
         {step === 1 && (
           <div>
-            <div style={{ fontSize: 28, marginBottom: 4 }}>👋</div>
+            <div style={{ fontSize: 28, marginBottom: 4 }}></div>
             <h1 style={{ fontSize: 22, fontWeight: 900, color: T, margin: "0 0 6px" }}>Willkommen bei TerminStop!</h1>
             <p style={{ fontSize: 15, color: M, margin: "0 0 28px", lineHeight: 1.6 }}>
               Lass uns in 4 Schritten deinen Betrieb einrichten. Das dauert nur 2 Minuten.
@@ -212,7 +212,7 @@ export default function OnboardingPage() {
         {/* ── Step 2: Leistungen ── */}
         {step === 2 && (
           <div>
-            <div style={{ fontSize: 28, marginBottom: 4 }}>✂️</div>
+            <div style={{ fontSize: 28, marginBottom: 4 }}></div>
             <h2 style={{ fontSize: 22, fontWeight: 900, color: T, margin: "0 0 6px" }}>Deine Leistungen</h2>
             <p style={{ fontSize: 15, color: M, margin: "0 0 24px", lineHeight: 1.6 }}>
               Welche Leistungen können Kunden bei dir buchen? Du kannst jederzeit weitere hinzufügen.
@@ -275,7 +275,7 @@ export default function OnboardingPage() {
         {/* ── Step 3: Buchungsseite ── */}
         {step === 3 && (
           <div>
-            <div style={{ fontSize: 28, marginBottom: 4 }}>🔗</div>
+            <div style={{ fontSize: 28, marginBottom: 4 }}></div>
             <h2 style={{ fontSize: 22, fontWeight: 900, color: T, margin: "0 0 6px" }}>Deine Buchungsseite</h2>
             <p style={{ fontSize: 15, color: M, margin: "0 0 24px", lineHeight: 1.6 }}>
               Kunden können über diesen Link direkt bei dir buchen. Du kannst ihn später noch ändern.
@@ -322,7 +322,7 @@ export default function OnboardingPage() {
         {/* ── Step 4: Fertig ── */}
         {step === 4 && (
           <div style={{ textAlign: "center" }}>
-            <div style={{ fontSize: 56, marginBottom: 16 }}>🎉</div>
+            <div style={{ fontSize: 56, marginBottom: 16 }}></div>
             <h2 style={{ fontSize: 24, fontWeight: 900, color: T, margin: "0 0 12px" }}>Alles bereit!</h2>
             <p style={{ fontSize: 15, color: M, margin: "0 0 32px", lineHeight: 1.7 }}>
               Dein Betrieb ist eingerichtet. Du kannst jetzt Termine eintragen,<br />
@@ -331,9 +331,9 @@ export default function OnboardingPage() {
 
             <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 32 }}>
               {[
-                { icon: "📅", title: "Termine verwalten",      desc: "Trage deinen ersten Termin ein",         href: "/dashboard" },
-                { icon: "🔗", title: "Buchungsseite teilen",   desc: slug ? `terminstop.de/book/${slug}` : "Link in Einstellungen konfigurieren", href: slug ? `/book/${slug}` : "/settings" },
-                { icon: "💳", title: "Paket wählen",           desc: "14 Tage kostenlos — danach ab 39 €",    href: "/settings" },
+                { icon: "", title: "Termine verwalten",      desc: "Trage deinen ersten Termin ein",         href: "/dashboard" },
+                { icon: "", title: "Buchungsseite teilen",   desc: slug ? `terminstop.de/book/${slug}` : "Link in Einstellungen konfigurieren", href: slug ? `/book/${slug}` : "/settings" },
+                { icon: "", title: "Paket wählen",           desc: "14 Tage kostenlos — danach ab 39 €",    href: "/settings" },
               ].map(item => (
                 <a key={item.title} href={item.href} style={{ display: "flex", alignItems: "center", gap: 14, padding: "14px 18px", background: "#F9FAFB", border: `1px solid ${BD}`, borderRadius: 14, textDecoration: "none", transition: "border .15s" }}
                   onMouseEnter={e => (e.currentTarget.style.borderColor = GB)}

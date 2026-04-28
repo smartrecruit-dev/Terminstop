@@ -36,11 +36,11 @@ function PhoneDemo({ onComplete }: { onComplete?: (name: string, phone: string, 
   }
 
   const types = [
-    { id: "schnitt",  icon: "✂️", label: "Haarschnitt",    price: "ab 25 €", dur: "45 Min" },
-    { id: "farbe",    icon: "🎨", label: "Färben",          price: "ab 55 €", dur: "90 Min" },
-    { id: "pflege",   icon: "💆", label: "Pflege-Ritual",   price: "ab 40 €", dur: "60 Min" },
-    { id: "termin",   icon: "📅", label: "Freier Termin",   price: "kostenlos", dur: "frei" },
-    { id: "rueckruf", icon: "📞", label: "Rückruf anfragen", price: "kostenlos", dur: "–" },
+    { id: "schnitt",  icon: "", label: "Haarschnitt",    price: "ab 25 €", dur: "45 Min" },
+    { id: "farbe",    icon: "", label: "Färben",          price: "ab 55 €", dur: "90 Min" },
+    { id: "pflege",   icon: "", label: "Pflege-Ritual",   price: "ab 40 €", dur: "60 Min" },
+    { id: "termin",   icon: "", label: "Freier Termin",   price: "kostenlos", dur: "frei" },
+    { id: "rueckruf", icon: "", label: "Rückruf anfragen", price: "kostenlos", dur: "–" },
   ]
 
   const inp: React.CSSProperties = {
@@ -104,11 +104,11 @@ function PhoneDemo({ onComplete }: { onComplete?: (name: string, phone: string, 
             {step === 0 && (
               <div style={{ animation: "fadeUp .3s ease" }}>
                 <div style={{ textAlign: "center", padding: "12px 0 16px" }}>
-                  <div style={{ width: 52, height: 52, background: G.greenSoft, border: `2px solid ${G.greenBorder}`, borderRadius: 16, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, margin: "0 auto 10px" }}>✂️</div>
+                  <div style={{ width: 52, height: 52, background: G.greenSoft, border: `2px solid ${G.greenBorder}`, borderRadius: 16, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, margin: "0 auto 10px" }}></div>
                   <div style={{ fontSize: 14, fontWeight: 900, color: G.ink, marginBottom: 4, letterSpacing: "-.3px" }}>Termin anfragen</div>
                   <div style={{ fontSize: 9.5, color: G.muted, lineHeight: 1.5, marginBottom: 16 }}>In 2 Minuten — kein Account, keine App</div>
                   <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 5, marginBottom: 18 }}>
-                    {["🔒 Sicher", "⚡ 2 Min", "✓ Gratis"].map(t => (
+                    {[" Sicher", " 2 Min", "✓ Gratis"].map(t => (
                       <span key={t} style={{ fontSize: 8, fontWeight: 600, color: G.muted, background: "#fff", border: `1px solid ${G.border}`, borderRadius: 99, padding: "3px 8px" }}>{t}</span>
                     ))}
                   </div>
@@ -118,7 +118,7 @@ function PhoneDemo({ onComplete }: { onComplete?: (name: string, phone: string, 
                 </div>
                 {/* Ratings */}
                 <div style={{ background: "#fff", border: `1px solid ${G.border}`, borderRadius: 10, padding: "9px 12px", display: "flex", alignItems: "center", gap: 8 }}>
-                  <div style={{ display: "flex", gap: 1 }}>{"★★★★★".split("").map((s,i) => <span key={i} style={{ fontSize: 11, color: "#F59E0B" }}>{s}</span>)}</div>
+                  <div style={{ display: "flex", gap: 1 }}>{"5 Sterne".split("").map((s,i) => <span key={i} style={{ fontSize: 11, color: "#F59E0B" }}>{s}</span>)}</div>
                   <div>
                     <div style={{ fontSize: 8.5, fontWeight: 700, color: G.ink }}>4.9 · 128 Buchungen</div>
                     <div style={{ fontSize: 7.5, color: G.muted }}>Schnell & zuverlässig</div>
@@ -153,7 +153,7 @@ function PhoneDemo({ onComplete }: { onComplete?: (name: string, phone: string, 
                 <div style={{ display: "flex", flexDirection: "column", gap: 7, marginBottom: 10 }}>
                   {/* "Keine Präferenz" option */}
                   <button onClick={() => { setSelectedEmp(null); setStep(3) }} style={{ display: "flex", alignItems: "center", gap: 9, background: "#fff", border: `1.5px solid ${G.border}`, borderRadius: 9, padding: "8px 10px", cursor: "pointer", textAlign: "left", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}>
-                    <div style={{ width: 30, height: 30, background: "#F3F4F6", border: `1px solid ${G.border}`, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, flexShrink: 0 }}>✦</div>
+                    <div style={{ width: 30, height: 30, background: "#F3F4F6", border: `1px solid ${G.border}`, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, flexShrink: 0 }}></div>
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ fontSize: 10.5, fontWeight: 700, color: G.ink }}>Keine Präferenz</div>
                       <div style={{ fontSize: 8.5, color: G.muted }}>Nächster freier Mitarbeiter</div>
@@ -166,7 +166,7 @@ function PhoneDemo({ onComplete }: { onComplete?: (name: string, phone: string, 
                       <div style={{ width: 30, height: 30, background: emp.color, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 9.5, fontWeight: 800, color: "#fff", flexShrink: 0 }}>{emp.initials}</div>
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ fontSize: 10.5, fontWeight: 700, color: G.ink }}>{emp.name}</div>
-                        <div style={{ display: "flex", gap: 2 }}>{"★★★★★".split("").map((s,i) => <span key={i} style={{ fontSize: 7.5, color: "#F59E0B" }}>{s}</span>)}</div>
+                        <div style={{ display: "flex", gap: 2 }}>{"5 Sterne".split("").map((s,i) => <span key={i} style={{ fontSize: 7.5, color: "#F59E0B" }}>{s}</span>)}</div>
                       </div>
                       <span style={{ fontSize: 12, color: G.muted2 }}>›</span>
                     </button>
@@ -207,7 +207,7 @@ function PhoneDemo({ onComplete }: { onComplete?: (name: string, phone: string, 
                     </div>
                   </div>
                   <div style={{ background: "rgba(24,166,109,0.12)", border: "1px solid rgba(24,166,109,0.25)", borderRadius: 7, padding: "6px 9px", display: "flex", gap: 6, alignItems: "center" }}>
-                    <span style={{ fontSize: 10 }}>📱</span>
+                    <span style={{ fontSize: 10 }}></span>
                     <span style={{ fontSize: 8, color: "rgba(255,255,255,0.8)", fontWeight: 600 }}>SMS-Bestätigung nach Freigabe</span>
                   </div>
                   <button type="submit" disabled={sending} style={{ background: sending ? "rgba(255,255,255,0.2)" : `linear-gradient(135deg,${G.green},${G.greenDeep})`, color: "#fff", fontWeight: 800, fontSize: 10.5, border: "none", borderRadius: 9, padding: "9px", cursor: sending ? "not-allowed" : "pointer", boxShadow: sending ? "none" : "0 4px 12px rgba(24,166,109,0.3)" }}>
@@ -227,7 +227,7 @@ function PhoneDemo({ onComplete }: { onComplete?: (name: string, phone: string, 
                   Friseur Müller prüft den Wunschtermin und bestätigt kurz per SMS.
                 </div>
                 <div style={{ background: G.greenSoft, border: `1px solid ${G.greenBorder}`, borderRadius: 10, padding: "9px 12px", marginBottom: 14 }}>
-                  <div style={{ fontSize: 9, fontWeight: 700, color: G.green, marginBottom: 2 }}>📱 Sie bekommen eine SMS sobald bestätigt</div>
+                  <div style={{ fontSize: 9, fontWeight: 700, color: G.green, marginBottom: 2 }}> Sie bekommen eine SMS sobald bestätigt</div>
                   <div style={{ fontSize: 8.5, color: G.greenDeep }}>Normalerweise innerhalb von wenigen Minuten</div>
                 </div>
                 <button onClick={reset} style={{ fontSize: 9, color: G.muted, background: "none", border: "none", cursor: "pointer", textDecoration: "underline" }}>
@@ -269,7 +269,7 @@ function IncomingCard({ name, phone, date, time, visible }: { name: string; phon
     <div style={{ animation: "slideIn .5s ease", background: G.bg, border: `1px solid ${G.border}`, borderRadius: 16, overflow: "hidden", boxShadow: "0 4px 24px rgba(15,27,45,0.08)" }}>
       <div style={{ background: "#FFFBEB", borderBottom: "1px solid #FDE68A", padding: "10px 18px", display: "flex", alignItems: "center", gap: 8 }}>
         <span style={{ width: 8, height: 8, background: "#F59E0B", borderRadius: "50%", display: "inline-block", animation: "pulse 2s infinite" }} />
-        <span style={{ fontSize: 12.5, fontWeight: 800, color: "#92400E" }}>🔔 Neue Online-Anfrage</span>
+        <span style={{ fontSize: 12.5, fontWeight: 800, color: "#92400E" }}> Neue Online-Anfrage</span>
         <span style={{ fontSize: 11, color: "#B45309", marginLeft: "auto" }}>Gerade eben</span>
       </div>
       {confirmed ? (
@@ -282,7 +282,7 @@ function IncomingCard({ name, phone, date, time, visible }: { name: string; phon
         </div>
       ) : (
         <div style={{ padding: "16px 18px", display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
-          <div style={{ width: 42, height: 42, background: G.greenSoft, border: `1.5px solid ${G.greenBorder}`, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>✂️</div>
+          <div style={{ width: 42, height: 42, background: G.greenSoft, border: `1.5px solid ${G.greenBorder}`, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}></div>
           <div style={{ flex: 1, minWidth: 180 }}>
             <div style={{ fontSize: 15, fontWeight: 800, color: G.ink, marginBottom: 2 }}>{name}</div>
             <div style={{ fontSize: 12.5, color: G.muted }}>{phone} · {date} um {time} Uhr</div>
@@ -310,19 +310,19 @@ export default function BuchungDemo() {
   }
 
   const features = [
-    { icon: "🔗", title: "Eigene Buchungsseite", desc: "Ihre persönliche URL — z.B. terminstop.de/ihr-betrieb. Kunden buchen direkt, ohne anzurufen." },
-    { icon: "📲", title: "QR-Code inklusive", desc: "Drucken oder aufstellen. Kunden scannen den Code und landen sofort auf Ihrer Buchungsseite." },
-    { icon: "📥", title: "Anfragen im Dashboard", desc: "Alle Buchungsanfragen landen direkt bei Ihnen. Ein Klick genügt zur Bestätigung." },
-    { icon: "✉️", title: "Automatische SMS", desc: "Sobald Sie bestätigen, bekommt der Kunde eine SMS — komplett automatisch, ohne Ihr Zutun." },
-    { icon: "🗂️", title: "Leistungen auswählen", desc: "Kunden wählen aus Ihren Leistungen oder fragen einen offenen Wunschtermin an." },
-    { icon: "📞", title: "Rückruf-Funktion", desc: "Keine Zeit für eine Buchung? Kunden können auch einen Rückruf anfragen." },
+    { icon: "", title: "Eigene Buchungsseite", desc: "Ihre persönliche URL — z.B. terminstop.de/ihr-betrieb. Kunden buchen direkt, ohne anzurufen." },
+    { icon: "", title: "QR-Code inklusive", desc: "Drucken oder aufstellen. Kunden scannen den Code und landen sofort auf Ihrer Buchungsseite." },
+    { icon: "", title: "Anfragen im Dashboard", desc: "Alle Buchungsanfragen landen direkt bei Ihnen. Ein Klick genügt zur Bestätigung." },
+    { icon: "", title: "Automatische SMS", desc: "Sobald Sie bestätigen, bekommt der Kunde eine SMS — komplett automatisch, ohne Ihr Zutun." },
+    { icon: "", title: "Leistungen auswählen", desc: "Kunden wählen aus Ihren Leistungen oder fragen einen offenen Wunschtermin an." },
+    { icon: "", title: "Rückruf-Funktion", desc: "Keine Zeit für eine Buchung? Kunden können auch einen Rückruf anfragen." },
   ]
 
   const howItWorks = [
-    { step: "01", icon: "📲", title: "Kunde öffnet die Seite", desc: "Per Link in der Bio, per QR-Code an der Kasse oder im Schaufenster — jederzeit, auf jedem Gerät.", color: "#EEF2FF", border: "#C7D2FE", iconBg: "#6366F1" },
-    { step: "02", icon: "✏️", title: "Buchung in 2 Minuten", desc: "Leistung wählen, Name und Wunschtermin eingeben — kein Account, keine App, keine Hürde.", color: "#FFF7ED", border: "#FED7AA", iconBg: "#F97316" },
-    { step: "03", icon: "🔔", title: "Sie werden benachrichtigt", desc: "Die Anfrage erscheint sofort in Ihrem Dashboard. Sie bestätigen mit einem einzigen Klick.", color: "#F0FBF6", border: "#D1F5E3", iconBg: "#18A66D" },
-    { step: "04", icon: "📱", title: "Kunde bekommt SMS", desc: "Automatisch, sofort, ohne Ihr Zutun. Der Kunde ist informiert — Sie haben einen neuen Termin.", color: "#FFFBEB", border: "#FDE68A", iconBg: "#F59E0B" },
+    { step: "01", icon: "", title: "Kunde öffnet die Seite", desc: "Per Link in der Bio, per QR-Code an der Kasse oder im Schaufenster — jederzeit, auf jedem Gerät.", color: "#EEF2FF", border: "#C7D2FE", iconBg: "#6366F1" },
+    { step: "02", icon: "", title: "Buchung in 2 Minuten", desc: "Leistung wählen, Name und Wunschtermin eingeben — kein Account, keine App, keine Hürde.", color: "#FFF7ED", border: "#FED7AA", iconBg: "#F97316" },
+    { step: "03", icon: "", title: "Sie werden benachrichtigt", desc: "Die Anfrage erscheint sofort in Ihrem Dashboard. Sie bestätigen mit einem einzigen Klick.", color: "#F0FBF6", border: "#D1F5E3", iconBg: "#18A66D" },
+    { step: "04", icon: "", title: "Kunde bekommt SMS", desc: "Automatisch, sofort, ohne Ihr Zutun. Der Kunde ist informiert — Sie haben einen neuen Termin.", color: "#FFFBEB", border: "#FDE68A", iconBg: "#F59E0B" },
   ]
 
   return (
@@ -370,7 +370,7 @@ export default function BuchungDemo() {
 
       {/* ── Demo Banner ── */}
       <div style={{ background: "linear-gradient(90deg,#7C3AED,#9333EA)", color: "#fff", padding: "10px 24px", display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: 13, fontWeight: 600, gap: 12, flexWrap: "wrap" }}>
-        <span>🎭 Demo-Modus – Alle Daten sind fiktiv</span>
+        <span> Demo-Modus – Alle Daten sind fiktiv</span>
         <a href="/register" style={{ background: "#fff", color: "#7C3AED", padding: "6px 16px", borderRadius: 8, fontWeight: 700, textDecoration: "none", fontSize: 12 }}>
           Kostenlos registrieren →
         </a>
@@ -509,10 +509,10 @@ export default function BuchungDemo() {
                 </p>
                 <div style={{ display: "flex", flexDirection: "column" as const, gap: 14 }}>
                   {[
-                    { icon: "👆", title: "1 — Seite öffnen", desc: "Über Link, QR-Code oder direkt aus Ihrer Instagram-Bio." },
-                    { icon: "✏️", title: "2 — Leistung wählen & Daten eingeben", desc: "Klick auf eine Leistung, Name und Wunschtermin — fertig." },
-                    { icon: "📥", title: "3 — Anfrage landet bei Ihnen", desc: "Sofort im Dashboard, sichtbar auf dem Smartphone — ein Klick zur Bestätigung." },
-                    { icon: "📱", title: "4 — Automatische SMS an den Kunden", desc: "Der Kunde ist informiert. Sie haben einen neuen Termin im Kalender." },
+                    { icon: "", title: "1 — Seite öffnen", desc: "Über Link, QR-Code oder direkt aus Ihrer Instagram-Bio." },
+                    { icon: "", title: "2 — Leistung wählen & Daten eingeben", desc: "Klick auf eine Leistung, Name und Wunschtermin — fertig." },
+                    { icon: "", title: "3 — Anfrage landet bei Ihnen", desc: "Sofort im Dashboard, sichtbar auf dem Smartphone — ein Klick zur Bestätigung." },
+                    { icon: "", title: "4 — Automatische SMS an den Kunden", desc: "Der Kunde ist informiert. Sie haben einen neuen Termin im Kalender." },
                   ].map((item, i) => (
                     <div key={i} style={{ display: "flex", gap: 14, alignItems: "flex-start" }}>
                       <div style={{ width: 36, height: 36, background: G.greenSoft, border: `1.5px solid ${G.greenBorder}`, borderRadius: 9, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15, flexShrink: 0 }}>{item.icon}</div>
@@ -532,7 +532,7 @@ export default function BuchungDemo() {
                 </div>
                 {!showIncoming ? (
                   <div style={{ background: G.bg2, border: `2px dashed ${G.border}`, borderRadius: 16, padding: "28px", textAlign: "center" }}>
-                    <div style={{ fontSize: 28, marginBottom: 8 }}>👆</div>
+                    <div style={{ fontSize: 28, marginBottom: 8 }}></div>
                     <div style={{ fontSize: 14, fontWeight: 600, color: G.muted }}>Schicken Sie die Demo-Anfrage ab</div>
                     <div style={{ fontSize: 13, color: G.muted2, marginTop: 4 }}>und sehen Sie hier, was in Ihrem Dashboard landet.</div>
                   </div>
@@ -561,12 +561,12 @@ export default function BuchungDemo() {
           <div className="demo-usecases-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 16 }}>
             {[
               {
-                icon: "🪟", title: "Schaufenster & Kasse",
+                icon: "", title: "Schaufenster & Kasse",
                 badge: "Meistgenutzt", badgeColor: G.green,
                 desc: "Stellen Sie den QR-Code auf die Theke oder kleben Sie ihn ins Schaufenster. Kunden scannen und buchen während sie warten.",
                 visual: (
                   <div style={{ background: "#1a1a2e", borderRadius: 12, padding: "14px 16px", marginBottom: 14, display: "flex", alignItems: "center", gap: 10 }}>
-                    <div style={{ width: 36, height: 36, background: "#2a2a3e", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, flexShrink: 0 }}>🪟</div>
+                    <div style={{ width: 36, height: 36, background: "#2a2a3e", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, flexShrink: 0 }}></div>
                     <div>
                       <div style={{ width: 80, height: 7, background: "rgba(255,255,255,0.15)", borderRadius: 99, marginBottom: 5 }} />
                       <div style={{ width: 52, height: 5, background: "rgba(255,255,255,0.08)", borderRadius: 99 }} />
@@ -583,33 +583,33 @@ export default function BuchungDemo() {
                 ),
               },
               {
-                icon: "📸", title: "Instagram Bio & Stories",
+                icon: "", title: "Instagram Bio & Stories",
                 badge: "Beliebt", badgeColor: "#E1306C",
                 desc: "Link in der Bio oder in der Story — Kunden tippen drauf und landen direkt auf Ihrer Buchungsseite. Kein Umweg, keine Erklärung nötig.",
                 visual: (
                   <div style={{ background: "linear-gradient(135deg, #405DE6, #E1306C)", borderRadius: 12, padding: "14px 16px", marginBottom: 14 }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-                      <div style={{ width: 28, height: 28, background: "rgba(255,255,255,0.2)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12 }}>✂️</div>
+                      <div style={{ width: 28, height: 28, background: "rgba(255,255,255,0.2)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12 }}></div>
                       <div>
                         <div style={{ fontSize: 10, fontWeight: 700, color: "#fff" }}>friseur_mueller</div>
                         <div style={{ fontSize: 8.5, color: "rgba(255,255,255,0.6)" }}>terminstop.de/friseur-mueller</div>
                       </div>
                     </div>
-                    <div style={{ background: "rgba(255,255,255,0.15)", borderRadius: 7, padding: "6px 10px", fontSize: 9.5, fontWeight: 700, color: "#fff", textAlign: "center" as const }}>🔗 Jetzt Termin buchen →</div>
+                    <div style={{ background: "rgba(255,255,255,0.15)", borderRadius: 7, padding: "6px 10px", fontSize: 9.5, fontWeight: 700, color: "#fff", textAlign: "center" as const }}> Jetzt Termin buchen →</div>
                   </div>
                 ),
               },
               {
-                icon: "🗺️", title: "Google Maps Profil",
+                icon: "", title: "Google Maps Profil",
                 badge: "Empfohlen", badgeColor: "#4285F4",
                 desc: "Fügen Sie den Link in Ihr Google Business Profil ein. Kunden die Sie bei Google suchen, können direkt buchen — ohne anzurufen.",
                 visual: (
                   <div style={{ background: "#fff", border: `1px solid ${G.border}`, borderRadius: 12, padding: "12px 14px", marginBottom: 14, boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-                      <div style={{ width: 32, height: 32, background: "#FEEBC8", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14 }}>📍</div>
+                      <div style={{ width: 32, height: 32, background: "#FEEBC8", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14 }}></div>
                       <div>
                         <div style={{ fontSize: 11, fontWeight: 700, color: G.ink }}>Friseur Müller</div>
-                        <div style={{ display: "flex", gap: 1 }}>{"★★★★★".split("").map((s,i) => <span key={i} style={{ fontSize: 8, color: "#F59E0B" }}>{s}</span>)}</div>
+                        <div style={{ display: "flex", gap: 1 }}>{"5 Sterne".split("").map((s,i) => <span key={i} style={{ fontSize: 8, color: "#F59E0B" }}>{s}</span>)}</div>
                       </div>
                     </div>
                     <div style={{ background: G.green, borderRadius: 6, padding: "5px 10px", fontSize: 9, fontWeight: 700, color: "#fff", textAlign: "center" as const }}>Termin buchen</div>
@@ -617,30 +617,30 @@ export default function BuchungDemo() {
                 ),
               },
               {
-                icon: "💬", title: "WhatsApp & Direktnachricht",
+                icon: "", title: "WhatsApp & Direktnachricht",
                 badge: "Schnell eingerichtet", badgeColor: "#25D366",
                 desc: "Schicken Sie den Buchungslink direkt per WhatsApp an bestehende Kunden. Kein hin und her, kein Warten auf eine Antwort.",
                 visual: (
                   <div style={{ background: "#ECE5DD", borderRadius: 12, padding: "12px 14px", marginBottom: 14 }}>
                     <div style={{ background: "#DCF8C6", borderRadius: "10px 10px 0 10px", padding: "8px 12px", marginBottom: 6, maxWidth: "80%", marginLeft: "auto" }}>
-                      <div style={{ fontSize: 9.5, color: "#111827", marginBottom: 3 }}>Hier ist dein Buchungslink 😊</div>
+                      <div style={{ fontSize: 9.5, color: "#111827", marginBottom: 3 }}>Hier ist dein Buchungslink </div>
                       <div style={{ fontSize: 8.5, color: G.greenDeep, fontWeight: 600 }}>terminstop.de/friseur-mueller</div>
                     </div>
                     <div style={{ background: "#fff", borderRadius: "10px 10px 10px 0", padding: "8px 12px", maxWidth: "70%" }}>
-                      <div style={{ fontSize: 9.5, color: "#111827" }}>Danke! Gleich gebucht 👍</div>
+                      <div style={{ fontSize: 9.5, color: "#111827" }}>Danke! Gleich gebucht </div>
                     </div>
                   </div>
                 ),
               },
               {
-                icon: "🖨️", title: "Visitenkarte & Flyer",
+                icon: "", title: "Visitenkarte & Flyer",
                 badge: "Offline", badgeColor: "#8B5CF6",
                 desc: "Drucken Sie die URL oder den QR-Code auf Ihre Visitenkarte, Flyer oder Gutscheine. Kunden haben alles dabei, wenn sie buchen möchten.",
                 visual: (
                   <div style={{ background: "linear-gradient(135deg, #1e1b4b, #312e81)", borderRadius: 12, padding: "14px 16px", marginBottom: 14 }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                       <div>
-                        <div style={{ fontSize: 11, fontWeight: 900, color: "#fff", marginBottom: 3 }}>✂️ Friseur Müller</div>
+                        <div style={{ fontSize: 11, fontWeight: 900, color: "#fff", marginBottom: 3 }}> Friseur Müller</div>
                         <div style={{ fontSize: 8, color: "rgba(255,255,255,0.5)", marginBottom: 6 }}>Musterstraße 12, München</div>
                         <div style={{ fontSize: 8.5, color: "#a5b4fc", fontWeight: 600 }}>terminstop.de/friseur-mueller</div>
                       </div>
@@ -655,7 +655,7 @@ export default function BuchungDemo() {
                 ),
               },
               {
-                icon: "🌐", title: "Eigene Website",
+                icon: "", title: "Eigene Website",
                 badge: "Professionell", badgeColor: "#0EA5E9",
                 desc: "Fügen Sie den Link oder ein Buchungs-Button auf Ihrer Website ein. Besucher buchen direkt — ohne dass sie woanders hin müssen.",
                 visual: (
@@ -730,7 +730,7 @@ export default function BuchungDemo() {
                   {/* SMS header */}
                   <div style={{ background: "#fff", padding: "12px 14px 8px", borderBottom: "1px solid #E5E7EB" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                      <div style={{ width: 36, height: 36, background: "linear-gradient(135deg,#18A66D,#15955F)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, flexShrink: 0 }}>✂️</div>
+                      <div style={{ width: 36, height: 36, background: "linear-gradient(135deg,#18A66D,#15955F)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, flexShrink: 0 }}></div>
                       <div>
                         <div style={{ fontSize: 12, fontWeight: 800, color: G.ink }}>TerminStop</div>
                         <div style={{ fontSize: 9, color: G.muted }}>SMS Benachrichtigung</div>
@@ -744,9 +744,9 @@ export default function BuchungDemo() {
                       <div style={{ marginBottom: 4 }}>Hallo Max,</div>
                       <div style={{ marginBottom: 8 }}>Ihr Termin bei <strong>Friseur Müller</strong> wurde bestätigt:</div>
                       <div style={{ background: "#fff", borderRadius: 8, padding: "8px 10px", marginBottom: 8 }}>
-                        <div style={{ fontSize: 10.5, fontWeight: 700, color: G.ink }}>📅 Montag, 28. April</div>
-                        <div style={{ fontSize: 10.5, fontWeight: 700, color: G.ink }}>⏰ 10:00 Uhr</div>
-                        <div style={{ fontSize: 10.5, fontWeight: 700, color: G.ink }}>✂️ Haarschnitt</div>
+                        <div style={{ fontSize: 10.5, fontWeight: 700, color: G.ink }}> Montag, 28. April</div>
+                        <div style={{ fontSize: 10.5, fontWeight: 700, color: G.ink }}> 10:00 Uhr</div>
+                        <div style={{ fontSize: 10.5, fontWeight: 700, color: G.ink }}> Haarschnitt</div>
                       </div>
                       <div style={{ fontSize: 9.5, color: G.muted }}>Wir freuen uns auf Sie!</div>
                     </div>
@@ -796,7 +796,7 @@ export default function BuchungDemo() {
                 <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.5)", textAlign: "center" }}>terminstop.de/friseur-mueller</div>
               </div>
               <div style={{ marginTop: 16, display: "flex", gap: 10, justifyContent: "center" }}>
-                {["📱 Scannen", "🖨️ Drucken", "🪟 Aufstellen"].map(t => (
+                {[" Scannen", " Drucken", " Aufstellen"].map(t => (
                   <span key={t} style={{ fontSize: 11.5, fontWeight: 600, color: G.muted, background: G.bg, border: `1px solid ${G.border}`, borderRadius: 99, padding: "5px 12px" }}>{t}</span>
                 ))}
               </div>

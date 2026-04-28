@@ -46,13 +46,13 @@ type Lead = {
 }
 
 const LEAD_STATUS: Record<LeadStatus, { label: string; color: string; bg: string; border: string; emoji: string }> = {
-  neu:             { emoji: "🔵", label: "Neu",              color: "#6B7280", bg: "#F9FAFB", border: BD        },
-  angerufen:       { emoji: "📞", label: "Angerufen",        color: "#3B82F6", bg: "#EFF6FF", border: "#BFDBFE" },
-  nicht_erreicht:  { emoji: "📵", label: "Nicht erreicht",   color: "#D97706", bg: "#FFFBEB", border: "#FDE68A" },
-  interesse:       { emoji: "💬", label: "Interesse",        color: "#7C3AED", bg: "#F5F3FF", border: "#DDD6FE" },
-  kein_interesse:  { emoji: "❌", label: "Kein Interesse",   color: M,         bg: "#F3F4F6", border: BD        },
-  termin:          { emoji: "📅", label: "Termin vereinbart",color: "#D97706", bg: "#FFF7ED", border: "#FED7AA" },
-  kunde:           { emoji: "✅", label: "Kunde geworden",   color: G,         bg: GL,        border: GB        },
+  neu:             { emoji: "", label: "Neu",              color: "#6B7280", bg: "#F9FAFB", border: BD        },
+  angerufen:       { emoji: "", label: "Angerufen",        color: "#3B82F6", bg: "#EFF6FF", border: "#BFDBFE" },
+  nicht_erreicht:  { emoji: "", label: "Nicht erreicht",   color: "#D97706", bg: "#FFFBEB", border: "#FDE68A" },
+  interesse:       { emoji: "", label: "Interesse",        color: "#7C3AED", bg: "#F5F3FF", border: "#DDD6FE" },
+  kein_interesse:  { emoji: "✗", label: "Kein Interesse",   color: M,         bg: "#F3F4F6", border: BD        },
+  termin:          { emoji: "", label: "Termin vereinbart",color: "#D97706", bg: "#FFF7ED", border: "#FED7AA" },
+  kunde:           { emoji: "✓", label: "Kunde geworden",   color: G,         bg: GL,        border: GB        },
 }
 
 const LEAD_CATEGORIES = [
@@ -83,43 +83,43 @@ type ScriptBlock = {
 }
 
 const DEFAULT_SCRIPT: ScriptBlock[] = [
-  { id: "1", title: "1️⃣  Einstieg – Name + Begrüßung", bg: "#ECFDF5", border: "#6EE7B7",
+  { id: "1", title: "1⃣  Einstieg – Name + Begrüßung", bg: "#ECFDF5", border: "#6EE7B7",
     tip: "Ruhig, freundlich, klar. Warte bis die Person ihren Namen sagt.",
     text: '"Schönen guten Tag, mein Name ist Marvin Passe – ich grüße Sie herzlich!"',
     sub: '→ Person sagt ihren Namen\n→ Du: "Frau / Herr [Name], schön, dass Sie rangehen."' },
-  { id: "2", title: "2️⃣  Transparenz-Opener – Der Vertrauens-Booster", bg: "#FFFBEB", border: "#FDE68A",
+  { id: "2", title: "2⃣  Transparenz-Opener – Der Vertrauens-Booster", bg: "#FFFBEB", border: "#FDE68A",
     tip: "Hier lachen die meisten – genau das will man. Kurz Pause lassen nach dem Lachen.",
-    text: '"Ich muss direkt ehrlich zu Ihnen sein – das ist ein Akquiseanruf. 😄\nMöchten Sie jetzt gleich auflegen … oder geben Sie mir 30 Sekunden,\num Ihnen zu erklären worum es geht?"',
+    text: '"Ich muss direkt ehrlich zu Ihnen sein – das ist ein Akquiseanruf. \nMöchten Sie jetzt gleich auflegen … oder geben Sie mir 30 Sekunden,\num Ihnen zu erklären worum es geht?"',
     sub: '→ Fast alle sagen "Na gut, 30 Sekunden" – dann direkt in den Pitch.' },
-  { id: "3", title: "3️⃣  Der 30-Sekunden-Pitch", bg: "#EFF6FF", border: "#BFDBFE",
+  { id: "3", title: "3⃣  Der 30-Sekunden-Pitch", bg: "#EFF6FF", border: "#BFDBFE",
     tip: "Konkret bleiben. Kein Fachjargon. Auf die Uhr schauen – wirklich 30 Sek.",
     text: '"Wir helfen kleinen Betrieben – Friseuren, Kosmetikstudios, Praxen –\ndabei, dass Kunden ihre Termine nicht mehr vergessen.\nTerminStop sendet automatisch eine SMS-Erinnerung, 24 Stunden vorher.\nKein Aufwand, keine App, läuft komplett im Hintergrund.\nAb unter 2 Euro am Tag."',
     sub: "" },
-  { id: "4", title: "4️⃣  Qualifizieren – Haben die das Problem?", bg: GL, border: GB,
+  { id: "4", title: "4⃣  Qualifizieren – Haben die das Problem?", bg: GL, border: GB,
     tip: "Fragen stellen statt reden. Wer fragt, führt das Gespräch.",
     text: '"Kennen Sie das – Kunden die einfach nicht erscheinen oder 10 Minuten vorher absagen?"',
     sub: '→ JA: "Genau das lösen wir."\n→ NEIN: "Wie machen Sie das aktuell? Rufen Sie vorher manuell an?"' },
-  { id: "5", title: "5️⃣  Konkret machen – Nutzen zeigen", bg: "#F5F3FF", border: "#DDD6FE",
+  { id: "5", title: "5⃣  Konkret machen – Nutzen zeigen", bg: "#F5F3FF", border: "#DDD6FE",
     tip: "Zahlen wirken. Lass sie kurz rechnen.",
     text: '"Stellen Sie sich vor, nur ein Termin pro Woche fällt nicht mehr aus –\nbei einem Durchschnittsumsatz von 40 € wären das über 160 € mehr im Monat.\nDas System kostet einen Bruchteil davon."',
     sub: "" },
-  { id: "6", title: "6️⃣  Abschluss – Nächster Schritt", bg: GL, border: GB,
+  { id: "6", title: "6⃣  Abschluss – Nächster Schritt", bg: GL, border: GB,
     tip: "Nicht fragen OB sie wollen – fragen WIE es weitergeht.",
     text: '"Ich richte Sie in 2 Minuten ein – ich brauche nur Ihren Namen,\nIhre E-Mail-Adresse und Ihre Handynummer.\nDann können Sie heute noch loslegen. Darf ich das kurz machen?"',
     sub: "" },
-  { id: "7", title: '🔄  Einwand: "Kein Interesse"', bg: "#FEF2F2", border: "#FECACA",
+  { id: "7", title: '  Einwand: "Kein Interesse"', bg: "#FEF2F2", border: "#FECACA",
     tip: "Nicht aufgeben – noch eine Frage stellen.",
     text: '"Verstehe ich völlig. Darf ich kurz fragen –\nwie läuft das bei Ihnen aktuell? Rufen Sie Kunden vor dem Termin manuell an,\noder läuft das bei Ihnen problemlos?"',
     sub: '→ Falls manuell: "Das ist ja ganz schön Aufwand – genau das nehmen wir Ihnen ab."' },
-  { id: "8", title: '🔄  Einwand: "Zu teuer"', bg: "#FEF2F2", border: "#FECACA",
+  { id: "8", title: '  Einwand: "Zu teuer"', bg: "#FEF2F2", border: "#FECACA",
     tip: "Perspektive verschieben – vom Preis zum Nutzen.",
     text: '"Das verstehe ich. Wenn ich Ihnen sage: unter 2 Euro am Tag –\ndas ist weniger als eine Tasse Kaffee.\nUnd wenn nur ein Termin pro Woche nicht mehr ausfällt,\nhat sich das schon mehrfach gerechnet.\nWir können auch klein anfangen – einfach testen."',
     sub: "" },
-  { id: "9", title: '🔄  Einwand: "Ich muss das erst überlegen"', bg: "#FEF2F2", border: "#FECACA",
+  { id: "9", title: '  Einwand: "Ich muss das erst überlegen"', bg: "#FEF2F2", border: "#FECACA",
     tip: "Verbindlichen nächsten Schritt vereinbaren, nicht einfach auflegen.",
     text: '"Klar, das ist absolut verständlich. Was wäre denn das Konkrete,\nüber das Sie noch nachdenken möchten? Vielleicht kann ich das direkt klären.\nOder: Wann passt es Ihnen, dass ich kurz nochmal anrufe?"',
     sub: "" },
-  { id: "10", title: "✅  Ziel des Anrufs", bg: GL, border: GB,
+  { id: "10", title: "✓  Ziel des Anrufs", bg: GL, border: GB,
     tip: "",
     text: "Name + E-Mail + Handynummer → direkt in Supabase anlegen → Betrieb ist sofort live.\nDer Kunde bekommt von dir eine E-Mail mit den Login-Daten.",
     sub: "" },
@@ -398,13 +398,13 @@ export default function AdminPage() {
         body: JSON.stringify(newBetrieb),
       })
       const data = await res.json()
-      if (!res.ok) { showToast("❌ " + (data.error || "Fehler"), false); return }
+      if (!res.ok) { showToast("✗ " + (data.error || "Fehler"), false); return }
       setCreateResult({ email: data.email, password: data.password, name: data.name })
       setNewBetrieb({ name: "", email: "", password: "", phone: "" })
       loadCompanies()
-      showToast(`✅ ${data.name} wurde angelegt!`)
+      showToast(`✓ ${data.name} wurde angelegt!`)
     } catch (err: any) {
-      showToast("❌ " + err.message, false)
+      showToast("✗ " + err.message, false)
     } finally {
       setCreating(false)
     }
@@ -547,11 +547,11 @@ export default function AdminPage() {
     <div style={{ minHeight: "100dvh", background: BG, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Inter','Manrope',sans-serif" }}>
       <div style={{ background: "#fff", border: `1px solid ${BD}`, borderRadius: 24, padding: "44px 36px", width: "100%", maxWidth: 380, boxShadow: "0 8px 40px rgba(0,0,0,0.08)" }}>
         <div style={{ textAlign: "center", marginBottom: 32 }}>
-          <div style={{ fontSize: 40, marginBottom: 10 }}>🛡️</div>
+          <div style={{ fontSize: 40, marginBottom: 10 }}></div>
           <div style={{ fontSize: 22, fontWeight: 900 }}><span style={{ color: G }}>Termin</span><span style={{ color: T }}>Stop</span></div>
           <div style={{ fontSize: 13, color: M, marginTop: 4 }}>Admin-Kommandozentrale</div>
         </div>
-        {authError && <div style={{ background: "#FEF2F2", border: "1px solid #FECACA", borderRadius: 10, padding: "10px 14px", marginBottom: 16, fontSize: 13, color: RED }}>⚠️ {authError}</div>}
+        {authError && <div style={{ background: "#FEF2F2", border: "1px solid #FECACA", borderRadius: 10, padding: "10px 14px", marginBottom: 16, fontSize: 13, color: RED }}>! {authError}</div>}
         <form onSubmit={handleAuth} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
           <input type="password" value={secret} onChange={e => setSecret(e.target.value)}
             placeholder="Admin-Passwort" style={{ ...inp, fontSize: 15, padding: "14px 16px" }} autoFocus />
@@ -580,13 +580,13 @@ export default function AdminPage() {
           </span>
           <div style={{ display: "flex", gap: 2 }}>
             {([
-              ["zentrale",   "📊 Zentrale"],
-              ["betriebe",   "🏢 Betriebe"],
-              ["coldcall",   "📞 Skript"],
-              ["rueckrufe",  "📋 Rückrufe"],
-              ["leads",      "🔍 Lead-Finder"],
-              ["prozesse",   "📖 Prozesse"],
-              ["notizen",    "📝 Notizen"],
+              ["zentrale",   " Zentrale"],
+              ["betriebe",   " Betriebe"],
+              ["coldcall",   " Skript"],
+              ["rueckrufe",  " Rückrufe"],
+              ["leads",      " Lead-Finder"],
+              ["prozesse",   " Prozesse"],
+              ["notizen",    " Notizen"],
             ] as [Tab, string][]).map(([t, label]) => (
               <button key={t} onClick={() => setTab(t)} style={{
                 padding: "6px 12px", borderRadius: 8, border: "none", cursor: "pointer",
@@ -617,7 +617,7 @@ export default function AdminPage() {
         {/* ════ ZENTRALE ════ */}
         {tab === "zentrale" && (
           <>
-            <h1 style={{ fontSize: 22, fontWeight: 900, color: T, margin: "0 0 20px", letterSpacing: "-.5px" }}>Kommandozentrale 🛡️</h1>
+            <h1 style={{ fontSize: 22, fontWeight: 900, color: T, margin: "0 0 20px", letterSpacing: "-.5px" }}>Kommandozentrale </h1>
 
             {/* MRR Banner */}
             <div style={{ background: `linear-gradient(135deg, ${G}, #15955F)`, borderRadius: 20, padding: "24px 28px", marginBottom: 20, color: "#fff", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 16 }}>
@@ -639,12 +639,12 @@ export default function AdminPage() {
             {/* KPI Grid */}
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 12, marginBottom: 24 }}>
               {[
-                { icon: "🏢", label: "Betriebe gesamt",  value: companies.length,                    color: T },
-                { icon: "✅", label: "Aktiv",             value: activeCount,                         color: G },
-                { icon: "🔖", label: "Buchungs-Add-on",  value: addonCount,                          color: "#3B82F6" },
-                { icon: "📱", label: "SMS dieser Monat", value: totalSMSMonth.toLocaleString("de"),  color: smsWarnList.length > 0 ? "#D97706" : T },
-                { icon: "📅", label: "Termine gesamt",   value: totalAppts.toLocaleString("de"),     color: T },
-                { icon: "👥", label: "Kunden gesamt",    value: totalCusts.toLocaleString("de"),     color: T },
+                { icon: "", label: "Betriebe gesamt",  value: companies.length,                    color: T },
+                { icon: "✓", label: "Aktiv",             value: activeCount,                         color: G },
+                { icon: "", label: "Buchungs-Add-on",  value: addonCount,                          color: "#3B82F6" },
+                { icon: "", label: "SMS dieser Monat", value: totalSMSMonth.toLocaleString("de"),  color: smsWarnList.length > 0 ? "#D97706" : T },
+                { icon: "", label: "Termine gesamt",   value: totalAppts.toLocaleString("de"),     color: T },
+                { icon: "", label: "Kunden gesamt",    value: totalCusts.toLocaleString("de"),     color: T },
               ].map(k => (
                 <div key={k.label} style={{ background: "#fff", border: `1px solid ${BD}`, borderRadius: 16, padding: "18px 20px", boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}>
                   <div style={{ fontSize: 24, marginBottom: 6 }}>{k.icon}</div>
@@ -657,7 +657,7 @@ export default function AdminPage() {
             {/* SMS Nachberechnung Banner — über Limit */}
             {smsOverList.length > 0 && (
               <div style={{ background: "#FEF2F2", border: "1px solid #FECACA", borderRadius: 14, padding: "14px 20px", marginBottom: 10, display: "flex", alignItems: "center", gap: 14 }}>
-                <span style={{ fontSize: 22, flexShrink: 0 }}>🔴</span>
+                <span style={{ fontSize: 22, flexShrink: 0 }}></span>
                 <div style={{ flex: 1 }}>
                   <div style={{ fontSize: 13, fontWeight: 800, color: RED, marginBottom: 4 }}>
                     {smsOverList.length} Betrieb{smsOverList.length > 1 ? "e" : ""} über SMS-Limit → Nachberechnung (0,10 €/SMS)
@@ -680,7 +680,7 @@ export default function AdminPage() {
             {/* SMS-Warnung Banner — nahe am Limit (90%) */}
             {smsWarnList.filter(c => (c.sms_count_month || 0) <= (c.sms_limit || 200)).length > 0 && (
               <div style={{ background: "#FFFBEB", border: "1px solid #FDE68A", borderRadius: 14, padding: "14px 20px", marginBottom: 16, display: "flex", alignItems: "center", gap: 14 }}>
-                <span style={{ fontSize: 22, flexShrink: 0 }}>⚠️</span>
+                <span style={{ fontSize: 22, flexShrink: 0 }}>!</span>
                 <div style={{ flex: 1 }}>
                   <div style={{ fontSize: 13, fontWeight: 800, color: "#92400E", marginBottom: 4 }}>
                     Betriebe nahe am SMS-Limit (90%+)
@@ -703,7 +703,7 @@ export default function AdminPage() {
               {/* Risiko-Betriebe */}
               <div style={{ background: "#fff", border: `1px solid ${BD}`, borderRadius: 20, overflow: "hidden", boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}>
                 <div style={{ padding: "14px 20px", borderBottom: `1px solid ${BD}`, display: "flex", alignItems: "center", gap: 10 }}>
-                  <span style={{ fontSize: 18 }}>⚠️</span>
+                  <span style={{ fontSize: 18 }}>!</span>
                   <div>
                     <div style={{ fontSize: 13, fontWeight: 800, color: T }}>Risiko-Betriebe</div>
                     <div style={{ fontSize: 11, color: M }}>Aktiv aber noch 0 Termine eingetragen</div>
@@ -712,7 +712,7 @@ export default function AdminPage() {
                 </div>
                 {risikoList.length === 0 ? (
                   <div style={{ padding: "28px 20px", textAlign: "center", color: M, fontSize: 13 }}>
-                    {companies.length === 0 ? "Keine Daten geladen" : "✅ Alle aktiven Betriebe haben Termine"}
+                    {companies.length === 0 ? "Keine Daten geladen" : "✓ Alle aktiven Betriebe haben Termine"}
                   </div>
                 ) : (
                   <div style={{ maxHeight: 240, overflowY: "auto" }}>
@@ -741,7 +741,7 @@ export default function AdminPage() {
               {/* Top-Performer */}
               <div style={{ background: "#fff", border: `1px solid ${BD}`, borderRadius: 20, overflow: "hidden", boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}>
                 <div style={{ padding: "14px 20px", borderBottom: `1px solid ${BD}`, display: "flex", alignItems: "center", gap: 10 }}>
-                  <span style={{ fontSize: 18 }}>🏆</span>
+                  <span style={{ fontSize: 18 }}></span>
                   <div>
                     <div style={{ fontSize: 13, fontWeight: 800, color: T }}>Top-Performer</div>
                     <div style={{ fontSize: 11, color: M }}>Die 5 aktivsten Betriebe nach Terminen</div>
@@ -756,7 +756,7 @@ export default function AdminPage() {
                     return (
                       <div key={c.id} style={{ display: "flex", alignItems: "center", gap: 12, padding: "11px 20px", borderBottom: i < topList.length - 1 ? `1px solid ${BD}` : "none" }}>
                         <div style={{ fontSize: 13, fontWeight: 900, color: i === 0 ? "#D97706" : M, minWidth: 18, textAlign: "center" }}>
-                          {i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : `${i + 1}.`}
+                          {i === 0 ? "" : i === 1 ? "" : i === 2 ? "" : `${i + 1}.`}
                         </div>
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <div style={{ fontSize: 12, fontWeight: 700, color: T, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.name}</div>
@@ -785,16 +785,16 @@ export default function AdminPage() {
               const totalCloses     = allDates.reduce((s, d) => s + salesLog[d].closes, 0)
 
               const metrics = [
-                { key: "anrufe"     as keyof SalesEntry, label: "📞 Anrufe",    color: "#6B7280", bg: "#F9FAFB" },
-                { key: "gespraeche" as keyof SalesEntry, label: "💬 Gespräche", color: "#3B82F6", bg: "#EFF6FF" },
-                { key: "termine"    as keyof SalesEntry, label: "📅 Termine",   color: "#D97706", bg: "#FFFBEB" },
-                { key: "closes"     as keyof SalesEntry, label: "✅ Closes",    color: G,         bg: GL },
+                { key: "anrufe"     as keyof SalesEntry, label: " Anrufe",    color: "#6B7280", bg: "#F9FAFB" },
+                { key: "gespraeche" as keyof SalesEntry, label: " Gespräche", color: "#3B82F6", bg: "#EFF6FF" },
+                { key: "termine"    as keyof SalesEntry, label: " Termine",   color: "#D97706", bg: "#FFFBEB" },
+                { key: "closes"     as keyof SalesEntry, label: "✓ Closes",    color: G,         bg: GL },
               ]
 
               return (
                 <div style={{ background: "#fff", border: `1px solid ${BD}`, borderRadius: 20, overflow: "hidden", boxShadow: "0 1px 4px rgba(0,0,0,0.04)", marginBottom: 20 }}>
                   <div style={{ padding: "16px 22px", borderBottom: `1px solid ${BD}`, display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
-                    <span style={{ fontSize: 14, fontWeight: 800, color: T }}>📊 Sales-Auswertung</span>
+                    <span style={{ fontSize: 14, fontWeight: 800, color: T }}> Sales-Auswertung</span>
                     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                       <span style={{ fontSize: 12, color: M }}>Datum:</span>
                       <input type="date" value={salesDate} onChange={e => setSalesDate(e.target.value)}
@@ -881,7 +881,7 @@ export default function AdminPage() {
                               <div key={d} onClick={() => setSalesDate(d)}
                                 style={{ display: "flex", alignItems: "center", gap: 14, padding: "8px 14px", borderRadius: 10, background: d === salesDate ? GL : "transparent", cursor: "pointer", border: `1px solid ${d === salesDate ? GB : "transparent"}` }}>
                                 <span style={{ fontSize: 12, color: M, fontWeight: 600, minWidth: 90 }}>{new Date(d).toLocaleDateString("de-DE", { weekday: "short", day: "numeric", month: "short" })}</span>
-                                {[{ l: "📞", v: e.anrufe }, { l: "💬", v: e.gespraeche }, { l: "📅", v: e.termine }, { l: "✅", v: e.closes }].map(x => (
+                                {[{ l: "", v: e.anrufe }, { l: "", v: e.gespraeche }, { l: "", v: e.termine }, { l: "✓", v: e.closes }].map(x => (
                                   <span key={x.l} style={{ fontSize: 12, color: T, fontWeight: 700 }}>{x.l} {x.v}</span>
                                 ))}
                                 <span style={{ marginLeft: "auto", fontSize: 12, fontWeight: 800, color: G }}>{pct(e.closes, e.anrufe)}</span>
@@ -905,7 +905,7 @@ export default function AdminPage() {
               {loading ? (
                 <div style={{ padding: 40, textAlign: "center", color: M }}>Lädt …</div>
               ) : loadError ? (
-                <div style={{ padding: 24, color: RED, fontSize: 13 }}>⚠️ Fehler: {loadError}</div>
+                <div style={{ padding: 24, color: RED, fontSize: 13 }}>! Fehler: {loadError}</div>
               ) : companies.length === 0 ? (
                 <div style={{ padding: 40, textAlign: "center", color: M, fontSize: 13 }}>Keine Betriebe gefunden.</div>
               ) : companies.slice(0, 8).map((c, i) => (
@@ -940,7 +940,7 @@ export default function AdminPage() {
                 <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Suchen …" style={{ ...inp, width: 220 }} />
                 {(["all", "active", "paused", "addon"] as const).map(f => (
                   <button key={f} onClick={() => setFilter(f)} style={{ ...btnStyle(filter === f ? "green" : "gray"), fontSize: 11 }}>
-                    {f === "all" ? "Alle" : f === "active" ? "✅ Aktiv" : f === "paused" ? "⏸ Pausiert" : "🔖 Add-on"}
+                    {f === "all" ? "Alle" : f === "active" ? "✓ Aktiv" : f === "paused" ? " Pausiert" : " Add-on"}
                   </button>
                 ))}
                 <button onClick={() => { setShowCreateForm(v => !v); setCreateResult(null) }} style={{ ...btnStyle("green") }}>
@@ -952,10 +952,10 @@ export default function AdminPage() {
             {/* ── Formular: Neuen Betrieb anlegen ── */}
             {showCreateForm && (
               <div style={{ background: "#fff", border: `1.5px solid ${G}`, borderRadius: 16, padding: 24, marginBottom: 20, boxShadow: "0 4px 20px rgba(24,166,109,0.08)" }}>
-                <div style={{ fontSize: 15, fontWeight: 900, color: T, marginBottom: 16 }}>🆕 Neuen Betrieb anlegen</div>
+                <div style={{ fontSize: 15, fontWeight: 900, color: T, marginBottom: 16 }}>Neu Neuen Betrieb anlegen</div>
                 {createResult ? (
                   <div style={{ background: GL, border: `1px solid ${GB}`, borderRadius: 12, padding: 20 }}>
-                    <div style={{ fontSize: 14, fontWeight: 800, color: G, marginBottom: 12 }}>✅ {createResult.name} wurde erfolgreich angelegt!</div>
+                    <div style={{ fontSize: 14, fontWeight: 800, color: G, marginBottom: 12 }}>✓ {createResult.name} wurde erfolgreich angelegt!</div>
                     <div style={{ fontSize: 13, color: T, marginBottom: 6 }}>Login-Daten für den Kunden:</div>
                     <div style={{ display: "flex", flexDirection: "column" as const, gap: 8 }}>
                       {[{ label: "E-Mail", value: createResult.email }, { label: "Passwort", value: createResult.password }].map(row => (
@@ -1002,7 +1002,7 @@ export default function AdminPage() {
               <div style={{ textAlign: "center", padding: 60, color: M }}>Lädt …</div>
             ) : loadError ? (
               <div style={{ background: "#FEF2F2", border: "1px solid #FECACA", borderRadius: 14, padding: 24, color: RED, fontSize: 13 }}>
-                ⚠️ {loadError} — Passwort prüfen oder Vercel Env-Vars kontrollieren.
+                ! {loadError} — Passwort prüfen oder Vercel Env-Vars kontrollieren.
               </div>
             ) : (
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
@@ -1035,17 +1035,17 @@ export default function AdminPage() {
                         </div>
                         <div style={{ display: "flex", gap: 5, flexShrink: 0 }}>
                           <button onClick={() => quickUpdate(c.id, { booking_addon: !c.booking_addon })} style={{ ...btnStyle(c.booking_addon ? "blue" : "gray"), padding: "6px 10px", fontSize: 11 }}>
-                            {c.booking_addon ? "🔖 An" : "🔖 Aus"}
+                            {c.booking_addon ? " An" : " Aus"}
                           </button>
                           <button onClick={() => quickUpdate(c.id, { paused: !c.paused })} style={{ ...btnStyle(c.paused ? "green" : "yellow"), padding: "6px 10px", fontSize: 11 }}>
-                            {c.paused ? "▶ Aktiv" : "⏸ Pause"}
+                            {c.paused ? "▶ Aktiv" : " Pause"}
                           </button>
                           <button onClick={() => {
                             const next = isOpen ? null : c.id
                             setExpanded(next)
                             if (next) loadCompanyDetail(next)
                           }} style={{ ...btnStyle("gray"), padding: "6px 10px", fontSize: 11 }}>
-                            {isOpen ? "▲ Zu" : "✏️ Details"}
+                            {isOpen ? "▲ Zu" : " Details"}
                           </button>
                         </div>
                         <div style={{ fontSize: 11, color: M, flexShrink: 0 }}>
@@ -1075,7 +1075,7 @@ export default function AdminPage() {
                             </div>
                           </div>
                           <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 16 }}>
-                            {[{ key: "booking_addon", label: "🔖 Buchungs-Add-on" }, { key: "paused", label: "⏸ Konto pausiert" }].map(toggle => {
+                            {[{ key: "booking_addon", label: " Buchungs-Add-on" }, { key: "paused", label: " Konto pausiert" }].map(toggle => {
                               const isOn = val(toggle.key as keyof Company) as boolean
                               return (
                                 <div key={toggle.key} onClick={() => setEdits(p => ({ ...p, [c.id]: { ...p[c.id], [toggle.key]: !isOn } }))}
@@ -1091,7 +1091,7 @@ export default function AdminPage() {
                           <div style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 16 }}>
                             <button onClick={() => saveEdits(c.id)} disabled={saving === c.id || Object.keys(e).length === 0}
                               style={{ ...btnStyle("green"), opacity: Object.keys(e).length === 0 ? .5 : 1, cursor: Object.keys(e).length === 0 ? "not-allowed" : "pointer" }}>
-                              {saving === c.id ? "Speichert …" : "💾 Speichern"}
+                              {saving === c.id ? "Speichert …" : " Speichern"}
                             </button>
                             <button onClick={() => { setEdits(p => { const n = { ...p }; delete n[c.id]; return n }); setExpanded(null) }} style={btnStyle("gray")}>Abbrechen</button>
                           </div>
@@ -1100,7 +1100,7 @@ export default function AdminPage() {
                               <div key={row.label} style={{ display: "flex", gap: 8, alignItems: "center" }}>
                                 <span style={{ fontSize: 11, color: M, fontWeight: 700, minWidth: 80 }}>{row.label}:</span>
                                 <span style={{ fontSize: 11, color: T, fontFamily: row.label === "User-ID" ? "monospace" : "inherit", wordBreak: "break-all" }}>{row.value}</span>
-                                {(row.label === "User-ID" || row.label === "E-Mail") && <CopyBtn text={row.value} label="⎘" />}
+                                {(row.label === "User-ID" || row.label === "E-Mail") && <CopyBtn text={row.value} label="" />}
                               </div>
                             ))}
                           </div>
@@ -1109,7 +1109,7 @@ export default function AdminPage() {
                           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 20 }}>
                             {/* SMS Limit */}
                             <div style={{ background: "#fff", border: `1px solid ${BD}`, borderRadius: 12, padding: "14px 16px" }}>
-                              <div style={{ fontSize: 12, fontWeight: 800, color: T, marginBottom: 4 }}>📱 SMS-Limit diesen Monat</div>
+                              <div style={{ fontSize: 12, fontWeight: 800, color: T, marginBottom: 4 }}> SMS-Limit diesen Monat</div>
                               <div style={{ fontSize: 11, color: M, marginBottom: 10 }}>
                                 Verbraucht: <strong style={{ color: (c.sms_count_month || 0) >= (c.sms_limit || 200) * 0.8 ? RED : G }}>{c.sms_count_month || 0}</strong> / {c.sms_limit || 200} SMS
                               </div>
@@ -1190,7 +1190,7 @@ export default function AdminPage() {
                             return (
                               <div style={{ background: "#fff", border: `1px solid ${BD}`, borderRadius: 14, overflow: "hidden" }}>
                                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px", borderBottom: `1px solid ${BD}`, flexWrap: "wrap", gap: 8 }}>
-                                  <div style={{ fontSize: 12, fontWeight: 800, color: T }}>📊 Live-Auswertung</div>
+                                  <div style={{ fontSize: 12, fontWeight: 800, color: T }}> Live-Auswertung</div>
                                   <div style={{ display: "flex", gap: 4 }}>
                                     {(["heute", "monat", "kunden", "einstellungen"] as const).map(t => (
                                       <button key={t} onClick={() => setDetailTab(p => ({ ...p, [c.id]: t }))}
@@ -1213,10 +1213,10 @@ export default function AdminPage() {
                                     {/* Mini-Stats Zeile */}
                                     <div style={{ display: "flex", gap: 0, borderBottom: `1px solid ${BD}` }}>
                                       {[
-                                        { icon: "📅", label: "Termine / Monat", value: dt.stats.totalThisMonth },
-                                        { icon: "✅", label: "Erledigt", value: dt.stats.doneThisMonth },
-                                        { icon: "📱", label: "SMS / Monat", value: dt.stats.smsThisMonth },
-                                        { icon: "👥", label: "Kunden", value: dt.stats.customerCount },
+                                        { icon: "", label: "Termine / Monat", value: dt.stats.totalThisMonth },
+                                        { icon: "✓", label: "Erledigt", value: dt.stats.doneThisMonth },
+                                        { icon: "", label: "SMS / Monat", value: dt.stats.smsThisMonth },
+                                        { icon: "", label: "Kunden", value: dt.stats.customerCount },
                                       ].map((s, i, arr) => (
                                         <div key={s.label} style={{ flex: 1, padding: "10px 12px", textAlign: "center", borderRight: i < arr.length - 1 ? `1px solid ${BD}` : "none" }}>
                                           <div style={{ fontSize: 18, fontWeight: 900, color: T }}>{s.value}</div>
@@ -1331,7 +1331,7 @@ export default function AdminPage() {
                                   color: c.paused ? G : RED,
                                 }}
                               >
-                                {c.paused ? "✓ Reaktivieren" : "⏸ Sofort pausieren"}
+                                {c.paused ? "✓ Reaktivieren" : " Sofort pausieren"}
                               </button>
 
                               {/* Konto löschen */}
@@ -1382,18 +1382,18 @@ export default function AdminPage() {
         {tab === "coldcall" && (
           <div style={{ maxWidth: 720 }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20, flexWrap: "wrap", gap: 10 }}>
-              <h1 style={{ fontSize: 20, fontWeight: 900, color: T, margin: 0, letterSpacing: "-.4px" }}>📞 Cold-Call Skript</h1>
+              <h1 style={{ fontSize: 20, fontWeight: 900, color: T, margin: 0, letterSpacing: "-.4px" }}> Cold-Call Skript</h1>
               <div style={{ display: "flex", gap: 8 }}>
                 {scriptEditing ? (
                   <>
                     <button onClick={() => { setEditScript(script); setScriptEditing(false) }} style={btnStyle("gray")}>Abbrechen</button>
                     <button onClick={resetScript} style={{ ...btnStyle("red"), fontSize: 11 }}>↩ Standard</button>
-                    <button onClick={saveScript} style={btnStyle("green")}>💾 Skript speichern</button>
+                    <button onClick={saveScript} style={btnStyle("green")}> Skript speichern</button>
                   </>
                 ) : (
                   <>
-                    <CopyBtn text={script.map(s => `${s.title}\n${s.text}`).join("\n\n")} label="📋 Alles kopieren" />
-                    <button onClick={() => { setEditScript(script); setScriptEditing(true) }} style={btnStyle("purple")}>✏️ Bearbeiten</button>
+                    <CopyBtn text={script.map(s => `${s.title}\n${s.text}`).join("\n\n")} label=" Alles kopieren" />
+                    <button onClick={() => { setEditScript(script); setScriptEditing(true) }} style={btnStyle("purple")}> Bearbeiten</button>
                   </>
                 )}
               </div>
@@ -1415,7 +1415,7 @@ export default function AdminPage() {
                       <button onClick={() => removeBlock(block.id)} style={{ background: "#FEF2F2", color: RED, border: "none", borderRadius: 8, padding: "6px 10px", cursor: "pointer", fontSize: 12, fontWeight: 700, flexShrink: 0 }}>✕ Löschen</button>
                     </div>
                     <div style={{ marginBottom: 8 }}>
-                      <label style={{ display: "block", fontSize: 10, fontWeight: 700, color: M, textTransform: "uppercase", letterSpacing: .4, marginBottom: 4 }}>💡 Coaching-Hinweis (optional)</label>
+                      <label style={{ display: "block", fontSize: 10, fontWeight: 700, color: M, textTransform: "uppercase", letterSpacing: .4, marginBottom: 4 }}> Coaching-Hinweis (optional)</label>
                       <input value={block.tip} onChange={e => updateBlock(block.id, "tip", e.target.value)} placeholder="Interner Hinweis für dich…" style={{ ...inp, fontSize: 12, background: "rgba(255,255,255,0.7)" }} />
                     </div>
                     <div style={{ marginBottom: 8 }}>
@@ -1461,7 +1461,7 @@ export default function AdminPage() {
                       <div style={{ fontSize: 12, fontWeight: 900, color: T, marginBottom: s.tip ? 8 : 10, letterSpacing: .2, textTransform: "uppercase" }}>{s.title}</div>
                       {s.tip && (
                         <div style={{ fontSize: 11, color: M, fontStyle: "italic", background: "rgba(255,255,255,0.6)", borderRadius: 8, padding: "6px 10px", marginBottom: 10, borderLeft: "3px solid rgba(0,0,0,0.08)" }}>
-                          💡 {s.tip}
+                           {s.tip}
                         </div>
                       )}
                       <div style={{ fontSize: 14, color: T, lineHeight: 1.75, whiteSpace: "pre-line", fontStyle: "italic", fontWeight: 500 }}>{s.text}</div>
@@ -1482,7 +1482,7 @@ export default function AdminPage() {
         {tab === "rueckrufe" && (
           <div style={{ maxWidth: 800 }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6, flexWrap: "wrap", gap: 10 }}>
-              <h1 style={{ fontSize: 20, fontWeight: 900, color: T, margin: 0, letterSpacing: "-.4px" }}>📋 Rückruf-Liste</h1>
+              <h1 style={{ fontSize: 20, fontWeight: 900, color: T, margin: 0, letterSpacing: "-.4px" }}> Rückruf-Liste</h1>
               <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
                 {offeneRueckrufe > 0 && <span style={{ fontSize: 13, fontWeight: 800, color: RED }}>{offeneRueckrufe} offen</span>}
               </div>
@@ -1563,9 +1563,9 @@ export default function AdminPage() {
                         </span>
 
                         <div style={{ display: "flex", gap: 5, flexShrink: 0 }}>
-                          <a href={`tel:${r.phone}`} style={{ ...btnStyle("green"), textDecoration: "none", padding: "6px 12px", fontSize: 12 }}>📞 Anrufen</a>
+                          <a href={`tel:${r.phone}`} style={{ ...btnStyle("green"), textDecoration: "none", padding: "6px 12px", fontSize: 12 }}> Anrufen</a>
                           <button onClick={() => setRfOpen(isOpen ? null : r.id)} style={{ ...btnStyle("gray"), padding: "6px 10px", fontSize: 11 }}>
-                            {isOpen ? "▲" : "✏️"}
+                            {isOpen ? "▲" : ""}
                           </button>
                           <button onClick={() => deleteRueckruf(r.id)} style={{ ...btnStyle("red"), padding: "6px 10px", fontSize: 11 }}>✕</button>
                         </div>
@@ -1624,7 +1624,7 @@ export default function AdminPage() {
           return (
             <div style={{ maxWidth: 960 }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6, flexWrap: "wrap", gap: 10 }}>
-                <h1 style={{ fontSize: 20, fontWeight: 900, color: T, margin: 0, letterSpacing: "-.4px" }}>🔍 Lead-Manager</h1>
+                <h1 style={{ fontSize: 20, fontWeight: 900, color: T, margin: 0, letterSpacing: "-.4px" }}> Lead-Manager</h1>
                 <button onClick={() => setShowLeadForm(v => !v)} style={{ ...btnStyle("green"), padding: "9px 18px" }}>
                   {showLeadForm ? "✕ Abbrechen" : "+ Lead eintragen"}
                 </button>
@@ -1698,15 +1698,15 @@ export default function AdminPage() {
 
               {/* ── Filter-Leiste ── */}
               <div style={{ display: "flex", gap: 8, marginBottom: 16, flexWrap: "wrap", alignItems: "center" }}>
-                <input value={leadSearch} onChange={e => setLeadSearch(e.target.value)} placeholder="🔎 Name, Telefon, Stadt …"
+                <input value={leadSearch} onChange={e => setLeadSearch(e.target.value)} placeholder=" Name, Telefon, Stadt …"
                   style={{ ...inp, width: 220, fontSize: 12 }} />
                 <select value={leadCityFilter} onChange={e => setLeadCityFilter(e.target.value)}
                   style={{ ...inp, width: "auto", fontSize: 12, cursor: "pointer" }}>
-                  {allCities.map(c => <option key={c} value={c}>{c === "Alle" ? "📍 Alle Städte" : c}</option>)}
+                  {allCities.map(c => <option key={c} value={c}>{c === "Alle" ? " Alle Städte" : c}</option>)}
                 </select>
                 <select value={leadCatFilter} onChange={e => setLeadCatFilter(e.target.value)}
                   style={{ ...inp, width: "auto", fontSize: 12, cursor: "pointer" }}>
-                  {allCats.map(c => <option key={c} value={c}>{c === "Alle" ? "🏷 Alle Kategorien" : c}</option>)}
+                  {allCats.map(c => <option key={c} value={c}>{c === "Alle" ? " Alle Kategorien" : c}</option>)}
                 </select>
                 {(leadSearch || leadCityFilter !== "Alle" || leadCatFilter !== "Alle" || leadStatusFilter !== "alle") && (
                   <button onClick={() => { setLeadSearch(""); setLeadCityFilter("Alle"); setLeadCatFilter("Alle"); setLeadStatusFilter("alle") }}
@@ -1718,7 +1718,7 @@ export default function AdminPage() {
               {/* ── Lead-Liste ── */}
               {leads.length === 0 ? (
                 <div style={{ background: "#fff", border: `1px solid ${BD}`, borderRadius: 16, padding: "60px 20px", textAlign: "center" }}>
-                  <div style={{ fontSize: 36, marginBottom: 12 }}>📋</div>
+                  <div style={{ fontSize: 36, marginBottom: 12 }}></div>
                   <div style={{ fontSize: 15, fontWeight: 700, color: T, marginBottom: 6 }}>Noch keine Leads eingetragen</div>
                   <div style={{ fontSize: 13, color: M, marginBottom: 16 }}>Trag Betriebe ein die du auf Google findest — Name, Telefon, Stadt, Kategorie.</div>
                   <button onClick={() => setShowLeadForm(true)} style={{ ...btnStyle("green"), padding: "10px 20px" }}>+ Ersten Lead eintragen</button>
@@ -1743,10 +1743,10 @@ export default function AdminPage() {
                           <div style={{ flex: 1, minWidth: 140 }}>
                             <div style={{ fontSize: 14, fontWeight: 800, color: T }}>{lead.name}</div>
                             <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 2 }}>
-                              {lead.city && <span style={{ fontSize: 11, color: M }}>📍 {lead.city}</span>}
+                              {lead.city && <span style={{ fontSize: 11, color: M }}> {lead.city}</span>}
                               {lead.category && <span style={{ fontSize: 11, color: M }}>· {lead.category}</span>}
-                              {lead.phone && <span style={{ fontSize: 11, color: T, fontWeight: 600 }}>📞 {lead.phone}</span>}
-                              {lead.email && <span style={{ fontSize: 11, color: "#3B82F6" }}>✉ {lead.email}</span>}
+                              {lead.phone && <span style={{ fontSize: 11, color: T, fontWeight: 600 }}> {lead.phone}</span>}
+                              {lead.email && <span style={{ fontSize: 11, color: "#3B82F6" }}> {lead.email}</span>}
                             </div>
                             {lead.notiz && <div style={{ fontSize: 11, color: M, marginTop: 3, fontStyle: "italic" }}>{lead.notiz}</div>}
                           </div>
@@ -1759,7 +1759,7 @@ export default function AdminPage() {
                           {/* Schnell-Status: die wichtigsten Aktionen */}
                           <div style={{ display: "flex", gap: 4, flexShrink: 0, flexWrap: "wrap" }}>
                             {lead.phone && (
-                              <a href={`tel:${lead.phone}`} style={{ ...btnStyle("green"), textDecoration: "none", padding: "6px 10px", fontSize: 11 }}>📞</a>
+                              <a href={`tel:${lead.phone}`} style={{ ...btnStyle("green"), textDecoration: "none", padding: "6px 10px", fontSize: 11 }}></a>
                             )}
                             {(["angerufen", "nicht_erreicht", "interesse", "kein_interesse", "termin", "kunde"] as LeadStatus[])
                               .filter(s => s !== lead.status)
@@ -1772,7 +1772,7 @@ export default function AdminPage() {
                               ))
                             }
                             <button onClick={() => setLeadExpanded(isOpen ? null : lead.id)} style={{ ...btnStyle("gray"), padding: "6px 10px", fontSize: 11 }}>
-                              {isOpen ? "▲" : "✏️"}
+                              {isOpen ? "▲" : ""}
                             </button>
                             <button onClick={() => deleteLead(lead.id)} style={{ ...btnStyle("red"), padding: "6px 9px", fontSize: 11 }}>✕</button>
                           </div>
@@ -1835,33 +1835,33 @@ export default function AdminPage() {
         {/* ════ PROZESSE ════ */}
         {tab === "prozesse" && (
           <div style={{ maxWidth: 860 }}>
-            <h1 style={{ fontSize: 20, fontWeight: 900, color: T, margin: "0 0 6px", letterSpacing: "-.4px" }}>📖 Prozesse & Anleitungen</h1>
+            <h1 style={{ fontSize: 20, fontWeight: 900, color: T, margin: "0 0 6px", letterSpacing: "-.4px" }}> Prozesse & Anleitungen</h1>
             <p style={{ fontSize: 13, color: M, margin: "0 0 28px" }}>Schritt-für-Schritt-Anleitungen für die täglichen Abläufe bei TerminStop.</p>
 
             {/* ── Prozess 1: Neuen Kunden anlegen ── */}
             <div style={{ background: "#fff", border: `1px solid ${BD}`, borderRadius: 18, marginBottom: 20, overflow: "hidden" }}>
               <div style={{ background: `linear-gradient(135deg, ${G}, #15955F)`, padding: "20px 24px", color: "#fff" }}>
                 <div style={{ fontSize: 11, fontWeight: 700, opacity: .8, textTransform: "uppercase", letterSpacing: .5, marginBottom: 4 }}>Prozess 01</div>
-                <div style={{ fontSize: 18, fontWeight: 900 }}>🆕 Neuen Kunden anlegen</div>
+                <div style={{ fontSize: 18, fontWeight: 900 }}>Neu Neuen Kunden anlegen</div>
                 <div style={{ fontSize: 12, opacity: .8, marginTop: 4 }}>Vom Cold-Call bis zum ersten Login – so geht's Schritt für Schritt</div>
               </div>
               <div style={{ padding: "24px" }}>
                 {[
                   {
-                    nr: "01", icon: "📞", title: "Cold-Call erfolgreich – Daten notieren",
+                    nr: "01", icon: "", title: "Cold-Call erfolgreich – Daten notieren",
                     color: "#EFF6FF", border: "#BFDBFE", text: "Du hast jemanden überzeugt? Top. Notiere dir während des Gesprächs:",
-                    items: ["✅ Vollständiger Firmenname (z.B. \"Friseur Schönheit GmbH\")", "✅ E-Mail-Adresse (die, mit der sie sich einloggen sollen)", "✅ Handynummer (für SMS-Erinnerungen an deren Kunden)", "✅ Kategorie / Branche (Friseur, Praxis, Kosmetik…)"],
+                    items: ["✓ Vollständiger Firmenname (z.B. \"Friseur Schönheit GmbH\")", "✓ E-Mail-Adresse (die, mit der sie sich einloggen sollen)", "✓ Handynummer (für SMS-Erinnerungen an deren Kunden)", "✓ Kategorie / Branche (Friseur, Praxis, Kosmetik…)"],
                     tip: "Tipp: Frag nach der E-Mail nochmal nach – Buchstabieren lassen falls nötig.",
                   },
                   {
-                    nr: "02", icon: "🌐", title: "Supabase öffnen",
+                    nr: "02", icon: "", title: "Supabase öffnen",
                     color: "#F5F3FF", border: "#DDD6FE",
                     text: "Gehe auf supabase.com → Log in → Dein TerminStop-Projekt öffnen.",
                     items: ["→ Linkes Menü: Authentication → Users"],
                     tip: "Alternativ direkt: supabase.com/dashboard → Projekt auswählen",
                   },
                   {
-                    nr: "03", icon: "👤", title: "Auth-User anlegen (E-Mail + Passwort)",
+                    nr: "03", icon: "", title: "Auth-User anlegen (E-Mail + Passwort)",
                     color: GL, border: GB,
                     text: "Im Authentication-Bereich → Tab \"Users\" → Button \"Add user\" → \"Create new user\":",
                     items: [
@@ -1870,10 +1870,10 @@ export default function AdminPage() {
                       "\"Auto Confirm User\" aktivieren – damit der Kunde sich sofort einloggen kann",
                       "Auf \"Create user\" klicken",
                     ],
-                    tip: "⚠️ Wichtig: Die User-ID, die Supabase automatisch vergibt, brauchst du gleich für Schritt 4.",
+                    tip: "! Wichtig: Die User-ID, die Supabase automatisch vergibt, brauchst du gleich für Schritt 4.",
                   },
                   {
-                    nr: "04", icon: "🏢", title: "Company-Eintrag in der Datenbank anlegen",
+                    nr: "04", icon: "", title: "Company-Eintrag in der Datenbank anlegen",
                     color: "#FFFBEB", border: "#FDE68A",
                     text: "Linkes Menü → Table Editor → Tabelle \"companies\" → \"Insert row\":",
                     items: [
@@ -1888,19 +1888,19 @@ export default function AdminPage() {
                     tip: "Die Spalte 'user_id' wurde aus Sicherheitsgründen entfernt – kein Mapping nötig. Der Login läuft über die E-Mail.",
                   },
                   {
-                    nr: "05", icon: "🔑", title: "Login-Daten an den Kunden schicken",
+                    nr: "05", icon: "", title: "Login-Daten an den Kunden schicken",
                     color: GL, border: GB,
                     text: "Schick dem Kunden eine kurze E-Mail oder Nachricht mit:",
                     items: [
-                      "🔗 Login-Link: www.terminstop.de/login",
-                      "📧 E-Mail: [ihre E-Mail]",
-                      "🔐 Passwort: [das Passwort aus Schritt 3]",
-                      "💡 Hinweis: Passwort bitte nach erstem Login ändern (Einstellungen → Passwort ändern)",
+                      " Login-Link: www.terminstop.de/login",
+                      " E-Mail: [ihre E-Mail]",
+                      " Passwort: [das Passwort aus Schritt 3]",
+                      " Hinweis: Passwort bitte nach erstem Login ändern (Einstellungen → Passwort ändern)",
                     ],
                     tip: "Vorlage: \"Hallo [Name], hier sind Ihre TerminStop-Zugangsdaten: Login: terminstop.de/login | E-Mail: [...] | Passwort: [...] – Bitte nach dem ersten Login ändern.\"",
                   },
                   {
-                    nr: "06", icon: "✅", title: "Prüfen ob alles läuft",
+                    nr: "06", icon: "✓", title: "Prüfen ob alles läuft",
                     color: "#ECFDF5", border: "#6EE7B7",
                     text: "Kurz kontrollieren bevor du auflegt oder die E-Mail schickst:",
                     items: [
@@ -1929,7 +1929,7 @@ export default function AdminPage() {
                       </div>
                       {step.tip && (
                         <div style={{ fontSize: 11.5, color: "#7C3AED", background: "#F5F3FF", border: "1px solid #DDD6FE", borderRadius: 8, padding: "7px 12px" }}>
-                          💡 {step.tip}
+                           {step.tip}
                         </div>
                       )}
                     </div>
@@ -1942,20 +1942,20 @@ export default function AdminPage() {
             <div style={{ background: "#fff", border: `1px solid ${BD}`, borderRadius: 18, marginBottom: 20, overflow: "hidden" }}>
               <div style={{ background: "linear-gradient(135deg, #D97706, #B45309)", padding: "20px 24px", color: "#fff" }}>
                 <div style={{ fontSize: 11, fontWeight: 700, opacity: .8, textTransform: "uppercase", letterSpacing: .5, marginBottom: 4 }}>Prozess 02</div>
-                <div style={{ fontSize: 18, fontWeight: 900 }}>⏸️ Kunden pausieren oder reaktivieren</div>
+                <div style={{ fontSize: 18, fontWeight: 900 }}> Kunden pausieren oder reaktivieren</div>
                 <div style={{ fontSize: 12, opacity: .8, marginTop: 4 }}>Wenn jemand kündigt oder eine Pause macht</div>
               </div>
               <div style={{ padding: "24px" }}>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
                   <div style={{ background: "#FEF2F2", border: "1px solid #FECACA", borderRadius: 12, padding: 16 }}>
-                    <div style={{ fontSize: 14, fontWeight: 800, color: RED, marginBottom: 8 }}>⏸ Pausieren</div>
+                    <div style={{ fontSize: 14, fontWeight: 800, color: RED, marginBottom: 8 }}> Pausieren</div>
                     <div style={{ fontSize: 12.5, color: T, lineHeight: 1.7 }}>
                       Admin → Tab "Betriebe" → Betrieb suchen → Aufklappen → Schalter "Pausiert" aktivieren → Speichern.<br/><br/>
                       Der Kunde wird beim nächsten Login automatisch ausgeloggt und kann sich nicht mehr einloggen, solange er pausiert ist.
                     </div>
                   </div>
                   <div style={{ background: GL, border: `1px solid ${GB}`, borderRadius: 12, padding: 16 }}>
-                    <div style={{ fontSize: 14, fontWeight: 800, color: G, marginBottom: 8 }}>▶️ Reaktivieren</div>
+                    <div style={{ fontSize: 14, fontWeight: 800, color: G, marginBottom: 8 }}>▶ Reaktivieren</div>
                     <div style={{ fontSize: 12.5, color: T, lineHeight: 1.7 }}>
                       Gleicher Weg – Schalter "Pausiert" deaktivieren → Speichern.<br/><br/>
                       Kunde kann sich sofort wieder einloggen. Alle Daten (Termine, Kunden) sind noch vorhanden.
@@ -1963,7 +1963,7 @@ export default function AdminPage() {
                   </div>
                 </div>
                 <div style={{ background: "#FFFBEB", border: "1px solid #FDE68A", borderRadius: 10, padding: "10px 14px", fontSize: 12.5, color: "#92400E" }}>
-                  ⚠️ Hinweis: Beim Pausieren werden keine Daten gelöscht. Falls ein Kunde dauerhaft weg ist und die Daten löschen möchte, musst du das manuell in Supabase unter Table Editor → companies → Zeile löschen tun. Auth-User ebenfalls unter Authentication → Users löschen.
+                  ! Hinweis: Beim Pausieren werden keine Daten gelöscht. Falls ein Kunde dauerhaft weg ist und die Daten löschen möchte, musst du das manuell in Supabase unter Table Editor → companies → Zeile löschen tun. Auth-User ebenfalls unter Authentication → Users löschen.
                 </div>
               </div>
             </div>
@@ -1972,7 +1972,7 @@ export default function AdminPage() {
             <div style={{ background: "#fff", border: `1px solid ${BD}`, borderRadius: 18, overflow: "hidden" }}>
               <div style={{ background: "linear-gradient(135deg, #7C3AED, #6D28D9)", padding: "20px 24px", color: "#fff" }}>
                 <div style={{ fontSize: 11, fontWeight: 700, opacity: .8, textTransform: "uppercase", letterSpacing: .5, marginBottom: 4 }}>Prozess 03</div>
-                <div style={{ fontSize: 18, fontWeight: 900 }}>🔖 Buchungs-Add-on aktivieren</div>
+                <div style={{ fontSize: 18, fontWeight: 900 }}> Buchungs-Add-on aktivieren</div>
                 <div style={{ fontSize: 12, opacity: .8, marginTop: 4 }}>Wenn ein Kunde das Online-Buchungs-Feature dazu bucht</div>
               </div>
               <div style={{ padding: "24px" }}>
@@ -1989,7 +1989,7 @@ export default function AdminPage() {
                   </div>
                 ))}
                 <div style={{ background: GL, border: `1px solid ${GB}`, borderRadius: 10, padding: "10px 14px", fontSize: 12.5, color: "#065F46", marginTop: 8 }}>
-                  💡 Der Slug ist die öffentliche URL der Buchungsseite. Einmal vergeben, möglichst nicht mehr ändern – sonst funktionieren alte Links nicht mehr.
+                   Der Slug ist die öffentliche URL der Buchungsseite. Einmal vergeben, möglichst nicht mehr ändern – sonst funktionieren alte Links nicht mehr.
                 </div>
               </div>
             </div>
@@ -1999,7 +1999,7 @@ export default function AdminPage() {
         {/* ════ NOTIZEN ════ */}
         {tab === "notizen" && (
           <div style={{ maxWidth: 900 }}>
-            <h1 style={{ fontSize: 20, fontWeight: 900, color: T, margin: "0 0 6px", letterSpacing: "-.4px" }}>📝 Notizen & Preistabelle</h1>
+            <h1 style={{ fontSize: 20, fontWeight: 900, color: T, margin: "0 0 6px", letterSpacing: "-.4px" }}> Notizen & Preistabelle</h1>
             <p style={{ fontSize: 13, color: M, margin: "0 0 24px" }}>Alles was du im Call brauchst – wird lokal gespeichert, bleibt immer da.</p>
 
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, alignItems: "start" }}>
@@ -2007,7 +2007,7 @@ export default function AdminPage() {
               {/* Notizblock */}
               <div style={{ background: "#fff", border: `1px solid ${BD}`, borderRadius: 20, overflow: "hidden", boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}>
                 <div style={{ padding: "16px 20px", borderBottom: `1px solid ${BD}`, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                  <span style={{ fontSize: 14, fontWeight: 800, color: T }}>📋 Notizblock</span>
+                  <span style={{ fontSize: 14, fontWeight: 800, color: T }}> Notizblock</span>
                   {notesSaved && <span style={{ fontSize: 11, color: G, fontWeight: 700 }}>✓ Gespeichert</span>}
                 </div>
                 <textarea
@@ -2026,7 +2026,7 @@ export default function AdminPage() {
               {/* Preistabelle */}
               <div style={{ background: "#fff", border: `1px solid ${BD}`, borderRadius: 20, overflow: "hidden", boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}>
                 <div style={{ padding: "16px 20px", borderBottom: `1px solid ${BD}` }}>
-                  <span style={{ fontSize: 14, fontWeight: 800, color: T }}>💰 Preistabelle</span>
+                  <span style={{ fontSize: 14, fontWeight: 800, color: T }}> Preistabelle</span>
                   <p style={{ fontSize: 12, color: M, margin: "2px 0 0" }}>Pakete & Preise für den Call</p>
                 </div>
 
@@ -2070,7 +2070,7 @@ export default function AdminPage() {
 
                 {prices.length > 0 && (
                   <div style={{ padding: "12px 20px", borderTop: `1px solid ${BD}`, display: "flex", justifyContent: "flex-end" }}>
-                    <CopyBtn text={prices.map(r => `${r.name}${r.price ? " – " + r.price : ""}${r.desc ? "\n  " + r.desc : ""}`).join("\n\n")} label="📋 Tabelle kopieren" />
+                    <CopyBtn text={prices.map(r => `${r.name}${r.price ? " – " + r.price : ""}${r.desc ? "\n  " + r.desc : ""}`).join("\n\n")} label=" Tabelle kopieren" />
                   </div>
                 )}
               </div>

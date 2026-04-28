@@ -11,7 +11,7 @@ function DemoBanner() {
       display: "flex", alignItems: "center", justifyContent: "space-between",
       fontSize: "13px", fontWeight: 600, gap: 12, flexWrap: "wrap",
     }}>
-      <span>🎭 Demo-Modus – Alle Daten sind fiktiv · Keine SMS werden versendet</span>
+      <span> Demo-Modus – Alle Daten sind fiktiv · Keine SMS werden versendet</span>
       <a href="/register" style={{ background: "white", color: "#7C3AED", padding: "6px 16px", borderRadius: 8, fontWeight: 700, textDecoration: "none", fontSize: "12px", whiteSpace: "nowrap" }}>
         Kostenlos registrieren →
       </a>
@@ -371,7 +371,7 @@ export default function DemoCalendarPage() {
             <div className="px-6 py-5 space-y-4">
               {selected.phone && (
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 bg-[#F7FAFC] border border-[#E5E7EB] rounded-lg flex items-center justify-center text-sm shrink-0">📞</div>
+                  <div className="w-8 h-8 bg-[#F7FAFC] border border-[#E5E7EB] rounded-lg flex items-center justify-center text-sm shrink-0"></div>
                   <div>
                     <div className="text-xs text-[#6B7280] font-medium">Telefon</div>
                     <div className="text-sm font-semibold text-[#1F2A37]">{selected.phone}</div>
@@ -380,7 +380,7 @@ export default function DemoCalendarPage() {
               )}
               {selected.note && (
                 <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 bg-[#F7FAFC] border border-[#E5E7EB] rounded-lg flex items-center justify-center text-sm shrink-0">📝</div>
+                  <div className="w-8 h-8 bg-[#F7FAFC] border border-[#E5E7EB] rounded-lg flex items-center justify-center text-sm shrink-0"></div>
                   <div>
                     <div className="text-xs text-[#6B7280] font-medium">Notiz</div>
                     <div className="text-sm text-[#1F2A37]">{selected.note}</div>
@@ -388,14 +388,14 @@ export default function DemoCalendarPage() {
                 </div>
               )}
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-[#E8FBF3] border border-[#6EE7B7]/40 rounded-lg flex items-center justify-center text-sm shrink-0">📱</div>
+                <div className="w-8 h-8 bg-[#E8FBF3] border border-[#6EE7B7]/40 rounded-lg flex items-center justify-center text-sm shrink-0"></div>
                 <div>
                   <div className="text-xs text-[#6B7280] font-medium">SMS-Erinnerung</div>
                   <div className="text-sm font-semibold text-[#18A66D]">Gesendet ✓</div>
                 </div>
               </div>
               <div className={`flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-semibold ${selected.status === "done" ? "bg-[#E8FBF3] text-[#18A66D]" : "bg-[#FEF3C7] text-[#D97706]"}`}>
-                <span>{selected.status === "done" ? "✓ Termin wahrgenommen" : "⏳ Ausstehend"}</span>
+                <span>{selected.status === "done" ? "✓ Termin wahrgenommen" : " Ausstehend"}</span>
               </div>
             </div>
             <div className="px-6 pb-6">

@@ -182,7 +182,7 @@ export default function CalendarPage() {
             display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap",
           }}>
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-              <span style={{ fontSize: 22 }}>🔒</span>
+              <span style={{ fontSize: 22 }}></span>
               <div>
                 <div style={{ fontSize: 14, fontWeight: 800, color: "#92400E" }}>Kalender im Lesemodus</div>
                 <div style={{ fontSize: 13, color: "#B45309" }}>Termine können nur angezeigt, nicht bearbeitet werden. Wähle ein Paket, um fortzufahren.</div>
@@ -517,7 +517,7 @@ export default function CalendarPage() {
             <div style={{ padding: "18px 24px", display: "flex", flexDirection: "column", gap: 14 }}>
               {selected.phone && (
                 <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                  <div style={{ width: 36, height: 36, background: "#F9FAFB", border: "1px solid #E5E7EB", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, flexShrink: 0 }}>📞</div>
+                  <div style={{ width: 36, height: 36, background: "#F9FAFB", border: "1px solid #E5E7EB", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, flexShrink: 0 }}></div>
                   <div>
                     <div style={{ fontSize: 11, color: "#9CA3AF", fontWeight: 600 }}>Telefon</div>
                     <div style={{ fontSize: 14, fontWeight: 700, color: "#111827" }}>{selected.phone}</div>
@@ -526,7 +526,7 @@ export default function CalendarPage() {
               )}
               {selected.note && (
                 <div style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
-                  <div style={{ width: 36, height: 36, background: "#F9FAFB", border: "1px solid #E5E7EB", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, flexShrink: 0 }}>📝</div>
+                  <div style={{ width: 36, height: 36, background: "#F9FAFB", border: "1px solid #E5E7EB", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, flexShrink: 0 }}></div>
                   <div>
                     <div style={{ fontSize: 11, color: "#9CA3AF", fontWeight: 600 }}>Notiz</div>
                     <div style={{ fontSize: 14, color: "#111827" }}>{selected.note}</div>
@@ -535,7 +535,7 @@ export default function CalendarPage() {
               )}
               {empName(selected.employee_id) && (
                 <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                  <div style={{ width: 36, height: 36, background: "#F0FBF6", border: "1px solid #D1F5E3", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, flexShrink: 0 }}>👤</div>
+                  <div style={{ width: 36, height: 36, background: "#F0FBF6", border: "1px solid #D1F5E3", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, flexShrink: 0 }}></div>
                   <div>
                     <div style={{ fontSize: 11, color: "#9CA3AF", fontWeight: 600 }}>Mitarbeiter</div>
                     <div style={{ fontSize: 14, fontWeight: 700, color: "#18A66D" }}>{empName(selected.employee_id)}</div>
@@ -545,14 +545,14 @@ export default function CalendarPage() {
               <div style={{ padding: "10px 14px", borderRadius: 12, fontSize: 13, fontWeight: 700,
                 background: selected.status === "done" ? "#F0FBF6" : "#FFFBEB",
                 color: selected.status === "done" ? "#18A66D" : "#D97706" }}>
-                {selected.status === "done" ? "✓ Termin wahrgenommen" : "⏳ Ausstehend"}
+                {selected.status === "done" ? "✓ Termin wahrgenommen" : " Ausstehend"}
               </div>
             </div>
             {/* Footer */}
             <div style={{ padding: "0 24px 24px", display: "flex", flexDirection: "column", gap: 8 }}>
               {isReadOnly ? (
                 <div style={{ background: "#FFFBEB", border: "1.5px solid #FDE68A", borderRadius: 13, padding: "14px 16px", textAlign: "center" }}>
-                  <p style={{ fontSize: 13, color: "#92400E", fontWeight: 700, margin: "0 0 10px" }}>🔒 Lesemodus — keine Änderungen möglich</p>
+                  <p style={{ fontSize: 13, color: "#92400E", fontWeight: 700, margin: "0 0 10px" }}> Lesemodus — keine Änderungen möglich</p>
                   <a href="/blocked?reason=trial" style={{ display: "inline-block", padding: "9px 20px", background: "#18A66D", color: "#fff", borderRadius: 10, fontSize: 13, fontWeight: 700, textDecoration: "none" }}>
                     Paket wählen →
                   </a>

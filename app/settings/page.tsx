@@ -182,7 +182,7 @@ export default function SettingsPage() {
       const { data: existing } = await supabase
         .from("companies").select("id").eq("slug", slug.trim()).neq("id", companyId).single()
       if (existing) {
-        setBookingMsg("❌ Dieser Link ist bereits vergeben.")
+        setBookingMsg("✗ Dieser Link ist bereits vergeben.")
         setBookingSaving(false); return
       }
     }
@@ -444,7 +444,7 @@ export default function SettingsPage() {
                 </div>
               ) : employees.length === 0 ? (
                 <div style={{ background: "#F9FAFB", borderRadius: 14, padding: "20px 24px", textAlign: "center", marginBottom: 24 }}>
-                  <div style={{ fontSize: 28, marginBottom: 8 }}>👤</div>
+                  <div style={{ fontSize: 28, marginBottom: 8 }}></div>
                   <div style={{ fontSize: 14, fontWeight: 700, color: T, marginBottom: 4 }}>Noch keine Mitarbeiter</div>
                   <div style={{ fontSize: 13, color: M }}>Füge deinen ersten Mitarbeiter hinzu — oder lass es leer für Einzelbetrieb.</div>
                 </div>
@@ -497,7 +497,7 @@ export default function SettingsPage() {
                             cursor: "pointer", fontSize: 14, background: "#FEF2F2", color: RED,
                           }}
                         >
-                          🗑
+                          
                         </button>
                       </div>
                     </div>
@@ -529,12 +529,12 @@ export default function SettingsPage() {
                     </button>
                   </div>
                   {empError && (
-                    <p style={{ fontSize: 13, color: RED, margin: "8px 0 0", fontWeight: 600 }}>⚠️ {empError}</p>
+                    <p style={{ fontSize: 13, color: RED, margin: "8px 0 0", fontWeight: 600 }}>! {empError}</p>
                   )}
                 </div>
               ) : (
                 <div style={{ background: "#FFF7ED", border: "1px solid #FED7AA", borderRadius: 12, padding: "12px 16px", fontSize: 13, color: "#92400E" }}>
-                  ⚠️ Maximale Anzahl von 5 Mitarbeitern erreicht. Lösche einen Mitarbeiter, um einen neuen hinzuzufügen.
+                  ! Maximale Anzahl von 5 Mitarbeitern erreicht. Lösche einen Mitarbeiter, um einen neuen hinzuzufügen.
                 </div>
               )}
 
@@ -586,7 +586,7 @@ export default function SettingsPage() {
 
               {pwErr && (
                 <div style={{ background: "#FEF2F2", border: "1px solid #FECACA", borderRadius: 11, padding: "11px 15px", marginBottom: 16, fontSize: 13, color: RED }}>
-                  ⚠️ {pwErr}
+                  ! {pwErr}
                 </div>
               )}
 
@@ -610,7 +610,7 @@ export default function SettingsPage() {
                     />
                     <button onClick={() => setPwOldShow(v => !v)} type="button"
                       style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: M, fontSize: 16, padding: 0, lineHeight: 1 }}>
-                      {pwOldShow ? "🙈" : "👁"}
+                      {pwOldShow ? "" : ""}
                     </button>
                   </div>
                 </div>
@@ -636,7 +636,7 @@ export default function SettingsPage() {
                     />
                     <button onClick={() => setPwNewShow(v => !v)} type="button"
                       style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: M, fontSize: 16, padding: 0, lineHeight: 1 }}>
-                      {pwNewShow ? "🙈" : "👁"}
+                      {pwNewShow ? "" : ""}
                     </button>
                   </div>
                   {/* Stärke-Anzeige */}
@@ -729,7 +729,7 @@ export default function SettingsPage() {
                     )}
                     {pct >= 80 && (
                       <div style={{ marginTop: 10, background: "#FFF7ED", border: "1px solid #FED7AA", borderRadius: 10, padding: "9px 14px", fontSize: 13, color: "#92400E", fontWeight: 600 }}>
-                        ⚠️ Du hast {100 - pct}% deines SMS-Kontingents übrig — kaufe jetzt nach, um lückenlos weiter zu senden.
+                        ! Du hast {100 - pct}% deines SMS-Kontingents übrig — kaufe jetzt nach, um lückenlos weiter zu senden.
                       </div>
                     )}
                   </div>
@@ -821,10 +821,10 @@ export default function SettingsPage() {
               <h2 style={{ fontSize: 16, fontWeight: 800, color: T, margin: "0 0 18px" }}>SMS-Versand</h2>
               <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
                 {[
-                  { icon: "📱", label: "Automatisch versandt",     value: "Täglich, 24h vorher" },
-                  { icon: "✅", label: "Zustellung",               value: "Deutschland, Österreich, CH" },
-                  { icon: "🔒", label: "Absender",                 value: "TerminStop" },
-                  { icon: "💡", label: "Nur bestätigte Termine",   value: "Keine SMS bei offenen Anfragen" },
+                  { icon: "", label: "Automatisch versandt",     value: "Täglich, 24h vorher" },
+                  { icon: "✓", label: "Zustellung",               value: "Deutschland, Österreich, CH" },
+                  { icon: "", label: "Absender",                 value: "TerminStop" },
+                  { icon: "", label: "Nur bestätigte Termine",   value: "Keine SMS bei offenen Anfragen" },
                 ].map(item => (
                   <div key={item.label} style={{ flex: 1, minWidth: 180, background: "#F9FAFB", borderRadius: 14, padding: "14px 16px" }}>
                     <div style={{ fontSize: 20, marginBottom: 6 }}>{item.icon}</div>
@@ -851,7 +851,7 @@ export default function SettingsPage() {
 
               <div style={{ display: "flex", alignItems: "center", gap: 14, background: "#F0FBF6", border: "1px solid #D1F5E3", borderRadius: 14, padding: "16px 20px", marginBottom: 20 }}>
                 <div style={{ fontSize: 28 }}>
-                  {plan === "trial" ? "🎉" : plan === "starter" ? "⚡" : plan === "pro" ? "🚀" : plan === "business" ? "🏢" : "❌"}
+                  {plan === "trial" ? "" : plan === "starter" ? "" : plan === "pro" ? "" : plan === "business" ? "" : "✗"}
                 </div>
                 <div>
                   <div style={{ fontSize: 15, fontWeight: 800, color: T }}>{planLabel[plan] || plan}</div>

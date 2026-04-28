@@ -246,7 +246,7 @@ const [appointments, setAppointments] = useState<any[]>([])
                 </div>
                 {smsWarning && (
                   <div className="mt-4 bg-[#FEF3C7] border border-[#FDE68A] rounded-xl px-4 py-3 text-xs text-[#92400E]">
-                    ⚠️ Ihr SMS-Kontingent ist fast aufgebraucht. Bitte melden Sie sich bei uns, um Ihr Paket anzupassen.
+                    ! Ihr SMS-Kontingent ist fast aufgebraucht. Bitte melden Sie sich bei uns, um Ihr Paket anzupassen.
                   </div>
                 )}
               </div>
@@ -257,7 +257,7 @@ const [appointments, setAppointments] = useState<any[]>([])
         {/* ─── EINSCHÄTZUNG ─── */}
         <div className={`${insightBg} border border-[#E5E7EB] rounded-2xl p-6 mb-8 flex items-start gap-5`}>
           <div className="w-12 h-12 bg-white rounded-xl border border-[#E5E7EB] flex items-center justify-center text-2xl shrink-0 shadow-sm">
-            {todayAppointments.length === 0 ? "📭" : completionPct >= 80 ? "🏆" : done >= open ? "✅" : "💡"}
+            {todayAppointments.length === 0 ? "" : completionPct >= 80 ? "" : done >= open ? "✓" : ""}
           </div>
           <div>
             <div className={`text-base font-bold ${insightColor} mb-1`}>{insightLabel}</div>
@@ -361,10 +361,10 @@ const [appointments, setAppointments] = useState<any[]>([])
             </div>
             <div className="px-6 py-5 space-y-4">
               {[
-                { label: "Termine gesamt", value: todayAppointments.length, icon: "📅" },
-                { label: "Erledigt", value: done, icon: "✅", green: true },
-                { label: "Noch offen", value: open, icon: "⏳" },
-                { label: "Abschlussrate", value: `${completionPct}%`, icon: "📊", green: completionPct >= 70 },
+                { label: "Termine gesamt", value: todayAppointments.length, icon: "" },
+                { label: "Erledigt", value: done, icon: "✓", green: true },
+                { label: "Noch offen", value: open, icon: "" },
+                { label: "Abschlussrate", value: `${completionPct}%`, icon: "", green: completionPct >= 70 },
               ].map((item, i) => (
                 <div key={i} className="flex items-center justify-between py-2 border-b border-[#F3F4F6] last:border-0">
                   <div className="flex items-center gap-3">
@@ -387,10 +387,10 @@ const [appointments, setAppointments] = useState<any[]>([])
             </div>
             <div className="px-6 py-5 space-y-4">
               {[
-                { label: "Termine gesamt", value: totalAll, icon: "📋" },
-                { label: "Erfolgreich wahrgenommen", value: doneAll, icon: "✅", green: true },
-                { label: "Letzte 7 Tage", value: last30Total, icon: "📆" },
-                { label: "Erfolgsquote (letzte 31 Tage)", value: `${successRateAll}%`, icon: "🏆", green: successRateAll >= 70 },
+                { label: "Termine gesamt", value: totalAll, icon: "" },
+                { label: "Erfolgreich wahrgenommen", value: doneAll, icon: "✓", green: true },
+                { label: "Letzte 7 Tage", value: last30Total, icon: "" },
+                { label: "Erfolgsquote (letzte 31 Tage)", value: `${successRateAll}%`, icon: "", green: successRateAll >= 70 },
               ].map((item, i) => (
                 <div key={i} className="flex items-center justify-between py-2 border-b border-[#F3F4F6] last:border-0">
                   <div className="flex items-center gap-3">
@@ -409,7 +409,7 @@ const [appointments, setAppointments] = useState<any[]>([])
         {/* ─── SYSTEMSTATUS ─── */}
         <div className="bg-[#1F2A37] text-white rounded-2xl p-6 mb-8">
           <div className="flex items-center gap-3 mb-5">
-            <div className="w-9 h-9 bg-[#18A66D] rounded-xl flex items-center justify-center text-base">⚙️</div>
+            <div className="w-9 h-9 bg-[#18A66D] rounded-xl flex items-center justify-center text-base"></div>
             <div>
               <div className="text-sm font-bold">Systemstatus</div>
               <div className="text-xs text-white/50">Alle Dienste laufen</div>
@@ -442,9 +442,9 @@ const [appointments, setAppointments] = useState<any[]>([])
           </div>
           <div className="px-6 py-5 grid grid-cols-1 sm:grid-cols-3 gap-5">
             {[
-              { icon: "📱", title: "Automatische Erinnerungen", desc: "Kunden erhalten 24h vor dem Termin eine persönliche SMS – ohne Ihr Zutun." },
-              { icon: "📉", title: "Weniger Ausfälle", desc: "Durch rechtzeitige Erinnerungen erscheinen deutlich mehr Kunden zuverlässig." },
-              { icon: "📆", title: "Planbarer Alltag", desc: "Ihr Kalender bleibt strukturiert und Ihr Tag vorhersehbar." },
+              { icon: "", title: "Automatische Erinnerungen", desc: "Kunden erhalten 24h vor dem Termin eine persönliche SMS – ohne Ihr Zutun." },
+              { icon: "", title: "Weniger Ausfälle", desc: "Durch rechtzeitige Erinnerungen erscheinen deutlich mehr Kunden zuverlässig." },
+              { icon: "", title: "Planbarer Alltag", desc: "Ihr Kalender bleibt strukturiert und Ihr Tag vorhersehbar." },
             ].map((item, i) => (
               <div key={i} className="flex flex-col gap-3">
                 <div className="w-10 h-10 bg-[#E8FBF3] rounded-xl flex items-center justify-center text-lg">
@@ -473,7 +473,7 @@ const [appointments, setAppointments] = useState<any[]>([])
                 href="mailto:terminstopp.business@gmail.com"
                 className="flex items-center gap-3 bg-[#F7FAFC] border border-[#E5E7EB] rounded-xl px-4 py-3 hover:border-[#18A66D] transition group"
               >
-                <div className="w-9 h-9 bg-[#E8FBF3] rounded-lg flex items-center justify-center text-base shrink-0">✉️</div>
+                <div className="w-9 h-9 bg-[#E8FBF3] rounded-lg flex items-center justify-center text-base shrink-0"></div>
                 <div>
                   <div className="text-xs text-[#6B7280] font-medium">E-Mail</div>
                   <div className="text-sm font-semibold text-[#1F2A37] group-hover:text-[#18A66D] transition">
@@ -485,7 +485,7 @@ const [appointments, setAppointments] = useState<any[]>([])
                 href="tel:015154219634"
                 className="flex items-center gap-3 bg-[#F7FAFC] border border-[#E5E7EB] rounded-xl px-4 py-3 hover:border-[#18A66D] transition group"
               >
-                <div className="w-9 h-9 bg-[#E8FBF3] rounded-lg flex items-center justify-center text-base shrink-0">📞</div>
+                <div className="w-9 h-9 bg-[#E8FBF3] rounded-lg flex items-center justify-center text-base shrink-0"></div>
                 <div>
                   <div className="text-xs text-[#6B7280] font-medium">Telefon</div>
                   <div className="text-sm font-semibold text-[#1F2A37] group-hover:text-[#18A66D] transition">

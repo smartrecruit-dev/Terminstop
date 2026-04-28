@@ -64,28 +64,28 @@ export default function BlockedPage() {
 
   const info = {
     trial: {
-      icon: "⏰",
+      icon: "",
       title: "Dein Testzeitraum ist abgelaufen",
       desc:  "Du hast TerminStop 14 Tage kostenlos getestet — wähle jetzt ein Paket, um weiterzumachen. Deine Daten bleiben vollständig erhalten.",
       showPlans: true,
       showPortal: false,
     },
     payment: {
-      icon: "💳",
+      icon: "",
       title: "Zahlung fehlgeschlagen",
       desc:  "Wir konnten deine letzte Zahlung nicht einziehen. Bitte aktualisiere deine Zahlungsmethode im Kundenportal, um deinen Zugang wiederherzustellen.",
       showPlans: false,
       showPortal: true,
     },
     cancelled: {
-      icon: "❌",
+      icon: "✗",
       title: "Dein Abo wurde gekündigt",
       desc:  "Du hast dein Abo gekündigt oder es wurde beendet. Wähle ein neues Paket, um TerminStop wieder zu nutzen. Deine Daten sind sicher.",
       showPlans: true,
       showPortal: false,
     },
     paused: {
-      icon: "🔒",
+      icon: "",
       title: "Konto vorübergehend gesperrt",
       desc:  "Dein Konto wurde gesperrt. Bitte wende dich an den Administrator unter terminstop.business@gmail.com.",
       showPlans: false,

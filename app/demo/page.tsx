@@ -64,7 +64,7 @@ function DemoForm({ name, setName, phone, setPhone, date, setDate, time, setTime
         <input className={inp} placeholder="z.B. Erstbesuch" value={note} onChange={e => setNote(e.target.value)} />
       </div>
       <div className="flex items-center gap-2.5 bg-[#F0FBF6] border border-[#D1F5E3] rounded-xl px-4 py-3">
-        <span className="text-base">📱</span>
+        <span className="text-base"></span>
         <div>
           <div className="text-xs font-semibold text-[#18A66D]">SMS-Erinnerung automatisch geplant</div>
           <div className="text-xs text-[#18A66D]/70">24 Stunden vor dem Termin</div>
@@ -155,7 +155,7 @@ export default function DemoDashboard() {
 
       {/* Demo Banner */}
       <div style={{ background: "linear-gradient(90deg,#7C3AED,#9333EA)", color: "#fff", padding: "10px 24px", display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: 13, fontWeight: 600, gap: 12, flexWrap: "wrap" }}>
-        <span>🎭 Demo-Modus – Alle Daten sind fiktiv · Keine SMS werden versendet</span>
+        <span> Demo-Modus – Alle Daten sind fiktiv · Keine SMS werden versendet</span>
         <a href="/register" style={{ background: "#fff", color: "#7C3AED", padding: "6px 16px", borderRadius: 8, fontWeight: 700, textDecoration: "none", fontSize: 12, whiteSpace: "nowrap" }}>
           Kostenlos registrieren →
         </a>
@@ -272,7 +272,7 @@ export default function DemoDashboard() {
         <a href="/demo/buchung" style={{ display: "block", textDecoration: "none", background: "#FFFBEB", border: "1px solid #FDE68A", borderRadius: 12, padding: "14px 16px", marginBottom: 16 }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <span style={{ fontSize: 18 }}>🔗</span>
+              <span style={{ fontSize: 18 }}></span>
               <div>
                 <div style={{ fontSize: 13, fontWeight: 800, color: "#92400E" }}>Buchungsseite Demo</div>
                 <div style={{ fontSize: 12, color: "#B45309" }}>So buchen Ihre Kunden rund um die Uhr — interaktive Demo ansehen</div>
@@ -290,7 +290,7 @@ export default function DemoDashboard() {
             <div className="bg-white border border-[#E5E7EB] rounded-2xl overflow-hidden">
               {allToday.length === 0 ? (
                 <div className="py-16 text-center">
-                  <div className="text-5xl mb-3">📅</div>
+                  <div className="text-5xl mb-3"></div>
                   <div className="text-sm font-semibold text-[#374151] mb-1">Noch keine Termine für heute</div>
                   <div className="text-xs text-[#9CA3AF]">Tippe auf + um einen Termin hinzuzufügen</div>
                 </div>
