@@ -117,6 +117,12 @@ export async function GET(req: NextRequest) {
     let sentCount = 0
 
     for (const a of data || []) {
+      // Sicherheitsprüfung: Termin ohne Datum/Zeit/Telefon überspringen
+      if (!a.date || !a.time || !a.phone) {
+        console.log(`[reminder] Termin ${a.id}: übersprungen (fehlendes Datum/Zeit/Telefon — date=${a.date}, time=${a.time}, phone=${a.phone})`)
+        continue
+      }
+
       const appointmentDate = parseLocalDate(a.date, a.time)
       const diffMs    = appointmentDate.getTime() - now.getTime()
       const diffHours = diffMs / (1000 * 60 * 60)
