@@ -117,63 +117,6 @@ function AppointmentForm({
   )
 }
 
-// TrialBanner: DB-basiert (created_at), zeigt sich für alle Trial-Nutzer
-function TrialBanner({ plan, createdAt }: { plan: string; createdAt: string | null }) {
-  const [dismissed, setDismissed] = useState(false)
-
-  if (plan !== "trial" || dismissed) return null
-
-  const daysLeft = createdAt
-    ? Math.max(0, 14 - Math.floor((Date.now() - new Date(createdAt).getTime()) / (1000 * 60 * 60 * 24)))
-    : 14
-
-  const isUrgent = daysLeft <= 3
-  const bg = isUrgent
-    ? "linear-gradient(135deg, #B91C1C 0%, #991B1B 100%)"
-    : "linear-gradient(135deg, #0F8A57 0%, #0A6B43 100%)"
-
-  return (
-    <div style={{
-      background: bg, borderRadius: 16, padding: "16px 20px", marginBottom: 20,
-      display: "flex", alignItems: "center", justifyContent: "space-between",
-      gap: 16, flexWrap: "wrap",
-      boxShadow: isUrgent ? "0 4px 20px -6px rgba(185,28,28,0.4)" : "0 4px 20px -6px rgba(10,107,67,0.35)",
-    }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-        <div style={{ width: 40, height: 40, borderRadius: 12, flexShrink: 0, background: "rgba(255,255,255,0.15)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <svg width="18" height="18" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
-            {isUrgent
-              ? <><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></>
-              : <><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></>}
-          </svg>
-        </div>
-        <div>
-          <div style={{ fontSize: 14, fontWeight: 800, color: "#fff", marginBottom: 2 }}>
-            {isUrgent ? `Nur noch ${daysLeft} Tag${daysLeft !== 1 ? "e" : ""} — Testzeitraum endet bald!` : `Testzeitraum: noch ${daysLeft} Tag${daysLeft !== 1 ? "e" : ""} kostenlos`}
-          </div>
-          <div style={{ fontSize: 13, color: "rgba(255,255,255,0.8)" }}>
-            {isUrgent
-              ? "Wähle jetzt ein Paket, damit deine SMS-Erinnerungen nicht stoppen."
-              : "Danach einfach ein Paket wählen — deine Daten bleiben erhalten."}
-          </div>
-        </div>
-      </div>
-      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-        <a href="/settings" style={{
-          fontSize: 13, fontWeight: 700, padding: "9px 18px", borderRadius: 10,
-          background: "#fff", color: isUrgent ? "#B91C1C" : "#0A6B43",
-          textDecoration: "none", boxShadow: "0 2px 8px rgba(0,0,0,0.12)", whiteSpace: "nowrap",
-        }}>
-          Paket wählen →
-        </a>
-        <button onClick={() => setDismissed(true)}
-          style={{ background: "none", border: "none", cursor: "pointer", color: "rgba(255,255,255,0.6)", fontSize: 18, padding: 4, lineHeight: 1 }}
-          aria-label="Schließen">×</button>
-      </div>
-    </div>
-  )
-}
-
 function getGreeting() {
   const h = new Date().getHours()
   if (h < 12) return "Guten Morgen"
@@ -219,10 +162,8 @@ export default function Dashboard() {
   const [customerSearch, setCustomerSearch]   = useState("")
   const [showSuggestions, setShowSuggestions] = useState(false)
   const [loading, setLoading] = useState(true)
-  const [smsUsed, setSmsUsed]     = useState(0)
-  const [smsLimit, setSmsLimit]   = useState(100)
-  const [plan, setPlan]           = useState("trial")
-  const [createdAt, setCreatedAt] = useState<string | null>(null)
+  const [smsUsed, setSmsUsed]   = useState(0)
+  const [smsLimit, setSmsLimit] = useState(100)
 
   useEffect(() => {
     const storedId   = localStorage.getItem("company_id")
@@ -264,8 +205,6 @@ export default function Dashboard() {
       if (coRes.data) {
         setSmsUsed(coRes.data.sms_count_month || 0)
         setSmsLimit(coRes.data.sms_limit || 100)
-        setPlan(coRes.data.plan || "trial")
-        setCreatedAt(coRes.data.created_at || null)
         if (coRes.data.name) setCompanyName(coRes.data.name)
       }
       if (apptRes.data) setAppointments(apptRes.data)
@@ -384,9 +323,6 @@ export default function Dashboard() {
       )}
 
       <div className="max-w-4xl mx-auto px-4 py-7 pb-28 md:pb-10">
-
-        {/* Trial-Banner — DB-basiert */}
-        <TrialBanner plan={plan} createdAt={createdAt} />
 
         {/* SMS-Balken — immer sichtbar, Farbe je nach Auslastung */}
         {(() => {

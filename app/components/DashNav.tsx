@@ -64,6 +64,12 @@ export default function DashNav({
   const [moreOpen, setMoreOpen]         = useState(false)
   const moreRef = useRef<HTMLDivElement>(null)
 
+  // Trial strip state
+  const [trialPlan,      setTrialPlan]      = useState<string | null>(null)
+  const [trialCreatedAt, setTrialCreatedAt] = useState<string | null>(null)
+  const [trialSmsUsed,   setTrialSmsUsed]   = useState(0)
+  const [trialSmsLimit,  setTrialSmsLimit]  = useState(100)
+
   useEffect(() => {
     function handleClick(e: MouseEvent) {
       if (moreRef.current && !moreRef.current.contains(e.target as Node)) setMoreOpen(false)
@@ -74,8 +80,16 @@ export default function DashNav({
 
   useEffect(() => {
     if (!companyId) return
-    supabase.from("companies").select("booking_addon").eq("id", companyId).single()
-      .then(({ data }) => setBookingAddon(!!data?.booking_addon))
+    supabase.from("companies")
+      .select("booking_addon, plan, created_at, sms_count_month, sms_limit")
+      .eq("id", companyId).single()
+      .then(({ data }) => {
+        setBookingAddon(!!data?.booking_addon)
+        setTrialPlan(data?.plan || null)
+        setTrialCreatedAt(data?.created_at || null)
+        setTrialSmsUsed(data?.sms_count_month || 0)
+        setTrialSmsLimit(data?.sms_limit || 100)
+      })
     supabase.from("appointments").select("id", { count: "exact", head: true })
       .eq("company_id", companyId).eq("online_booking", true).eq("status", "pending")
       .then(({ count }) => setPendingCount(count || 0))
@@ -208,6 +222,65 @@ export default function DashNav({
           </button>
         </div>
       </nav>
+
+      {/* ── Trial Strip (nur für Trial-Nutzer) ── */}
+      {trialPlan === "trial" && (() => {
+        const daysLeft = trialCreatedAt
+          ? Math.max(0, 14 - Math.floor((Date.now() - new Date(trialCreatedAt).getTime()) / 86400000))
+          : 14
+        const daysPct    = Math.round(((14 - daysLeft) / 14) * 100)
+        const smsPct     = trialSmsLimit > 0 ? Math.round((trialSmsUsed / trialSmsLimit) * 100) : 0
+        const daysUrgent = daysLeft <= 3
+        const smsUrgent  = smsPct >= 80
+        const daysColor  = daysUrgent ? "#DC2626" : daysLeft <= 7 ? "#D97706" : "#18A66D"
+        const smsColor   = smsPct >= 100 ? "#DC2626" : smsUrgent ? "#D97706" : "#18A66D"
+        return (
+          <div style={{
+            background: (daysUrgent || smsPct >= 100) ? "#FEF2F2" : smsUrgent ? "#FFFBEB" : "#F0FBF6",
+            borderBottom: `1px solid ${(daysUrgent || smsPct >= 100) ? "#FECACA" : smsUrgent ? "#FDE68A" : "#D1F5E3"}`,
+            padding: "8px 24px",
+            display: "flex", alignItems: "center", gap: 24, flexWrap: "wrap",
+            fontFamily: "'Inter','Manrope',sans-serif",
+          }}>
+            {/* Days bar */}
+            <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 160 }}>
+              <svg width="13" height="13" fill="none" stroke={daysColor} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+              </svg>
+              <span style={{ fontSize: 12, fontWeight: 700, color: daysColor, whiteSpace: "nowrap" }}>
+                {daysLeft === 0 ? "Test abgelaufen" : `Test: noch ${daysLeft} Tag${daysLeft !== 1 ? "e" : ""}`}
+              </span>
+              <div style={{ width: 60, height: 5, background: "#E5E7EB", borderRadius: 99, overflow: "hidden" }}>
+                <div style={{ height: "100%", width: `${daysPct}%`, background: daysColor, borderRadius: 99, transition: "width .3s" }} />
+              </div>
+            </div>
+
+            {/* SMS bar */}
+            <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 160 }}>
+              <svg width="13" height="13" fill="none" stroke={smsColor} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+              </svg>
+              <span style={{ fontSize: 12, fontWeight: 700, color: smsColor, whiteSpace: "nowrap" }}>
+                SMS: {trialSmsUsed} / {trialSmsLimit}
+              </span>
+              <div style={{ width: 60, height: 5, background: "#E5E7EB", borderRadius: 99, overflow: "hidden" }}>
+                <div style={{ height: "100%", width: `${Math.min(100, smsPct)}%`, background: smsColor, borderRadius: 99, transition: "width .3s" }} />
+              </div>
+            </div>
+
+            {/* CTA */}
+            <a href="/settings" style={{
+              marginLeft: "auto", fontSize: 12, fontWeight: 700,
+              padding: "5px 14px", borderRadius: 8,
+              background: (daysUrgent || smsPct >= 80) ? "#18A66D" : "#F3F4F6",
+              color: (daysUrgent || smsPct >= 80) ? "#fff" : "#374151",
+              textDecoration: "none", whiteSpace: "nowrap",
+            }}>
+              Paket wählen →
+            </a>
+          </div>
+        )
+      })()}
 
       {/* ── Mobile Bottom Nav (nur auf Mobilgeräten) ── */}
       <div className="ts-mobile-nav" style={{

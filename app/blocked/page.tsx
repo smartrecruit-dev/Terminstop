@@ -7,7 +7,7 @@ const G = "#18A66D", GL = "#F0FBF6", GB = "#D1F5E3"
 const INK = "#111827", MUTED = "#6B7280", BD = "#E5E7EB"
 
 export default function BlockedPage() {
-  const [reason, setReason]   = useState<"trial" | "payment" | "cancelled" | "paused">("paused")
+  const [reason, setReason]   = useState<"trial" | "payment" | "cancelled" | "paused" | "sms_limit">("paused")
   const [plan,   setPlan]     = useState<string>("trial")
   const [loading, setLoading] = useState(false)
 
@@ -97,6 +97,13 @@ export default function BlockedPage() {
       title: "Konto vorübergehend gesperrt",
       desc:  "Dein Konto wurde gesperrt. Bitte wende dich an den Administrator unter terminstop.business@gmail.com.",
       showPlans: false,
+      showPortal: false,
+    },
+    sms_limit: {
+      icon: <IconSVG color="#F59E0B" path="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />,
+      title: "SMS-Kontingent aufgebraucht",
+      desc:  "Du hast dein kostenloses SMS-Kontingent (100 SMS) im Testzeitraum aufgebraucht. Wähle ein Paket, um unbegrenzt weiterzumachen. Deine Daten bleiben vollständig erhalten.",
+      showPlans: true,
       showPortal: false,
     },
   }[reason]

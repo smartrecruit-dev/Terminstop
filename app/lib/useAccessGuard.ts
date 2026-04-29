@@ -62,7 +62,7 @@ export function useAccessGuard(
         // 3. Trial SMS limit reached
         if (!reason && plan === "trial") {
           const used  = co.sms_count_month ?? 0
-          const limit = co.sms_limit ?? 50
+          const limit = co.sms_limit ?? 100
           if (used >= limit) reason = "trial_limit"
         }
 
@@ -70,8 +70,9 @@ export function useAccessGuard(
 
         if (locked && redirectOnLock) {
           const urlReason =
-            reason === "payment"    ? "payment"   :
-            reason === "cancelled"  ? "cancelled" : "trial"
+            reason === "payment"      ? "payment"    :
+            reason === "cancelled"    ? "cancelled"  :
+            reason === "trial_limit"  ? "sms_limit"  : "trial"
           window.location.href = `/blocked?reason=${urlReason}&plan=${plan}`
           return
         }

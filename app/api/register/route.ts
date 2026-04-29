@@ -98,7 +98,7 @@ export async function POST(req: NextRequest) {
         booking_addon: true,
         paused:          false,
         plan:            "trial",
-        sms_limit:       50,   // Testzeitraum: max. 50 SMS
+        sms_limit:       100,  // Testzeitraum: max. 100 SMS
         sms_count_month: 0,
       })
 
