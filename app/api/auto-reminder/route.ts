@@ -113,6 +113,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ success: false, error })
     }
 
+    console.log(`[reminder] ${data?.length ?? 0} offene Termine gefunden`)
     let sentCount = 0
 
     for (const a of data || []) {
@@ -120,7 +121,12 @@ export async function GET(req: NextRequest) {
       const diffMs    = appointmentDate.getTime() - now.getTime()
       const diffHours = diffMs / (1000 * 60 * 60)
 
-      if (!(diffHours <= 24 && diffHours > 0)) continue
+      console.log(`[reminder] Termin ${a.id}: ${a.date} ${a.time}, diffHours=${diffHours.toFixed(2)}, phone=${a.phone}`)
+
+      if (!(diffHours <= 24 && diffHours > 0)) {
+        console.log(`[reminder] → übersprungen (nicht im 24h-Fenster)`)
+        continue
+      }
 
       try {
         const { data: company, error: compErr } = await supabase
@@ -135,7 +141,10 @@ export async function GET(req: NextRequest) {
         }
 
         // ── Skip if company is paused ──
-        if (company?.paused) continue
+        if (company?.paused) {
+          console.log(`[reminder] → übersprungen (company paused)`)
+          continue
+        }
 
         // ── Monthly reset: if new month, reset counter + extra ──
         const month = currentMonth()
@@ -154,8 +163,10 @@ export async function GET(req: NextRequest) {
         const smsExtra = company?.sms_extra_month ?? 0
         const smsLimit = (company?.sms_limit ?? 100) + smsExtra
 
+        console.log(`[reminder] → SMS-Stand: ${smsUsed}/${smsLimit}, plan=${company?.plan}`)
+
         if (smsUsed >= smsLimit) {
-          console.log(`[reminder] SMS-Limit erreicht für ${a.company_id} (${smsUsed}/${smsLimit}) — markiere als erledigt`)
+          console.log(`[reminder] → übersprungen (SMS-Limit erreicht)`)
           await supabase.from("appointments").update({ reminded: true, sms_sent_at: null }).eq("id", a.id)
           continue
         }
