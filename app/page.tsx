@@ -1228,7 +1228,7 @@ export default function LandingPage() {
                   <span style={{ color: C.text, fontWeight: 800, fontSize: 16, letterSpacing: "-0.3px" }}>Alles in einem Paket.</span>
                   <span style={{ color: C.muted, fontSize: 14, marginLeft: 12 }}>Monatlich kündbar · Kein Vertrag</span>
                 </div>
-                <a href="/lead" className="btn btn-primary" style={{ fontSize: 14, padding: "12px 24px", flexShrink: 0 }}>
+                <a href="/register" className="btn btn-primary" style={{ fontSize: 14, padding: "12px 24px", flexShrink: 0 }}>
                   Kostenlos testen →
                 </a>
               </div>
@@ -1292,7 +1292,7 @@ export default function LandingPage() {
                   ))}
                 </div>
                 <div style={{ marginTop: 32 }}>
-                  <a href="/lead" className="btn btn-primary" style={{ fontSize: 15, padding: "14px 26px" }}>
+                  <a href="/register" className="btn btn-primary" style={{ fontSize: 15, padding: "14px 26px" }}>
                     Jetzt kostenlos testen →
                   </a>
                 </div>
@@ -1324,7 +1324,7 @@ export default function LandingPage() {
                     height: "100%", boxSizing: "border-box",
                     boxShadow: "0 1px 4px rgba(15,27,45,0.04)",
                   }}>
-                    <div style={{ color: "#F59E0B", fontSize: 14, letterSpacing: 3, marginBottom: 18 }}>5 Sterne</div>
+                    <div style={{ color: "#F59E0B", fontSize: 18, letterSpacing: 2, marginBottom: 18 }}>★★★★★</div>
                     <p style={{ fontSize: 15, color: C.text2, lineHeight: 1.75, flex: 1, marginBottom: 22, fontWeight: 400 }}>
                       „{r.text}"
                     </p>
@@ -1489,12 +1489,12 @@ export default function LandingPage() {
                 {[
                   { value: "50+",    label: "Betriebe vertrauen uns" },
                   { value: "94%",    label: "weniger Terminausfälle" },
-                  { value: "4,9 ",  label: "Kundenbewertung" },
+                  { value: "4,9",   label: "★★★★★  43 Bewertungen" },
                   { value: "10 Min", label: "bis zur ersten SMS" },
                 ].map((stat, i) => (
                   <div key={i} style={{ flex: "1 1 180px", textAlign: "center", padding: "24px 20px", borderRight: i < 3 ? `1px solid ${C.border}` : "none" }}>
                     <div style={{ fontSize: 36, fontWeight: 900, color: C.ink, letterSpacing: "-1px", marginBottom: 6 }}>{stat.value}</div>
-                    <div style={{ fontSize: 14, color: C.muted, fontWeight: 500 }}>{stat.label}</div>
+                    <div style={{ fontSize: 13, color: stat.label.startsWith("★") ? "#F59E0B" : C.muted, fontWeight: stat.label.startsWith("★") ? 700 : 500 }}>{stat.label}</div>
                   </div>
                 ))}
               </div>
@@ -1537,7 +1537,7 @@ export default function LandingPage() {
                   name: "Petra W.",
                   role: "Kosmetikstudio, Berlin",
                   avatar: "PW",
-                  stars: 5,
+                  stars: 4.5,
                   delay: 120,
                 },
               ].map((t, i) => (
@@ -1548,10 +1548,18 @@ export default function LandingPage() {
                     display: "flex", flexDirection: "column", gap: 16,
                   }}>
                     {/* Stars */}
-                    <div style={{ display: "flex", gap: 2 }}>
-                      {"5 Sterne".split("").map((s, j) => (
-                        <span key={j} style={{ color: "#F59E0B", fontSize: 16 }}>{s}</span>
+                    <div style={{ display: "flex", gap: 1, fontSize: 18, color: "#F59E0B" }}>
+                      {"★★★★".split("").map((s, j) => (
+                        <span key={j}>{s}</span>
                       ))}
+                      <span style={{ color: t.stars === 5 ? "#F59E0B" : "#E5E7EB", position: "relative" }}>
+                        {t.stars === 5 ? "★" : (
+                          <span style={{ position: "relative", display: "inline-block" }}>
+                            <span style={{ color: "#E5E7EB" }}>★</span>
+                            <span style={{ position: "absolute", left: 0, top: 0, width: "50%", overflow: "hidden", color: "#F59E0B" }}>★</span>
+                          </span>
+                        )}
+                      </span>
                     </div>
                     {/* Quote */}
                     <p style={{ fontSize: 15, color: C.text2, lineHeight: 1.65, margin: 0, flex: 1 }}>
@@ -1797,7 +1805,7 @@ export default function LandingPage() {
                 </div>
                 <p style={{ textAlign: "center", fontSize: 14, color: C.muted2, lineHeight: 1.8, margin: 0 }}>
                   Über 1.000 SMS pro Monat?{" "}
-                  <a href="mailto:hallo@terminstop.de" style={{ color: C.green, fontWeight: 700, textDecoration: "none" }}>
+                  <a href="mailto:terminstop.business@gmail.com" style={{ color: C.green, fontWeight: 700, textDecoration: "none" }}>
                     Individuelles Angebot anfragen →
                   </a>
                 </p>
