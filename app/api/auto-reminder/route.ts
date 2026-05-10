@@ -14,10 +14,11 @@ const supabaseAdmin = createAdminClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
 
-// Current month as YYYYMM integer (e.g. 202604)
+// Current month as "YYYY-MM" string (matches DB column format)
 function currentMonth() {
   const d = new Date()
-  return d.getFullYear() * 100 + (d.getMonth() + 1)
+  const berlin = new Date(d.toLocaleString("en-US", { timeZone: "Europe/Berlin" }))
+  return `${berlin.getFullYear()}-${String(berlin.getMonth() + 1).padStart(2, "0")}`
 }
 
 async function sendSMS(to: string, message: string): Promise<void> {
