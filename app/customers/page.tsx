@@ -184,7 +184,9 @@ const [companyId, setCompanyId] = useState<string | null>(null)
             <div className="divide-y divide-[#F3F4F6] overflow-y-auto max-h-[520px]">
               {filtered.length === 0 ? (
                 <div className="px-6 py-16 text-center">
-                  <div className="text-4xl mb-3"></div>
+                  <div className="mb-3 flex justify-center">
+                    <svg width="36" height="36" fill="none" stroke="#D1D5DB" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                  </div>
                   <div className="text-sm font-semibold text-[#1F2A37] mb-1">
                     {search ? "Kein Treffer" : "Noch keine Kunden"}
                   </div>

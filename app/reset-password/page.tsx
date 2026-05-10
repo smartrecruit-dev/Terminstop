@@ -88,7 +88,9 @@ export default function ResetPasswordPage() {
   if (!ready) return (
     <div style={wrap}>
       <div style={{ ...cardStyle, textAlign:"center" }}>
-        <div style={{ width:64, height:64, background:"#FEF2F2", border:"1px solid #FECACA", borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", fontSize:28, margin:"0 auto 20px" }}></div>
+        <div style={{ width:64, height:64, background:"#FEF2F2", border:"1px solid #FECACA", borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", margin:"0 auto 20px" }}>
+          <svg width="28" height="28" fill="none" stroke="#EF4444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        </div>
         <h1 style={{ fontSize:20, fontWeight:800, color:"#111827", margin:"0 0 10px" }}>Link ungültig oder abgelaufen</h1>
         <p style={{ fontSize:14, color:"#6B7280", lineHeight:1.65, margin:"0 0 24px" }}>
           Bitte fordere einen neuen Passwort-Link an.

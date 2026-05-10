@@ -34,7 +34,9 @@ export default function ForgotPasswordPage() {
   if (sent) return (
     <div style={{ minHeight:"100dvh", display:"flex", alignItems:"center", justifyContent:"center", background:"#F9FAFB", fontFamily:"-apple-system,BlinkMacSystemFont,'Inter',sans-serif", padding:"24px" }}>
       <div style={{ background:"#fff", border:"1px solid #E5E7EB", borderRadius:24, padding:"40px 32px", maxWidth:400, width:"100%", textAlign:"center", boxShadow:"0 4px 24px rgba(0,0,0,0.06)" }}>
-        <div style={{ width:64, height:64, background:"#F0FBF6", border:"1px solid #D1F5E3", borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", fontSize:28, margin:"0 auto 20px" }}></div>
+        <div style={{ width:64, height:64, background:"#F0FBF6", border:"1px solid #D1F5E3", borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", margin:"0 auto 20px" }}>
+          <svg width="28" height="28" fill="none" stroke="#18A66D" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        </div>
         <h1 style={{ fontSize:22, fontWeight:800, color:"#111827", margin:"0 0 10px", letterSpacing:"-.4px" }}>E-Mail gesendet!</h1>
         <p style={{ fontSize:14, color:"#6B7280", lineHeight:1.7, margin:"0 0 28px" }}>
           Wir haben einen Link an <strong style={{ color:"#111827" }}>{email}</strong> geschickt. Klicke auf den Link um ein neues Passwort zu setzen.

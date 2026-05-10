@@ -165,7 +165,9 @@ export default function OnboardingPage() {
         {/* ── Step 1: Betrieb ── */}
         {step === 1 && (
           <div>
-            <div style={{ fontSize: 28, marginBottom: 4 }}></div>
+            <div style={{ marginBottom: 4 }}>
+              <svg width="28" height="28" fill="none" stroke={G} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            </div>
             <h1 style={{ fontSize: 22, fontWeight: 900, color: T, margin: "0 0 6px" }}>Willkommen bei TerminStop!</h1>
             <p style={{ fontSize: 15, color: M, margin: "0 0 28px", lineHeight: 1.6 }}>
               Lass uns in 4 Schritten deinen Betrieb einrichten. Das dauert nur 2 Minuten.
@@ -212,7 +214,9 @@ export default function OnboardingPage() {
         {/* ── Step 2: Leistungen ── */}
         {step === 2 && (
           <div>
-            <div style={{ fontSize: 28, marginBottom: 4 }}></div>
+            <div style={{ marginBottom: 4 }}>
+              <svg width="28" height="28" fill="none" stroke={G} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+            </div>
             <h2 style={{ fontSize: 22, fontWeight: 900, color: T, margin: "0 0 6px" }}>Deine Leistungen</h2>
             <p style={{ fontSize: 15, color: M, margin: "0 0 24px", lineHeight: 1.6 }}>
               Welche Leistungen können Kunden bei dir buchen? Du kannst jederzeit weitere hinzufügen.
@@ -275,7 +279,9 @@ export default function OnboardingPage() {
         {/* ── Step 3: Buchungsseite ── */}
         {step === 3 && (
           <div>
-            <div style={{ fontSize: 28, marginBottom: 4 }}></div>
+            <div style={{ marginBottom: 4 }}>
+              <svg width="28" height="28" fill="none" stroke={G} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+            </div>
             <h2 style={{ fontSize: 22, fontWeight: 900, color: T, margin: "0 0 6px" }}>Deine Buchungsseite</h2>
             <p style={{ fontSize: 15, color: M, margin: "0 0 24px", lineHeight: 1.6 }}>
               Kunden können über diesen Link direkt bei dir buchen. Du kannst ihn später noch ändern.

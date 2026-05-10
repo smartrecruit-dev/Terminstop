@@ -158,7 +158,9 @@ const [companyId,    setCompanyId]    = useState<string | null>(null)
             background:"#fff", border:"2px dashed #E5E7EB", borderRadius:20,
             padding:"40px 28px", textAlign:"center"
           }}>
-            <div style={{ fontSize:48, marginBottom:16 }}></div>
+            <div style={{ marginBottom:16, display:"flex", justifyContent:"center" }}>
+              <svg width="52" height="52" fill="none" stroke="#D1D5DB" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><circle cx="12" cy="16" r="2" fill="#D1D5DB" stroke="none"/></svg>
+            </div>
             <h2 style={{ fontSize:18, fontWeight:800, color:"#1F2A37", marginBottom:8 }}>
               Online-Buchung ist noch nicht freigeschaltet
             </h2>
@@ -217,7 +219,9 @@ const [companyId,    setCompanyId]    = useState<string | null>(null)
           </div>
         ) : bookingAddon === true && requests.length === 0 ? (
           <div className="bg-white rounded-2xl border border-[#E5E7EB] p-12 text-center">
-            <div className="text-5xl mb-4"></div>
+            <div className="mb-4 flex justify-center">
+              <svg width="44" height="44" fill="none" stroke="#D1D5DB" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>
+            </div>
             <p className="text-sm font-semibold text-[#374151]">Noch keine Anfragen</p>
             <p className="text-xs text-[#9CA3AF] mt-1 leading-relaxed">
               Sobald Kunden über Ihren Buchungslink buchen,<br />erscheinen sie hier.

@@ -487,7 +487,9 @@ export default function Dashboard() {
                     width: 64, height: 64, borderRadius: "50%", background: "#F0FDF6",
                     display: "flex", alignItems: "center", justifyContent: "center",
                     margin: "0 auto 16px", fontSize: 28
-                  }}></div>
+                  }}>
+                    <svg width="28" height="28" fill="none" stroke="#18A66D" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                  </div>
                   <div style={{ fontSize: 15, fontWeight: 700, color: "#374151", marginBottom: 4 }}>Noch keine Termine heute</div>
                   <div style={{ fontSize: 13, color: "#9CA3AF" }}>Tippe auf + um den ersten Termin einzutragen</div>
                 </div>

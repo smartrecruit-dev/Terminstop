@@ -444,7 +444,9 @@ export default function SettingsPage() {
                 </div>
               ) : employees.length === 0 ? (
                 <div style={{ background: "#F9FAFB", borderRadius: 14, padding: "20px 24px", textAlign: "center", marginBottom: 24 }}>
-                  <div style={{ fontSize: 28, marginBottom: 8 }}></div>
+                  <div style={{ marginBottom: 8, display: "flex", justifyContent: "center" }}>
+                    <svg width="28" height="28" fill="none" stroke="#D1D5DB" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+                  </div>
                   <div style={{ fontSize: 14, fontWeight: 700, color: T, marginBottom: 4 }}>Noch keine Mitarbeiter</div>
                   <div style={{ fontSize: 13, color: M }}>Füge deinen ersten Mitarbeiter hinzu — oder lass es leer für Einzelbetrieb.</div>
                 </div>

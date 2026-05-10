@@ -517,7 +517,9 @@ export default function CalendarPage() {
             <div style={{ padding: "18px 24px", display: "flex", flexDirection: "column", gap: 14 }}>
               {selected.phone && (
                 <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                  <div style={{ width: 36, height: 36, background: "#F9FAFB", border: "1px solid #E5E7EB", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, flexShrink: 0 }}></div>
+                  <div style={{ width: 36, height: 36, background: "#F9FAFB", border: "1px solid #E5E7EB", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                    <svg width="16" height="16" fill="none" stroke="#6B7280" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.4 2 2 0 0 1 3.6 1.22h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.84a16 16 0 0 0 6.29 6.29l.95-.95a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7a2 2 0 0 1 1.72 2.03z"/></svg>
+                  </div>
                   <div>
                     <div style={{ fontSize: 11, color: "#9CA3AF", fontWeight: 600 }}>Telefon</div>
                     <div style={{ fontSize: 14, fontWeight: 700, color: "#111827" }}>{selected.phone}</div>
@@ -526,7 +528,9 @@ export default function CalendarPage() {
               )}
               {selected.note && (
                 <div style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
-                  <div style={{ width: 36, height: 36, background: "#F9FAFB", border: "1px solid #E5E7EB", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, flexShrink: 0 }}></div>
+                  <div style={{ width: 36, height: 36, background: "#F9FAFB", border: "1px solid #E5E7EB", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                    <svg width="16" height="16" fill="none" stroke="#6B7280" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                  </div>
                   <div>
                     <div style={{ fontSize: 11, color: "#9CA3AF", fontWeight: 600 }}>Notiz</div>
                     <div style={{ fontSize: 14, color: "#111827" }}>{selected.note}</div>
@@ -535,7 +539,9 @@ export default function CalendarPage() {
               )}
               {empName(selected.employee_id) && (
                 <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                  <div style={{ width: 36, height: 36, background: "#F0FBF6", border: "1px solid #D1F5E3", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, flexShrink: 0 }}></div>
+                  <div style={{ width: 36, height: 36, background: "#F0FBF6", border: "1px solid #D1F5E3", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                    <svg width="16" height="16" fill="none" stroke="#18A66D" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                  </div>
                   <div>
                     <div style={{ fontSize: 11, color: "#9CA3AF", fontWeight: 600 }}>Mitarbeiter</div>
                     <div style={{ fontSize: 14, fontWeight: 700, color: "#18A66D" }}>{empName(selected.employee_id)}</div>

@@ -46,7 +46,9 @@ export default function RegisterPage() {
     return (
       <div style={{ minHeight: "100dvh", display: "flex", alignItems: "center", justifyContent: "center", background: "#F4F6F9", fontFamily: FONT, padding: 24 }}>
         <div style={{ textAlign: "center", maxWidth: 420 }}>
-          <div style={{ fontSize: 48, marginBottom: 16 }}></div>
+          <div style={{ marginBottom: 16, display: "flex", justifyContent: "center" }}>
+            <svg width="52" height="52" fill="none" stroke="#D1D5DB" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
           <h1 style={{ fontSize: 24, fontWeight: 900, color: C.text, marginBottom: 12 }}>Bald verfügbar</h1>
           <p style={{ fontSize: 15, color: C.muted, lineHeight: 1.6, marginBottom: 28 }}>
             Wir arbeiten noch an ein paar letzten Details.<br />Die Registrierung öffnet in Kürze.
