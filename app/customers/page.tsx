@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { supabase } from "../lib/supabaseClient"
 import { useAccessGuard } from "../lib/useAccessGuard"
 import DashNav from "../components/DashNav"
@@ -58,7 +58,7 @@ const [companyId, setCompanyId] = useState<string | null>(null)
   async function loadAppointments() {
     const { data } = await supabase
       .from("appointments")
-      .select("*")
+      .select("id, company_id, name, phone, date, time, status, note")
       .eq("company_id", companyId)
       .order("date", { ascending: false })
     if (data) setAppointments(data)
@@ -124,9 +124,19 @@ const [companyId, setCompanyId] = useState<string | null>(null)
     c.phone.includes(search)
   )
 
-  const customerAppointments = selected
-    ? appointments.filter(a => a.phone === selected.phone)
-    : []
+  // O(1) lookup statt O(n²) filter im render loop
+  const apptCountByPhone = useMemo(() => {
+    const map: Record<string, number> = {}
+    for (const a of appointments) {
+      map[a.phone] = (map[a.phone] || 0) + 1
+    }
+    return map
+  }, [appointments])
+
+  const customerAppointments = useMemo(
+    () => selected ? appointments.filter(a => a.phone === selected.phone) : [],
+    [selected, appointments]
+  )
 
   if (loading) return (
     <div className="min-h-screen" style={{ backgroundColor: "#F7FAFC" }}>
@@ -184,7 +194,7 @@ const [companyId, setCompanyId] = useState<string | null>(null)
                 </div>
               ) : (
                 filtered.map(c => {
-                  const cAppts = appointments.filter(a => a.phone === c.phone)
+                  const cAppts = apptCountByPhone[c.phone] || 0
                   const isSelected = selected?.id === c.id
                   return (
                     <div
@@ -203,9 +213,9 @@ const [companyId, setCompanyId] = useState<string | null>(null)
                         </div>
                       </div>
                       <div className="flex items-center gap-3">
-                        {cAppts.length > 0 && (
+                        {cAppts > 0 && (
                           <div className="text-xs bg-[#F7FAFC] border border-[#E5E7EB] text-[#6B7280] px-2.5 py-1 rounded-full">
-                            {cAppts.length} Termin{cAppts.length !== 1 ? "e" : ""}
+                            {cAppts} Termin{cAppts !== 1 ? "e" : ""}
                           </div>
                         )}
                         <div className={`w-2 h-2 rounded-full ${isSelected ? "bg-[#18A66D]" : "bg-[#E5E7EB]"}`} />

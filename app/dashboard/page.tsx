@@ -172,9 +172,9 @@ export default function Dashboard() {
     setCompanyName(storedName || "")
     Promise.all([
       supabase.from("companies").select("paused, sms_count_month, sms_limit, plan, name, created_at").eq("id", storedId).single(),
-      supabase.from("appointments").select("*").eq("company_id", storedId)
+      supabase.from("appointments").select("id, company_id, name, phone, date, time, status, note, employee_id, reminded, online_booking").eq("company_id", storedId)
         .order("date", { ascending: true }).order("time", { ascending: true }),
-      supabase.from("customers").select("*").eq("company_id", storedId).order("name", { ascending: true }),
+      supabase.from("customers").select("id, company_id, name, phone, note").eq("company_id", storedId).order("name", { ascending: true }),
       supabase.from("employees").select("id, name, active").eq("company_id", storedId).order("created_at", { ascending: true }),
     ]).then(async ([coRes, apptRes, custRes, empRes]) => {
       const co = coRes.data
@@ -215,7 +215,7 @@ export default function Dashboard() {
 
   async function loadAppointments() {
     if (!companyId) return
-    const { data } = await supabase.from("appointments").select("*")
+    const { data } = await supabase.from("appointments").select("id, company_id, name, phone, date, time, status, note, employee_id, reminded, online_booking")
       .eq("company_id", companyId)
       .order("date", { ascending: true }).order("time", { ascending: true })
     if (data) setAppointments(data)
