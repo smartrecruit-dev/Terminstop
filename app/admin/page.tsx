@@ -639,12 +639,12 @@ export default function AdminPage() {
             {/* KPI Grid */}
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 12, marginBottom: 24 }}>
               {[
-                { icon: "", label: "Betriebe gesamt",  value: companies.length,                    color: T },
+                { icon: <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>, label: "Betriebe gesamt",  value: companies.length,                    color: T },
                 { icon: "✓", label: "Aktiv",             value: activeCount,                         color: G },
-                { icon: "", label: "Buchungs-Add-on",  value: addonCount,                          color: "#3B82F6" },
-                { icon: "", label: "SMS dieser Monat", value: totalSMSMonth.toLocaleString("de"),  color: smsWarnList.length > 0 ? "#D97706" : T },
-                { icon: "", label: "Termine gesamt",   value: totalAppts.toLocaleString("de"),     color: T },
-                { icon: "", label: "Kunden gesamt",    value: totalCusts.toLocaleString("de"),     color: T },
+                { icon: <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>, label: "Buchungs-Add-on",  value: addonCount,                          color: "#3B82F6" },
+                { icon: <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>, label: "SMS dieser Monat", value: totalSMSMonth.toLocaleString("de"),  color: smsWarnList.length > 0 ? "#D97706" : T },
+                { icon: <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>, label: "Termine gesamt",   value: totalAppts.toLocaleString("de"),     color: T },
+                { icon: <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>, label: "Kunden gesamt",    value: totalCusts.toLocaleString("de"),     color: T },
               ].map(k => (
                 <div key={k.label} style={{ background: "#fff", border: `1px solid ${BD}`, borderRadius: 16, padding: "18px 20px", boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}>
                   <div style={{ fontSize: 24, marginBottom: 6 }}>{k.icon}</div>
@@ -1213,10 +1213,10 @@ export default function AdminPage() {
                                     {/* Mini-Stats Zeile */}
                                     <div style={{ display: "flex", gap: 0, borderBottom: `1px solid ${BD}` }}>
                                       {[
-                                        { icon: "", label: "Termine / Monat", value: dt.stats.totalThisMonth },
+                                        { icon: <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>, label: "Termine / Monat", value: dt.stats.totalThisMonth },
                                         { icon: "✓", label: "Erledigt", value: dt.stats.doneThisMonth },
-                                        { icon: "", label: "SMS / Monat", value: dt.stats.smsThisMonth },
-                                        { icon: "", label: "Kunden", value: dt.stats.customerCount },
+                                        { icon: <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>, label: "SMS / Monat", value: dt.stats.smsThisMonth },
+                                        { icon: <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>, label: "Kunden", value: dt.stats.customerCount },
                                       ].map((s, i, arr) => (
                                         <div key={s.label} style={{ flex: 1, padding: "10px 12px", textAlign: "center", borderRight: i < arr.length - 1 ? `1px solid ${BD}` : "none" }}>
                                           <div style={{ fontSize: 18, fontWeight: 900, color: T }}>{s.value}</div>
@@ -1848,20 +1848,20 @@ export default function AdminPage() {
               <div style={{ padding: "24px" }}>
                 {[
                   {
-                    nr: "01", icon: "", title: "Cold-Call erfolgreich – Daten notieren",
+                    nr: "01", icon: <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.87a16 16 0 0 0 6.29 6.29l.95-.95a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7a2 2 0 0 1 1.72 2z"/></svg>, title: "Cold-Call erfolgreich – Daten notieren",
                     color: "#EFF6FF", border: "#BFDBFE", text: "Du hast jemanden überzeugt? Top. Notiere dir während des Gesprächs:",
                     items: ["✓ Vollständiger Firmenname (z.B. \"Friseur Schönheit GmbH\")", "✓ E-Mail-Adresse (die, mit der sie sich einloggen sollen)", "✓ Handynummer (für SMS-Erinnerungen an deren Kunden)", "✓ Kategorie / Branche (Friseur, Praxis, Kosmetik…)"],
                     tip: "Tipp: Frag nach der E-Mail nochmal nach – Buchstabieren lassen falls nötig.",
                   },
                   {
-                    nr: "02", icon: "", title: "Supabase öffnen",
+                    nr: "02", icon: <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>, title: "Supabase öffnen",
                     color: "#F5F3FF", border: "#DDD6FE",
                     text: "Gehe auf supabase.com → Log in → Dein TerminStop-Projekt öffnen.",
                     items: ["→ Linkes Menü: Authentication → Users"],
                     tip: "Alternativ direkt: supabase.com/dashboard → Projekt auswählen",
                   },
                   {
-                    nr: "03", icon: "", title: "Auth-User anlegen (E-Mail + Passwort)",
+                    nr: "03", icon: <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>, title: "Auth-User anlegen (E-Mail + Passwort)",
                     color: GL, border: GB,
                     text: "Im Authentication-Bereich → Tab \"Users\" → Button \"Add user\" → \"Create new user\":",
                     items: [
@@ -1873,7 +1873,7 @@ export default function AdminPage() {
                     tip: "! Wichtig: Die User-ID, die Supabase automatisch vergibt, brauchst du gleich für Schritt 4.",
                   },
                   {
-                    nr: "04", icon: "", title: "Company-Eintrag in der Datenbank anlegen",
+                    nr: "04", icon: <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>, title: "Company-Eintrag in der Datenbank anlegen",
                     color: "#FFFBEB", border: "#FDE68A",
                     text: "Linkes Menü → Table Editor → Tabelle \"companies\" → \"Insert row\":",
                     items: [
@@ -1888,7 +1888,7 @@ export default function AdminPage() {
                     tip: "Die Spalte 'user_id' wurde aus Sicherheitsgründen entfernt – kein Mapping nötig. Der Login läuft über die E-Mail.",
                   },
                   {
-                    nr: "05", icon: "", title: "Login-Daten an den Kunden schicken",
+                    nr: "05", icon: <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>, title: "Login-Daten an den Kunden schicken",
                     color: GL, border: GB,
                     text: "Schick dem Kunden eine kurze E-Mail oder Nachricht mit:",
                     items: [

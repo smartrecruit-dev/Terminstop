@@ -789,10 +789,10 @@ export default function SettingsPage() {
               <h2 style={{ fontSize: 16, fontWeight: 800, color: T, margin: "0 0 18px" }}>SMS-Versand</h2>
               <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
                 {[
-                  { icon: "", label: "Automatisch versandt",     value: "Täglich, 24h vorher" },
+                  { icon: <svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>, label: "Automatisch versandt",     value: "Täglich, 24h vorher" },
                   { icon: "✓", label: "Zustellung",               value: "Deutschland, Österreich, CH" },
-                  { icon: "", label: "Absender",                 value: "TerminStop" },
-                  { icon: "", label: "Nur bestätigte Termine",   value: "Keine SMS bei offenen Anfragen" },
+                  { icon: <svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>, label: "Absender",                 value: "TerminStop" },
+                  { icon: <svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>, label: "Nur bestätigte Termine",   value: "Keine SMS bei offenen Anfragen" },
                 ].map(item => (
                   <div key={item.label} style={{ flex: 1, minWidth: 180, background: "#F9FAFB", borderRadius: 14, padding: "14px 16px" }}>
                     <div style={{ fontSize: 20, marginBottom: 6 }}>{item.icon}</div>

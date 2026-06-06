@@ -489,9 +489,9 @@ export default function BookingPage() {
             <div style={{ marginTop:32, background:"#fff", border:"1.5px solid #F0F0F0", borderRadius:16, padding:"16px 20px" }}>
               <div style={{ display:"flex", justifyContent:"space-around", gap:12 }}>
                 {[
-                  { icon:"", label:"Datenschutz",   sub:"DSGVO-konform" },
-                  { icon:"", label:"Schnell",        sub:"In 2 Minuten fertig" },
-                  { icon:"", label:"Kostenlos",      sub:"Keine Kosten für dich" },
+                  { icon:<svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>, label:"Datenschutz",   sub:"DSGVO-konform" },
+                  { icon:<svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>, label:"Schnell",        sub:"In 2 Minuten fertig" },
+                  { icon:<svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>, label:"Kostenlos",      sub:"Keine Kosten für dich" },
                 ].map(t => (
                   <div key={t.label} style={{ textAlign:"center" }}>
                     <div style={{ fontSize:20, marginBottom:4 }}>{t.icon}</div>

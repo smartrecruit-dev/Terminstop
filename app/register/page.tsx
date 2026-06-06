@@ -569,10 +569,10 @@ export default function RegisterPage() {
 
             {/* Feature list */}
             {[
-              { icon: "", title: "Eigene Buchungsseite", desc: "Kunden buchen rund um die Uhr — du schläfst, das System arbeitet." },
-              { icon: "", title: "Automatische SMS", desc: "Erinnerungen gehen 24h vorher raus. Nie wieder hinterhertelefonieren." },
-              { icon: "", title: "Kundenkartei", desc: "Alle Kunden an einem Ort. Verlauf, Notizen, Nummern." },
-              { icon: "", title: "Auswertungen", desc: "Sieh genau, wie dein Betrieb läuft — Zahlen statt Bauchgefühl." },
+              { icon: <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>, title: "Eigene Buchungsseite", desc: "Kunden buchen rund um die Uhr — du schläfst, das System arbeitet." },
+              { icon: <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>, title: "Automatische SMS", desc: "Erinnerungen gehen 24h vorher raus. Nie wieder hinterhertelefonieren." },
+              { icon: <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>, title: "Kundenkartei", desc: "Alle Kunden an einem Ort. Verlauf, Notizen, Nummern." },
+              { icon: <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>, title: "Auswertungen", desc: "Sieh genau, wie dein Betrieb läuft — Zahlen statt Bauchgefühl." },
             ].map((f, i) => (
               <div key={i} style={{
                 display: "flex", gap: 16, alignItems: "flex-start",
