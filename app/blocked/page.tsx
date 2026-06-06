@@ -9,8 +9,6 @@ const INK = "#111827", MUTED = "#6B7280", BD = "#E5E7EB"
 export default function BlockedPage() {
   const [reason, setReason]   = useState<"trial" | "payment" | "cancelled" | "paused" | "sms_limit">("paused")
   const [plan,   setPlan]     = useState<string>("trial")
-  const [loading, setLoading] = useState(false)
-
   useEffect(() => {
     document.title = "Konto gesperrt | TerminStop"
     // Reason aus URL
@@ -21,31 +19,12 @@ export default function BlockedPage() {
     if (p) setPlan(p)
   }, [])
 
-  async function goToCheckout(priceId: string) {
-    setLoading(true)
-    const { data: { session } } = await supabase.auth.getSession()
-    if (!session) { window.location.href = "/login"; return }
-    const res = await fetch("/api/stripe/checkout", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.access_token}` },
-      body: JSON.stringify({ priceId }),
-    })
-    const json = await res.json()
-    setLoading(false)
-    if (json.url) window.location.href = json.url
-  }
+  const CONTACT = "terminstop.business@gmail.com"
 
-  async function goToPortal() {
-    setLoading(true)
-    const { data: { session } } = await supabase.auth.getSession()
-    if (!session) { window.location.href = "/login"; return }
-    const res = await fetch("/api/stripe/portal", {
-      method: "POST",
-      headers: { Authorization: `Bearer ${session.access_token}` },
-    })
-    const json = await res.json()
-    setLoading(false)
-    if (json.url) window.location.href = json.url
+  function bookingMailto(label: string, price: string) {
+    const subject = encodeURIComponent(`Paket-Buchung: ${label} (${price}/Monat)`)
+    const body = encodeURIComponent(`Hallo,\n\nich möchte das ${label}-Paket (${price}/Monat) bei TerminStop buchen.\n\nBitte sendet mir die Zahlungsdetails (IBAN / Überweisung).\n\nViele Grüße`)
+    return `mailto:${CONTACT}?subject=${subject}&body=${body}`
   }
 
   function handleLogout() {
@@ -57,9 +36,9 @@ export default function BlockedPage() {
   }
 
   const PLANS = [
-    { key: "starter",  label: "Starter",  price: "39 €/Monat",  sms: "100 SMS",   priceId: process.env.NEXT_PUBLIC_STRIPE_STARTER_PRICE_ID!  },
-    { key: "pro",      label: "Pro",       price: "109 €/Monat", sms: "400 SMS",   priceId: process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID!       },
-    { key: "business", label: "Business",  price: "229 €/Monat", sms: "1.000 SMS", priceId: process.env.NEXT_PUBLIC_STRIPE_BUSINESS_PRICE_ID!  },
+    { key: "starter",  label: "Starter",  price: "39 €",  sms: "100 SMS"   },
+    { key: "pro",      label: "Pro",       price: "109 €", sms: "400 SMS"   },
+    { key: "business", label: "Business",  price: "229 €", sms: "1.000 SMS" },
   ]
 
   const IconSVG = ({ path, color }: { path: string; color: string }) => (
@@ -162,20 +141,18 @@ export default function BlockedPage() {
                       </div>
                       <div style={{ fontSize: 12.5, color: MUTED, marginTop: 2 }}>{p.price} · {p.sms}/Monat</div>
                     </div>
-                    <button
-                      onClick={() => goToCheckout(p.priceId)}
-                      disabled={loading}
+                    <a
+                      href={bookingMailto(p.label, p.price)}
                       style={{
-                        padding: "9px 18px", borderRadius: 10, border: "none",
-                        cursor: loading ? "not-allowed" : "pointer",
-                        fontSize: 13, fontWeight: 700,
+                        padding: "9px 18px", borderRadius: 10,
+                        fontSize: 13, fontWeight: 700, textDecoration: "none",
                         background: p.key === "pro" ? G : "#F3F4F6",
                         color: p.key === "pro" ? "#fff" : INK,
-                        opacity: loading ? 0.6 : 1, whiteSpace: "nowrap",
+                        whiteSpace: "nowrap", display: "inline-block",
                       }}
                     >
-                      {loading ? "…" : "Wählen →"}
-                    </button>
+                      Jetzt buchen →
+                    </a>
                   </div>
                 ))}
               </div>
@@ -185,21 +162,19 @@ export default function BlockedPage() {
             </div>
           )}
 
-          {/* Kundenportal */}
+          {/* Zahlung fehlgeschlagen → per E-Mail melden */}
           {info.showPortal && (
             <div style={{ marginTop: 24 }}>
-              <button
-                onClick={goToPortal}
-                disabled={loading}
+              <a
+                href={`mailto:${CONTACT}?subject=${encodeURIComponent("Zahlung fehlgeschlagen – Hilfe benötigt")}&body=${encodeURIComponent("Hallo,\n\nbei meinem TerminStop-Konto ist eine Zahlung fehlgeschlagen. Bitte helft mir, das zu lösen.\n\nViele Grüße")}`}
                 style={{
-                  width: "100%", padding: "13px", borderRadius: 12, border: "none",
-                  cursor: loading ? "not-allowed" : "pointer",
+                  display: "block", width: "100%", padding: "13px", borderRadius: 12,
                   fontSize: 14, fontWeight: 700, background: G, color: "#fff",
-                  opacity: loading ? 0.6 : 1,
+                  textDecoration: "none", textAlign: "center",
                 }}
               >
-                {loading ? "Weiterleitung…" : "Zahlungsmethode aktualisieren →"}
-              </button>
+                Per E-Mail Kontakt aufnehmen →
+              </a>
             </div>
           )}
 

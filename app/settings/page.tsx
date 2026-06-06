@@ -26,14 +26,10 @@ export default function SettingsPage() {
   const [bookingAddon, setBookingAddon] = useState(false)
   const [section, setSection]         = useState<Section>("konto")
   const [plan,    setPlan]            = useState<string>("trial")
-  const [portalLoading, setPortalLoading] = useState(false)
-  const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null)
-
   // SMS-Verbrauch
   const [smsUsed,       setSmsUsed]       = useState(0)
   const [smsLimit,      setSmsLimit]      = useState(0)
   const [smsExtra,      setSmsExtra]      = useState(0)
-  const [topupLoading,  setTopupLoading]  = useState<string | null>(null)
 
   // Buchungsseite
   const [bookingNote,   setBookingNote]   = useState("")
@@ -73,14 +69,10 @@ export default function SettingsPage() {
     setCompanyId(id)
     setCompanyName(name || "")
 
-    // Nach Stripe-Rücksprung direkt auf richtigen Tab springen
-    const params = new URLSearchParams(window.location.search)
+      const params = new URLSearchParams(window.location.search)
     const tab = params.get("tab") as Section | null
     if (tab && ["buchungsseite","mitarbeiter","konto","sms","abo"].includes(tab)) {
       setSection(tab)
-    }
-    if (params.get("topup") === "success") {
-      setTimeout(() => toast.success("Extra-SMS gutgeschrieben!", "Deine zusätzlichen SMS sind sofort verfügbar."), 500)
     }
   }, [])
 
@@ -256,55 +248,30 @@ export default function SettingsPage() {
     { id: "abo",           label: "Abo & Zahlung" },
   ]
 
-  async function openPortal() {
-    setPortalLoading(true)
-    const { data: { session } } = await supabase.auth.getSession()
-    const res = await fetch("/api/stripe/portal", {
-      method: "POST",
-      headers: { Authorization: `Bearer ${session?.access_token}` },
-    })
-    const json = await res.json()
-    setPortalLoading(false)
-    if (json.url) window.location.href = json.url
+  const CONTACT_EMAIL = "terminstop.business@gmail.com"
+
+  function bookingMailto(planLabel: string, planPrice: string) {
+    const subject = encodeURIComponent(`Paket-Buchung: ${planLabel} (${planPrice}/Monat)`)
+    const body = encodeURIComponent(`Hallo,\n\nich möchte das ${planLabel}-Paket (${planPrice}/Monat) bei TerminStop buchen.\n\nMein Betrieb: ${companyName}\nMeine E-Mail: ${userEmail}\n\nBitte sendet mir die Zahlungsdetails (IBAN / Überweisung).\n\nViele Grüße`)
+    return `mailto:${CONTACT_EMAIL}?subject=${subject}&body=${body}`
   }
 
-  async function startCheckout(priceId: string, planKey: string) {
-    setCheckoutLoading(planKey)
-    const { data: { session } } = await supabase.auth.getSession()
-    const res = await fetch("/api/stripe/checkout", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${session?.access_token}` },
-      body: JSON.stringify({ priceId }),
-    })
-    const json = await res.json()
-    setCheckoutLoading(null)
-    if (json.url) window.location.href = json.url
-  }
-
-  async function startTopup(priceId: string, key: string) {
-    setTopupLoading(key)
-    const { data: { session } } = await supabase.auth.getSession()
-    const res = await fetch("/api/stripe/sms-topup", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${session?.access_token}` },
-      body: JSON.stringify({ priceId }),
-    })
-    const json = await res.json()
-    setTopupLoading(null)
-    if (json.url) window.location.href = json.url
-    else toast.error("Fehler", json.error || "Unbekannter Fehler")
+  function smsTopupMailto(label: string, price: string) {
+    const subject = encodeURIComponent(`Extra-SMS: ${label} (${price})`)
+    const body = encodeURIComponent(`Hallo,\n\nich möchte ${label} (${price}) dazubuchen.\n\nMein Betrieb: ${companyName}\nMeine E-Mail: ${userEmail}\n\nBitte sendet mir die Zahlungsdetails.\n\nViele Grüße`)
+    return `mailto:${CONTACT_EMAIL}?subject=${subject}&body=${body}`
   }
 
   const SMS_PACKAGES = [
-    { key: "sms50",  label: "50 Extra-SMS",  price: "9,90 €",  priceId: process.env.NEXT_PUBLIC_STRIPE_SMS_50_PRICE_ID!  },
-    { key: "sms100", label: "100 Extra-SMS", price: "17,90 €", priceId: process.env.NEXT_PUBLIC_STRIPE_SMS_100_PRICE_ID! },
-    { key: "sms200", label: "200 Extra-SMS", price: "29,90 €", priceId: process.env.NEXT_PUBLIC_STRIPE_SMS_200_PRICE_ID! },
+    { key: "sms50",  label: "50 Extra-SMS",  price: "9,90 €"  },
+    { key: "sms100", label: "100 Extra-SMS", price: "17,90 €" },
+    { key: "sms200", label: "200 Extra-SMS", price: "29,90 €" },
   ]
 
   const PLANS = [
-    { key: "starter",  label: "Starter",  price: "39 €",  sms: "100 SMS",  priceId: process.env.NEXT_PUBLIC_STRIPE_STARTER_PRICE_ID! },
-    { key: "pro",      label: "Pro",       price: "109 €", sms: "400 SMS",  priceId: process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID! },
-    { key: "business", label: "Business",  price: "229 €", sms: "1.000 SMS",priceId: process.env.NEXT_PUBLIC_STRIPE_BUSINESS_PRICE_ID! },
+    { key: "starter",  label: "Starter",  price: "39 €",  sms: "100 SMS"   },
+    { key: "pro",      label: "Pro",       price: "109 €", sms: "400 SMS"   },
+    { key: "business", label: "Business",  price: "229 €", sms: "1.000 SMS" },
   ]
 
   const planLabel: Record<string, string> = {
@@ -738,11 +705,11 @@ export default function SettingsPage() {
                 )
               })()}
 
-              {/* Extra-SMS kaufen */}
+              {/* Extra-SMS dazukaufen */}
               <div style={{ borderTop: `1px solid ${BD}`, paddingTop: 20 }}>
                 <div style={{ fontSize: 13, fontWeight: 800, color: T, marginBottom: 4 }}>Extra-SMS dazukaufen</div>
                 <div style={{ fontSize: 13, color: M, marginBottom: 16, lineHeight: 1.6 }}>
-                  Einmalige Zahlung — die SMS gelten nur für den laufenden Monat und verfallen danach.
+                  Einmalige Zahlung per Überweisung — wir schreiben dir die SMS innerhalb von 24h gut.
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                   {SMS_PACKAGES.map(pkg => (
@@ -755,18 +722,17 @@ export default function SettingsPage() {
                         <div style={{ fontSize: 14, fontWeight: 700, color: T }}>{pkg.label}</div>
                         <div style={{ fontSize: 12, color: M, marginTop: 2 }}>Einmalig · {pkg.price} · nur diesen Monat</div>
                       </div>
-                      <button
-                        onClick={() => startTopup(pkg.priceId, pkg.key)}
-                        disabled={topupLoading === pkg.key}
+                      <a
+                        href={smsTopupMailto(pkg.label, pkg.price)}
                         style={{
                           padding: "9px 18px", borderRadius: 9, border: "none",
-                          cursor: topupLoading === pkg.key ? "not-allowed" : "pointer",
-                          fontSize: 13, fontWeight: 700, background: G, color: "#fff",
-                          opacity: topupLoading === pkg.key ? 0.6 : 1, whiteSpace: "nowrap",
+                          cursor: "pointer", fontSize: 13, fontWeight: 700,
+                          background: G, color: "#fff", whiteSpace: "nowrap",
+                          textDecoration: "none", display: "inline-block",
                         }}
                       >
-                        {topupLoading === pkg.key ? "Weiterleitung…" : `Kaufen ${pkg.price} →`}
-                      </button>
+                        Anfragen {pkg.price} →
+                      </a>
                     </div>
                   ))}
                 </div>
@@ -848,13 +814,10 @@ export default function SettingsPage() {
             <div style={card}>
               <h2 style={{ fontSize: 16, fontWeight: 800, color: T, margin: "0 0 6px" }}>Dein aktuelles Paket</h2>
               <p style={{ fontSize: 14, color: M, margin: "0 0 20px", lineHeight: 1.6 }}>
-                Hier siehst du dein aktives Paket und kannst es jederzeit ändern oder kündigen.
+                Hier siehst du dein aktives Paket. Änderungen und Kündigungen einfach per E-Mail anfragen.
               </p>
 
               <div style={{ display: "flex", alignItems: "center", gap: 14, background: "#F0FBF6", border: "1px solid #D1F5E3", borderRadius: 14, padding: "16px 20px", marginBottom: 20 }}>
-                <div style={{ fontSize: 28 }}>
-                  {plan === "trial" ? "" : plan === "starter" ? "" : plan === "pro" ? "" : plan === "business" ? "" : "✗"}
-                </div>
                 <div>
                   <div style={{ fontSize: 15, fontWeight: 800, color: T }}>{planLabel[plan] || plan}</div>
                   <div style={{ fontSize: 13, color: M, marginTop: 2 }}>
@@ -867,24 +830,23 @@ export default function SettingsPage() {
                 </div>
               </div>
 
-              {/* Portal Button (wenn bereits Abo) */}
+              {/* Kündigung/Änderung per E-Mail */}
               {["starter", "pro", "business"].includes(plan) && (
-                <button
-                  onClick={openPortal}
-                  disabled={portalLoading}
-                  style={{ ...saveBtn(portalLoading), display: "flex", alignItems: "center", gap: 8 }}
+                <a
+                  href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent("Abo-Änderung / Kündigung")}&body=${encodeURIComponent(`Hallo,\n\nich möchte mein Abo ändern oder kündigen.\n\nMein Betrieb: ${companyName}\nMeine E-Mail: ${userEmail}\n\nViele Grüße`)}`}
+                  style={{ ...saveBtn(false), display: "inline-flex", alignItems: "center", gap: 8, textDecoration: "none" }}
                 >
-                  {portalLoading ? "Weiterleitung…" : "Abo verwalten / kündigen →"}
-                </button>
+                  Abo ändern / kündigen →
+                </a>
               )}
             </div>
 
-            {/* Pakete */}
+            {/* Pakete wählen (Trial oder gekündigt) */}
             {(plan === "trial" || plan === "cancelled") && (
               <div style={card}>
                 <h2 style={{ fontSize: 16, fontWeight: 800, color: T, margin: "0 0 6px" }}>Paket wählen</h2>
                 <p style={{ fontSize: 14, color: M, margin: "0 0 20px", lineHeight: 1.6 }}>
-                  Alle Pakete beinhalten 14 Tage gratis — danach monatlich kündbar.
+                  Klicke auf „Jetzt buchen" — wir schicken dir die Zahlungsdetails per E-Mail.
                 </p>
                 <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                   {PLANS.map(p => (
@@ -902,38 +864,39 @@ export default function SettingsPage() {
                         </div>
                         <div style={{ fontSize: 13, color: M, marginTop: 3 }}>{p.price} / Monat · {p.sms}</div>
                       </div>
-                      <button
-                        onClick={() => startCheckout(p.priceId, p.key)}
-                        disabled={checkoutLoading === p.key}
+                      <a
+                        href={bookingMailto(p.label, p.price)}
                         style={{
                           padding: "10px 20px", borderRadius: 10, border: "none", cursor: "pointer",
                           fontSize: 13, fontWeight: 700, background: p.key === "pro" ? G : "#F3F4F6",
                           color: p.key === "pro" ? "#fff" : T, whiteSpace: "nowrap",
-                          opacity: checkoutLoading === p.key ? 0.6 : 1,
+                          textDecoration: "none", display: "inline-block",
                         }}
                       >
-                        {checkoutLoading === p.key ? "Weiterleitung…" : "Jetzt wählen →"}
-                      </button>
+                        Jetzt buchen →
+                      </a>
                     </div>
                   ))}
                 </div>
+                <p style={{ fontSize: 12, color: M, marginTop: 14, lineHeight: 1.7 }}>
+                  Zahlung per Überweisung · Wir schalten dein Konto innerhalb von 24h frei · Monatlich kündbar
+                </p>
               </div>
             )}
 
-            {/* Plan upgraden wenn bereits aktiv */}
+            {/* Paket wechseln wenn bereits aktiv */}
             {["starter", "pro", "business"].includes(plan) && (
               <div style={card}>
                 <h2 style={{ fontSize: 16, fontWeight: 800, color: T, margin: "0 0 6px" }}>Paket wechseln</h2>
-                <p style={{ fontSize: 14, color: M, margin: "0 0 4px" }}>
-                  Upgrades und Downgrades über das Stripe-Kundenportal möglich.
+                <p style={{ fontSize: 14, color: M, margin: "0 0 14px", lineHeight: 1.6 }}>
+                  Upgrade oder Downgrade einfach per E-Mail anfragen — wir passen dein Paket innerhalb von 24h an.
                 </p>
-                <button
-                  onClick={openPortal}
-                  disabled={portalLoading}
-                  style={{ ...saveBtn(false), marginTop: 14, display: "inline-flex", alignItems: "center", gap: 8 }}
+                <a
+                  href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent("Paket wechseln")}&body=${encodeURIComponent(`Hallo,\n\nich möchte mein Paket wechseln.\n\nMein Betrieb: ${companyName}\nMeine E-Mail: ${userEmail}\nGewünschtes Paket: \n\nViele Grüße`)}`}
+                  style={{ ...saveBtn(false), display: "inline-flex", alignItems: "center", gap: 8, textDecoration: "none" }}
                 >
-                  {portalLoading ? "Weiterleitung…" : "Paket wechseln →"}
-                </button>
+                  Paket wechseln →
+                </a>
               </div>
             )}
           </div>
